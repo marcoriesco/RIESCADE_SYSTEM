@@ -1,0 +1,46 @@
+import { exec } from 'child_process'
+import { app } from 'electron'
+
+export class SystemService {
+  public executeCommand(command: string): void {
+    console.log(`Executing system command: ${command}`)
+    
+    const isWindows = process.platform === 'win32'
+    
+    switch (command) {
+      case 'reboot':
+        this.run(isWindows ? 'shutdown /r /t 0' : 'reboot')
+        break
+      case 'shutdown':
+        this.run(isWindows ? 'shutdown /s /t 0' : 'shutdown -h now')
+        break
+      case 'fast-shutdown':
+        this.run(isWindows ? 'shutdown /s /t 0' : 'shutdown -h now')
+        break
+      case 'restart-es':
+      case 'restart-frontend':
+        app.relaunch()
+        app.exit(0)
+        break
+      case 'exit-frontend':
+        app.quit()
+        break
+      case 'update-gamelists':
+        console.log('Update gamelists triggered')
+        break
+      default:
+        console.warn(`Unknown command: ${command}`)
+    }
+  }
+
+  private run(cmd: string): void {
+    exec(cmd, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing command ${cmd}:`, error)
+        return
+      }
+      if (stdout) console.log(`STDOUT: ${stdout}`)
+      if (stderr) console.error(`STDERR: ${stderr}`)
+    })
+  }
+}

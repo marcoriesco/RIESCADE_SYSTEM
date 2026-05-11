@@ -1,0 +1,41 @@
+<div data-riescade-view="gamelist">
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+
+  <!-- Camada de Fundo (Pode ser estática ou um blur do jogo atual) -->
+  <div class="gamelist-background">
+    <!-- Imagem de Fundo (Se a Boxart não existir usamos logo) -->
+    <img src="{game:image}" class="bg-blur-art" onerror="this.src='./assets/logos/{system:theme}.png'" />
+    <div class="bg-overlay-gradient"></div>
+  </div>
+
+  <div class="gamelist-layout">
+    <!-- Coluna Esquerda: Logo e TextList -->
+    <div class="left-panel">
+      <!-- O Logo do sistema puxado dinamicamente -->
+      <img src="./assets/logos/{system:theme}.png" class="system-logo" />
+
+      <div class="textlist-container">
+        <riescade-gamelist></riescade-gamelist>
+      </div>
+    </div>
+
+    <!-- Coluna Direita: Media & Metadados -->
+    <div class="right-panel">
+      <div class="media-container">
+        <riescade-video src="{game:video}" fallback="{game:image}"></riescade-video>
+      </div>
+
+      <div class="metadata-container">
+        <h2 class="md-title">{game:name}</h2>
+        <div class="md-row">
+          <div class="md-item"><span class="md-label">Developer</span><span class="md-value">{game:developer}</span></div>
+          <div class="md-item"><span class="md-label">Released</span><span class="md-value">{game:releasedate}</span></div>
+          <div class="md-item"><span class="md-label">Genre</span><span class="md-value">{game:genre}</span></div>
+          <div class="md-item"><span class="md-label">Players</span><span class="md-value">{game:players}</span></div>
+        </div>
+        <p class="md-description">{game:desc}</p>
+      </div>
+    </div>
+  </div>
+
+</div>

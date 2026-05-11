@@ -1,0 +1,24 @@
+<div data-riescade-view="menu">
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+
+  <!-- Blur Background Overlay -->
+  <div class="menu-overlay-backdrop"></div>
+
+  <!-- Main Menu Sidebar -->
+  <div class="menu-sidebar">
+    <div class="menu-header">
+      <img src="./assets/indicators/ps4.svg" class="menu-icon" />
+      <h2>MAIN MENU</h2>
+    </div>
+
+    <!-- The actual menu items injected by React -->
+    <div class="menu-items-container">
+      <riescade-menu-items></riescade-menu-items>
+    </div>
+
+    <div class="menu-footer">
+      <span>{global:time}</span>
+      <span>RIESCADE SYSTEM</span>
+    </div>
+  </div>
+</div>

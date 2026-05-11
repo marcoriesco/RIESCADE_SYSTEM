@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+modern-frontend/node_modules/
+
+# Build artifacts
+dist/
+out/
+modern-frontend/dist/
+modern-frontend/out/
+*.exe
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs and Tools
+.vscode/
+.idea/
+.gemini/
+*.swp
+*.swo
+
+# User Data / Gaming Assets (Keep structure but ignore content if large)
+# roms/
+# bios/
+# saves/
+# screenshots/
+# records/

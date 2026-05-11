@@ -1,0 +1,186 @@
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #0f111a;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.modern-system-view {
+  font-family: 'Inter', sans-serif;
+  color: white;
+}
+
+.modern-system-view h2 {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -1px;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at top left, #1a1e2e, #0f111a);
+  z-index: -1;
+}
+
+header h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+  background: linear-gradient(to right, #f042b0, #ff8c42);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.hero-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #a0a0a0;
+}
+
+.systems-carousel {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 0;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.systems-carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+.system-card {
+  min-width: 200px;
+  height: 280px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.system-card.active {
+  border-color: #f042b0;
+  background: rgba(240, 66, 176, 0.1);
+  box-shadow: 0 0 30px rgba(240, 66, 176, 0.3);
+  transform: translateY(-10px);
+}
+
+.system-icon {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #f042b0;
+  margin-bottom: 1rem;
+}
+
+.system-name {
+  font-weight: 600;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.footer {
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer .hints span {
+  opacity: 0.7;
+}
+
+/* Games List */
+.games-section {
+  margin-top: 2rem;
+  padding: 0 5%;
+}
+
+.games-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #f042b0; /* RIESCADE Pink */
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.game-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-item:hover {
+  background: rgba(240, 66, 176, 0.2);
+  transform: translateX(5px);
+}
+
+/* Scrollbar */
+.games-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.games-grid::-webkit-scrollbar-thumb {
+  background: rgba(240, 66, 176, 0.5);
+  border-radius: 10px;
+}
+
+.hints {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 600;
+}
