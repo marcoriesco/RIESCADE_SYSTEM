@@ -1,7 +1,14 @@
 {
-  "name": "RIESCADE_DEFAULT",
+  "name": "RIESCADE Default",
   "version": "1.0.0",
   "author": "Marco Riesco",
   "description": "Exemplo do novo motor de temas baseado em web (HTML/CSS)",
-  "type": "web"
+  "type": "web",
+  "templates": {
+    "system": "system.html",
+    "gamelist": "gamelist.html",
+    "start": "start.html",
+    "menu": "menu.html",
+    "loading": "loading.html"
+  }
 }

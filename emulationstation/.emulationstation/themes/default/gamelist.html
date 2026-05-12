@@ -1,41 +1,80 @@
 <div data-riescade-view="gamelist">
   <link rel="stylesheet" href="./assets/css/styles.css" />
 
-  <!-- Camada de Fundo (Pode ser estática ou um blur do jogo atual) -->
-  <div class="gamelist-background">
-    <!-- Imagem de Fundo (Se a Boxart não existir usamos logo) -->
-    <img src="{game:image}" class="bg-blur-art" onerror="this.src='./assets/logos/{system:theme}.png'" />
-    <div class="bg-overlay-gradient"></div>
-  </div>
+  <!-- Camadas de Fundo -->
+  <div class="gamelist-bg-layer gamelist-bg-default"></div>
+  <img
+    class="gamelist-bg-layer gamelist-fanart"
+    src="{game:fanart}"
+    onerror="this.src = '{game:image}'"
+  />
+  <div class="gamelist-bg-layer gamelist-overlay"></div>
 
-  <div class="gamelist-layout">
-    <!-- Coluna Esquerda: Logo e TextList -->
-    <div class="left-panel">
-      <!-- O Logo do sistema puxado dinamicamente -->
-      <img src="./assets/logos/{system:theme}.png" class="system-logo" />
-
-      <div class="textlist-container">
-        <riescade-gamelist></riescade-gamelist>
+  <!-- Camada Principal -->
+  <div class="gamelist-ui">
+    <!-- Header Global -->
+    <div class="riescade-header">
+      <div class="header-left">
+        <div class="system-name">{system:fullName}</div>
       </div>
+      <div class="header-center centered">
+        <div class="clock">{global:time}</div>
+      </div>
+      <div class="header-right"></div>
     </div>
 
-    <!-- Coluna Direita: Media & Metadados -->
-    <div class="right-panel">
-      <div class="media-container">
-        <riescade-video src="{game:video}" fallback="{game:image}"></riescade-video>
-      </div>
-
-      <div class="metadata-container">
-        <h2 class="md-title">{game:name}</h2>
-        <div class="md-row">
-          <div class="md-item"><span class="md-label">Developer</span><span class="md-value">{game:developer}</span></div>
-          <div class="md-item"><span class="md-label">Released</span><span class="md-value">{game:releasedate}</span></div>
-          <div class="md-item"><span class="md-label">Genre</span><span class="md-value">{game:genre}</span></div>
-          <div class="md-item"><span class="md-label">Players</span><span class="md-value">{game:players}</span></div>
+    <!-- Conteúdo da Gamelist -->
+    <div class="gamelist-main-content">
+      <!-- Coluna Esquerda: Thumbnail e Metadados -->
+      <div class="gamelist-left-col">
+        <div class="thumbnail-container">
+          <img
+            src="{game:thumbnail}"
+            class="gamelist-thumbnail"
+            onerror="this.src = './assets/logos/{system:theme}.png'"
+          />
         </div>
-        <p class="md-description">{game:desc}</p>
+
+        <div class="gamelist-game-info">
+          <h2 class="gamelist-game-title">{game:name}</h2>
+          <div class="gamelist-game-meta">
+            {game:releasedate:d/m/Y}, {game:developer}
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna Direita: Carousel Vertical -->
+      <div class="gamelist-right-col">
+        <riescade-game-carousel
+          direction="vertical"
+          media-source="marquee"
+          items-count="11"
+          logo-scale="0.6"
+          logo-selected-scale="1.5"
+        ></riescade-game-carousel>
+      </div>
+    </div>
+
+    <!-- Footer Global -->
+    <div class="riescade-footer">
+      <div class="system-meta">
+        <span class="system-theme-text"
+          >{system:theme}
+          <span class="hardware-type">[{system:hardwareType}]</span></span
+        >
+      </div>
+
+      <!-- Helpsystem Customizado do Origins -->
+      <div class="helpsystem-bar centered">
+        <img
+          src="./assets/_parts/helpsystem/gamelist-ps4.png"
+          class="helpsystem-image"
+        />
+      </div>
+
+      <div class="controller-activity">
+        <img src="./assets/indicators/ps4.svg" class="controller-icon" />
       </div>
     </div>
   </div>
-
 </div>

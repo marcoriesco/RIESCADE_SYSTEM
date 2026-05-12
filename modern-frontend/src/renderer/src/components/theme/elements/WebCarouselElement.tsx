@@ -10,9 +10,11 @@ interface Props {
   data: any
   themePath: string
   isGame: boolean
+  logoScale?: number
+  logoSelectedScale?: number
 }
 
-export const WebCarouselElement: React.FC<Props> = ({ direction = 'horizontal', mediaSource = 'theme', itemsCount, data, themePath, isGame }) => {
+export const WebCarouselElement: React.FC<Props> = ({ direction = 'horizontal', mediaSource = 'theme', itemsCount, data, themePath, isGame, logoScale = 0.5, logoSelectedScale = 1.0 }) => {
   const items = isGame ? (data?.games || []) : (data?.systems || [])
   const currentItemName = isGame ? (data?.name) : (data?.['system.name'])
   
@@ -51,6 +53,8 @@ export const WebCarouselElement: React.FC<Props> = ({ direction = 'horizontal', 
             isVertical={isVertical}
             themePath={themePath}
             mediaSource={mediaSource}
+            logoScale={logoScale}
+            logoSelectedScale={logoSelectedScale}
           />
         ))}
       </AnimatePresence>
@@ -63,8 +67,10 @@ const CarouselItem = forwardRef<HTMLDivElement, {
   distance: number,
   isVertical: boolean,
   themePath: string,
-  mediaSource: string
-}>(({ item, distance, isVertical, themePath, mediaSource }, ref) => {
+  mediaSource: string,
+  logoScale: number,
+  logoSelectedScale: number
+}>(({ item, distance, isVertical, themePath, mediaSource, logoScale, logoSelectedScale }, ref) => {
   const { data, offset, isSelected, isGame } = item
   
   // Premium Coverflow Logic
@@ -79,7 +85,7 @@ const CarouselItem = forwardRef<HTMLDivElement, {
   const rotateX = 0
   const zTranslate = 0
   
-  const scale = isSelected ? 1.0 : 0.5
+  const scale = isSelected ? logoSelectedScale : logoScale
   const opacity = isSelected ? 1.0 : 0.5
   const saturation = isSelected ? 1 : 0
   

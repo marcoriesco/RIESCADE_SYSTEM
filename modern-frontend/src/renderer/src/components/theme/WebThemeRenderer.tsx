@@ -29,13 +29,26 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
   const reactTree = useMemo(() => {
     // 1. First, replace all variables in the raw HTML string
     // This is the most robust way to handle dynamic content
-    let processedHtml = htmlContent.replace(/\{([a-zA-Z0-9_:-]+)\}/g, (match, key) => {
-      if (key === 'global:time') return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-      if (key === 'systems_json') return JSON.stringify(data?.systems || [])
-      if (key === 'games_json') return JSON.stringify(data?.games || [])
+    let processedHtml = htmlContent.replace(/\{([a-zA-Z0-9_:-]+)\}/g, (match, fullKey) => {
+      if (fullKey === 'global:time') return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      if (fullKey === 'systems_json') return JSON.stringify(data?.systems || [])
+      if (fullKey === 'games_json') return JSON.stringify(data?.games || [])
       
-      const val = data?.[key] !== undefined ? data[key] : data?.[key.toLowerCase()]
+      const parts = fullKey.split(':')
+      const baseKey = parts.length > 2 ? `${parts[0]}:${parts[1]}` : fullKey
+      const format = parts.length > 2 ? parts[2] : null
+
+      let val = data?.[baseKey] !== undefined ? data[baseKey] : data?.[baseKey.toLowerCase()]
       if (val === null || val === undefined) return ''
+
+      // Dynamic formatting
+      if (typeof val === 'string' && format) {
+        if (format === 'Y' && val.length >= 4) {
+          val = val.substring(0, 4) // Extrai o ano: "19900101T000000" -> "1990"
+        }
+        // Futuramente podemos adicionar format === 'upper', format === 'lower', etc
+      }
+
       return String(val)
     })
 
@@ -118,9 +131,28 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
               direction={props.direction || 'horizontal'}
               mediaSource={props['media-source'] || 'theme'}
               itemsCount={parseInt(props['items-count'] || '5')} 
+              logoScale={props['logo-scale'] ? parseFloat(props['logo-scale']) : 0.5}
+              logoSelectedScale={props['logo-selected-scale'] ? parseFloat(props['logo-selected-scale']) : 1.0}
               data={data} 
               themePath={themePath} 
               isGame={false} 
+            />
+          )
+        }
+
+        if (tagName === 'riescade-game-carousel') {
+          return (
+            <WebCarouselElement 
+              key={index}
+              type={props.type || 'horizontal'} 
+              direction={props.direction || 'horizontal'}
+              mediaSource={props['media-source'] || 'marquee'}
+              itemsCount={parseInt(props['items-count'] || '5')} 
+              logoScale={props['logo-scale'] ? parseFloat(props['logo-scale']) : 0.5}
+              logoSelectedScale={props['logo-selected-scale'] ? parseFloat(props['logo-selected-scale']) : 1.0}
+              data={data} 
+              themePath={themePath} 
+              isGame={true} 
             />
           )
         }
