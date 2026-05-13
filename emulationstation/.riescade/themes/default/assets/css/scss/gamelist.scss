@@ -1,0 +1,101 @@
+/* ========================================================
+   GAMELIST VIEW LAYOUT
+   ======================================================== */
+[data-riescade-view="gamelist"] {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+
+  .gamelist-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+
+    .bg-blur-art {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(20px) brightness(0.3);
+      transform: scale(1.1); /* Tira as bordas do blur */
+    }
+
+    .bg-overlay-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        rgba(15, 17, 26, 0.95) 0%,
+        rgba(15, 17, 26, 0.7) 100%
+      );
+    }
+  }
+
+  .gamelist-layout {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    .left-panel {
+      width: 35%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 5vh 3vw;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+
+      .system-logo {
+        max-width: 80%;
+        max-height: 12vh;
+        object-fit: contain;
+        margin-bottom: 5vh;
+      }
+
+      .textlist-container {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+      }
+    }
+
+    .right-panel {
+      width: 65%;
+      height: 100%;
+      display: flex;
+    }
+  }
+}
+
+/* RIESCADE-GAMELIST MAGIC TAGS */
+.riescade-list-item {
+  padding: 1.5vh 2vw;
+  font-size: 2.2vh;
+  color: var(--text-muted);
+  border-left: 0.4vw solid transparent;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.selected {
+    background: linear-gradient(
+      90deg,
+      rgba(159, 0, 67, 0.3) 0%,
+      transparent 100%
+    );
+    border-left-color: var(--theme-color);
+    color: var(--text-primary);
+    font-weight: 800;
+    font-size: 2.4vh;
+  }
+}

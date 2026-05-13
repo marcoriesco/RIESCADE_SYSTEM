@@ -1,0 +1,19 @@
+[
+  {
+    "id": "colors",
+    "name": "COLOR HIGHLIGHTS",
+    "type": "select",
+    "options": [
+      { "value": "#9f0043", "label": "PINK" },
+      { "value": "#ffffff", "label": "WHITE" },
+      { "value": "#3377ff", "label": "BLUE" },
+      { "value": "#13eafd", "label": "LIGHT BLUE" },
+      { "value": "#fb2246", "label": "RED" },
+      { "value": "#cccccc", "label": "GRAY" },
+      { "value": "#00ffbf", "label": "GREEN" },
+      { "value": "#9133c7", "label": "PURPLE" },
+      { "value": "#ffc233", "label": "YELLOW" }
+    ],
+    "default": "9f0043"
+  }
+]

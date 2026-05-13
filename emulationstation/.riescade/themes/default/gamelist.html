@@ -1,39 +1,35 @@
-<div data-riescade-view="gamelist" style="--theme-color: #{options:colors};">
+<div data-riescade-view="gamelist" style="--theme-color: {options:colors};">
   <link rel="stylesheet" href="./assets/css/global.css" />
   <link rel="stylesheet" href="./assets/css/gamelist.css" />
 
   <!-- Camadas de Fundo -->
   <div class="gamelist-bg-layer gamelist-bg-default"></div>
-  <img
-    class="gamelist-bg-layer gamelist-fanart"
-    src="{game:fanart}"
-    onerror="this.src = '{game:image}'"
-  />
+  <img class="gamelist-bg-layer gamelist-fanart" src="{game:fanart}" onerror="this.src = '{game:image}'" />
   <div class="gamelist-bg-layer gamelist-overlay"></div>
 
   <!-- Camada Principal -->
   <div class="gamelist-ui">
-    <!-- Header Global -->
-    <div class="riescade-header">
-      <div class="header-left">
-        <div class="system-name">{system:fullName}</div>
-      </div>
-      <div class="header-center centered">
-        <div class="clock">{global:time}</div>
-      </div>
-      <div class="header-right"></div>
+    
+    <!-- HEADER GLOBAL -->
+<div class="riescade-header">
+    <div class="header-left">
+        <div class="system-name">
+            {system:fullName}
+            <span>({system:gamecount})</span>
+        </div>
     </div>
+    <div class="header-center centered">
+        <riescade-clock format="HH:mm" />
+    </div>
+    <div class="header-right"></div>
+</div>
+
 
     <!-- Conteúdo da Gamelist -->
     <div class="gamelist-main-content">
-      <!-- Coluna Esquerda: Thumbnail e Metadados -->
       <div class="gamelist-left-col">
         <div class="thumbnail-container">
-          <img
-            src="{game:thumbnail}"
-            class="gamelist-thumbnail"
-            onerror="this.src = './assets/logos/{system:theme}.png'"
-          />
+          <img src="{game:thumbnail}" class="gamelist-thumbnail" onerror="this.src = './assets/logos/{system:theme}.png'" />
         </div>
 
         <div class="gamelist-game-info">
@@ -44,7 +40,6 @@
         </div>
       </div>
 
-      <!-- Coluna Direita: Carousel Vertical -->
       <div class="gamelist-right-col">
         <riescade-game-carousel
           direction="vertical"
@@ -56,26 +51,24 @@
       </div>
     </div>
 
-    <!-- Footer Global -->
-    <div class="riescade-footer">
-      <div class="system-meta">
-        <span class="system-theme-text"
-          >{system:theme}
-          <span class="hardware-type">[{system:hardwareType}]</span></span
-        >
-      </div>
-
-      <!-- Helpsystem Customizado do Origins -->
-      <div class="helpsystem-bar centered">
-        <img
-          src="./assets/_parts/helpsystem/gamelist-ps4.png"
-          class="helpsystem-image"
-        />
-      </div>
-
-      <div class="controller-activity">
-        <img src="./assets/indicators/ps4.svg" class="controller-icon" />
-      </div>
+    <!-- FOOTER GLOBAL -->
+<div class="riescade-footer">
+    <div class="system-meta">
+        <span class="system-meta-name">
+            {system:theme}
+            <span class="system-meta-hardware">[{system:hardwareType}]</span>
+        </span>
     </div>
+
+    <!-- Helpsystem Customizado -->
+    <div class="helpsystem centered">
+        <img src="./assets/_parts/helpsystem/system-ps4.png" class="helpsystem-image" />
+    </div>
+
+    <div class="controller-activity">
+        <img src="./assets/indicators/ps4.svg" class="controller-activity-icon" />
+    </div>
+</div>
+
   </div>
 </div>

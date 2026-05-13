@@ -6,6 +6,7 @@ const api = {
   // Library
   getSystems: () => ipcRenderer.invoke('get-systems'),
   getGames: (systemName: string) => ipcRenderer.invoke('get-games', systemName),
+  updateGame: (systemName: string, gameData: any) => ipcRenderer.invoke('update-game', systemName, gameData),
   launchGame: (game: any, system: any) => ipcRenderer.invoke('launch-game', game, system),
 
   // Themes
@@ -27,7 +28,14 @@ const api = {
   getConfiguredControllers: () => ipcRenderer.invoke('get-configured-controllers'),
 
   // System commands
-  executeCommand: (command: string, data?: any) => ipcRenderer.send('system-command', command, data)
+  executeCommand: (command: string, data?: any) => ipcRenderer.send('system-command', command, data),
+
+  // Events
+  on: (channel: string, callback: (...args: any[]) => void) => {
+    const subscription = (event: any, ...args: any[]) => callback(event, ...args)
+    ipcRenderer.on(channel, subscription)
+    return () => ipcRenderer.removeListener(channel, subscription)
+  }
 }
 
 if (process.contextIsolated) {

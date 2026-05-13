@@ -37,4 +37,5 @@ export interface Game {
   lastplayed?: string
   path: string
   system: string
+  emulator?: string
 }

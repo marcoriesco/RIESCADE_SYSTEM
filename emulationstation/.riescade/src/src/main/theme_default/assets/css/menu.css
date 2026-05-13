@@ -4,105 +4,116 @@
 
 /* Fundo escurecido e borrado da tela inteira */
 .menu-overlay-backdrop {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  z-index: 1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(10px);
+	z-index: 1;
 }
 
 /* Container Principal do Menu */
 .menu-custom-container {
-  position: relative;
-  z-index: 2;
-  width: 650px;
-  max-height: 85vh;
-  background: rgba(30, 30, 35, 0.95);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  font-family: 'Inter', sans-serif;
+	position: relative;
+	z-index: 2;
+	width: 650px;
+	max-height: 85vh;
+	background: rgba(30, 30, 35, 0.95);
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	font-family: 'Inter', sans-serif;
 }
 
 /* Cabeçalho do Menu */
 .menu-header {
-  background: linear-gradient(to bottom, rgba(50,50,55,1), rgba(30,30,35,1));
-  padding: 20px;
-  text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
+	background: linear-gradient(
+		to bottom,
+		rgba(50, 50, 55, 1),
+		rgba(30, 30, 35, 1)
+	);
+	padding: 20px;
+	text-align: center;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 15px;
 }
 
 /* Título Dinâmico */
 .menu-header h2 {
-  margin: 0;
-  color: #ffffff;
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+	margin: 0;
+	color: #ffffff;
+	font-size: 1.4rem;
+	font-weight: 800;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Área onde a lista React será injetada */
 .menu-items-container {
-  flex: 1;
-  padding: 0;
-  overflow: auto;
-  background: transparent;
+	flex: 1;
+	padding: 0;
+	overflow: auto;
+	background: transparent;
 }
 
 /* Você pode forçar estilos nos itens do menu gerados pelo React usando !important */
 .menu-item {
-  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-  color: #cccccc !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+	color: #cccccc !important;
 }
 .menu-item.selected {
-  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%) !important;
-  color: #ffffff !important;
-  box-shadow: inset 0 0 15px rgba(255,255,255,0.1) !important;
+	background: linear-gradient(
+		90deg,
+		var(--theme-color) 0%,
+		var(--theme-color) 100%
+	) !important;
+	color: #ffffff !important;
+	box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Rodapé do Menu */
 .menu-footer {
-  background: rgba(20, 20, 25, 0.95);
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(0,0,0,0.5);
-  font-size: 0.8rem;
-  color: #888888;
-  font-weight: 600;
+	background: rgba(20, 20, 25, 0.95);
+	padding: 15px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-top: 1px solid rgba(0, 0, 0, 0.5);
+	font-size: 0.8rem;
+	color: #888888;
+	font-weight: 600;
 }
 
 .help-buttons {
-  display: flex;
-  gap: 20px;
+	display: flex;
+	gap: 20px;
 }
 
 .help-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 .help-icon {
-  background: #555;
-  color: #fff;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
+	background: #555;
+	color: #fff;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	font-weight: 800;
 }

@@ -44,4 +44,21 @@ export class LibraryService {
 
     return games.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
   }
+
+  public updateGame(systemName: string, gameData: Game): void {
+    const configPath = getConfigPath()
+    const gamelistPath = join(configPath, 'gamelists', systemName, 'gamelist.xml')
+    const romsGamelistPath = join(getRomsPath(), systemName, 'gamelist.xml')
+    
+    const targetPath = existsSync(gamelistPath) ? gamelistPath : romsGamelistPath
+    if (!existsSync(targetPath)) return
+
+    const games = this.gamelistParser.parse(targetPath, systemName)
+    const index = games.findIndex(g => g.path === gameData.path)
+    
+    if (index !== -1) {
+      games[index] = { ...games[index], ...gameData }
+      this.gamelistParser.save(targetPath, games)
+    }
+  }
 }

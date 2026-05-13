@@ -47,8 +47,16 @@ export class LauncherService {
       writeFileSync(gameXmlPath, gameXmlContent)
 
       // Setup arguments
-      const emulator = system.emulators?.[0]?.name || 'libretro'
-      const core = system.emulators?.[0]?.cores?.[0] || ''
+      let emulator = game.emulator || system.emulators?.[0]?.name || 'libretro'
+      let core = ''
+
+      // If we are using the game-specific emulator, find its core
+      const selectedEmulator = system.emulators?.find(e => e.name === emulator)
+      if (selectedEmulator) {
+        core = selectedEmulator.cores?.[0] || ''
+      } else if (system.emulators?.[0]) {
+        core = system.emulators[0].cores?.[0] || ''
+      }
 
       let controllerArgs: string[] = []
       

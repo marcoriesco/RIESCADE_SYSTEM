@@ -1,7 +1,7 @@
 /* ========================================================
    SYSTEM VIEW LAYOUT (1920x1080 Aspect Ratio Scaling)
    ======================================================== */
-[data-riescade-view="system"] {
+[data-riescade-view=system] {
   position: relative;
   width: 100%;
   height: 100%;
@@ -19,6 +19,7 @@
   height: 100%;
   z-index: 0;
 }
+
 .system-background-overlay {
   background-image: url(../_parts/overlay-system.png);
   background-repeat: no-repeat;
@@ -32,48 +33,7 @@
   z-index: 1;
 }
 
-/* 2. HEADER */
-.riescade-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 10vh;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 3vw;
-  z-index: 100;
-  box-sizing: border-box;
-}
-
-.header-left {
-  font-family: var(--font-clock);
-  font-weight: 300;
-  font-size: 3.4vh; /* Equivalente ao 0.034 do ES */
-  color: var(--text-primary);
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
-}
-
-.header-center .clock {
-  font-family: var(--font-clock);
-  font-weight: 300;
-  font-size: 3.4vh; /* Equivalente ao 0.034 do ES */
-  color: var(--text-primary);
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
-}
-
-.header-right .controller-activity {
-  display: flex;
-  align-items: center;
-}
-
-.controller-icon {
-  height: 3vh; /* Equivalente ao 0.03 do ES */
-  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
-}
-
-/* 3. CAROUSEL AREA */
+/* CAROUSEL AREA */
 .riescade-carousel-area {
   position: absolute;
   top: 70vh; /* Aproximadamente o centro da tela descontando header/footer */
@@ -91,64 +51,4 @@
   width: 100%;
   height: 100%;
   z-index: 10;
-}
-
-/* 4. FOOTER */
-.riescade-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 4vh;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 1.5vw 2vh 1.5vw;
-  box-sizing: border-box;
-  z-index: 100;
-}
-
-.system-meta {
-  flex: 1;
-}
-
-.system-theme-text {
-  font-family: var(--font-hardware);
-  font-size: 2vh; /* 0.020 no ES */
-  color: var(--text-muted);
-}
-
-.system-theme-text .hardware-type {
-  color: var(--theme-color); /* extraTextColor */
-}
-
-.helpsystem-bar {
-  display: flex;
-  gap: 1.5vw;
-  padding-bottom: 1vh;
-}
-
-.help-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5vw;
-}
-
-.help-item .btn {
-  background: var(--text-primary);
-  color: #000;
-  border-radius: 50%;
-  width: 2.5vh;
-  height: 2.5vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  font-size: 1.5vh;
-}
-
-.help-item .label {
-  font-size: 2vh;
-  color: var(--text-primary);
-  font-family: "Roboto Condensed", sans-serif;
 }

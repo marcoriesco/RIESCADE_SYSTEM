@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { resolvePath } from './utils'
 import { WebCarouselElement } from './elements/WebCarouselElement'
 import { WebGamelistElement } from './elements/WebGamelistElement'
+import { WebClockElement } from './elements/WebClockElement'
 
 interface Props {
   htmlContent: string
@@ -32,19 +33,38 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
   const reactTree = useMemo(() => {
     // 1. Replace all variables in the raw HTML string
-    let processedHtml = htmlContent.replace(/\{([a-zA-Z0-9_:-]+)\}/g, (match, fullKey) => {
+    let processedHtml = htmlContent.replace(/\{([a-zA-Z0-9_:/.-]+)\}/g, (match, fullKey) => {
       if (fullKey === 'global:time') return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       if (fullKey === 'systems_json') return JSON.stringify(data?.systems || [])
       if (fullKey === 'games_json') return JSON.stringify(data?.games || [])
 
       const parts = fullKey.split(':')
-      const baseKey = parts.length > 2 ? `${parts[0]}:${parts[1]}` : fullKey
-      const format = parts.length > 2 ? parts[2] : null
+      const baseKey = parts.length >= 2 ? `${parts[0]}:${parts[1]}` : fullKey
+      const format = parts.length > 2 ? parts.slice(2).join(':') : null
 
       let val = data?.[baseKey] !== undefined ? data[baseKey] : data?.[baseKey.toLowerCase()]
       if (val === null || val === undefined) return ''
 
       if (typeof val === 'string' && format) {
+        // Date formatting: {game:releasedate:d/m/Y}
+        if (baseKey.includes('releasedate') || baseKey.includes('lastplayed')) {
+          try {
+            // ES format is usually YYYYMMDDTHHMMSS or just YYYYMMDD
+            const y = val.substring(0, 4)
+            const m = val.substring(4, 6)
+            const d = val.substring(6, 8)
+            if (y && m && d) {
+              return format
+                .replace('d', d)
+                .replace('m', m)
+                .replace('Y', y)
+                .replace('y', y.substring(2))
+            }
+          } catch (e) {
+            console.error('Error formatting date variable:', e)
+          }
+        }
+        
         if (format === 'Y' && val.length >= 4) val = val.substring(0, 4)
       }
 
@@ -57,22 +77,30 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
     const resolveLocalPath = (val: string) => {
       if (!val) return ''
+      const addCacheBust = (url: string) => {
+        const rev = data?.['global:themeRevision']
+        if (rev === undefined || rev === null) return url
+        if (!url.endsWith('.css') && !url.includes('.css?')) return url
+        if (url.includes('themeRev=')) return url
+        return url.includes('?') ? `${url}&themeRev=${rev}` : `${url}?themeRev=${rev}`
+      }
+
       if (val.startsWith('file://') || val.startsWith('http') || val.match(/^[a-zA-Z]:/)) {
-        return resolvePath(val, data)
+        return addCacheBust(resolvePath(val, data))
       }
       if (val.startsWith('./') || val.startsWith('../')) {
         if (val.startsWith('./')) {
-          return resolvePath(`${themePath}/${val.substring(2)}`, data)
+          return addCacheBust(resolvePath(`${themePath}/${val.substring(2)}`, data))
         } else {
           const parts = themePath.replace(/\\/g, '/').split('/')
           let upDirs = 0
           let p = val
           while (p.startsWith('../')) { upDirs++; p = p.substring(3) }
           const basePath = parts.slice(0, parts.length - upDirs).join('/')
-          return resolvePath(`${basePath}/${p}`, data)
+          return addCacheBust(resolvePath(`${basePath}/${p}`, data))
         }
       }
-      return resolvePath(val, data)
+      return addCacheBust(resolvePath(val, data))
     }
 
     const convertNode = (node: Node, index: any): React.ReactNode => {
@@ -146,6 +174,17 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
       if (tagName === 'riescade-gamelist') {
         return <WebGamelistElement key={index} data={data} />
+      }
+
+      if (tagName === 'riescade-clock') {
+        return (
+          <WebClockElement 
+            key={index} 
+            format={props.format} 
+            displayDate={props['display-date'] === 'true'} 
+            dateFormat={props['date-format']} 
+          />
+        )
       }
 
       if (tagName === 'riescade-menu-items') {

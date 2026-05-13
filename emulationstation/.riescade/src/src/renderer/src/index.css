@@ -98,7 +98,71 @@ header h1 {
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+}
+
+/* ─── RIESCADE NOTIFICATION SYSTEM ─── 
+   Estas classes podem ser sobrescritas nos temas (theme.css) 
+   para customizar visualmente as notificações globais.
+*/
+
+/* Container que segura a lista de notificações */
+.riescade-notifications-container {
+  position: fixed;
+  top: 40px;
+  right: 40px;
+  z-index: 11000;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  pointer-events: none;
+}
+
+/* Base de cada notificação (Toast) */
+.riescade-notification {
+  background: #fff;
+  color: #333;
+  padding: 12px 25px;
+  border: 3px solid #3b82f6;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  pointer-events: auto;
+  min-width: 250px;
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  animation: riescadeNotificationSlideIn 0.3s ease-out forwards;
+}
+
+/* Ponto colorido de status */
+.riescade-notification-status {
+  width: 10px;
+  height: 10px;
+  borderRadius: 50%;
+  background: #3b82f6; /* Default info color */
+}
+
+/* Texto da mensagem */
+.riescade-notification-message {
+  font-weight: 900;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+/* Variações de tipo */
+.riescade-notification.success { border-color: #4ade80; }
+.riescade-notification.success .riescade-notification-status { background: #4ade80; }
+
+.riescade-notification.warning { border-color: #facc15; }
+.riescade-notification.warning .riescade-notification-status { background: #facc15; }
+
+.riescade-notification.info { border-color: #3b82f6; }
+.riescade-notification.info .riescade-notification-status { background: #3b82f6; }
+
+@keyframes riescadeNotificationSlideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}  backdrop-filter: blur(10px);
 }
 
 .system-card.active {

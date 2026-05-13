@@ -12,7 +12,11 @@ export class SettingsParser {
       ignoreAttributes: false,
       attributeNamePrefix: '@_',
       parseAttributeValue: true,
-      ignoreDeclaration: true
+      ignoreDeclaration: true,
+      processEntities: {
+        maxTotalExpansions: 99999,
+        maxExpandedLength: 1000000
+      }
     })
     this.builder = new XMLBuilder({
       ignoreAttributes: false,

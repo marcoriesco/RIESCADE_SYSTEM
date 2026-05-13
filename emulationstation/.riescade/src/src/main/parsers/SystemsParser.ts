@@ -11,7 +11,11 @@ export class SystemsParser {
   constructor() {
     this.parser = new XMLParser({
       ignoreAttributes: false,
-      attributeNamePrefix: '@_'
+      attributeNamePrefix: '@_',
+      processEntities: {
+        maxTotalExpansions: 99999,
+        maxExpandedLength: 1000000
+      }
     })
   }
 

@@ -6,6 +6,7 @@ declare global {
     api: {
       getSystems: () => Promise<any>
       getGames: (systemName: string) => Promise<any>
+      updateGame: (systemName: string, gameData: any) => Promise<void>
       launchGame: (game: any, system: any) => Promise<any>
       getThemes: () => Promise<any>
       getActiveTheme: () => Promise<string>
@@ -16,6 +17,7 @@ declare global {
       saveThemeSetting: (themeName: string, key: string, value: string) => Promise<any>
       getConfiguredControllers: () => Promise<any>
       executeCommand: (command: string, data?: any) => void
+      on: (channel: string, callback: (...args: any[]) => void) => () => void
     }
   }
 }

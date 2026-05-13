@@ -8,6 +8,7 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "dist": "npm run build && electron-builder --win --dir",
+    "deploy": "npm run dist && node scripts/deploy.js",
     "postbuild": "node scripts/copy-default-theme.js",
     "preview": "electron-vite preview"
   },
@@ -26,11 +27,13 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "chokidar": "^5.0.0",
     "electron": "^31.0.2",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",
     "prettier": "^3.3.2",
+    "sass": "^1.99.0",
     "typescript": "^5.5.2",
     "vite": "^5.3.1"
   },
@@ -51,7 +54,9 @@
       {
         "from": "src/main/theme_default",
         "to": "theme_default",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ]
   }
