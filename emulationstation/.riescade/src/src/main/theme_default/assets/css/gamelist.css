@@ -1,0 +1,284 @@
+/* ========================================================
+   GAMELIST VIEW LAYOUT
+   ======================================================== */
+[data-riescade-view="gamelist"] {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.gamelist-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.bg-blur-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(20px) brightness(0.3);
+  transform: scale(1.1); /* Tira as bordas do blur */
+}
+
+.bg-overlay-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 17, 26, 0.95) 0%,
+    rgba(15, 17, 26, 0.7) 100%
+  );
+}
+
+.gamelist-layout {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.left-panel {
+  width: 35%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5vh 3vw;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+.system-logo {
+  max-width: 80%;
+  max-height: 12vh;
+  object-fit: contain;
+  margin-bottom: 5vh;
+}
+
+.textlist-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* RIESCADE-GAMELIST MAGIC TAGS */
+.riescade-list-item {
+  padding: 1.5vh 2vw;
+  font-size: 2.2vh;
+  color: var(--text-muted);
+  border-left: 0.4vw solid transparent;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.riescade-list-item.selected {
+  background: linear-gradient(
+    90deg,
+    rgba(159, 0, 67, 0.3) 0%,
+    transparent 100%
+  );
+  border-left-color: var(--theme-color);
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 2.4vh;
+}
+
+.right-panel {
+  width: 65%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5vh 4vw;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.media-container {
+  flex: 1;
+  width: 100%;
+  max-height: 60vh;
+  border-radius: 1vw;
+  overflow: hidden;
+  box-shadow: 0 1vh 3vh rgba(0, 0, 0, 0.5);
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.media-container riescade-video {
+  width: 100%;
+  height: 100%;
+}
+
+.metadata-container {
+  height: 30vh;
+  padding-top: 3vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.md-title {
+  font-size: 4vh;
+  font-weight: 800;
+  margin: 0 0 1.5vh 0;
+  color: var(--text-primary);
+}
+
+.md-row {
+  display: flex;
+  gap: 3vw;
+  margin-bottom: 2vh;
+}
+
+.md-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vh;
+}
+
+.md-label {
+  font-size: 1.4vh;
+  color: var(--theme-color);
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.md-value {
+  font-size: 1.8vh;
+  color: var(--text-primary);
+}
+
+.md-description {
+  font-size: 1.6vh;
+  line-height: 1.6;
+  color: var(--text-muted);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+/* ========================================================
+   GAMELIST NEW ORIGINS LAYOUT
+   ======================================================== */
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.gamelist-bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gamelist-bg-default {
+  z-index: 1;
+  background-image: url("../_parts/default.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.gamelist-fanart {
+  z-index: 2;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.gamelist-overlay {
+  z-index: 3;
+  background-image: url("../_parts/overlay-gamelist-hard.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.gamelist-ui {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.gamelist-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  overflow: hidden;
+}
+
+.gamelist-left-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 45%;
+}
+
+.thumbnail-container {
+  animation: slideInLeft 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.gamelist-thumbnail {
+  max-width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+}
+
+.gamelist-game-info {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.gamelist-game-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.gamelist-game-meta {
+  font-size: 1.2rem;
+  color: #ddd;
+  margin-top: 5px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  font-weight: 500;
+}
+
+.gamelist-right-col {
+  width: 20%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <defs>
+    <linearGradient id="grad" x1="40" y1="40" x2="216" y2="216" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#B0005A"/>
+      <stop offset="100%" stop-color="#5A005A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shadow / depth -->
+  <circle cx="128" cy="128" r="84" stroke="#6D004F" stroke-width="24" stroke-linecap="round" stroke-dasharray="440 120" transform="rotate(38 128 128)" opacity="0.45"/>
+
+  <!-- Main circular loader -->
+  <circle cx="128" cy="128" r="84" stroke="url(#grad)" stroke-width="24" stroke-linecap="round" stroke-dasharray="440 120" transform="rotate(38 128 128)"/>
+</svg>

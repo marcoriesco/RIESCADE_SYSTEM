@@ -1,0 +1,66 @@
+<div data-riescade-view="system" style="--theme-color: {options:colors}">
+  <link rel="stylesheet" href="./assets/css/global.css" />
+  <link rel="stylesheet" href="./assets/css/system.css" />
+
+  <!-- Camada de Fundo (Vídeo ou Imagem) -->
+  <div
+    class="system-background"
+    style="background-image: url(&quot;./assets/arts/{system:theme}.jpg&quot;)"
+  >
+    <div class="system-background-overlay"></div>
+  </div>
+
+  <!-- Header Global -->
+  <div class="riescade-header">
+    <div class="header-left">
+      <div class="system-name">
+        {system:fullName}
+        <span>({system:gamecount})</span>
+      </div>
+    </div>
+    <div class="header-center centered">
+      <div class="clock">{global:time}</div>
+    </div>
+    <div class="header-right"></div>
+  </div>
+
+  <!-- Camada Principal: Carousel -->
+  <div class="riescade-carousel-area">
+    <!-- Efeito de sobra / Logo Effect Shadow -->
+    <!-- <img src="./assets/logos/{system:theme}.png" class="carousel-shadow-logo" /> -->
+
+    <riescade-system-carousel
+      type="horizontal"
+      items-count="5"
+      media-source="./assets/logos"
+      class="main-system-carousel"
+      logo-scale="0.5"
+      logo-selected-scale="1.2"
+    >
+    </riescade-system-carousel>
+  </div>
+
+  <!-- Footer Global -->
+  <div class="riescade-footer">
+    <div class="system-meta">
+      <span class="system-theme-text"
+        >{system:theme}
+        <span class="hardware-type">[{system:hardwareType}]</span></span
+      >
+    </div>
+
+    <!-- Helpsystem Customizado do Origins -->
+    <div class="helpsystem-bar centered">
+      <!-- Imagem dinâmica baseada em subset (para web themes podemos fazer o mesmo usando variáveis ou CSS puro) -->
+      <img
+        src="./assets/_parts/helpsystem/system-ps4.png"
+        class="helpsystem-image"
+      />
+    </div>
+
+    <div class="controller-activity">
+      <!-- Ícones que mudam de cor baseado no tema RIESCADE_ORIGINS -->
+      <img src="./assets/indicators/ps4.svg" class="controller-icon" />
+    </div>
+  </div>
+</div>

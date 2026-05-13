@@ -1,0 +1,32 @@
+/* ========================================================
+   RIESCADE_ORIGINS WEB PORT - GLOBAL / BASE STYLES
+   ======================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Roboto+Condensed:wght@400;700&display=swap");
+
+:root {
+  --theme-color: #9f0043;
+  --text-primary: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.56);
+  --font-main: "Inter", sans-serif;
+  --font-clock: "Inter", sans-serif;
+  --font-hardware: "Inter", sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+  font-family: var(--font-main);
+  user-select: none;
+}
+
+/* UTILS */
+.centered {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}

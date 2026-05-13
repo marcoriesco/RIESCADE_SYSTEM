@@ -1,0 +1,12 @@
+/* ========================================================
+   START / INTRO LOADER VIEW LAYOUT
+   ======================================================== */
+.intro-loader {
+  position: fixed;
+  width: 35vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 10px;
+}
