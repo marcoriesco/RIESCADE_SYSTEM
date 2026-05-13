@@ -17,19 +17,20 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
+  const [draftGame, setDraftGame] = useState<Game>(game)
 
   const options = [
     { 
       id: 'favorite', 
       label: 'FAVORITE', 
       type: 'toggle', 
-      value: game.favorite 
+      value: draftGame.favorite 
     },
     { 
       id: 'emulator', 
       label: 'EMULATOR', 
       type: 'select', 
-      value: game.emulator || system.emulators?.[0]?.name || 'DEFAULT',
+      value: draftGame.emulator || system.emulators?.[0]?.name || 'DEFAULT',
       items: system.emulators?.map(e => ({ label: e.name.toUpperCase(), value: e.name })) || []
     }
   ]
@@ -37,6 +38,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   useEffect(() => {
     if (isOpen) {
       setSelectedIndex(0)
+      setDraftGame(game)
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)
@@ -46,7 +48,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const handleToggle = () => {
     const item = options[selectedIndex]
     if (item.id === 'favorite') {
-      onUpdate({ ...game, favorite: !game.favorite })
+      const updated = { ...draftGame, favorite: !draftGame.favorite }
+      setDraftGame(updated)
+      onUpdate(updated)
     }
   }
 
@@ -55,7 +59,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     if (item.id === 'emulator' && item.items) {
       const currentIdx = item.items.findIndex(i => i.value === item.value)
       const nextIdx = (currentIdx + direction + item.items.length) % item.items.length
-      onUpdate({ ...game, emulator: item.items[nextIdx].value })
+      const updated = { ...draftGame, emulator: item.items[nextIdx].value }
+      setDraftGame(updated)
+      onUpdate(updated)
     }
   }
 

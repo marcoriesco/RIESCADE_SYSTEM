@@ -1,7 +1,7 @@
 {
   "name": "riescade",
   "version": "2.0.0",
-  "description": "RIESCADE - Modern Retro Gaming Frontend",
+  "description": "RIESCADE Frontend",
   "main": "./out/main/index.js",
   "author": "Marco Riesco",
   "scripts": {
@@ -45,7 +45,8 @@
     },
     "win": {
       "target": "dir",
-      "artifactName": "${productName}.${ext}"
+      "artifactName": "${productName}.${ext}",
+      "icon": "src/main/theme_default/assets/_parts/riescade.ico"
     },
     "files": [
       "out/**/*"

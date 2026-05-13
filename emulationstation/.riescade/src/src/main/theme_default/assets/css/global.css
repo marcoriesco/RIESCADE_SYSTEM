@@ -35,10 +35,10 @@ body {
   font-weight: 300;
   font-size: 1.85rem;
   color: var(--text-primary);
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.35);
+  text-shadow: 1px 1px 1px #000000;
 }
 
-/* FOOTER */
+/* FOOER */
 .riescade-footer {
   position: fixed;
   bottom: 0;

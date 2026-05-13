@@ -137,6 +137,21 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         props[name] = value
       })
 
+      if (tagName === 'link' && props.rel === 'stylesheet') {
+        const rev = data?.['global:themeRevision'] ?? 0
+        props.key = `${props.key}-${rev}`
+      }
+
+      const gameKey = data?.path || data?.['game:path'] || data?.['game:name'] || ''
+      if (
+        gameKey &&
+        (props['data-riescade-key'] === 'game' ||
+          (typeof props.className === 'string' &&
+            (props.className.includes('media-container') || props.className.includes('thumbnail-container'))))
+      ) {
+        props.key = `${props.key}-${gameKey}`
+      }
+
       // ─── Custom Components ───
       if (tagName === 'riescade-system-carousel') {
         return (

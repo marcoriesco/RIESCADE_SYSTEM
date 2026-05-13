@@ -1,8 +1,16 @@
-import * as sass from 'sass'
 import { writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 import { join, dirname, basename, extname } from 'path'
 
 export class SassService {
+  private loadSass(): any | null {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      return require('sass')
+    } catch {
+      return null
+    }
+  }
+
   /**
    * Compiles a single SCSS file to CSS.
    * Target directory is one level up from the 'scss' folder by default.
@@ -13,6 +21,9 @@ export class SassService {
     }
 
     try {
+      const sass = this.loadSass()
+      if (!sass) return null
+
       console.log(`Compiling SCSS: ${scssFilePath}`)
       const result = sass.compile(scssFilePath)
       

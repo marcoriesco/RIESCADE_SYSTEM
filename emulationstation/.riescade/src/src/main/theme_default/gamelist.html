@@ -25,15 +25,17 @@
   <!-- Conteúdo da Gamelist -->
   <div class="gamelist-main-content">
     <div class="gamelist-left-col">
-      <div class="thumbnail-container">
-        <img src="{game:thumbnail}" class="gamelist-thumbnail" onerror="this.src = './assets/logos/{system:theme}.png'" />
+      <div class="thumbnail-container" data-riescade-key="game">
+        <img
+          src="{game:thumbnail}"
+          class="gamelist-thumbnail"
+          onerror="this.src = './assets/logos/{system:theme}.png'"
+        />
       </div>
 
-      <div class="gamelist-meta">
+      <div class="gamelist-meta" data-riescade-key="game">
         <h2 class="gamelist-meta-title">{game:name}</h2>
-        <div class="gamelist-meta-info">
-          {game:releasedate:Y}, {game:developer}
-        </div>
+        <div class="gamelist-meta-info">{game:releasedate:Y}, {game:developer}</div>
       </div>
     </div>
 

@@ -1,59 +1,24 @@
-<div class="loading-screen-root" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; font-family: sans-serif;">
-  
-  <!-- Background Fanart -->
-  <div class="loading-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('{game:fanart}'); background-size: cover; background-position: center; filter: brightness(0.5) blur(10px); transform: scale(1.1);"></div>
+<div class="loading-screen-root">
+  <link rel="stylesheet" href="./assets/css/global.css" />
+  <link rel="stylesheet" href="./assets/css/loading.css" />
 
-  <!-- Theme Overlay -->
-  <div class="loading-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('./assets/_parts/overlay-gamelist-hard.png'); background-size: 100% 100%; opacity: 0.8;"></div>
+  <img class="loading-bg" src="{game:fanart}" onerror="this.style.display='none';" />
+  <div class="loading-overlay"></div>
 
-  <!-- Content Container -->
-  <div class="loading-content" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 30px; text-align: center;">
-    
-    <!-- Game Logo -->
-    <div class="game-logo-container" style="max-width: 500px; max-height: 250px;">
-        <img src="{game:marquee}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.style.display='none';" />
+  <div class="loading-content">
+    <div class="game-logo-container">
+      <img src="{game:marquee}" onerror="this.style.display='none';" />
     </div>
 
-    <!-- Game Name -->
-    <h1 style="color: #fff; font-size: 3rem; margin: 0; text-transform: uppercase; font-weight: 900; text-shadow: 0 10px 20px rgba(0,0,0,0.8); letter-spacing: 2px;">
-      {game:name}
-    </h1>
+    <h1 class="loading-title">{game:name}</h1>
 
-    <!-- Loading Text -->
-    <div style="display: flex; align-items: center; gap: 15px;">
-        <span style="color: #fff; opacity: 0.8; letter-spacing: 8px; font-size: 1.2rem; font-weight: 700; text-transform: uppercase;">Carregando</span>
-        <span class="loading-dots" style="color: #fff; font-size: 1.5rem;">...</span>
+    <div class="loading-text-row">
+      <span class="loading-text">Carregando</span>
+      <span class="loading-dots">...</span>
     </div>
   </div>
 
-  <!-- Rotating Loading Icon (Bottom Right) -->
-  <div class="loading-spinner-container" style="position: absolute; bottom: 50px; right: 50px; width: 80px; height: 80px;">
-    <img src="./assets/_parts/loadings/loading.svg" class="rotating-icon" style="width: 100%; height: 100%; object-fit: contain;" />
+  <div class="loading-spinner-container">
+    <img src="./assets/_parts/loadings/loading.svg" class="rotating-icon" />
   </div>
-
-  <style>
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .rotating-icon {
-      animation: rotate 2s linear infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
-    .loading-dots {
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .loading-content {
-      animation: fadeIn 0.8s ease-out forwards;
-    }
-  </style>
 </div>
