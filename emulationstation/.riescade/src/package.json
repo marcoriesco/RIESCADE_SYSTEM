@@ -51,14 +51,6 @@
     "files": [
       "out/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "src/main/theme_default",
-        "to": "theme_default",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
+    "extraResources": []
   }
 }

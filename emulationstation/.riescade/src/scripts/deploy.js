@@ -9,7 +9,9 @@ const rootExe = path.join(__dirname, '..', '..', '..', '..', 'RIESCADE.exe') // 
 const targetExe = path.join(distDest, 'RIESCADE.exe')
 const retroBatRoot = path.dirname(rootExe)
 const iconIcoSource = path.join(__dirname, '..', 'src', 'main', 'theme_default', 'assets', '_parts', 'riescade.ico')
-const iconIco = path.join(distDest, 'riescade.ico')
+const iconIco = path.join(distDest, 'resources', 'riescade.ico')
+const themeSource = path.join(__dirname, '..', 'src', 'main', 'theme_default')
+const themeDest = path.join(distDest, 'themes', 'default')
 
 function copyRecursiveSync(src, dest) {
   const exists = fs.existsSync(src)
@@ -24,6 +26,10 @@ function copyRecursiveSync(src, dest) {
     const copyWithRetry = (from, to) => {
       const maxRetries = 8
       const delayMs = 150
+
+      // Ensure destination directory exists
+      const destDir = path.dirname(to)
+      if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true })
 
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
@@ -46,6 +52,23 @@ function copyRecursiveSync(src, dest) {
   }
 }
 
+function copyTheme(src, dest) {
+  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
+  const entries = fs.readdirSync(src, { withFileTypes: true })
+
+  for (let entry of entries) {
+    const srcPath = path.join(src, entry.name)
+    const destPath = path.join(dest, entry.name)
+
+    if (entry.isDirectory()) {
+      if (entry.name === 'scss') continue // Skip scss folder
+      copyTheme(srcPath, destPath)
+    } else {
+      fs.copyFileSync(srcPath, destPath)
+    }
+  }
+}
+
 console.log('🚀 Starting deployment...')
 
 // 1. Copy unpacked build to .riescade root
@@ -56,6 +79,10 @@ if (fs.existsSync(distSource)) {
   console.log('⚠️ Build source not found. Make sure you ran "npm run build" first.')
   process.exit(1)
 }
+
+// 1.2 Copy/Update Default Theme in themes/default
+console.log(`🎨 Deploying default theme to ${themeDest}...`)
+copyTheme(themeSource, themeDest)
 
 // 1.1 Cleanup accidental Electron runtime files in RetroBat root (keep only the launcher)
 try {
@@ -167,8 +194,5 @@ if (Test-Path $icon) {
   fs.writeFileSync(cmdPath, cmd, 'utf8')
   console.log(`✅ Fallback launcher created: ${cmdPath}`)
 }
-
-// 3. Run theme copy
-require('./copy-default-theme.js')
 
 console.log('🎉 Deployment complete!')
