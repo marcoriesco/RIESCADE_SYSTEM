@@ -52,7 +52,9 @@ export class LauncherService {
 
       // If we are using the game-specific emulator, find its core
       const selectedEmulator = system.emulators?.find(e => e.name === emulator)
-      if (selectedEmulator) {
+      if (game.core) {
+        core = game.core
+      } else if (selectedEmulator) {
         core = selectedEmulator.cores?.[0] || ''
       } else if (system.emulators?.[0]) {
         core = system.emulators[0].cores?.[0] || ''

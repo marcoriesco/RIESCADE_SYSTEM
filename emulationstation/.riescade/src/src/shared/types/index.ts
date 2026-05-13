@@ -38,4 +38,5 @@ export interface Game {
   path: string
   system: string
   emulator?: string
+  core?: string
 }

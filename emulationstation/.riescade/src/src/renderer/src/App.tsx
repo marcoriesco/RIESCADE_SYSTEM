@@ -159,9 +159,11 @@ function App() {
 					else if (gp.buttons[5]?.pressed) key = 'PageUp';
 					else if (gp.buttons[0]?.pressed) key = 'Enter';
 					else if (gp.buttons[1]?.pressed) key = 'Backspace';
+					else if (gp.buttons[8]?.pressed) key = 'Control';
 					else if (gp.buttons[9]?.pressed) key = ' ';
 					if (key) {
 						window.dispatchEvent(new KeyboardEvent('keydown', { key }));
+						setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key })), 50);
 						lastInputTime = time;
 					}
 				}
@@ -308,11 +310,12 @@ function App() {
 	// ─── Keyboard Navigation ───
 	useEffect(() => {
 		const handleKey = (e: KeyboardEvent) => {
-			if (e.key === ' ' && !isMenuOpen) {
-				setIsMenuOpen(true);
+			if (e.key === ' ' && !isGameOptionsOpen) {
+				setIsMenuOpen((prev) => !prev);
 				return;
 			}
-			if (isMenuOpen || isInitializing) return;
+
+			if (isMenuOpen || isInitializing || isGameOptionsOpen || isLaunching) return;
 
 			if (!selectedSystem) {
 				// System view navigation
@@ -411,43 +414,29 @@ function App() {
 					}
 				}
 
-				if (e.key === 'Enter' && currentGame) {
-					// Detect long press
-					const timer = setTimeout(() => {
-						setIsGameOptionsOpen(true);
-						setEnterPressTimer(null);
-					}, 1000); // 1 second for long press
-					setEnterPressTimer(timer);
+				if (e.key === 'Control' && currentGame) {
+					setIsGameOptionsOpen((prev) => !prev);
+					return;
+				}
+				if (isGameOptionsOpen) return;
+
+				if (e.key === 'Enter' && currentGame && !isLaunching) {
+					setIsLaunching(true);
+					window.api
+						.launchGame(currentGame, selectedSystem)
+						.then(() => {
+							setTimeout(() => setIsLaunching(false), 5000);
+						})
+						.catch((err) => {
+							console.error('Launch game failed or exited with code:', err);
+							setTimeout(() => setIsLaunching(false), 5000);
+						});
 				}
 			}
 		};
 
 		const handleKeyUp = (e: KeyboardEvent) => {
-			if (e.key === 'Enter') {
-				if (enterPressTimer) {
-					clearTimeout(enterPressTimer);
-					setEnterPressTimer(null);
-
-					// Short press - Launch game
-					if (
-						selectedSystem &&
-						currentGame &&
-						!isGameOptionsOpen &&
-						!isMenuOpen
-					) {
-						setIsLaunching(true);
-						window.api
-							.launchGame(currentGame, selectedSystem)
-							.then(() => {
-								setTimeout(() => setIsLaunching(false), 5000);
-							})
-							.catch((err) => {
-								console.error('Launch game failed or exited with code:', err);
-								setTimeout(() => setIsLaunching(false), 5000);
-							});
-					}
-				}
-			}
+			// No logic needed here for now
 		};
 
 		window.addEventListener('keydown', handleKey);
@@ -466,6 +455,7 @@ function App() {
 		isGameOptionsOpen,
 		currentGame,
 		isInitializing,
+		isLaunching,
 		enterPressTimer,
 	]);
 

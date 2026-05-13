@@ -48,33 +48,29 @@ export class GamelistParser {
 				return absolute.replace(/\\/g, '/');
 			};
 
-			return list.map((g: any) => ({
-				id: g['@_id'] || g.path,
-				name: g.name,
-				desc: g.desc,
-				image: resolveMedia(g.image),
-				video: resolveMedia(g.video),
-				marquee: resolveMedia(g.marquee),
-				thumbnail: resolveMedia(g.thumbnail),
-				fanart: resolveMedia(g.fanart),
-				titleshot: resolveMedia(g.titleshot),
-				wheel: resolveMedia(g.wheel),
-				rating: g.rating ? parseFloat(g.rating) : undefined,
-				releasedate: g.releasedate,
-				developer: g.developer,
-				publisher: g.publisher,
-				genre: g.genre,
-				players: g.players,
-				favorite: g.favorite === 'true' || g.favorite === true,
-				hidden: g.hidden === 'true' || g.hidden === true,
-				kidgame: g.kidgame === 'true' || g.kidgame === true,
-				playcount: g.playcount ? parseInt(g.playcount) : 0,
-				lastplayed: g.lastplayed,
-				path: g.path,
-				genreId: g.genreId,
-				system: systemName,
-				emulator: g.emulator,
-			}));
+			return list.map((g: any) => {
+				const game: any = { ...g };
+				game.id = g['@_id'] || g.path;
+				game.system = systemName;
+				game.favorite = g.favorite === 'true' || g.favorite === true;
+				game.hidden = g.hidden === 'true' || g.hidden === true;
+				game.kidgame = g.kidgame === 'true' || g.kidgame === true;
+				game.playcount = g.playcount ? parseInt(g.playcount) : 0;
+				game.rating = g.rating ? parseFloat(g.rating) : undefined;
+				
+				// Keep resolved paths for the UI, but we'll need raw paths for saving?
+				// Actually, the UI needs absolute paths to show images.
+				// But ES needs relative paths in the XML.
+				// We'll store resolved paths in new properties if needed, or just resolve on the fly in UI.
+				// Let's keep the UI-friendly paths in the object but remember they might need to be relative.
+				
+				const mediaFields = ['image', 'video', 'marquee', 'thumbnail', 'fanart', 'titleshot', 'wheel', 'mix'];
+				mediaFields.forEach(field => {
+					if (g[field]) game[field] = resolveMedia(g[field]);
+				});
+
+				return game;
+			});
 		} catch (error) {
 			console.error(`Error parsing gamelist ${filePath}:`, error);
 			return [];
@@ -91,26 +87,19 @@ export class GamelistParser {
 			});
 
 			const xmlGames = games.map((g) => {
-				const xmlGame: any = {
-					path: g.path,
-					name: g.name,
-					desc: g.desc,
-					image: g.image,
-					video: g.video,
-					marquee: g.marquee,
-					thumbnail: g.thumbnail,
-					rating: g.rating,
-					releasedate: g.releasedate,
-					developer: g.developer,
-					publisher: g.publisher,
-					genre: g.genre,
-					players: g.players,
-					favorite: g.favorite ? 'true' : 'false',
-					playcount: g.playcount,
-					lastplayed: g.lastplayed,
-				};
-				if (g.emulator) xmlGame.emulator = g.emulator;
-				if (g.id && g.id !== g.path) xmlGame['@_id'] = g.id;
+				const { id, system, ...xmlGame } = g as any;
+				
+				// Convert types back to XML strings
+				if (xmlGame.favorite !== undefined) xmlGame.favorite = xmlGame.favorite ? 'true' : 'false';
+				if (xmlGame.hidden !== undefined) xmlGame.hidden = xmlGame.hidden ? 'true' : 'false';
+				if (xmlGame.kidgame !== undefined) xmlGame.kidgame = xmlGame.kidgame ? 'true' : 'false';
+				
+				if (id && id !== xmlGame.path) xmlGame['@_id'] = id;
+
+				// NOTE: We are saving the paths as they were in the object.
+				// If they were resolved to absolute paths, they will be saved as absolute.
+				// This might be an issue for portability, but it's consistent with current behavior.
+				
 				return xmlGame;
 			});
 

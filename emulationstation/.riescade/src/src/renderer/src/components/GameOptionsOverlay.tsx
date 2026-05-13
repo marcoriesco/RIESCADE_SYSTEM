@@ -59,7 +59,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     if (item.id === 'emulator' && item.items) {
       const currentIdx = item.items.findIndex(i => i.value === item.value)
       const nextIdx = (currentIdx + direction + item.items.length) % item.items.length
-      const updated = { ...draftGame, emulator: item.items[nextIdx].value }
+      const updated = { ...draftGame, emulator: item.items[nextIdx].value, core: undefined }
       setDraftGame(updated)
       onUpdate(updated)
     }
@@ -79,7 +79,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         if (options[selectedIndex].type === 'select') handleSelect(1)
       } else if (e.key === 'ArrowLeft') {
         if (options[selectedIndex].type === 'select') handleSelect(-1)
-      } else if (e.key === 'Backspace' || e.key === 'Escape') {
+      } else if (e.key === 'Backspace' || e.key === 'Escape' || e.key === 'Control') {
         onClose()
       }
     },
