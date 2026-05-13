@@ -22,7 +22,11 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
   // If theme has a loading view, use it
   if (theme?.isWebTheme && theme.views?.loading) {
     return (
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 10000, background: '#000' }}>
+      <div style={{ 
+        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
+        zIndex: 10000, background: '#000',
+        animation: 'fadeIn 0.3s ease forwards'
+      }}>
         <WebThemeRenderer
           htmlContent={theme.views.loading}
           data={themeData}

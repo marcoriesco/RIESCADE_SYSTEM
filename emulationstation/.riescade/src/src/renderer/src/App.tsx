@@ -472,16 +472,6 @@ function App() {
 		);
 	}
 
-	if (isLaunching && currentGame && selectedSystem) {
-		return (
-			<LaunchScreen
-				game={currentGame}
-				system={selectedSystem}
-				theme={theme}
-				themeData={themeData}
-			/>
-		);
-	}
 
 	return (
 		<div
@@ -513,6 +503,15 @@ function App() {
 					theme={theme}
 					themeData={themeData}
 					onUpdate={handleUpdateGame}
+				/>
+			)}
+
+			{isLaunching && currentGame && selectedSystem && (
+				<LaunchScreen
+					game={currentGame}
+					system={selectedSystem}
+					theme={theme}
+					themeData={themeData}
 				/>
 			)}
 
