@@ -52,18 +52,6 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
         animation: 'fadeIn 0.3s ease forwards'
       }}
     >
-      {/* Background Fanart */}
-      {fanart && (
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, width: '100%', height: '100%',
-          backgroundImage: `url("${resolveFilePath(fanart)}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'brightness(0.4) blur(10px)',
-          transform: 'scale(1.1)'
-        }} />
-      )}
 
       {/* Content */}
       <div style={{

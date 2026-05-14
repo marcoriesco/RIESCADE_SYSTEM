@@ -97,9 +97,14 @@
 }
 
 .loading-text-row {
+  position: fixed;
+  left: 50px;
+  bottom: 60px;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 15px;
+  height: auto;
 }
 
 .loading-text {

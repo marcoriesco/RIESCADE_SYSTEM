@@ -35,5 +35,7 @@
   "AUTO": "AUTO",
   "OFF": "DESLIGADO",
   "1 MIN": "1 MIN",
-  "5 MIN": "5 MIN"
+  "5 MIN": "5 MIN",
+  "Save changes to see new options": "Salve para ver as novas opções",
+  "No options available for this theme": "Sem opções para este tema"
 }

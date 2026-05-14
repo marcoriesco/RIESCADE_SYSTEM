@@ -42,6 +42,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
   const [visible, setVisible] = useState(false)
   const [showInputConfig, setShowInputConfig] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [modalSelectedIndex, setModalSelectedIndex] = useState(0)
   const [versions, setVersions] = useState({ app: '2.0.0', es: '' })
 
   const getSetting = (name: string, fallback: any = ''): any => {
@@ -56,11 +57,23 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
   }
 
   const updateSetting = (name: string, value: any) => {
-    setPendingSettings(prev => ({ ...prev, [name]: String(value) }))
+    const stringVal = String(value)
+    if (String(getSetting(name)) === stringVal) {
+      setPendingSettings(prev => {
+        const next = { ...prev }
+        delete next[name]
+        return next
+      })
+    } else {
+      setPendingSettings(prev => ({ ...prev, [name]: stringVal }))
+    }
   }
 
   const updateThemeSetting = (name: string, value: any) => {
-    setThemeSettings(prev => ({ ...prev, [name]: String(value) }))
+    const stringVal = String(value)
+    // For theme settings, we don't have the "original" state easily available in a single object like settings,
+    // but we can check if it matches what was loaded initially.
+    setThemeSettings(prev => ({ ...prev, [name]: stringVal }))
   }
 
   const handleSave = async () => {
@@ -164,21 +177,52 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
     const items: MenuItem[] = [
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
+          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', actionName: 'reload-app' },
+          { id: 'ui_group_gen', label: t('AUTO SAVE'), type: 'group' },
+          { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
+          { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
+          { id: 'ui_group_gen', label: t('DISPLAY CONFIGURATION'), type: 'group' },
+          { id: 'smooth_games', label: t('SMOOTH GAMES'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
+          { id: 'shaders', label: t('SHADER SET'), type: 'select', settingName: 'global.shaderset', options: [
+            { label: t('NONE'), value: 'none' }, 
+            { label: 'RIESCADE', value: '[riescade]' },
+            { label: 'CRT-NEW-PIXIE', value: 'crt-new-pixie' },
+            { label: 'CRT-ROYALE', value: 'crt-royale' },
+            { label: 'CURVATURE', value: 'curvature' },
+            { label: 'ENHANCED', value: 'enhanced' },
+            { label: 'FLATTEN-GLOW', value: 'flatten-glow' },
+            { label: 'HANDHELD', value: 'handheld' },
+            { label: 'NTSC', value: 'ntsc' },
+            { label: 'NTSC-256PX', value: 'ntsc-256px' },
+            { label: 'NTSC-320PX', value: 'ntsc-320px' },
+            { label: 'NTSC-NES', value: 'ntsc-nes' },
+            { label: 'NTSC-SVIDEO', value: 'ntsc-svideo' },
+            { label: 'NTSC-VCR', value: 'ntsc-vcr' },
+            { label: 'RETRO', value: 'retro' }, 
+            { label: 'SCALEFX', value: 'scalefx' },
+            { label: 'SCALEFX-AA', value: 'scalefx-aa' },
+            { label: 'SCALEFX-HYBRID', value: 'scalefx-hybrid' },
+            { label: 'SCALEHQ', value: 'scalehq' },
+            { label: 'SCANLINES', value: 'scanlines' },
+            { label: 'SINDENBORDER', value: 'sindenborder' },
+            { label: 'TECHNICOLOR', value: 'technicolor' },
+            { label: 'TVOUT', value: 'tvout' },
+            { label: 'TVOUT-INTERLACING', value: 'tvout-interlacing' },
+            { label: 'VHS', value: 'vhs' },
+            { label: 'XBRZ-5X', value: 'xbrz-5x' },
+            { label: 'ZFAST', value: 'zfast' }
+          ]},
+          { id: 'decorations', label: t('DECORATIONS'), type: 'select', settingName: 'global.bezel', options: [
+            { label: t('NONE'), value: 'none' }, { label: t('AUTO'), value: 'auto' }
+          ]},
           { id: 'game_ratio', label: t('GAME ASPECT RATIO'), type: 'select', settingName: 'global.ratio', options: [
             { label: t('AUTO'), value: 'auto' }, { label: '4/3', value: '4/3' }, { label: '16/9', value: '16/9' },
             { label: '16/10', value: '16/10' }, { label: 'FULL', value: 'full' }
           ]},
-          { id: 'smooth_games', label: t('SMOOTH GAMES'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
-          { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
-          { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
-          { id: 'shaders', label: t('SHADER SET'), type: 'select', settingName: 'global.shaderset', options: [
-            { label: t('NONE'), value: 'none' }, { label: 'RIESCADE', value: '[riescade]' },
-            { label: 'RETRO', value: 'retro' }, { label: 'SCANLINES', value: 'scanlines' }
-          ]},
-          { id: 'decorations', label: t('DECORATIONS'), type: 'select', settingName: 'global.bezel', options: [
-            { label: t('NONE'), value: 'none' }, { label: t('AUTO'), value: 'auto' },
-            { label: 'THE BEZEL PROJECT', value: 'thebezelproject' }
-          ]}
+          { id: 'forcefullscreen', label: t('FORCE FULLSCREEN'), type: 'toggle', settingName: 'global.forcefullscreen', settingType: 'bool' },
+          { id: 'exclusivefs', label: t('EXCLUSIVE FULLSCREEN'), type: 'toggle', settingName: 'global.exclusivefs', settingType: 'bool' },
+          { id: 'disableautocontrollers', label: t('DISABLE AUTOCONTROLLERS'), type: 'toggle', settingName: 'global.disableautocontrollers', settingType: 'bool' },
+
         ]
       },
       {
@@ -186,16 +230,26 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
           { id: 'theme_set', label: t('THEME'), type: 'select', settingName: 'RIESCADE.ThemeSet',
             options: themes.length ? themes.map(t => ({ label: t.toUpperCase(), value: t })) : [{ label: 'DEFAULT', value: 'default' }]
           },
-          ...(theme?.options && theme.options.length > 0 ? [
-            { id: 'theme_cfg_group', label: t('THEME CONFIGURATION'), type: 'group' },
-            ...theme.options.map((opt: any) => ({
-              id: `theme_opt_${opt.id}`,
-              label: opt.name,
-              type: opt.type || 'select',
-              settingName: opt.id,
-              options: opt.options
-            }))
-          ] : [] as any[]),
+          { 
+            id: 'theme_cfg_submenu', 
+            label: t('THEME CONFIGURATION'), 
+            // Only show options if we haven't changed the theme in the menu
+            submenu: (() => {
+              if (pendingSettings['RIESCADE.ThemeSet'] && pendingSettings['RIESCADE.ThemeSet'] !== theme?.name) {
+                return [{ id: 'theme_cfg_pending', label: t('Save changes to see new options'), type: 'info' }] as MenuItem[]
+              }
+              if (!theme?.options || theme.options.length === 0) {
+                return [{ id: 'theme_cfg_none', label: t('No options available for this theme'), type: 'info' }] as MenuItem[]
+              }
+              return theme.options.map((opt: any) => ({
+                id: `theme_opt_${opt.id}`,
+                label: opt.name,
+                type: opt.type || 'select',
+                settingName: opt.id,
+                options: opt.options
+              })) as MenuItem[]
+            })()
+          },
           { id: 'ui_group_gen', label: t('GENERAL UI'), type: 'group' },
           { id: 'screensaver_time', label: t('SCREENSAVER'), type: 'select', settingName: 'ScreenSaverTime', options: [
             { label: t('OFF'), value: '0' }, { label: t('1 MIN'), value: '60000' },
@@ -239,7 +293,27 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isOpen || showInputConfig || showSaveModal) return
+      if (!isOpen || showInputConfig) return
+
+      if (showSaveModal) {
+        const modalButtons = [
+          { label: t('Save & Apply'), action: handleSave },
+          { label: t('Discard Changes'), action: onClose },
+          { label: t('Cancel'), action: () => setShowSaveModal(false) }
+        ]
+
+        if (e.key === 'ArrowDown') {
+          setModalSelectedIndex(prev => (prev + 1) % modalButtons.length)
+        } else if (e.key === 'ArrowUp') {
+          setModalSelectedIndex(prev => (prev - 1 + modalButtons.length) % modalButtons.length)
+        } else if (e.key === 'Enter') {
+          modalButtons[modalSelectedIndex].action()
+        } else if (e.key === 'Backspace' || e.key === 'Escape') {
+          setShowSaveModal(false)
+        }
+        return
+      }
+
       if (currentMenu.length === 0) return
 
       if (e.key === 'ArrowDown') {
@@ -278,8 +352,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
           setSelectedIndex(0)
         } else {
           // Check for pending changes
-          const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).length > 0
+          const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).some(k => themeSettings[k] !== themeData[`options:${k}`])
           if (hasChanges) {
+            setModalSelectedIndex(0)
             setShowSaveModal(true)
           } else {
             onClose()
@@ -287,7 +362,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         }
       }
     },
-    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings]
+    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData]
   )
 
   useEffect(() => {
@@ -400,19 +475,19 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
             <div className="riescade-modal-buttons">
               <button 
                 onClick={handleSave}
-                className="riescade-modal-button-primary"
+                className={`riescade-modal-button-primary ${modalSelectedIndex === 0 ? 'selected' : ''}`}
               >
                 {t('Save & Apply')}
               </button>
               <button 
                 onClick={onClose}
-                className="riescade-modal-button-danger"
+                className={`riescade-modal-button-danger ${modalSelectedIndex === 1 ? 'selected' : ''}`}
               >
                 {t('Discard Changes')}
               </button>
               <button 
                 onClick={() => setShowSaveModal(false)}
-                className="riescade-modal-button-secondary"
+                className={`riescade-modal-button-secondary ${modalSelectedIndex === 2 ? 'selected' : ''}`}
               >
                 {t('Cancel')}
               </button>
@@ -424,18 +499,18 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       <style dangerouslySetInnerHTML={{ __html: `
         .riescade-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
         .riescade-menu-overlay.visible { opacity: 1; pointer-events: auto; }
-        .riescade-menu-container { width: 600px; background: #dfdfdf; display: flex; flex-direction: column; border: 4px solid #fff; font-family: "Inter", sans-serif; transform: scale(0.95); transition: transform 0.2s ease; }
+        .riescade-menu-container { width: 600px; background: #dfdfdf; display: flex; flex-direction: column; font-family: "Inter", sans-serif; transform: scale(0.95); transition: transform 0.2s ease; }
         .riescade-menu-overlay.visible .riescade-menu-container { transform: scale(1); }
-        .riescade-menu-header { background: #eee; padding: 15px 25px; border-bottom: 2px solid #aaa; text-align: center; }
+        .riescade-menu-header { background: #eee; padding: 15px 25px; text-align: center; }
         .riescade-menu-title { margin: 0; color: #333; font-size: 1.2rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
         .riescade-menu-subtitle { font-size: 0.8rem; color: #666; margin-top: 5px; }
-        .riescade-menu-list-container { height: 60vh; background: #fff; overflow-y: auto; }
+        .riescade-menu-list-container { height: auto; background: #fff; overflow-y: auto; }
         .riescade-menu-item { padding: 12px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.1); transition: background 0.15s ease, color 0.15s ease; color: #444; }
         .riescade-menu-item.selected { background: #3b82f6; color: #fff; }
         .riescade-menu-label { font-weight: 500; font-size: 0.95rem; text-transform: uppercase; }
         .riescade-menu-item.selected .riescade-menu-label { font-weight: 800; }
         .riescade-menu-group { padding: 20px 30px 10px; color: #888; font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .riescade-menu-footer { background: #ddd; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #aaa; }
+        .riescade-menu-footer { background: #ddd; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; }
         .riescade-menu-footer-actions { display: flex; gap: 30px; font-size: 0.8rem; color: #444; font-weight: 700; }
         .riescade-menu-footer-action { display: flex; align-items: center; gap: 8px; }
         .riescade-menu-footer-button { background: #333; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
@@ -446,9 +521,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         .riescade-modal-title { margin: 0 0 20px; color: #333; font-size: 1.4rem; font-weight: 900; text-transform: uppercase; }
         .riescade-modal-message { margin: 0 0 30px; color: #666; line-height: 1.6; }
         .riescade-modal-buttons { display: flex; gap: 15px; justify-content: center; flex-direction: column; }
-        .riescade-modal-button-primary { padding: 12px 30px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
-        .riescade-modal-button-danger { padding: 12px 30px; background: #f43f5e; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
-        .riescade-modal-button-secondary { padding: 12px 30px; background: #eee; color: #444; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+        .riescade-modal-button-primary { padding: 12px 30px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; border: 3px solid transparent; }
+        .riescade-modal-button-primary.selected { border-color: #fff; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .riescade-modal-button-danger { padding: 12px 30px; background: #f43f5e; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; border: 3px solid transparent; }
+        .riescade-modal-button-danger.selected { border-color: #fff; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); }
+        .riescade-modal-button-secondary { padding: 12px 30px; background: #eee; color: #444; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; border: 3px solid transparent; }
+        .riescade-modal-button-secondary.selected { border-color: #3b82f6; }
 
         .menu-toggle { width: 40px; height: 20px; background: #ccc; border-radius: 10px; position: relative; transition: background 0.15s ease; }
         .menu-toggle.on { background: #4ade80; }

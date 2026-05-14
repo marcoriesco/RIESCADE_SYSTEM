@@ -35,5 +35,7 @@
   "AUTO": "AUTO",
   "OFF": "OFF",
   "1 MIN": "1 MIN",
-  "5 MIN": "5 MIN"
+  "5 MIN": "5 MIN",
+  "Save changes to see new options": "Save changes to see new options",
+  "No options available for this theme": "No options available for this theme"
 }
