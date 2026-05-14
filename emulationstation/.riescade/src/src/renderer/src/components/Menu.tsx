@@ -121,7 +121,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
     },
     {
       id: 'ui_settings', label: 'USER INTERFACE', submenu: [
-        { id: 'theme_set', label: 'THEME', type: 'select', settingName: 'ThemeSet',
+        { id: 'theme_set', label: 'THEME', type: 'select', settingName: 'RIESCADE.ThemeSet',
           options: themes.length ? themes.map(t => ({ label: t.toUpperCase(), value: t })) : [{ label: 'DEFAULT', value: 'default' }]
         },
         { id: 'language', label: 'LANGUAGE', type: 'select', settingName: 'Language', options: [

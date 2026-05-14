@@ -68,7 +68,7 @@ export class SettingsParser {
   }
 
   public getSelectedTheme(): string {
-    return this.getSetting('ThemeSet', 'string') || 'es-theme-carbon'
+    return this.getSetting('RIESCADE.ThemeSet', 'string') || 'default'
   }
 
   public getSetting(settingName: string, type: 'string' | 'bool' | 'int' | 'float' = 'string'): any {

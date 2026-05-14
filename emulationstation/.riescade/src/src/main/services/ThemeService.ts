@@ -48,7 +48,7 @@ export class ThemeService {
    * Returns the currently selected theme name from ES settings.
    */
   public getActiveThemeName(): string {
-    return this.settingsParser.getSetting('ThemeSet', 'string') || 'default'
+    return this.settingsParser.getSetting('RIESCADE.ThemeSet', 'string') || 'default'
   }
 
   public getThemePath(themeName: string): string {
