@@ -4,21 +4,22 @@
   <!-- TOP BAR -->
   <header class="ns2-topbar">
     <div class="ns2-profile">
-      <img src="./assets/avatar.png" class="ns2-avatar" />
+      <img src="./assets/images/riescade.png" class="ns2-avatar" />
     </div>
 
     <div class="ns2-status">
       <span class="ns2-clock"><riescade-clock format="hh:mm A" /></span>
 
-      <svg class="ns2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M5 12.55a11 11 0 0114.08 0"/>
-        <path d="M1.42 9a16 16 0 0121.16 0"/>
-        <path d="M8.53 16.11a6 6 0 016.95 0"/>
+      <svg class="ns2-icon" width="45" height="32" viewBox="0 0 45 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M44.3912 11.9298C41.7311 8.25949 38.3744 5.28726 34.5607 3.22545C30.747 1.16365 26.5706 0.0631683 22.3298 0.00264011C18.089 -0.057888 13.8885 0.923029 10.0284 2.87531C6.16837 4.82759 2.744 7.70304 0 11.2962L3.20248 14.3155C5.54632 11.2463 8.4713 8.79023 11.7684 7.12266C15.0656 5.45509 18.6535 4.61722 22.2759 4.66893C25.8982 4.72063 29.4656 5.66062 32.7231 7.42174C35.9806 9.18287 38.8478 11.7217 41.1199 14.8567L44.3912 11.9298Z" fill="black"/>
+        <path d="M36.944 19.0959C35.1437 16.5436 32.8579 14.465 30.2501 13.009C27.6423 11.553 24.7771 10.7556 21.8596 10.6737C18.942 10.5919 16.0442 11.2277 13.3737 12.5357C10.7031 13.8436 8.32579 15.7914 6.41188 18.2395L9.33265 21.0585C10.8726 19.0887 12.7854 17.5215 14.9341 16.4692C17.0829 15.4168 19.4144 14.9052 21.7619 14.971C24.1094 15.0369 26.4148 15.6785 28.513 16.85C30.6112 18.0215 32.4504 19.694 33.8989 21.7476L36.944 19.0959Z" fill="black"/>
+        <path d="M28.7481 24.4575C27.8567 23.467 26.7984 22.6813 25.6337 22.1453C24.4689 21.6092 23.2206 21.3333 21.9599 21.3333C20.6992 21.3333 19.4508 21.6092 18.2861 22.1453C17.1214 22.6813 16.0631 23.467 15.1717 24.4575L21.9599 32L28.7481 24.4575Z" fill="black"/>
       </svg>
 
-      <svg class="ns2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="1" y="6" width="18" height="12" rx="2"/>
-        <path d="M23 13V11"/>
+      <svg class="ns2-icon" width="54" height="32" viewBox="0 0 54 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="8" width="32" height="16" rx="2" fill="black"/>
+        <path d="M48 10H52C53.1046 10 54 10.8954 54 12V20C54 21.1046 53.1046 22 52 22H48V10Z" fill="black"/>
+        <rect x="2" y="2" width="44" height="28" rx="3" stroke="black" stroke-width="4"/>
       </svg>
     </div>
   </header>
@@ -33,13 +34,14 @@
   <main class="ns2-carousel">
     <riescade-game-carousel 
       type="horizontal"
-      items-count="5" 
+      items-count="5"
       items-count-selected="1"
       item-class="ns2-game"
       item-marquee="true"
       item-marquee-source="./assets/logos"
       item-background="true"
       item-background-source="./assets/arts"
+      media-source="theme"
       logo-scale="1"
       logo-selected-scale="1"
       gap="20"
@@ -49,20 +51,43 @@
   <!-- BOTTOM MENU -->
   <footer class="ns2-bottombar">
     <div class="ns2-menu-pill">
-      <div class="ns2-menu-item active red"></div>
-      <div class="ns2-menu-item orange"></div>
-      <div class="ns2-menu-item green"></div>
-      <div class="ns2-menu-item red-outline"></div>
-      <div class="ns2-menu-item blue"></div>
-      <div class="ns2-menu-item cyan"></div>
-      <div class="ns2-menu-item gray"></div>
-      <div class="ns2-menu-item gray"></div>
-      <div class="ns2-menu-item gray"></div>
+      <div class="ns2-menu-item active">
+        <img src="./assets/images/menu-switch.png" alt="Switch Online">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu1.png" alt="Menu1">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu2.png" alt="Menu2">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu3.png" alt="Menu3">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu4.png" alt="Menu4">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu5.png" alt="Menu5">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu6.png" alt="Menu6">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu7.png" alt="Menu7">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu8.png" alt="Menu8">
+      </div>
+      <div class="ns2-menu-item">
+        <img src="./assets/images/menu9.png" alt="Menu9">  
+      </div>    
     </div>
   </footer>
 
   <!-- BOTTOM LEFT -->
-  <div class="ns2-switch-logo"></div>
+  <div class="ns2-switch-logo">
+    <img src="./assets/images/connected-controller.png" alt="connected-controller"/>
+  </div>
 
   <!-- BOTTOM RIGHT -->
   <div class="ns2-actions">

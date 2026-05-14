@@ -80,9 +80,7 @@ export const WebCarouselElement: React.FC<Props> = ({
 
   const getAssetPath = (itemData: any, isGameItem: boolean): string => {
     if (isGameItem) {
-      if (mediaSource === 'image') return resolvePath(itemData?.image, itemData)
-      if (mediaSource === 'marquee') return resolvePath(itemData?.marquee, itemData)
-      return resolvePath(itemData?.image || itemData?.marquee, itemData)
+      return resolvePath(itemData?.marquee || itemData?.image, itemData)
     }
 
     const sysTheme = itemData.theme || itemData.name
@@ -181,11 +179,13 @@ const CarouselItemNode = ({
   const sysTheme = itemData.theme || itemData.name
   const sysName = itemData.name === 'all' ? 'auto-allgames' : sysTheme
   
-  const artPath = itemBackground && itemBackgroundSource
-    ? resolvePath(`${themePath}/${itemBackgroundSource.replace('./', '')}/${sysName}.jpg`)
-    : (itemBackground && !item.isGame 
-        ? resolvePath(`${themePath}/assets/arts/${sysName}.jpg`)
-        : (itemBackground ? resolvePath(itemData.image || itemData.marquee, itemData) : ''))
+  const artPath = itemBackground 
+    ? (item.isGame 
+        ? resolvePath(itemData.image || itemData.marquee, itemData)
+        : (itemBackgroundSource 
+            ? resolvePath(`${themePath}/${itemBackgroundSource.replace('./', '')}/${sysName}.jpg`)
+            : resolvePath(`${themePath}/assets/arts/${sysName}.jpg`)))
+    : ''
 
   return (
     <div

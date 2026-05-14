@@ -320,12 +320,17 @@ function App() {
 			if (!selectedSystem) {
 				// System view navigation
 				if (systems.length === 0) return;
-				if (e.key === 'ArrowRight')
-					setSystemIndex((prev) => (prev + 1) % systems.length);
-				if (e.key === 'ArrowLeft')
-					setSystemIndex(
-						(prev) => (prev - 1 + systems.length) % systems.length,
-					);
+				
+				const systemHtml = theme?.views?.system || '';
+				const isVertical = systemHtml.includes('type="vertical"');
+
+				if (isVertical) {
+					if (e.key === 'ArrowDown') setSystemIndex((prev) => (prev + 1) % systems.length);
+					if (e.key === 'ArrowUp') setSystemIndex((prev) => (prev - 1 + systems.length) % systems.length);
+				} else {
+					if (e.key === 'ArrowRight') setSystemIndex((prev) => (prev + 1) % systems.length);
+					if (e.key === 'ArrowLeft') setSystemIndex((prev) => (prev - 1 + systems.length) % systems.length);
+				}
 
 				// Quick jump by hardware group
 				if (e.key === 'PageUp') {
@@ -370,12 +375,17 @@ function App() {
 					return;
 				}
 				if (games.length === 0) return;
-				if (e.key === 'ArrowDown')
-					setSelectedGameIndex((prev) => (prev + 1) % games.length);
-				if (e.key === 'ArrowUp')
-					setSelectedGameIndex(
-						(prev) => (prev - 1 + games.length) % games.length,
-					);
+
+				const gamelistHtml = theme?.views?.gamelist || '';
+				const isHorizontal = gamelistHtml.includes('type="horizontal"');
+
+				if (isHorizontal) {
+					if (e.key === 'ArrowRight') setSelectedGameIndex((prev) => (prev + 1) % games.length);
+					if (e.key === 'ArrowLeft') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+				} else {
+					if (e.key === 'ArrowDown') setSelectedGameIndex((prev) => (prev + 1) % games.length);
+					if (e.key === 'ArrowUp') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+				}
 
 				// Quick jump by letter
 				if (e.key === 'PageUp') {
