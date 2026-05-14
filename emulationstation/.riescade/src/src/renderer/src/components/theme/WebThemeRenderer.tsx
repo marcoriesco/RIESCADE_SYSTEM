@@ -120,6 +120,19 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         if (name === 'class') name = 'className'
         if (name === 'src' || name === 'href') value = resolveLocalPath(value)
 
+        // Map kebab-case SVG attributes to camelCase for React
+        const svgAttrMap: Record<string, string> = {
+          'stroke-width': 'strokeWidth',
+          'stroke-linecap': 'strokeLinecap',
+          'stroke-linejoin': 'strokeLinejoin',
+          'fill-opacity': 'fillOpacity',
+          'stroke-opacity': 'strokeOpacity',
+          'viewbox': 'viewBox'
+        }
+        if (svgAttrMap[name.toLowerCase()]) {
+          name = svgAttrMap[name.toLowerCase()]
+        }
+
         if (name === 'style') {
           value = value.replace(/url\(['"]?([^'")\s]+)['"]?\)/g, (match, path) => {
             if (!path.startsWith('data:') && !path.startsWith('http')) {
@@ -134,7 +147,19 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         // Skip event handler strings
         if (name.startsWith('on')) return
 
-        props[name] = value
+        // Convert kebab-case attribute names to camelCase for React props
+        const kebabToCamel = (str: string) => {
+          if (str === 'class') return 'className'
+          return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
+        }
+
+        let propName = kebabToCamel(name)
+        
+        // Special case for viewBox (already handled by svgAttrMap for SVG elements, 
+        // but this handles it for custom components too if needed)
+        if (propName === 'viewbox') propName = 'viewBox'
+
+        props[propName] = value
       })
 
       if (tagName === 'link' && props.rel === 'stylesheet') {
@@ -154,35 +179,49 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
       // ─── Custom Components ───
       if (tagName === 'riescade-system-carousel') {
+        const carouselProps = { ...props }
+        if (carouselProps.itemsCount) carouselProps.itemsCount = parseInt(carouselProps.itemsCount)
+        if (carouselProps.itemsCountSelected) carouselProps.itemsCountSelected = parseInt(carouselProps.itemsCountSelected)
+        if (carouselProps.gap) carouselProps.gap = parseInt(carouselProps.gap)
+        if (carouselProps.itemWidth) carouselProps.itemWidth = parseInt(carouselProps.itemWidth)
+        if (carouselProps.itemHeight) carouselProps.itemHeight = parseInt(carouselProps.itemHeight)
+        if (carouselProps.logoScale) carouselProps.logoScale = parseFloat(carouselProps.logoScale)
+        if (carouselProps.logoSelectedScale) carouselProps.logoSelectedScale = parseFloat(carouselProps.logoSelectedScale)
+        
+        carouselProps.itemMarquee = carouselProps.itemMarquee === 'true'
+        carouselProps.itemBackground = carouselProps.itemBackground === 'true'
+
         return (
           <WebCarouselElement
+            {...carouselProps}
             key={index}
-            type={props.type || 'horizontal'}
-            direction={props.direction || 'horizontal'}
-            mediaSource={props['media-source'] || 'theme'}
-            itemsCount={parseInt(props['items-count'] || '5')}
-            logoScale={props['logo-scale'] ? parseFloat(props['logo-scale']) : 0.5}
-            logoSelectedScale={props['logo-selected-scale'] ? parseFloat(props['logo-selected-scale']) : 1.0}
+            isGame={false}
             data={data}
             themePath={themePath}
-            isGame={false}
           />
         )
       }
 
       if (tagName === 'riescade-game-carousel') {
+        const carouselProps = { ...props }
+        if (carouselProps.itemsCount) carouselProps.itemsCount = parseInt(carouselProps.itemsCount)
+        if (carouselProps.itemsCountSelected) carouselProps.itemsCountSelected = parseInt(carouselProps.itemsCountSelected)
+        if (carouselProps.gap) carouselProps.gap = parseInt(carouselProps.gap)
+        if (carouselProps.itemWidth) carouselProps.itemWidth = parseInt(carouselProps.itemWidth)
+        if (carouselProps.itemHeight) carouselProps.itemHeight = parseInt(carouselProps.itemHeight)
+        if (carouselProps.logoScale) carouselProps.logoScale = parseFloat(carouselProps.logoScale)
+        if (carouselProps.logoSelectedScale) carouselProps.logoSelectedScale = parseFloat(carouselProps.logoSelectedScale)
+        
+        carouselProps.itemMarquee = carouselProps.itemMarquee === 'true'
+        carouselProps.itemBackground = carouselProps.itemBackground === 'true'
+
         return (
           <WebCarouselElement
+            {...carouselProps}
             key={index}
-            type={props.type || 'horizontal'}
-            direction={props.direction || 'horizontal'}
-            mediaSource={props['media-source'] || 'marquee'}
-            itemsCount={parseInt(props['items-count'] || '5')}
-            logoScale={props['logo-scale'] ? parseFloat(props['logo-scale']) : 0.5}
-            logoSelectedScale={props['logo-selected-scale'] ? parseFloat(props['logo-selected-scale']) : 1.0}
+            isGame={true}
             data={data}
             themePath={themePath}
-            isGame={true}
           />
         )
       }

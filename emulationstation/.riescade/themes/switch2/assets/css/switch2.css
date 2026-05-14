@@ -1,0 +1,260 @@
+:root {
+  --bg: #E9E9E9;
+  --text: #222;
+  --muted: #7f7f7f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+}
+
+.ns2-ui {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: #E9E9E9;
+}
+
+/* TOP */
+.ns2-topbar {
+  position: absolute;
+  top: 80px;
+  left: 48px;
+  right: 48px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ns2-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+
+  border: 5px solid white;
+  object-fit: cover;
+}
+
+.ns2-status {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ns2-icon {
+  width: 28px;
+  height: 28px;
+}
+
+/* TITLE */
+.ns2-current-game {
+  position: absolute;
+  top: 200px;
+  left: 120px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 26px;
+  color: #215FE5;
+  font-weight: 500;
+}
+
+.ns2-dot {
+  width: 26px;
+  height: 32px;
+  background: #215FE5;
+  border-radius: 4px;
+  position: relative; /* Para posicionar o triângulo */
+}
+
+.ns2-dot::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; /* Pequeno ajuste para ficar dentro na parte inferior */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #ffffff; /* Triângulo branco apontando para baixo */
+}
+
+/* GAMES */
+.ns2-carousel {
+  position: absolute;
+  top: 220px;
+  left: 70px;
+  width: 100vw;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+  overflow: visible;
+}
+
+.ns2-game {
+  border-radius: 24px !important;
+  overflow: visible !important;
+  background: rgba(255, 255, 255, 0.5);
+  position: absolute !important;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  padding-bottom: 40px !important;
+}
+
+/* Art Background for Tiles (Systems and Games) */
+.ns2-game {
+  background-image: var(--item-art);
+  background-size: cover;
+  background-position: center;
+}
+
+.ns2-game img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 70% !important;
+  max-height: 25% !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));
+  position: relative;
+  z-index: 2;
+}
+
+/* 1. Camada de Fundo (Arte do Sistema/Jogo + Overlay) */
+.ns2-game::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(transparent, rgba(0,0,0,0.4)), var(--item-art);
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  z-index: -1;
+}
+.ns2-game.selected::after {
+  box-shadow: 0 0 0 6px #E9E9E9, 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+.ns2-game.selected {
+  transform: translate(0, -50%) scale(1) !important;
+  z-index: 100 !important;
+  border-radius: 24px;
+}
+
+/* 2. Camada da Borda Degradê (Estática - Atrás de tudo) */
+.ns2-game.selected::before {
+  content: '';
+  position: absolute;
+  /* Expande 12px para fora (4 branca + 4 fundo + 4 degradê) */
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  /* Degradê Estático com as suas 5 cores */
+  background: linear-gradient(45deg, #66F2FF, #6B66FF, #9966FF, #F1F1F1, #FF66B8);
+  border-radius: 34px; /* Acompanha a expansão das bordas */
+  z-index: -2;
+  pointer-events: none;
+}
+
+.ns2-game img {
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes ns2-rotate-selection {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateZ(-2px); }
+  to { transform: translate(-50%, -50%) rotate(360deg) translateZ(-2px); }
+}
+
+/* BOTTOM BAR */
+.ns2-bottombar {
+  position: absolute;
+  left: 50%;
+  bottom: 160px;
+  transform: translateX(-50%);
+}
+
+.ns2-menu-pill {
+  height: 80px;
+  padding: 0 10px;
+  border-radius: 50px;
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    0 8px 30px rgba(0,0,0,0.05);
+}
+
+.ns2-menu-item {
+  width: 60px;
+  height: 60px;
+}
+.ns2-menu-item:first-child {
+  margin-right: 20px;
+}
+.ns2-menu-item img {
+  width: 100%;
+  height: auto;
+  display: inline-block;
+}
+
+/* SWITCH LOGO */
+.ns2-switch-logo {
+  position: absolute;
+  left: 48px;
+  bottom: 42px;
+  width: 68px;
+  opacity: 0.9;
+}
+.ns2-switch-logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ACTIONS */
+.ns2-actions {
+  position: absolute;
+  right: 48px;
+  bottom: 36px;
+  display: flex;
+  gap: 38px;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ns2-actions b {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: black;
+  color: #fff;
+  font-size: 16px;
+  margin-right: 8px;
+}

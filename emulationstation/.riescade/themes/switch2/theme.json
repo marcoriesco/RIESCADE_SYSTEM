@@ -1,0 +1,12 @@
+{
+  "name": "Nintendo Switch 2 Concept",
+  "version": "1.0.0",
+  "author": "Marco Riesco / Figma Concept",
+  "type": "web",
+  "templates": {
+    "system": "system.html",
+    "gamelist": "gamelist.html",
+    "loading": "loading.html",
+    "start": "start.html"
+  }
+}

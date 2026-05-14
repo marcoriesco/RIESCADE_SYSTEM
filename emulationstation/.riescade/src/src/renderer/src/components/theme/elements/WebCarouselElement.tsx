@@ -11,6 +11,15 @@ interface Props {
   isGame: boolean
   logoScale?: number
   logoSelectedScale?: number
+  itemClass?: string
+  itemsCountSelected?: number
+  itemMarquee?: boolean
+  itemMarqueeSource?: string
+  itemBackground?: boolean
+  itemBackgroundSource?: string
+  gap?: number
+  itemWidth?: number
+  itemHeight?: number
 }
 
 export const WebCarouselElement: React.FC<Props> = ({
@@ -21,7 +30,16 @@ export const WebCarouselElement: React.FC<Props> = ({
   themePath,
   isGame,
   logoScale = 0.5,
-  logoSelectedScale = 1.0
+  logoSelectedScale = 1.0,
+  itemClass = 'riescade-carousel-item',
+  itemsCountSelected,
+  itemMarquee = false,
+  itemMarqueeSource = './assets/logos',
+  itemBackground = false,
+  itemBackgroundSource = './assets/arts',
+  gap = 20,
+  itemWidth = 385,
+  itemHeight = 385
 }) => {
   const items = isGame ? (data?.games || []) : (data?.systems || [])
   const currentItemName = isGame ? data?.path : data?.['system.name']
@@ -33,6 +51,9 @@ export const WebCarouselElement: React.FC<Props> = ({
 
   const distance = 100 / itemsCount
   const halfCount = Math.floor(itemsCount / 2)
+  
+  // Default selected slot is center
+  const activeSlot = itemsCountSelected !== undefined ? itemsCountSelected : halfCount + 1
 
   const itemsToShow: any[] = []
   if (items.length > 0) {
@@ -43,8 +64,8 @@ export const WebCarouselElement: React.FC<Props> = ({
       if (diff > items.length / 2) diff -= items.length
       else if (diff < -items.length / 2) diff += items.length
 
-      // Render if close enough to viewport, or if we have few items
-      if (Math.abs(diff) <= halfCount + 2 || items.length <= itemsCount + 2) {
+      // Render if close enough to viewport
+      if (Math.abs(diff) <= itemsCount) {
         itemsToShow.push({
           data: item,
           offset: diff,
@@ -66,6 +87,11 @@ export const WebCarouselElement: React.FC<Props> = ({
 
     const sysTheme = itemData.theme || itemData.name
     const sysName = itemData.name === 'all' ? 'auto-allgames' : sysTheme
+
+    // Use custom marquee source if requested
+    if (itemMarquee && itemMarqueeSource) {
+      return resolvePath(`${themePath}/${itemMarqueeSource.replace('./', '')}/${sysName}.png`)
+    }
 
     if (mediaSource === 'theme') {
       return resolvePath(`${themePath}/assets/logos/${sysName}.png`)
@@ -93,12 +119,21 @@ export const WebCarouselElement: React.FC<Props> = ({
           <CarouselItemNode 
             key={itemData.path || itemData.name}
             item={item}
-            distance={distance}
             isVertical={isVertical}
             logoScale={logoScale}
             logoSelectedScale={logoSelectedScale}
             assetPath={assetPath}
             themePath={themePath}
+            itemClass={itemClass}
+            activeSlot={activeSlot}
+            isCentered={itemsCountSelected === undefined}
+            distance={distance}
+            itemsCount={itemsCount}
+            gap={gap}
+            itemWidth={itemWidth}
+            itemHeight={itemHeight}
+            itemBackground={itemBackground}
+            itemBackgroundSource={itemBackgroundSource}
           />
         )
       })}
@@ -106,59 +141,92 @@ export const WebCarouselElement: React.FC<Props> = ({
   )
 }
 
-const CarouselItemNode = ({ item, distance, isVertical, logoScale, logoSelectedScale, assetPath, themePath }: any) => {
+const CarouselItemNode = ({ 
+  item, isVertical, logoScale, logoSelectedScale, assetPath, themePath, itemClass, 
+  activeSlot, gap, itemWidth, itemHeight, itemBackground, itemBackgroundSource,
+  isCentered, distance, itemsCount
+}: any) => {
   const [imageFailed, setImageFailed] = React.useState(false)
   const { data: itemData, offset, isSelected } = item
   
   const absOffset = Math.abs(offset)
-  const pos = 50 + offset * distance
-  const scale = isSelected ? logoSelectedScale : logoScale
-  const opacity = isSelected ? 1.0 : 0.5
-  const saturation = isSelected ? 1 : 0
-  const isVisible = absOffset <= Math.floor(100 / distance / 1.5)
-  const zIndex = isSelected ? 50 : 20 - absOffset
+  
+  // Percentage-based size
+  const sizePct = 100 / itemsCount
+  
+  // Calculate position
+  let posValue = ''
+  let transform = ''
+  let isVisible = false
+
+  if (isCentered) {
+    // Percentage-based logic for centered carousels (Default Theme)
+    const pos = 50 + offset * distance
+    posValue = `${pos}%`
+    transform = `translate(-50%, -50%) scale(${isSelected ? logoSelectedScale : logoScale})`
+    isVisible = absOffset <= Math.floor(itemsCount / 2) + 1
+  } else {
+    // Percentage-based Slot logic (Switch Theme)
+    const slotIndex = (activeSlot - 1) + offset
+    // posValue = `calc(${slotIndex * sizePct}% + ${gap / 2}px)`
+    posValue = `${slotIndex * sizePct}%`
+    transform = `translate(0, -50%) scale(${isSelected ? logoSelectedScale : logoScale})`
+    isVisible = slotIndex >= -1 && slotIndex <= itemsCount
+  }
+
+  const opacity = isSelected ? 1.0 : 0.8
+  const saturation = isSelected ? 1 : 0.8
+  const zIndex = isSelected ? 100 : 50 - absOffset
+
+  const sysTheme = itemData.theme || itemData.name
+  const sysName = itemData.name === 'all' ? 'auto-allgames' : sysTheme
+  
+  const artPath = itemBackground && itemBackgroundSource
+    ? resolvePath(`${themePath}/${itemBackgroundSource.replace('./', '')}/${sysName}.jpg`)
+    : (itemBackground && !item.isGame 
+        ? resolvePath(`${themePath}/assets/arts/${sysName}.jpg`)
+        : (itemBackground ? resolvePath(itemData.image || itemData.marquee, itemData) : ''))
 
   return (
     <div
-      className={`carousel-item ${isSelected ? 'selected' : ''}`}
+      className={`${itemClass} ${isSelected ? 'selected' : ''}`}
+      data-riescade-name={itemData.name}
       style={{
         position: 'absolute',
-        left: isVertical ? '50%' : `${pos}%`,
-        top: isVertical ? `${pos}%` : '50%',
-        transform: `translate(-50%, -50%) scale(${scale})`,
-        width: isVertical ? '90%' : '20%',
-        height: isVertical ? '20%' : '80%',
+        left: isVertical ? '50%' : posValue,
+        top: isVertical ? posValue : '50%',
+        transform: transform,
+        width: isVertical ? '90%' : `calc(${sizePct}% - ${gap}px)`,
+        height: isVertical ? `calc(${sizePct}% - ${gap}px)` : '80%',
+        margin: isVertical ? `0 0 0 ${gap / 2}px` : `0 0 0 ${gap / 2}px`,
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: isCentered ? 'center' : 'flex-end',
+        paddingBottom: isCentered ? '0' : (isSelected ? '40px' : '20px'),
         opacity: isVisible ? opacity : 0,
         filter: `saturate(${saturation})`,
         zIndex,
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        willChange: 'transform, opacity'
-      }}
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        willChange: 'transform, opacity',
+        '--item-art': `url("${artPath}")`,
+        overflow: 'visible'
+      } as any}
     >
       {!imageFailed ? (
         <img
           src={assetPath}
           style={{
-            maxWidth: '100%',
-            maxHeight: '60%',
+            maxWidth: isCentered ? '100%' : '70%',
+            maxHeight: isCentered ? '60%' : '25%',
             objectFit: 'contain',
+            position: 'relative',
+            zIndex: 2,
+            filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))'
           }}
           alt={itemData.name}
           onError={(e) => {
-            if (!item.isGame) {
-              const sysName = itemData.name === 'all' ? 'auto-allgames' : itemData.name
-              const fbPath = resolvePath(`${themePath}/assets/logos/collections/${sysName}.png`)
-              if (e.currentTarget.src !== fbPath) {
-                e.currentTarget.src = fbPath
-              } else {
-                setImageFailed(true)
-              }
-            } else {
-              setImageFailed(true)
-            }
+            setImageFailed(true)
           }}
         />
       ) : (

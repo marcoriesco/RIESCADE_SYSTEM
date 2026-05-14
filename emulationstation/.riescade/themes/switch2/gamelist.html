@@ -1,0 +1,72 @@
+<div class="ns2-ui" data-riescade-view="gamelist">
+  <link rel="stylesheet" href="./assets/css/switch2.css" />
+
+  <!-- TOP BAR -->
+  <header class="ns2-topbar">
+    <div class="ns2-profile">
+      <img src="./assets/avatar.png" class="ns2-avatar" />
+    </div>
+
+    <div class="ns2-status">
+      <span class="ns2-clock"><riescade-clock format="hh:mm A" /></span>
+
+      <svg class="ns2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12.55a11 11 0 0114.08 0"/>
+        <path d="M1.42 9a16 16 0 0121.16 0"/>
+        <path d="M8.53 16.11a6 6 0 016.95 0"/>
+      </svg>
+
+      <svg class="ns2-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="1" y="6" width="18" height="12" rx="2"/>
+        <path d="M23 13V11"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- GAME TITLE -->
+  <div class="ns2-current-game">
+    <div class="ns2-dot"></div>
+    <span>{game:name}</span>
+  </div>
+
+  <!-- GAMES ROW -->
+  <main class="ns2-carousel">
+    <riescade-game-carousel 
+      type="horizontal"
+      items-count="5" 
+      items-count-selected="1"
+      item-class="ns2-game"
+      item-marquee="true"
+      item-marquee-source="./assets/logos"
+      item-background="true"
+      item-background-source="./assets/arts"
+      logo-scale="1"
+      logo-selected-scale="1"
+      gap="20"
+    />
+  </main>
+
+  <!-- BOTTOM MENU -->
+  <footer class="ns2-bottombar">
+    <div class="ns2-menu-pill">
+      <div class="ns2-menu-item active red"></div>
+      <div class="ns2-menu-item orange"></div>
+      <div class="ns2-menu-item green"></div>
+      <div class="ns2-menu-item red-outline"></div>
+      <div class="ns2-menu-item blue"></div>
+      <div class="ns2-menu-item cyan"></div>
+      <div class="ns2-menu-item gray"></div>
+      <div class="ns2-menu-item gray"></div>
+      <div class="ns2-menu-item gray"></div>
+    </div>
+  </footer>
+
+  <!-- BOTTOM LEFT -->
+  <div class="ns2-switch-logo"></div>
+
+  <!-- BOTTOM RIGHT -->
+  <div class="ns2-actions">
+    <span><b>+</b> Options</span>
+    <span><b>A</b> Play</span>
+  </div>
+</div>
