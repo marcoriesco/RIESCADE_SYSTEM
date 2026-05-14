@@ -2,6 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { WebThemeRenderer } from './theme/WebThemeRenderer'
 import { InputConfigOverlay } from './InputConfigOverlay'
 
+const localeModules = import.meta.glob('../locales/*.json', { eager: true })
+const locales: Record<string, any> = {}
+Object.entries(localeModules).forEach(([path, module]: [string, any]) => {
+  const lang = path.split('/').pop()?.replace('.json', '')
+  if (lang) locales[lang] = module.default || module
+})
+
 interface MenuItem {
   id: string
   label: string
@@ -27,36 +34,81 @@ interface MenuProps {
 
 export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData }) => {
   const [settings, setSettings] = useState<Record<string, any>>({})
+  const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
+  const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
   const [themes, setThemes] = useState<string[]>([])
   const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string }[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
   const [showInputConfig, setShowInputConfig] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [versions, setVersions] = useState({ app: '2.0.0', es: '' })
 
   const getSetting = (name: string, fallback: any = ''): any => {
-    return settings[name]?.value ?? fallback
+    return (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value) ?? fallback
   }
 
-  const saveSetting = async (name: string, value: any, type: string) => {
-    await window.api.saveSetting(name, value, type)
-    setSettings(prev => ({
-      ...prev,
-      [name]: { value: String(value), type }
-    }))
+  const currentLang = getSetting('Language', 'en_US')
+  const t = (key: string): string => locales[currentLang]?.[key] || key
+
+  const getThemeSetting = (name: string, fallback: any = ''): any => {
+    return themeSettings[name] ?? fallback
+  }
+
+  const updateSetting = (name: string, value: any) => {
+    setPendingSettings(prev => ({ ...prev, [name]: String(value) }))
+  }
+
+  const updateThemeSetting = (name: string, value: any) => {
+    setThemeSettings(prev => ({ ...prev, [name]: String(value) }))
+  }
+
+  const handleSave = async () => {
+    // 1. Save global settings
+    for (const [name, value] of Object.entries(pendingSettings)) {
+      const type = settings[name]?.type || 'string'
+      await window.api.saveSetting(name, value, type)
+    }
+
+    // 2. Save theme settings
+    if (theme?.name) {
+      for (const [key, value] of Object.entries(themeSettings)) {
+        await window.api.saveThemeSetting(theme.name, key, value)
+      }
+    }
+
+    // Check if theme changed or if reload is needed
+    if (pendingSettings['RIESCADE.ThemeSet']) {
+      window.api.executeCommand('reload-frontend')
+    } else {
+      // Just close and refresh
+      onClose()
+      window.api.executeCommand('reload-frontend')
+    }
   }
 
   useEffect(() => {
     if (isOpen) {
-      window.api.getSettings().then(setSettings)
+      window.api.getSettings().then(s => {
+        setSettings(s)
+        setPendingSettings({})
+      })
       window.api.getThemes().then(setThemes)
+      window.api.getVersion?.().then(setVersions)
+      
+      if (theme?.name) {
+        window.api.getThemeSettings(theme.name).then(setThemeSettings)
+      }
+
       setActiveMenuStack([{ items: getMainMenuItems(), title: 'MAIN MENU' }])
       setSelectedIndex(0)
       // Animate in
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)
+      setShowSaveModal(false)
     }
-  }, [isOpen])
+  }, [isOpen, theme?.name])
 
   // Update menu when settings/themes change
   useEffect(() => {
@@ -70,99 +122,124 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
   }, [settings, themes])
 
   const handleToggle = (item: MenuItem) => {
-    if (item.settingName && item.settingType === 'bool') {
-      const current = getSetting(item.settingName, 'false')
+    if (item.settingName) {
+      const current = item.id.startsWith('theme_opt_') 
+        ? getThemeSetting(item.settingName, 'false')
+        : getSetting(item.settingName, 'false')
       const newVal = current === 'true' || current === true ? 'false' : 'true'
-      saveSetting(item.settingName, newVal, 'bool')
+      
+      if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName, newVal)
+      else updateSetting(item.settingName, newVal)
     }
   }
 
   const handleSelect = (item: MenuItem, direction: 1 | -1) => {
     if (item.options && item.options.length > 0 && item.settingName) {
-      const current = getSetting(item.settingName, item.options[0].value)
-      let idx = item.options.findIndex(o => o.value === current)
+      const current = item.id.startsWith('theme_opt_')
+        ? getThemeSetting(item.settingName, item.options[0].value)
+        : getSetting(item.settingName, item.options[0].value)
+        
+      let idx = item.options.findIndex(o => String(o.value) === String(current))
       if (idx === -1) idx = 0
       const next = (idx + direction + item.options.length) % item.options.length
-      saveSetting(item.settingName, item.options[next].value, item.settingType || 'string')
+      
+      if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName, item.options[next].value)
+      else updateSetting(item.settingName, item.options[next].value)
     }
   }
 
   const handleSlider = (item: MenuItem, direction: 1 | -1) => {
-    if (item.settingName && item.settingType === 'int') {
+    if (item.settingName) {
       const min = item.min ?? 0
       const max = item.max ?? 100
       const step = item.step ?? 5
       const current = parseInt(getSetting(item.settingName, Math.floor((min + max) / 2)))
       let newVal = current + direction * step
       newVal = Math.max(min, Math.min(max, newVal))
-      saveSetting(item.settingName, newVal, 'int')
+      updateSetting(item.settingName, newVal)
     }
   }
 
-  const getMainMenuItems = (): MenuItem[] => [
-    {
-      id: 'game_settings', label: 'GAME SETTINGS', submenu: [
-        { id: 'game_ratio', label: 'GAME ASPECT RATIO', type: 'select', settingName: 'global.ratio', options: [
-          { label: 'AUTO', value: 'auto' }, { label: '4/3', value: '4/3' }, { label: '16/9', value: '16/9' },
-          { label: '16/10', value: '16/10' }, { label: 'FULL', value: 'full' }
-        ]},
-        { id: 'smooth_games', label: 'SMOOTH GAMES', type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
-        { id: 'rewind', label: 'REWIND', type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
-        { id: 'autosave', label: 'AUTO SAVE/LOAD', type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
-        { id: 'shaders', label: 'SHADER SET', type: 'select', settingName: 'global.shaderset', options: [
-          { label: 'NONE', value: 'none' }, { label: 'RIESCADE', value: '[riescade]' },
-          { label: 'RETRO', value: 'retro' }, { label: 'SCANLINES', value: 'scanlines' }
-        ]},
-        { id: 'decorations', label: 'DECORATIONS', type: 'select', settingName: 'global.bezel', options: [
-          { label: 'NONE', value: 'none' }, { label: 'AUTO', value: 'auto' },
-          { label: 'THE BEZEL PROJECT', value: 'thebezelproject' }
-        ]}
-      ]
-    },
-    {
-      id: 'ui_settings', label: 'USER INTERFACE', submenu: [
-        { id: 'theme_set', label: 'THEME', type: 'select', settingName: 'RIESCADE.ThemeSet',
-          options: themes.length ? themes.map(t => ({ label: t.toUpperCase(), value: t })) : [{ label: 'DEFAULT', value: 'default' }]
-        },
-        { id: 'language', label: 'LANGUAGE', type: 'select', settingName: 'Language', options: [
-          { label: 'ENGLISH', value: 'en_US' }, { label: 'PORTUGUÊS', value: 'pt_BR' },
-          { label: 'ESPAÑOL', value: 'es_ES' }, { label: 'FRANÇAIS', value: 'fr_FR' }
-        ]},
-        { id: 'screensaver_time', label: 'SCREENSAVER', type: 'select', settingName: 'ScreenSaverTime', options: [
-          { label: 'OFF', value: '0' }, { label: '1 MIN', value: '60000' },
-          { label: '5 MIN', value: '300000' }
-        ]}
-      ]
-    },
-    {
-      id: 'sound_settings', label: 'SOUND', submenu: [
-        { id: 'system_volume', label: 'SYSTEM VOLUME', type: 'slider', settingName: 'Volume', settingType: 'int', min: 0, max: 100, step: 5, suffix: '%' },
-        { id: 'music_volume', label: 'MUSIC VOLUME', type: 'slider', settingName: 'MusicVolume', settingType: 'int', min: 0, max: 100, step: 5, suffix: '%' },
-        { id: 'frontend_music', label: 'FRONTEND MUSIC', type: 'toggle', settingName: 'audio.bgmusic', settingType: 'bool' },
-        { id: 'video_audio', label: 'VIDEO PREVIEW AUDIO', type: 'toggle', settingName: 'VideoAudio', settingType: 'bool' }
-      ]
-    },
-    {
-      id: 'system_settings', label: 'SYSTEM', submenu: [
-        { id: 'clock_format', label: '12-HOUR CLOCK', type: 'toggle', settingName: 'ClockMode12', settingType: 'bool' },
-        { id: 'show_fps', label: 'SHOW FRAMERATE', type: 'toggle', settingName: 'DrawFramerate', settingType: 'bool' },
-        { id: 'vram_limit', label: 'VRAM LIMIT', type: 'slider', settingName: 'MaxVRAM', settingType: 'int', min: 40, max: 1000, step: 10, suffix: ' Mb' }
-      ]
-    },
-    {
-      id: 'controller_settings', label: 'CONTROLLERS', submenu: [
-        { id: 'configure_input', label: 'CONFIGURE INPUT', type: 'action', onClick: () => setShowInputConfig(true) }
-      ]
-    },
-    { id: 'quit', label: 'QUIT', type: 'action', onClick: () => window.api?.executeCommand('exit-frontend') }
-  ]
+  const getMainMenuItems = (): MenuItem[] => {
+    const items: MenuItem[] = [
+      {
+        id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
+          { id: 'game_ratio', label: t('GAME ASPECT RATIO'), type: 'select', settingName: 'global.ratio', options: [
+            { label: t('AUTO'), value: 'auto' }, { label: '4/3', value: '4/3' }, { label: '16/9', value: '16/9' },
+            { label: '16/10', value: '16/10' }, { label: 'FULL', value: 'full' }
+          ]},
+          { id: 'smooth_games', label: t('SMOOTH GAMES'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
+          { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
+          { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
+          { id: 'shaders', label: t('SHADER SET'), type: 'select', settingName: 'global.shaderset', options: [
+            { label: t('NONE'), value: 'none' }, { label: 'RIESCADE', value: '[riescade]' },
+            { label: 'RETRO', value: 'retro' }, { label: 'SCANLINES', value: 'scanlines' }
+          ]},
+          { id: 'decorations', label: t('DECORATIONS'), type: 'select', settingName: 'global.bezel', options: [
+            { label: t('NONE'), value: 'none' }, { label: t('AUTO'), value: 'auto' },
+            { label: 'THE BEZEL PROJECT', value: 'thebezelproject' }
+          ]}
+        ]
+      },
+      {
+        id: 'ui_settings', label: t('USER INTERFACE'), submenu: [
+          { id: 'theme_set', label: t('THEME'), type: 'select', settingName: 'RIESCADE.ThemeSet',
+            options: themes.length ? themes.map(t => ({ label: t.toUpperCase(), value: t })) : [{ label: 'DEFAULT', value: 'default' }]
+          },
+          ...(theme?.options && theme.options.length > 0 ? [
+            { id: 'theme_cfg_group', label: t('THEME CONFIGURATION'), type: 'group' },
+            ...theme.options.map((opt: any) => ({
+              id: `theme_opt_${opt.id}`,
+              label: opt.name,
+              type: opt.type || 'select',
+              settingName: opt.id,
+              options: opt.options
+            }))
+          ] : [] as any[]),
+          { id: 'ui_group_gen', label: t('GENERAL UI'), type: 'group' },
+          { id: 'screensaver_time', label: t('SCREENSAVER'), type: 'select', settingName: 'ScreenSaverTime', options: [
+            { label: t('OFF'), value: '0' }, { label: t('1 MIN'), value: '60000' },
+            { label: t('5 MIN'), value: '300000' }
+          ]}
+        ]
+      },
+      {
+        id: 'sound_settings', label: t('SOUND'), submenu: [
+          { id: 'system_volume', label: t('SYSTEM VOLUME'), type: 'slider', settingName: 'Volume', settingType: 'int', min: 0, max: 100, step: 5, suffix: '%' },
+          { id: 'music_volume', label: t('MUSIC VOLUME'), type: 'slider', settingName: 'MusicVolume', settingType: 'int', min: 0, max: 100, step: 5, suffix: '%' },
+          { id: 'frontend_music', label: t('FRONTEND MUSIC'), type: 'toggle', settingName: 'audio.bgmusic', settingType: 'bool' },
+          { id: 'video_audio', label: t('VIDEO PREVIEW AUDIO'), type: 'toggle', settingName: 'VideoAudio', settingType: 'bool' }
+        ]
+      },
+      {
+        id: 'system_settings', label: t('SYSTEM SETTINGS'), submenu: [
+          { id: 'language', label: t('LANGUAGE'), type: 'select', settingName: 'Language', options: 
+            Object.keys(locales).sort().map(lang => ({ 
+              label: lang.toUpperCase().replace('_', '-'), 
+              value: lang 
+            }))
+          },
+          { id: 'show_fps', label: t('SHOW FRAMERATE'), type: 'toggle', settingName: 'DrawFramerate', settingType: 'bool' },
+          { id: 'vram_limit', label: t('VRAM LIMIT'), type: 'slider', settingName: 'MaxVRAM', settingType: 'int', min: 40, max: 1000, step: 10, suffix: ' Mb' }
+        ]
+      },
+      {
+        id: 'controller_settings', label: t('CONTROLLERS'), submenu: [
+          { id: 'configure_input', label: t('CONFIGURE INPUT'), type: 'action', onClick: () => setShowInputConfig(true) }
+        ]
+      },
+      { id: 'quit', label: t('QUIT'), type: 'action', onClick: () => window.api?.executeCommand('exit-frontend') }
+    ]
+
+    return items
+  }
 
   const currentMenu = activeMenuStack[activeMenuStack.length - 1]?.items || []
   const menuTitle = activeMenuStack[activeMenuStack.length - 1]?.title || 'MAIN MENU'
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isOpen || showInputConfig) return
+      if (!isOpen || showInputConfig || showSaveModal) return
       if (currentMenu.length === 0) return
 
       if (e.key === 'ArrowDown') {
@@ -200,11 +277,17 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
           setActiveMenuStack(prev => prev.slice(0, -1))
           setSelectedIndex(0)
         } else {
-          onClose()
+          // Check for pending changes
+          const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).length > 0
+          if (hasChanges) {
+            setShowSaveModal(true)
+          } else {
+            onClose()
+          }
         }
       }
     },
-    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, settings]
+    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings]
   )
 
   useEffect(() => {
@@ -213,7 +296,11 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
   }, [handleKeyDown])
 
   const renderItemValue = (item: MenuItem) => {
-    const val = item.value !== undefined ? item.value : (item.settingName ? getSetting(item.settingName, false) : undefined)
+    const val = item.value !== undefined ? item.value : (
+      item.settingName ? (
+        item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName) : getSetting(item.settingName)
+      ) : undefined
+    )
 
     if (item.type === 'toggle') {
       const isOn = val === 'true' || val === true
@@ -241,21 +328,17 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       return <div className="menu-info">{item.value}</div>
     }
     if (item.submenu) {
-      return <span style={{ opacity: 0.5, fontSize: '1.2em' }}>›</span>
+      return <span className="menu-submenu-arrow">›</span>
     }
     return null
   }
 
   const menuItemsNode = (
-    <div className="menu-list" style={{ padding: 0, background: 'transparent', height: '100%', overflowY: 'auto' }}>
+    <div className="riescade-menu-list">
       {currentMenu.map((item, index) => {
         if (item.type === 'group') {
           return (
-            <div key={item.id} className="menu-group" style={{
-              padding: '20px 30px 10px', color: '#888', fontSize: '0.8rem',
-              fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase',
-              borderBottom: '1px solid rgba(0,0,0,0.05)'
-            }}>
+            <div key={item.id} className="riescade-menu-group">
               {item.label}
             </div>
           )
@@ -263,20 +346,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         return (
           <div
             key={item.id}
-            className={`menu-item ${index === selectedIndex ? 'selected' : ''}`}
-            style={{
-              padding: '12px 30px', display: 'flex', alignItems: 'center',
-              justifyContent: 'space-between', cursor: 'pointer',
-              background: index === selectedIndex ? '#3b82f6' : 'transparent',
-              color: index === selectedIndex ? '#fff' : '#444',
-              borderBottom: '1px solid rgba(0,0,0,0.1)',
-              transition: 'background 0.15s ease, color 0.15s ease'
-            }}
+            className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
           >
-            <span style={{ fontWeight: index === selectedIndex ? 800 : 500, fontSize: '0.95rem', textTransform: 'uppercase' }}>
+            <span className="riescade-menu-label">
               {item.label}
             </span>
-            <div className="menu-value">{renderItemValue(item)}</div>
+            <div className="riescade-menu-value">{renderItemValue(item)}</div>
           </div>
         )
       })}
@@ -287,82 +362,105 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
 
   return (
     <>
-      <div
-        className="menu-overlay"
-        style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: theme?.views?.menu ? 'transparent' : 'rgba(0,0,0,0.85)',
-          zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          opacity: visible ? 1 : 0,
-          transition: 'opacity 0.2s ease'
-        }}
-      >
-        {theme?.isWebTheme && theme.views?.menu ? (
-          <div style={{ width: '100%', height: '100%' }}>
-            <WebThemeRenderer
-              htmlContent={theme.views.menu}
-              data={{ ...themeData, menuTitle }}
-              themePath={theme.path}
-              menuItemsNode={menuItemsNode}
-            />
+      <div className={`riescade-menu-overlay ${visible ? 'visible' : ''}`}>
+        <div className="riescade-menu-container">
+          <div className="riescade-menu-header">
+            <h2 className="riescade-menu-title">{menuTitle}</h2>
           </div>
-        ) : (
-          <div
-            className="menu-container"
-            style={{
-              width: '600px', background: '#dfdfdf', borderRadius: 0,
-              boxShadow: '0 40px 100px rgba(0,0,0,0.9)',
-              display: 'flex', flexDirection: 'column',
-              border: '4px solid #fff', fontFamily: '"Inter", sans-serif',
-              transform: visible ? 'scale(1)' : 'scale(0.95)',
-              opacity: visible ? 1 : 0,
-              transition: 'transform 0.2s ease, opacity 0.2s ease'
-            }}
-          >
-            <div style={{
-              background: '#eee', padding: '15px 25px',
-              borderBottom: '2px solid #aaa', textAlign: 'center'
-            }}>
-              <h2 style={{ margin: 0, color: '#333', fontSize: '1.2rem', fontWeight: 900, letterSpacing: '3px', textTransform: 'uppercase' }}>
-                {menuTitle}
-              </h2>
-            </div>
 
-            <div style={{ height: '60vh', background: '#fff' }}>
-              {menuItemsNode}
-            </div>
+          <div className="riescade-menu-list-container">
+            {menuItemsNode}
+          </div>
 
-            <div style={{
-              background: '#ddd', padding: '10px 25px',
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              borderTop: '2px solid #aaa'
-            }}>
-              <div style={{ display: 'flex', gap: '30px', fontSize: '0.8rem', color: '#444', fontWeight: 700 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ background: '#333', color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>A</span> CHOOSE
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ background: '#333', color: '#fff', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>B</span> BACK
-                </div>
+          <div className="riescade-menu-footer">
+            <div className="riescade-menu-footer-actions">
+              <div className="riescade-menu-footer-action">
+                <span className="riescade-menu-footer-button">A</span>
+                <span className="riescade-menu-footer-text">{t('CHOOSE')}</span>
               </div>
-              <div style={{ fontSize: '0.7rem', color: '#666', fontWeight: 600 }}>
-                RIESCADE 2.0
+              <div className="riescade-menu-footer-action">
+                <span className="riescade-menu-footer-button">B</span>
+                <span className="riescade-menu-footer-text">{t('BACK')}</span>
               </div>
             </div>
+            <div className="riescade-menu-version">
+              RIESCADE {versions.app} | ES {versions.es}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
+      {showSaveModal && (
+        <div className="riescade-modal-overlay">
+          <div className="riescade-modal-container">
+            <h3 className="riescade-modal-title">{t('Apply Changes?')}</h3>
+            <p className="riescade-modal-message">
+              {t('Settings will be saved. The app will refresh to apply changes.')}
+            </p>
+            <div className="riescade-modal-buttons">
+              <button 
+                onClick={handleSave}
+                className="riescade-modal-button-primary"
+              >
+                {t('Save & Apply')}
+              </button>
+              <button 
+                onClick={onClose}
+                className="riescade-modal-button-danger"
+              >
+                {t('Discard Changes')}
+              </button>
+              <button 
+                onClick={() => setShowSaveModal(false)}
+                className="riescade-modal-button-secondary"
+              >
+                {t('Cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{ __html: `
+        .riescade-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+        .riescade-menu-overlay.visible { opacity: 1; pointer-events: auto; }
+        .riescade-menu-container { width: 600px; background: #dfdfdf; display: flex; flex-direction: column; border: 4px solid #fff; font-family: "Inter", sans-serif; transform: scale(0.95); transition: transform 0.2s ease; }
+        .riescade-menu-overlay.visible .riescade-menu-container { transform: scale(1); }
+        .riescade-menu-header { background: #eee; padding: 15px 25px; border-bottom: 2px solid #aaa; text-align: center; }
+        .riescade-menu-title { margin: 0; color: #333; font-size: 1.2rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+        .riescade-menu-subtitle { font-size: 0.8rem; color: #666; margin-top: 5px; }
+        .riescade-menu-list-container { height: 60vh; background: #fff; overflow-y: auto; }
+        .riescade-menu-item { padding: 12px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.1); transition: background 0.15s ease, color 0.15s ease; color: #444; }
+        .riescade-menu-item.selected { background: #3b82f6; color: #fff; }
+        .riescade-menu-label { font-weight: 500; font-size: 0.95rem; text-transform: uppercase; }
+        .riescade-menu-item.selected .riescade-menu-label { font-weight: 800; }
+        .riescade-menu-group { padding: 20px 30px 10px; color: #888; font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .riescade-menu-footer { background: #ddd; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #aaa; }
+        .riescade-menu-footer-actions { display: flex; gap: 30px; font-size: 0.8rem; color: #444; font-weight: 700; }
+        .riescade-menu-footer-action { display: flex; align-items: center; gap: 8px; }
+        .riescade-menu-footer-button { background: #333; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .riescade-menu-version { font-size: 0.7rem; color: #666; font-weight: 600; }
+        
+        .riescade-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: "Inter", sans-serif; }
+        .riescade-modal-container { background: #fff; padding: 40px; border-radius: 4px; text-align: center; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .riescade-modal-title { margin: 0 0 20px; color: #333; font-size: 1.4rem; font-weight: 900; text-transform: uppercase; }
+        .riescade-modal-message { margin: 0 0 30px; color: #666; line-height: 1.6; }
+        .riescade-modal-buttons { display: flex; gap: 15px; justify-content: center; flex-direction: column; }
+        .riescade-modal-button-primary { padding: 12px 30px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+        .riescade-modal-button-danger { padding: 12px 30px; background: #f43f5e; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+        .riescade-modal-button-secondary { padding: 12px 30px; background: #eee; color: #444; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+
         .menu-toggle { width: 40px; height: 20px; background: #ccc; border-radius: 10px; position: relative; transition: background 0.15s ease; }
         .menu-toggle.on { background: #4ade80; }
         .menu-toggle.on .toggle-thumb { transform: translateX(20px); }
         .toggle-thumb { width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.15s ease; }
         .menu-select { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.9rem; }
         .menu-select .arrow { opacity: 0.3; }
-        .menu-item.selected .menu-select .arrow { opacity: 1; }
-        .menu-list::-webkit-scrollbar { width: 6px; }
-        .menu-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        .riescade-menu-item.selected .menu-select .arrow { opacity: 1; }
+        .riescade-menu-list-container::-webkit-scrollbar { width: 6px; }
+        .riescade-menu-list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        .menu-submenu-arrow { opacity: 0.5; font-size: 1.2em; }
+        .riescade-menu-item.selected .menu-submenu-arrow { opacity: 1; }
       ` }} />
       {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />}
     </>

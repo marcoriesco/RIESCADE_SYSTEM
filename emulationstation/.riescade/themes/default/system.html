@@ -12,14 +12,12 @@
     <div class="header-left">
         <div class="system-name">
             {system:fullName}
-            <span>({system:gamecount})!</span>
+            <span>({system:gamecount})</span>
         </div>
     </div>
-
     <div class="header-center centered">
         <riescade-clock format="HH:mm" />
     </div>
-
     <div class="header-right"></div>
 </div>
 
@@ -29,13 +27,10 @@
     <riescade-system-carousel
       type="horizontal"
       items-count="5"
-      media-source="theme"
-      item-marquee="true"
-      item-marquee-source="./assets/logos"
+      media-source="./assets/logos"
       class="main-system-carousel"
       logo-scale="0.5"
       logo-selected-scale="1.2"
-      gap="20"
     ></riescade-system-carousel>
   </div>
 

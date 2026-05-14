@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 import { SettingsParser } from '../parsers/SettingsParser'
+import { ThemeSettingsParser } from '../parsers/ThemeSettingsParser'
 import { getDefaultThemePath, getUserThemesPath } from '../utils/paths'
 
 export interface WebThemeConfig {
@@ -11,11 +12,11 @@ export interface WebThemeConfig {
   views: {
     system: string
     gamelist: string
-    menu: string
     loading: string
     start: string
   }
   options?: any[]
+  settings?: Record<string, string>
 }
 
 export class ThemeService {
@@ -123,11 +124,11 @@ export class ThemeService {
       views: {
         system: getTemplate('system', 'system.html'),
         gamelist: getTemplate('gamelist', 'gamelist.html'),
-        menu: getTemplate('menu', 'menu.html'),
         loading: getTemplate('loading', 'loading.html'),
         start: getTemplate('start', 'start.html')
       },
-      options
+      options,
+      settings: ThemeSettingsParser.getThemeSettings(themeName, themePath)
     }
   }
 }

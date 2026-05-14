@@ -9,7 +9,8 @@ import { ThemeSettingsParser } from './parsers/ThemeSettingsParser'
 import { SystemService } from './services/SystemService'
 import { SassService } from './services/SassService'
 import { Game, System } from '../shared/types'
-import { watch, FSWatcher } from 'fs'
+import { watch, FSWatcher, readFileSync, existsSync } from 'fs'
+import { getRetroBatPath } from './utils/paths'
 
 const libraryService = new LibraryService()
 const launcherService = new LauncherService()
@@ -147,7 +148,7 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('save-theme-setting', async (_, themeName: string, key: string, value: string) => {
-    return ThemeSettingsParser.saveThemeSetting(themeName, key, value)
+    return ThemeSettingsParser.saveThemeSetting(themeName, themeService.getThemePath(themeName), key, value)
   })
 
   // ─── IPC: System Commands ───
@@ -166,6 +167,23 @@ app.whenReady().then(() => {
   ipcMain.handle('get-configured-controllers', async () => {
     // Implement parsing es_input.cfg later if needed
     return []
+  })
+
+  ipcMain.handle('get-version', async () => {
+    let esVersion = 'unknown'
+    try {
+      const versionFile = join(getRetroBatPath(), 'emulationstation', 'version.info')
+      if (existsSync(versionFile)) {
+        esVersion = readFileSync(versionFile, 'utf-8').trim()
+      }
+    } catch (e) {
+      console.error('Failed to read version.info:', e)
+    }
+    
+    return {
+      app: app.getVersion(),
+      es: esVersion
+    }
   })
 
   app.on('activate', function () {

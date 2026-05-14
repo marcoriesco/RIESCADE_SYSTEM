@@ -1,5 +1,5 @@
 import { exec } from 'child_process'
-import { app } from 'electron'
+import { app, BrowserWindow } from 'electron'
 
 export class SystemService {
   public executeCommand(command: string): void {
@@ -21,6 +21,9 @@ export class SystemService {
       case 'restart-frontend':
         app.relaunch()
         app.exit(0)
+        break
+      case 'reload-frontend':
+        BrowserWindow.getAllWindows().forEach(w => w.reload())
         break
       case 'exit-frontend':
         app.quit()

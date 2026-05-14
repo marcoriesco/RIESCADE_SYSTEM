@@ -92,40 +92,25 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   }, [handleKeyDown])
 
   const menuItemsNode = (
-    <div className="menu-list" style={{ padding: 0, background: 'transparent' }}>
+    <div className="riescade-menu-list">
       {options.map((item, index) => (
         <div
           key={item.id}
-          className={`menu-item ${index === selectedIndex ? 'selected' : ''}`}
-          style={{
-            padding: '12px 30px', display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', cursor: 'pointer',
-            background: index === selectedIndex ? '#3b82f6' : 'transparent',
-            color: index === selectedIndex ? '#fff' : '#444',
-            borderBottom: '1px solid rgba(0,0,0,0.1)',
-            transition: 'background 0.15s ease'
-          }}
+          className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
         >
-          <span style={{ fontWeight: index === selectedIndex ? 800 : 500, fontSize: '0.95rem', textTransform: 'uppercase' }}>
+          <span className="riescade-menu-label">
             {item.label}
           </span>
-          <div className="menu-value">
+          <div className="riescade-menu-value">
             {item.type === 'toggle' ? (
-              <div className={`menu-toggle ${item.value ? 'on' : 'off'}`} style={{
-                width: 40, height: 20, background: item.value ? '#4ade80' : '#ccc',
-                borderRadius: 10, position: 'relative'
-              }}>
-                <div style={{
-                  width: 16, height: 16, background: '#fff', borderRadius: '50%',
-                  position: 'absolute', top: 2, left: item.value ? 22 : 2,
-                  transition: 'left 0.15s ease'
-                }} />
+              <div className={`menu-toggle ${item.value ? 'on' : 'off'}`}>
+                <div className="toggle-thumb" />
               </div>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800 }}>
-                <span style={{ opacity: index === selectedIndex ? 1 : 0.3 }}>«</span>
-                <span>{item.items?.find(i => i.value === item.value)?.label || item.value}</span>
-                <span style={{ opacity: index === selectedIndex ? 1 : 0.3 }}>»</span>
+              <div className="menu-select">
+                <span className="arrow">«</span>
+                <span className="value">{item.items?.find(i => i.value === item.value)?.label || item.value}</span>
+                <span className="arrow">»</span>
               </div>
             )}
           </div>
@@ -137,43 +122,22 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   if (!isOpen) return null
 
   return (
-    <div
-      className="game-options-overlay"
-      style={{
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'rgba(0,0,0,0.85)', zIndex: 10000,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        opacity: visible ? 1 : 0, transition: 'opacity 0.2s ease'
-      }}
-    >
-      {theme?.isWebTheme && theme.views?.menu ? (
-        <div style={{ width: '100%', height: '100%' }}>
-          <WebThemeRenderer
-            htmlContent={theme.views.menu}
-            data={{ ...themeData, menuTitle: 'GAME OPTIONS', 'game:name': game.name }}
-            themePath={theme.path}
-            menuItemsNode={menuItemsNode}
-          />
+    <div className={`riescade-menu-overlay game-options ${visible ? 'visible' : ''}`}>
+      <div className="riescade-menu-container">
+        <div className="riescade-menu-header">
+          <h2 className="riescade-menu-title">GAME OPTIONS</h2>
+          <div className="riescade-menu-subtitle">{game.name}</div>
         </div>
-      ) : (
-        <div
-          style={{
-            width: '500px', background: '#dfdfdf', border: '4px solid #fff',
-            display: 'flex', flexDirection: 'column',
-            transform: visible ? 'scale(1)' : 'scale(0.95)',
-            transition: 'transform 0.2s ease'
-          }}
-        >
-          <div style={{ background: '#eee', padding: '15px 25px', borderBottom: '2px solid #aaa' }}>
-            <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase' }}>GAME OPTIONS</h2>
-            <div style={{ fontSize: '0.8rem', color: '#666' }}>{game.name}</div>
-          </div>
-          <div style={{ background: '#fff' }}>{menuItemsNode}</div>
-          <div style={{ background: '#ddd', padding: '10px 25px', fontSize: '0.8rem', fontWeight: 700 }}>
-            PRESS B TO CLOSE
+        <div className="riescade-menu-list-container">{menuItemsNode}</div>
+        <div className="riescade-menu-footer">
+          <div className="riescade-menu-footer-actions">
+            <div className="riescade-menu-footer-action">
+              <span className="riescade-menu-footer-button">B</span>
+              <span className="riescade-menu-footer-text">BACK</span>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

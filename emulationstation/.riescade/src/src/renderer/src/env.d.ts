@@ -17,6 +17,7 @@ declare global {
       saveThemeSetting: (themeName: string, key: string, value: string) => Promise<any>
       getConfiguredControllers: () => Promise<any>
       executeCommand: (command: string, data?: any) => void
+      getVersion: () => Promise<{ app: string; es: string }>
       on: (channel: string, callback: (...args: any[]) => void) => () => void
     }
   }

@@ -239,6 +239,8 @@ function App() {
 			'global:screenWidth': window.innerWidth,
 			'global:screenHeight': window.innerHeight,
 			'menu:open': isMenuOpen,
+			...(theme?.settings || {}),
+			...Object.entries(theme?.settings || {}).reduce((acc, [k, v]) => ({ ...acc, [`options:${k}`]: v }), {})
 		};
 
 		if (selectedSystem && currentGame) {
@@ -284,6 +286,7 @@ function App() {
 		currentGame,
 		isMenuOpen,
 		isGameOptionsOpen,
+		theme,
 	]);
 
 	const handleUpdateGame = (updatedGame: Game) => {

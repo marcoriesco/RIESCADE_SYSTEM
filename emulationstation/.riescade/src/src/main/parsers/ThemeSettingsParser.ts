@@ -3,17 +3,12 @@ import { join } from 'path'
 import { getConfigPath } from '../utils/paths'
 
 export class ThemeSettingsParser {
-  static getSettingsPath(themeName: string): string {
-    const configPath = getConfigPath()
-    const themeSettingsDir = join(configPath, 'themesettings')
-    if (!existsSync(themeSettingsDir)) {
-      mkdirSync(themeSettingsDir, { recursive: true })
-    }
-    return join(themeSettingsDir, `${themeName}.cfg`)
+  static getSettingsPath(themePath: string): string {
+    return join(themePath, 'config.json')
   }
 
   static getThemeSettings(themeName: string, themePath: string): Record<string, string> {
-    const settingsPath = this.getSettingsPath(themeName)
+    const settingsPath = this.getSettingsPath(themePath)
     const settings: Record<string, string> = {}
 
     // 1. Load defaults from options.json if it exists
@@ -22,15 +17,11 @@ export class ThemeSettingsParser {
       try {
         const optionsContent = readFileSync(optionsPath, 'utf8')
         const optionsData = JSON.parse(optionsContent)
-        
-        // options.json structure is usually a record or has subsets
-        // Let's iterate and extract defaults
-        if (optionsData && typeof optionsData === 'object') {
-          for (const key of Object.keys(optionsData)) {
-             // Basic support: assume we can parse defaults if any
-             if (optionsData[key] && optionsData[key].default) {
-                settings[key] = optionsData[key].default
-             }
+        if (Array.isArray(optionsData)) {
+          for (const opt of optionsData) {
+            if (opt.id && opt.default !== undefined) {
+              settings[opt.id] = String(opt.default)
+            }
           }
         }
       } catch (e) {
@@ -38,52 +29,37 @@ export class ThemeSettingsParser {
       }
     }
 
-    // 2. Override with user settings
+    // 2. Override with user settings from config.json
     if (existsSync(settingsPath)) {
       try {
         const content = readFileSync(settingsPath, 'utf8')
-        const lines = content.split('\n')
-        for (const line of lines) {
-          const match = line.match(/<string name="([^"]+)" value="([^"]+)"\s*\/>/)
-          if (match) {
-            settings[match[1]] = match[2]
+        const userData = JSON.parse(content)
+        if (userData && typeof userData === 'object') {
+          for (const [key, val] of Object.entries(userData)) {
+            settings[key] = String(val)
           }
         }
       } catch (e) {
-        console.error(`Error reading ${themeName}.cfg:`, e)
+        console.error(`Error reading ${settingsPath}:`, e)
       }
     }
 
     return settings
   }
 
-  static saveThemeSetting(themeName: string, key: string, value: string): void {
-    const settingsPath = this.getSettingsPath(themeName)
-    let content = ''
+  static saveThemeSetting(themeName: string, themePath: string, key: string, value: string): void {
+    const settingsPath = this.getSettingsPath(themePath)
+    let userData: Record<string, string> = {}
+    
     if (existsSync(settingsPath)) {
-      content = readFileSync(settingsPath, 'utf8')
-    }
-
-    const lines = content.split('\n').filter(l => l.trim() !== '')
-    const newLines: string[] = []
-    let replaced = false
-
-    const regex = new RegExp(`<string name="${key}" value="([^"]+)"\\s*\\/>`)
-
-    for (const line of lines) {
-      if (regex.test(line)) {
-        newLines.push(`  <string name="${key}" value="${value}" />`)
-        replaced = true
-      } else {
-        newLines.push(line)
+      try {
+        userData = JSON.parse(readFileSync(settingsPath, 'utf8'))
+      } catch (e) {
+        console.error('Error reading theme config.json for saving:', e)
       }
     }
 
-    if (!replaced) {
-      newLines.push(`  <string name="${key}" value="${value}" />`)
-    }
-
-    const finalContent = newLines.join('\n')
-    writeFileSync(settingsPath, finalContent, 'utf8')
+    userData[key] = value
+    writeFileSync(settingsPath, JSON.stringify(userData, null, 2), 'utf8')
   }
 }

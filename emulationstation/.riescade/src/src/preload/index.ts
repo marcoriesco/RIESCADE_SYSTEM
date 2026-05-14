@@ -29,6 +29,7 @@ const api = {
 
   // System commands
   executeCommand: (command: string, data?: any) => ipcRenderer.send('system-command', command, data),
+  getVersion: () => ipcRenderer.invoke('get-version'),
 
   // Events
   on: (channel: string, callback: (...args: any[]) => void) => {
