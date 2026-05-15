@@ -73,8 +73,20 @@ function App() {
 
 	// ─── Initial Load ───
 	useEffect(() => {
-		// Load systems
-		window.api.getSystems().then((s: System[]) => setSystems(s));
+		// Load systems and settings
+		Promise.all([
+			window.api.getSystems(),
+			window.api.getSettings()
+		]).then(([s, settings]: [System[], any]) => {
+			setSystems(s);
+			
+			// Restore LastSystem
+			const lastSystem = settings.LastSystem?.value;
+			if (lastSystem) {
+				const idx = s.findIndex(sys => sys.name === lastSystem);
+				if (idx !== -1) setSystemIndex(idx);
+			}
+		});
 
 		// Load theme
 		const loadTheme = (themeName: string) => {
@@ -96,6 +108,9 @@ function App() {
 				loadTheme(themeName);
 			},
 		);
+
+		// Save LastSystem when systemIndex changes (via debounced/effect)
+		// We'll use another useEffect for saving to avoid complexity here.
 
 		// Gamepad polling
 		let rafId: number;
@@ -215,6 +230,12 @@ function App() {
 	const currentGame = games[selectedGameIndex];
 
 	// ─── Theme Data ───
+	useEffect(() => {
+		if (selectedSystem) {
+			window.api.saveSetting('LastSystem', selectedSystem.name, 'string');
+		}
+	}, [selectedSystem]);
+
 	const themeData = useMemo(() => {
 		const sys = selectedSystem || currentSystem;
 

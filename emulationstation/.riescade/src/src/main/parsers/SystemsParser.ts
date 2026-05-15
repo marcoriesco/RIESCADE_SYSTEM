@@ -44,7 +44,7 @@ export class SystemsParser {
     }
 
     const settings = new SettingsParser()
-    const showEmpty = settings.getSetting('ShowEmptySystems', 'bool')
+    const showEmpty = settings.getSetting('LoadEmptySystems', 'bool')
 
     // Filter systems that have existing ROM folders and count games
     return systems.filter(s => {

@@ -66,7 +66,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 5vw 0 3vw;
+  padding: 0 2vw 0 3vw;
   overflow: hidden;
   z-index: 9;
   width: 100vw;
@@ -102,20 +102,43 @@
   line-height: 110%;
   color: #fff;
   margin: 0;
-  text-shadow: 1px 1px 10px #000000;
+  text-shadow: 2px 2px 2px #000000;
+  white-space: nowrap;
 }
 .gamelist-left-col .gamelist-meta-info {
   font-size: 1.75rem;
   color: #ffffff;
   margin-left: 10px;
-  text-shadow: 1px 1px 10px #000000;
+  text-shadow: 2px 2px 2px #000000;
   font-weight: 500;
 }
 
 .gamelist-right-col {
-  width: 20%;
+  width: 30%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+.gamelist-right-col .riescade-carousel-item {
+  width: 100% !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+  filter: saturate(0) !important;
+  opacity: 0.2 !important;
+  height: auto !important;
+}
+.gamelist-right-col .riescade-carousel-item img {
+  max-width: 50% !important;
+  min-width: 50% !important;
+  max-height: max-content !important;
+}
+.gamelist-right-col .riescade-carousel-item.selected {
+  filter: saturate(1) !important;
+  opacity: 1 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+.gamelist-right-col .riescade-carousel-item.selected img {
+  width: 100% !important;
+  min-width: 100% !important;
 }

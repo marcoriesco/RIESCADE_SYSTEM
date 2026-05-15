@@ -177,7 +177,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
     const items: MenuItem[] = [
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
-          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', actionName: 'reload-app' },
+          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => window.api.executeCommand('reload-frontend') },
           { id: 'ui_group_gen', label: t('AUTO SAVE'), type: 'group' },
           { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
           { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
