@@ -101,7 +101,14 @@ All media variables return a full, resolved path to the file.
 - `{game:titleshot}`: Screenshot of the title screen.
 - `{game:mix}`: Pre-rendered mix image (box + screen + logo).
 
-#### 📅 Special Formatting
+#### 🛡️ Handling Missing Media
+To avoid showing broken image icons when a piece of media is missing (e.g., a game without fanart), use the special attribute:
+- `data-riescade-hide-on-error="true"`: Add this to any `<img>` tag. If the image fails to load or the variable is empty, the element will be automatically hidden (`display: none`).
+
+Example:
+```html
+<img src="{game:fanart}" data-riescade-hide-on-error="true" />
+```
 For date variables (`releasedate`, `lastplayed`), you can specify a format:
 - `{game:releasedate:Y}`: Shows only the year (e.g., `1991`).
 - `{game:releasedate:d/m/Y}`: Shows full date (e.g., `23/08/1991`).
