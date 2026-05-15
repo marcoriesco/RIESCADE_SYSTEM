@@ -32,18 +32,103 @@ const styleStringToObject = (styleString: string) => {
 export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode }) => {
 
   const reactTree = useMemo(() => {
-    // 1. Replace all variables in the raw HTML string
-    let processedHtml = htmlContent.replace(/\{([a-zA-Z0-9_:/.-]+)\}/g, (match, fullKey) => {
-      if (fullKey === 'global:time') return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      if (fullKey === 'systems_json') return JSON.stringify(data?.systems || [])
-      if (fullKey === 'games_json') return JSON.stringify(data?.games || [])
+    // 1. Replace all variables and expressions in the raw HTML string
+    const resolveValue = (key: string) => {
+      if (!key) return undefined;
+      const k = key.trim();
+      
+      // Handle literal strings
+      if ((k.startsWith("'") && k.endsWith("'")) || (k.startsWith('"') && k.endsWith('"'))) {
+        return k.substring(1, k.length - 1);
+      }
 
-      const parts = fullKey.split(':')
-      const baseKey = parts.length >= 2 ? `${parts[0]}:${parts[1]}` : fullKey
+      // Check for exact match in data (handles global:time, system:name etc)
+      if (data[k] !== undefined) return data[k];
+      if (data[k.toLowerCase()] !== undefined) return data[k.toLowerCase()];
+
+      // Nested resolution for dots
+      const parts = k.split('.');
+      let current = data;
+      for (const part of parts) {
+        if (current === undefined || current === null || typeof current !== 'object') {
+          current = undefined;
+          break;
+        }
+        current = current[part];
+      }
+      if (current !== undefined) return current;
+
+      return undefined;
+    };
+
+    const processExpression = (expr: string): string => {
+      // Ternary: condition ? truePart : falsePart
+      if (expr.includes('?')) {
+        const qIndex = expr.indexOf('?');
+        const condition = expr.substring(0, qIndex).trim();
+        const rest = expr.substring(qIndex + 1);
+
+        // Find the ':' that separates true and false parts, respecting quotes and braces
+        let colonIndex = -1;
+        let inQuotes = false;
+        let quoteChar = '';
+        let depth = 0;
+        for (let i = 0; i < rest.length; i++) {
+          const c = rest[i];
+          if ((c === "'" || c === '"') && (i === 0 || rest[i-1] !== '\\')) {
+            if (!inQuotes) { inQuotes = true; quoteChar = c; }
+            else if (c === quoteChar) { inQuotes = false; }
+          }
+          if (!inQuotes) {
+            if (c === '{') depth++;
+            if (c === '}') depth--;
+            if (c === ':' && depth === 0) {
+              colonIndex = i;
+              break;
+            }
+          }
+        }
+
+        if (colonIndex !== -1) {
+          const truePart = rest.substring(0, colonIndex).trim();
+          const falsePart = rest.substring(colonIndex + 1).trim();
+          
+          const condResult = (() => {
+            if (condition.includes('==')) {
+              const [left, right] = condition.split('==').map(s => s.trim());
+              return String(resolveValue(left)) === String(resolveValue(right));
+            }
+            if (condition.includes('!=')) {
+              const [left, right] = condition.split('!=').map(s => s.trim());
+              return String(resolveValue(left)) !== String(resolveValue(right));
+            }
+            return resolveValue(condition);
+          })();
+
+          const selected = condResult ? truePart : falsePart;
+          
+          // Remove potential wrapping quotes from the result
+          let final = String(selected).trim();
+          if ((final.startsWith("'") && final.endsWith("'")) || (final.startsWith('"') && final.endsWith('"'))) {
+            final = final.substring(1, final.length - 1);
+          }
+
+          // Recursively resolve any variables inside the selected part (${var} or {var})
+          return final.replace(/(\$\{|\{)([^{}]+)\}/g, (m, prefix, k) => processExpression(k));
+        }
+      }
+
+      // Standard variable resolution with date formatting support
+      const parts = expr.split(':');
+      const baseKey = parts.length >= 2 ? `${parts[0]}:${parts[1]}` : expr;
       const format = parts.length > 2 ? parts.slice(2).join(':') : null
 
-      let val = data?.[baseKey] !== undefined ? data[baseKey] : data?.[baseKey.toLowerCase()]
-      if (val === null || val === undefined) return ''
+      if (baseKey === 'global:time') return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      if (baseKey === 'systems_json') return JSON.stringify(data?.systems || [])
+      if (baseKey === 'games_json') return JSON.stringify(data?.games || [])
+
+      let val = resolveValue(baseKey);
+      if (val === null || val === undefined) return '';
 
       if (typeof val === 'string' && format) {
         // Date formatting: {game:releasedate:d/m/Y}
@@ -69,7 +154,10 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       }
 
       return String(val)
-    })
+    };
+
+    // Use a regex that supports one level of nested braces (for ternaries with internal variables)
+    let processedHtml = htmlContent.replace(/\{((?:[^{}]|\{[^{}]*\})+)\}/g, (match, expr) => processExpression(expr))
 
     // 2. Parse processed HTML
     const parser = new DOMParser()

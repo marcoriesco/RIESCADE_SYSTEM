@@ -14,7 +14,7 @@ interface MenuItem {
   label: string
   onClick?: () => void
   submenu?: MenuItem[]
-  type?: 'toggle' | 'select' | 'slider' | 'action' | 'info' | 'group'
+  type?: 'toggle' | 'select' | 'slider' | 'action' | 'info' | 'group' | 'input'
   settingName?: string
   settingType?: 'string' | 'bool' | 'int' | 'float'
   options?: { label: string; value: any }[]
@@ -23,6 +23,7 @@ interface MenuItem {
   max?: number
   step?: number
   suffix?: string
+  isPassword?: boolean
 }
 
 interface MenuProps {
@@ -44,6 +45,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [modalSelectedIndex, setModalSelectedIndex] = useState(0)
   const [versions, setVersions] = useState({ app: '2.0.0', es: '' })
+  const [showInputModal, setShowInputModal] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
 
   const getSetting = (name: string, fallback: any = ''): any => {
     return (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value) ?? fallback
@@ -139,7 +143,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       const current = item.id.startsWith('theme_opt_') 
         ? getThemeSetting(item.settingName, 'false')
         : getSetting(item.settingName, 'false')
-      const newVal = current === 'true' || current === true ? 'false' : 'true'
+      const isOn = current === 'true' || current === true || current === '1' || current === 1
+      const newVal = isOn ? 'false' : 'true'
       
       if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName, newVal)
       else updateSetting(item.settingName, newVal)
@@ -178,6 +183,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
           { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => window.api.executeCommand('reload-frontend') },
+          { id: 'group_accounts', label: t('CONTAS'), type: 'group' },
+          { id: 'retroachievements_submenu', label: t('CONQUISTAS RETRÔ'), submenu: [
+            { id: 'cheevos_enable', label: t('CONQUISTAS RETRÔ'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },
+            { id: 'cheevos_user', label: t('USUÁRIO'), type: 'input', settingName: 'global.cheevos.username', settingType: 'string' },
+            { id: 'cheevos_pass', label: t('SENHA'), type: 'input', settingName: 'global.cheevos.password', settingType: 'string', isPassword: true },
+          ]},
           { id: 'group_autosave', label: t('AUTO SAVE'), type: 'group' },
           { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
           { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
@@ -350,6 +361,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
           setSelectedIndex(0)
         } else if (item.type === 'toggle') {
           handleToggle(item)
+        } else if (item.type === 'input') {
+          setActiveInputItem(item)
+          setInputValue(String(getSetting(item.settingName!, '')))
+          setShowInputModal(true)
         } else if (item.onClick) {
           item.onClick()
         }
@@ -393,7 +408,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
     )
 
     if (item.type === 'toggle') {
-      const isOn = val === 'true' || val === true
+      const isOn = val === 'true' || val === true || val === '1' || val === 1
       return (
         <div className={`menu-toggle ${isOn ? 'on' : 'off'}`}>
           <div className="toggle-thumb" />
@@ -413,6 +428,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
     }
     if (item.type === 'slider') {
       return <div className="menu-slider">{getSetting(item.settingName!, item.min ?? 0)}{item.suffix || '%'}</div>
+    }
+    if (item.type === 'input') {
+      const displayVal = item.isPassword ? '••••••••' : (val || '')
+      return <div className="menu-input-preview">{displayVal || t('EMPTY')}</div>
     }
     if (item.type === 'info') {
       return <div className="menu-info">{item.value}</div>
@@ -556,6 +575,55 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         .riescade-menu-item.selected .menu-submenu-arrow { opacity: 1; }
       ` }} />
       {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />}
+      
+      {showInputModal && (
+        <div className="riescade-modal-overlay">
+          <div className="riescade-modal-container">
+            <h3 className="riescade-modal-title">{activeInputItem?.label}</h3>
+            <div style={{ margin: '20px 0' }}>
+              <input 
+                type={activeInputItem?.isPassword ? 'password' : 'text'}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    updateSetting(activeInputItem!.settingName!, inputValue)
+                    setShowInputModal(false)
+                  } else if (e.key === 'Escape') {
+                    setShowInputModal(false)
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '1.2rem',
+                  border: '2px solid #3b82f6',
+                  borderRadius: '4px',
+                  outline: 'none'
+                }}
+              />
+            </div>
+            <div className="riescade-modal-buttons">
+              <button 
+                className="riescade-modal-button-primary selected"
+                onClick={() => {
+                  updateSetting(activeInputItem!.settingName!, inputValue)
+                  setShowInputModal(false)
+                }}
+              >
+                {t('OK')}
+              </button>
+              <button 
+                className="riescade-modal-button-secondary"
+                onClick={() => setShowInputModal(false)}
+              >
+                {t('Cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

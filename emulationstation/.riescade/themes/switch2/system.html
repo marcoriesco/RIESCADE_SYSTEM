@@ -1,11 +1,10 @@
 <div class="ns2-ui {options:theme_style}" data-riescade-view="system">
-    <link rel="stylesheet" href="./assets/css/global.css" />
   <link rel="stylesheet" href="./assets/css/switch2.css" />
 
   <!-- TOP BAR -->
   <header class="ns2-topbar">
     <div class="ns2-profile">
-      <img src="./assets/images/riescade.png" class="ns2-avatar" />
+      <img src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/images/riescade.png'}" class="ns2-avatar" />
     </div>
 
     <div class="ns2-status">
@@ -52,35 +51,36 @@
   <!-- BOTTOM MENU -->
   <footer class="ns2-bottombar">
     <div class="ns2-menu-pill">
-      <div class="ns2-menu-item active">
+      <div class="ns2-menu-item switch-online {system:hardwareType == 'all' ? 'active' : ''}">
         <img src="./assets/images/menu-switch.png" alt="Switch Online">
+        {global.cheevos == '1' ? '<div class="online-indicator"></div>' : ''}
+      </div>
+      <div class="ns2-menu-item {system:hardwareType == 'arcade' ? 'active' : ''}">
+        <img src="./assets/images/switch_arcade.svg" alt="Arcades">
+      </div>
+      <div class="ns2-menu-item {system:hardwareType == 'computer' ? 'active' : ''}">
+        <img src="./assets/images/switch_computer.svg" alt="PCs">
+      </div>
+      <div class="ns2-menu-item {system:hardwareType == 'console' ? 'active' : ''}">
+        <img src="./assets/images/switch_console.svg" alt="Consoles">
+      </div>
+      <div class="ns2-menu-item {system:hardwareType == 'extension' ? 'active' : ''}">
+        <img src="./assets/images/switch_extension.svg" alt="Extensions">
+      </div>
+      <div class="ns2-menu-item {system:hardwareType == 'pinball' ? 'active' : ''}">
+        <img src="./assets/images/switch_pinball.svg" alt="Pinballs">
+      </div>
+      <div class="ns2-menu-item {system:hardwareType == 'port' ? 'active' : ''}">
+        <img src="./assets/images/switch_port.svg" alt="Ports">
+      </div>
+      <div class="ns2-menu-item {system:hardwareType == 'portable' ? 'active' : ''}">
+        <img src="./assets/images/switch_portable.svg" alt="Portables">
       </div>
       <div class="ns2-menu-item">
-        <img src="./assets/images/menu1.png" alt="Menu1">
+        <img src="./assets/images/switch_poweroff.svg" alt="Power Off">
       </div>
       <div class="ns2-menu-item">
-        <img src="./assets/images/menu2.png" alt="Menu2">
-      </div>
-      <div class="ns2-menu-item">
-        <img src="./assets/images/menu3.png" alt="Menu3">
-      </div>
-      <div class="ns2-menu-item">
-        <img src="./assets/images/menu4.png" alt="Menu4">
-      </div>
-      <div class="ns2-menu-item">
-        <img src="./assets/images/menu5.png" alt="Menu5">
-      </div>
-      <div class="ns2-menu-item">
-        <img src="./assets/images/menu6.png" alt="Menu6">
-      </div>
-      <div class="ns2-menu-item">
-        <img src="./assets/images/menu7.png" alt="Menu7">
-      </div>
-      <div class="ns2-menu-item">
-        <img src="./assets/images/menu8.png" alt="Menu8">
-      </div>
-      <div class="ns2-menu-item">
-        <img src="./assets/images/menu9.png" alt="Menu9">  
+        <img src="./assets/images/switch_settings.svg" alt="Settings">  
       </div>    
     </div>
   </footer>

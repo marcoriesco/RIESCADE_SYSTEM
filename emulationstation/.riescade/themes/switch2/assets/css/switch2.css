@@ -1,7 +1,16 @@
-@charset "UTF-8";
 /* ========================================================
    RIESCADE - SWITCH 2 THEME (SCSS)
    ======================================================== */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes rotate-gradient {
+  to {
+    --angle: 360deg;
+  }
+}
 :root {
   --bg: #E9E9E9;
   --text: #222;
@@ -188,26 +197,21 @@ body {
 .ns2-game.selected {
   transform: translate(0, -50%) scale(1) !important;
   z-index: 100 !important;
-  border-radius: 24px;
+  border-radius: 36px !important;
+  border: 12px solid transparent;
+  background-image: linear-gradient(#1a1a1a, #1a1a1a), conic-gradient(from var(--angle), #66F2FF, #6B66FF, #9966FF, #F1F1F1, #FF66B8, #66F2FF);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-size: 105% 105%;
+  animation: rotate-gradient 4s linear infinite;
+  width: calc(20% - 0px) !important;
+  height: calc(80% + 24px) !important;
+  margin-left: 0 !important;
 }
 .ns2-game.selected::after {
+  content: "";
   box-shadow: 0 0 0 6px var(--bg), var(--card-shadow);
   opacity: 1;
-}
-.ns2-game.selected {
-  /* Borda Degradê Estática */
-}
-.ns2-game.selected::before {
-  content: "";
-  position: absolute;
-  top: -12px;
-  left: -12px;
-  right: -12px;
-  bottom: -12px;
-  background: linear-gradient(45deg, #66F2FF, #6B66FF, #9966FF, #F1F1F1, #FF66B8);
-  border-radius: 34px;
-  z-index: -2;
-  pointer-events: none;
 }
 
 /* BOTTOM BAR */
@@ -236,13 +240,64 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+.ns2-menu-item.active::before {
+  content: "";
+  background-color: #121212;
+  background-clip: content-box;
+  width: 94%;
+  height: 94%;
+  border-radius: 100%;
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  z-index: -1;
+}
+.ns2-menu-item.active::after {
+  content: "";
+  background-image: url("../images/selected.png");
+  background-size: cover;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -2;
+  animation: ns2-rotate 4s linear infinite;
+}
+@keyframes ns2-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.ns2-menu-item .online-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background-color: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
 }
 .ns2-menu-item:first-child {
   margin-right: 20px;
 }
-.ns2-menu-item img {
+.ns2-menu-item:first-child img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+.ns2-menu-item img {
+  width: 55%;
+  height: 55%;
+  max-width: 55%;
+  max-height: 55%;
   display: inline-block;
 }
 
@@ -281,6 +336,6 @@ body {
   border-radius: 50%;
   background: var(--text);
   color: var(--bg);
-  font-size: 16px;
+  font-size: 22px;
   margin-right: 8px;
 }

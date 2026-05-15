@@ -120,6 +120,35 @@ Values defined by the user in the "THEME CONFIGURATION" menu.
 
 ---
 
+## ⚡ Expressions & Conditionals
+
+You can use basic logic inside curly braces to make your theme dynamic. This works anywhere in your HTML (attributes, text, classes).
+
+### ❓ Ternary Operator
+Syntax: `{condition ? 'true_value' : 'false_value'}`
+If the condition is truthy (not empty and not false), it returns the first value; otherwise, it returns the second.
+
+#### Comparisons
+You can use `==` and `!=` to compare variables with literal strings or other variables.
+- `{system:hardwareType == 'arcade' ? 'active' : ''}`
+- `{game:players != '1' ? 'Multiplayer' : 'Single Player'}`
+
+Example:
+```html
+<!-- Dynamic Avatar -->
+<img src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/images/guest.png'}" />
+
+<!-- Conditional Class based on Hardware -->
+<div class="ns2-menu-item {system:hardwareType == 'arcade' ? 'active' : ''}">
+```
+
+### 🔗 Nested Resolution (Dot Notation)
+You can access nested properties using dots.
+- `{global.cheevos.username}`
+- `{system.details.manufacturer}`
+
+---
+
 ## 🧩 Custom HTML Elements
 
 Our engine provides special tags that you can use in your `system.html` and `gamelist.html` files. These elements are highly optimized and handle all input and logic automatically.

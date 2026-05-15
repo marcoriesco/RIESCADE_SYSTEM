@@ -70,6 +70,7 @@ function App() {
 		{ id: string; message: string; type: 'info' | 'success' | 'warning' }[]
 	>([]);
 	const [themeRevision, setThemeRevision] = useState(0);
+	const [settings, setSettings] = useState<any>({});
 
 	// ─── Initial Load ───
 	useEffect(() => {
@@ -77,11 +78,12 @@ function App() {
 		Promise.all([
 			window.api.getSystems(),
 			window.api.getSettings()
-		]).then(([s, settings]: [System[], any]) => {
+		]).then(([s, initialSettings]: [System[], any]) => {
 			setSystems(s);
+			setSettings(initialSettings);
 			
 			// Restore LastSystem
-			const lastSystem = settings.LastSystem?.value;
+			const lastSystem = initialSettings.LastSystem?.value;
 			if (lastSystem) {
 				const idx = s.findIndex(sys => sys.name === lastSystem);
 				if (idx !== -1) setSystemIndex(idx);
@@ -239,7 +241,14 @@ function App() {
 	const themeData = useMemo(() => {
 		const sys = selectedSystem || currentSystem;
 
+		// Flatten global settings
+		const flattenedSettings = Object.entries(settings).reduce((acc, [k, v]: [string, any]) => {
+			acc[k] = v?.value !== undefined ? v.value : v;
+			return acc;
+		}, {} as any);
+
 		const baseData: any = {
+			...flattenedSettings,
 			systems,
 			games,
 			'global:themeRevision': themeRevision,
@@ -263,6 +272,13 @@ function App() {
 			...(theme?.settings || {}),
 			...Object.entries(theme?.settings || {}).reduce((acc, [k, v]) => ({ ...acc, [`options:${k}`]: v }), {})
 		};
+
+		// Mapping for common settings (like RetroAchievements)
+		const cheevosUser = baseData['global.cheevos.username'] || baseData['RetroAchievements.Username'];
+		if (cheevosUser) {
+			baseData['global.cheevos.username'] = cheevosUser;
+			baseData.global = { ...baseData.global, cheevos: { username: cheevosUser } };
+		}
 
 		if (selectedSystem && currentGame) {
 			const resolveMedia = (p?: string) => {
