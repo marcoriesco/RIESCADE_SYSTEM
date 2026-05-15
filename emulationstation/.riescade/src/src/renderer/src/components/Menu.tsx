@@ -178,10 +178,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
           { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => window.api.executeCommand('reload-frontend') },
-          { id: 'ui_group_gen', label: t('AUTO SAVE'), type: 'group' },
+          { id: 'group_autosave', label: t('AUTO SAVE'), type: 'group' },
           { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
           { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
-          { id: 'ui_group_gen', label: t('DISPLAY CONFIGURATION'), type: 'group' },
+          { id: 'group_display', label: t('DISPLAY CONFIGURATION'), type: 'group' },
           { id: 'smooth_games', label: t('SMOOTH GAMES'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
           { id: 'shaders', label: t('SHADER SET'), type: 'select', settingName: 'global.shaderset', options: [
             { label: t('NONE'), value: 'none' }, 
@@ -250,7 +250,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
               })) as MenuItem[]
             })()
           },
-          { id: 'ui_group_gen', label: t('GENERAL UI'), type: 'group' },
+          { id: 'group_ui_gen', label: t('GENERAL UI'), type: 'group' },
           { id: 'screensaver_time', label: t('SCREENSAVER'), type: 'select', settingName: 'ScreenSaverTime', options: [
             { label: t('OFF'), value: '0' }, { label: t('1 MIN'), value: '60000' },
             { label: t('5 MIN'), value: '300000' }
@@ -332,6 +332,21 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         const item = currentMenu[selectedIndex]
         if (item.submenu) {
           setActiveMenuStack(prev => [...prev, { items: item.submenu!, title: item.label }])
+          setSelectedIndex(0)
+        } else if (item.type === 'select' && item.options) {
+          // Convert options to a temporary submenu
+          const optionsSubmenu: MenuItem[] = item.options.map(opt => ({
+            id: `opt_${opt.value}`,
+            label: `${opt.label}${String(opt.value) === String(item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)) ? '  ◀' : ''}`.toUpperCase(),
+            type: 'action',
+            onClick: () => {
+              if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName!, opt.value)
+              else updateSetting(item.settingName!, opt.value)
+              setActiveMenuStack(prev => prev.slice(0, -1))
+              setSelectedIndex(selectedIndex)
+            }
+          }))
+          setActiveMenuStack(prev => [...prev, { items: optionsSubmenu, title: item.label }])
           setSelectedIndex(0)
         } else if (item.type === 'toggle') {
           handleToggle(item)

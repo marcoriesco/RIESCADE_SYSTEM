@@ -1,15 +1,16 @@
 /* ========================================================
-   RIESCADE_ORIGINS WEB PORT - GLOBAL / BASE STYLES
+   RIESCADE - GLOBAL / BASE STYLES
    ======================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Roboto+Condensed:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:wght@400&display=swap");
+@import "./menu.scss";
 
 $theme-color: #9f0043;
 $text-primary: #ffffff;
 $text-muted: rgba(255, 255, 255, 0.56);
-$font-main: "Inter", sans-serif;
-$font-clock: "Inter", sans-serif;
-$font-hardware: "Inter", sans-serif;
+$font-main: "Inter Tight", sans-serif;
+$font-clock: "Inter Tight", sans-serif;
+$font-hardware: "Inter Tight", sans-serif;
 
 :root {
   --theme-color: #{$theme-color};
@@ -28,6 +29,7 @@ body {
   overflow: hidden;
   background-color: #000;
   font-family: var(--font-main);
+  font-optical-sizing: auto;
   user-select: none;
 }
 
@@ -40,11 +42,11 @@ body {
 
 /* CLOCK */
 .riescade-clock-time {
-font-family: var(--font-clock);
-    font-weight: 300;
-    font-size: 1.85rem;
-    color: var(--text-primary);
-    text-shadow: 1px 1px 1px #000000;
+  font-family: var(--font-clock);
+  font-weight: 300;
+  font-size: 1.85rem;
+  color: var(--text-primary);
+  text-shadow: 1px 1px 1px #000000;
 }
 
 /* FOOER */
