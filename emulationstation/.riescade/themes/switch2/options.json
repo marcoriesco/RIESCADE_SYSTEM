@@ -1,0 +1,12 @@
+[
+  {
+    "id": "theme_style",
+    "name": "THEME STYLE",
+    "type": "select",
+    "options": [
+      { "value": "dark", "label": "DARK" },
+      { "value": "light", "label": "LIGHT" }
+    ],
+    "default": "dark"
+  }
+]

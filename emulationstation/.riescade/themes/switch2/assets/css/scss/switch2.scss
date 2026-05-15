@@ -1,7 +1,7 @@
-@charset "UTF-8";
 /* ========================================================
    RIESCADE - SWITCH 2 THEME (SCSS)
    ======================================================== */
+
 :root {
   --bg: #E9E9E9;
   --text: #222;
@@ -18,22 +18,12 @@
   --pill-bg: rgba(0, 0, 0, 0.45);
   --item-bg: rgba(255, 255, 255, 0.1);
   --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-}
-.ns2-ui.dark .ns2-ui {
-  background: var(--bg);
-}
-.ns2-ui.dark .ns2-icon path, .ns2-ui.dark .ns2-icon rect {
-  fill: var(--text) !important;
-  stroke: var(--text) !important;
-}
-.ns2-ui.dark .ns2-icon rect[fill=black] {
-  fill: var(--text) !important;
-}
-.ns2-ui.dark .ns2-icon path[fill=black] {
-  fill: var(--text) !important;
-}
-.ns2-ui.dark .ns2-icon rect[stroke=black] {
-  stroke: var(--text) !important;
+  
+  .ns2-ui { background: var(--bg); }
+  .ns2-icon path, .ns2-icon rect { fill: var(--text) !important; stroke: var(--text) !important; }
+  .ns2-icon rect[fill="black"] { fill: var(--text) !important; }
+  .ns2-icon path[fill="black"] { fill: var(--text) !important; }
+  .ns2-icon rect[stroke="black"] { stroke: var(--text) !important; }
 }
 
 * {
@@ -44,7 +34,7 @@ body {
   margin: 0;
   overflow: hidden;
   background: var(--bg);
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   color: var(--text);
 }
 
@@ -74,7 +64,7 @@ body {
   border-radius: 50%;
   border: 5px solid white;
   object-fit: cover;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .ns2-status {
@@ -89,19 +79,15 @@ body {
 .ns2-icon {
   width: 28px;
   height: 28px;
-}
-.ns2-icon path, .ns2-icon rect, .ns2-icon circle {
-  fill: var(--text) !important;
-  stroke: var(--text) !important;
-}
-.ns2-icon path[stroke-width], .ns2-icon rect[stroke-width], .ns2-icon circle[stroke-width] {
-  stroke-width: inherit;
-}
-.ns2-icon {
+  
+  path, rect, circle { 
+    fill: var(--text) !important; 
+    stroke: var(--text) !important;
+    &[stroke-width] { stroke-width: inherit; }
+  }
+  
   /* Some rects in battery might need fill only */
-}
-.ns2-icon rect:not([stroke]) {
-  stroke: none !important;
+  rect:not([stroke]) { stroke: none !important; }
 }
 
 /* TITLE */
@@ -126,7 +112,7 @@ body {
 }
 
 .ns2-dot::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 4px;
   left: 50%;
@@ -162,52 +148,55 @@ body {
   justify-content: flex-end !important;
   align-items: center !important;
   padding-bottom: 40px !important;
+  
   /* Art Background */
-}
-.ns2-game::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.4)), var(--item-art);
-  background-size: cover;
-  background-position: center;
-  border-radius: 24px;
-  z-index: -1;
-  opacity: 0.9;
-}
-.ns2-game img {
-  width: auto !important;
-  height: auto !important;
-  max-width: 70% !important;
-  max-height: 25% !important;
-  object-fit: contain !important;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.4));
-  position: relative;
-  z-index: 2;
-}
-.ns2-game.selected {
-  transform: translate(0, -50%) scale(1) !important;
-  z-index: 100 !important;
-  border-radius: 24px;
-}
-.ns2-game.selected::after {
-  box-shadow: 0 0 0 6px var(--bg), var(--card-shadow);
-  opacity: 1;
-}
-.ns2-game.selected {
-  /* Borda Degradê Estática */
-}
-.ns2-game.selected::before {
-  content: "";
-  position: absolute;
-  top: -12px;
-  left: -12px;
-  right: -12px;
-  bottom: -12px;
-  background: linear-gradient(45deg, #66F2FF, #6B66FF, #9966FF, #F1F1F1, #FF66B8);
-  border-radius: 34px;
-  z-index: -2;
-  pointer-events: none;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(transparent, rgba(0,0,0,0.4)), var(--item-art);
+    background-size: cover;
+    background-position: center;
+    border-radius: 24px;
+    z-index: -1;
+    opacity: 0.9;
+  }
+
+  img {
+    width: auto !important;
+    height: auto !important;
+    max-width: 70% !important;
+    max-height: 25% !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 2px 10px rgba(0,0,0,0.4));
+    position: relative;
+    z-index: 2;
+  }
+
+  &.selected {
+    transform: translate(0, -50%) scale(1) !important;
+    z-index: 100 !important;
+    border-radius: 24px;
+    
+    &::after {
+      box-shadow: 0 0 0 6px var(--bg), var(--card-shadow);
+      opacity: 1;
+    }
+
+    /* Borda Degradê Estática */
+    &::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      background: linear-gradient(45deg, #66F2FF, #6B66FF, #9966FF, #F1F1F1, #FF66B8);
+      border-radius: 34px;
+      z-index: -2;
+      pointer-events: none;
+    }
+  }
 }
 
 /* BOTTOM BAR */
@@ -226,7 +215,9 @@ body {
   backdrop-filter: blur(18px);
   display: flex;
   align-items: center;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 30px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 8px 30px rgba(0,0,0,0.1);
   transition: background 0.3s ease;
 }
 
@@ -236,14 +227,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.ns2-menu-item:first-child {
-  margin-right: 20px;
-}
-.ns2-menu-item img {
-  width: 100%;
-  height: auto;
-  display: inline-block;
+  
+  &:first-child {
+    margin-right: 20px;
+  }
+  
+  img {
+    width: 100%;
+    height: auto;
+    display: inline-block;
+  }
 }
 
 /* SWITCH LOGO */
@@ -253,12 +246,13 @@ body {
   bottom: 42px;
   width: 68px;
   opacity: 0.9;
-}
-.ns2-switch-logo img {
-  width: 100%;
-  height: auto;
-  display: block;
-  /* Invert for dark mode if needed, but Switch logo is usually fine */
+  
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* Invert for dark mode if needed, but Switch logo is usually fine */
+  }
 }
 
 /* ACTIONS */
@@ -271,16 +265,17 @@ body {
   font-size: 22px;
   font-weight: 500;
   color: var(--text);
-}
-.ns2-actions b {
-  width: 30px;
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--text);
-  color: var(--bg);
-  font-size: 16px;
-  margin-right: 8px;
+
+  b {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 16px;
+    margin-right: 8px;
+  }
 }
