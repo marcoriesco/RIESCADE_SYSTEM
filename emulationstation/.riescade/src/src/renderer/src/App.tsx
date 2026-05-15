@@ -118,7 +118,7 @@ function App() {
 		let rafId: number;
 		let lastInputTime = 0;
 
-		const updateControllers = () => {
+		const updateControllers = (event?: GamepadEvent) => {
 			const gamepads = navigator.getGamepads();
 			const active = Array.from(gamepads)
 				.filter((gp) => gp !== null)
@@ -151,13 +151,62 @@ function App() {
 						hats: 1,
 					};
 				});
+
+			if (event) {
+				const isConnected = event.type === 'gamepadconnected';
+				const gpName = event.gamepad.id.split('(')[0].trim();
+				addNotification(
+					`${gpName}\n${isConnected ? 'Conectado' : 'Desconectado'}`,
+					isConnected ? 'success' : 'warning'
+				);
+			}
+
 			if (active.length > 0)
 				window.api.executeCommand('set-active-controllers', active);
 		};
 
 		let controllersInitialized = false;
+		let activityTimeout: NodeJS.Timeout;
 		const pollGamepad = (time: number) => {
-			const gp = navigator.getGamepads()[0];
+			const gamepads = navigator.getGamepads();
+			
+			// Detect ANY activity across all gamepads for visual feedback
+			let hasActivity = false;
+			for (const gp of gamepads) {
+				if (!gp) continue;
+				// Check buttons
+				for (let i = 0; i < gp.buttons.length; i++) {
+					if (gp.buttons[i].pressed) {
+						hasActivity = true;
+						break;
+					}
+				}
+				if (hasActivity) break;
+				// Check axes (with deadzone)
+				for (let i = 0; i < gp.axes.length; i++) {
+					if (Math.abs(gp.axes[i]) > 0.1) {
+						hasActivity = true;
+						break;
+					}
+				}
+				if (hasActivity) break;
+			}
+
+			if (hasActivity) {
+				const elements = document.querySelectorAll('riescade-controller-activity, [riescade-controller-activity]');
+				if (elements.length > 0) {
+					elements.forEach(el => el.classList.add('active'));
+					
+					clearTimeout(activityTimeout);
+					activityTimeout = setTimeout(() => {
+						document.querySelectorAll('riescade-controller-activity, [riescade-controller-activity]').forEach(el => {
+							el.classList.remove('active');
+						});
+					}, 500); // 500ms is enough for a quick blink
+				}
+			}
+
+			const gp = gamepads[0];
 			if (gp) {
 				if (!controllersInitialized) {
 					updateControllers();

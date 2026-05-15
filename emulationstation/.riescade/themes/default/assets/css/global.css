@@ -190,6 +190,13 @@ body {
 .riescade-footer .controller-activity {
   display: flex;
   align-items: center;
+  opacity: 0.5;
+}
+.riescade-footer .controller-activity.active {
+  opacity: 1;
+}
+.riescade-footer .controller-activity.hidden {
+  opacity: 0;
 }
 .riescade-footer .controller-activity .controller-activity-icon {
   height: 3vh; /* Equivalente ao 0.03 do ES */
@@ -212,5 +219,11 @@ body {
 .riescade-header .system-name {
   font-size: 1.85rem;
   font-weight: 300;
+  text-align: center;
+}
+.riescade-header .system-gamecount {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--theme-color);
   text-align: center;
 }

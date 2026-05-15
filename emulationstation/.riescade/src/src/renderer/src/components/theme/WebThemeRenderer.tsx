@@ -201,11 +201,13 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
       const props: any = { key: index }
 
+      const isCustomElement = tagName.includes('-')
+
       Array.from(el.attributes).forEach(attr => {
         let name = attr.name
         let value = attr.value
 
-        if (name === 'class') name = 'className'
+        if (name === 'class' && !isCustomElement) name = 'className'
         if (name === 'src' || name === 'href') value = resolveLocalPath(value)
 
         // Map kebab-case SVG attributes to camelCase for React
@@ -237,8 +239,8 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
         // Convert kebab-case attribute names to camelCase for React props
         const kebabToCamel = (str: string) => {
-          if (str === 'class') return 'className'
-          if (str.startsWith('data-') || str.startsWith('aria-')) return str
+          if (str === 'class' && !isCustomElement) return 'className'
+          if (str.startsWith('data-') || str.startsWith('aria-') || str.startsWith('riescade-')) return str
           return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
         }
 

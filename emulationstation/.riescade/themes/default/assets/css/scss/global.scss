@@ -89,6 +89,15 @@ body {
   .controller-activity {
     display: flex;
     align-items: center;
+    opacity: 0.5;
+
+    &.active {
+      opacity: 1;
+    }
+
+    &.hidden {
+      opacity: 0;
+    }
 
     .controller-activity-icon {
       height: 3vh; /* Equivalente ao 0.03 do ES */
@@ -98,21 +107,27 @@ body {
 }
 
 .riescade-header {
-position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 12vh;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 2vw;
-    box-sizing: border-box;
-    z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 12vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2vw;
+  box-sizing: border-box;
+  z-index: 100;
 
   .system-name {
     font-size: 1.85rem;
     font-weight: 300;
+    text-align: center;
+  }
+  .system-gamecount {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--theme-color);
     text-align: center;
   }
 }
