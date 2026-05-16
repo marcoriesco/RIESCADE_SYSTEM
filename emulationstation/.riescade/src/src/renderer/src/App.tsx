@@ -318,6 +318,7 @@ function App() {
 			'global:screenWidth': window.innerWidth,
 			'global:screenHeight': window.innerHeight,
 			'menu:open': isMenuOpen,
+			'game:launching': isLaunching,
 			...(theme?.settings || {}),
 			...Object.entries(theme?.settings || {}).reduce((acc, [k, v]) => ({ ...acc, [`options:${k}`]: v }), {})
 		};
@@ -562,11 +563,15 @@ function App() {
 	if (!theme) return null;
 
 	if (isInitializing && theme.views?.start) {
+		const normalizedPath = theme.path.replace(/\\/g, '/');
+		const processedHtml = theme.views.start
+			.replace(/src="\.\//g, `src="file:///${normalizedPath}/`)
+			.replace(/href="\.\//g, `href="file:///${normalizedPath}/`);
+
 		return (
-			<WebThemeRenderer
-				htmlContent={theme.views.start}
-				data={themeData}
-				themePath={theme.path}
+			<div 
+				style={{ width: '100vw', height: '100vh', background: '#000', overflow: 'hidden' }} 
+				dangerouslySetInnerHTML={{ __html: processedHtml }} 
 			/>
 		);
 	}

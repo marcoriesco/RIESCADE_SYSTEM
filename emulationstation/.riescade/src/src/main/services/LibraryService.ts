@@ -2,6 +2,7 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 import { SystemsParser } from '../parsers/SystemsParser'
 import { GamelistParser } from '../parsers/GamelistParser'
+import { SettingsParser } from '../parsers/SettingsParser'
 import { getConfigPath, getRomsPath } from '../utils/paths'
 import { System, Game } from '../../shared/types'
 
@@ -16,17 +17,42 @@ export class LibraryService {
 
   public getSystems(): System[] {
     const systems = this.systemsParser.parse()
-    
-    // Sort systems: First by Hardware (alphabetical), then by Fullname (alphabetical)
-    return systems.sort((a, b) => {
-      const aHardware = (a.hardware || 'console').toLowerCase()
-      const bHardware = (b.hardware || 'console').toLowerCase()
+    const settings = new SettingsParser()
+    const sortMode = settings.getSetting('SortSystems', 'string') || 'hardware'
 
-      if (aHardware !== bHardware) {
-        return aHardware.localeCompare(bHardware)
+    return systems.sort((sys1, sys2) => {
+      const getPriority = (sys: System) => {
+        const name = sys.name.toLowerCase()
+        const isAuto = sys.hardware === 'auto collection'
+        
+        // 1. Arcade Manufacturers (z*)
+        if (isAuto && name.startsWith('z')) return 1
+        
+        // 2. All other Auto Collections
+        if (isAuto) return 2
+        
+        // 3. Special / Maintenance Systems
+        if (['library', 'magazine', 'manuals', 'retrobat', 'screenshots'].includes(name)) return 3
+        
+        // 4. Real Game Systems (The rest)
+        return 4
       }
-      
-      return (a.fullname || a.name).localeCompare(b.fullname || b.name)
+
+      const p1 = getPriority(sys1)
+      const p2 = getPriority(sys2)
+
+      if (p1 !== p2) return p1 - p2
+
+      // Within the same priority (especially priority 4), sort by hardware THEN name
+      if (p1 === 4) {
+        const hw1 = (sys1.hardware || 'console').toLowerCase()
+        const hw2 = (sys2.hardware || 'console').toLowerCase()
+        if (hw1 !== hw2) return hw1.localeCompare(hw2)
+      }
+
+      const name1 = (sys1.fullname || sys1.name).toUpperCase()
+      const name2 = (sys2.fullname || sys2.name).toUpperCase()
+      return name1.localeCompare(name2)
     })
   }
 

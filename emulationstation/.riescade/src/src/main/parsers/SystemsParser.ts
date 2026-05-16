@@ -47,7 +47,7 @@ export class SystemsParser {
     const showEmpty = settings.getSetting('LoadEmptySystems', 'bool')
 
     // Filter systems that have existing ROM folders and count games
-    return systems.filter(s => {
+    const filteredSystems = systems.filter(s => {
       const fullPath = this.resolveRomPath(s.path)
       if (existsSync(fullPath)) {
         const count = this.countGames(fullPath)
@@ -59,6 +59,66 @@ export class SystemsParser {
       }
       return false
     })
+
+    // Inject Auto Collections
+    const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
+    if (autoColsString) {
+      const enabledCols = autoColsString.split(',').filter(c => c.trim() !== '')
+      
+      // Map specific collection names to their ES theme folders
+      const specificThemes: Record<string, string> = {
+        'all': 'auto-allgames',
+        'recent': 'auto-lastplayed',
+        'favorites': 'auto-favorites',
+        '2players': 'auto-at2players',
+        '4players': 'auto-at4players',
+        'neverplayed': 'auto-neverplayed',
+        'retroachievements': 'auto-retroachievements',
+        'vertical': 'auto-verticalarcade',
+        'lightgun': 'auto-lightgun',
+        'wheel': 'auto-wheel',
+        'trackball': 'auto-trackball',
+        'spinner': 'auto-spinner',
+        'arcade': 'arcade'
+      }
+
+      enabledCols.forEach(col => {
+        let themeName = specificThemes[col] || col
+        let displayName = col
+
+        if (col.startsWith('_')) {
+          // Genre collection: _action -> theme: auto-action
+          themeName = `auto-${col.substring(1)}`
+          displayName = col.substring(1)
+        } else if (col.startsWith('z') && !specificThemes[col]) {
+          // Arcade collection: znamco -> theme: namco
+          themeName = col.substring(1)
+          displayName = col.substring(1)
+        } else if (!specificThemes[col]) {
+          themeName = `auto-${col}`
+          displayName = col
+        }
+
+        // Avoid duplicate system names if possible (e.g. arcade conflict)
+        const isDuplicate = filteredSystems.some(s => s.name === col)
+        const systemName = isDuplicate ? `auto-${col}` : col
+
+        filteredSystems.push({
+          name: systemName,
+          fullname: displayName.toUpperCase(),
+          path: `virtual://${col}`,
+          extension: '',
+          command: '',
+          platform: 'pc',
+          theme: themeName,
+          hardware: 'auto collection',
+          emulators: [],
+          gamecount: 0
+        })
+      })
+    }
+
+    return filteredSystems
   }
 
   private parseFile(filePath: string): System[] {
@@ -71,17 +131,29 @@ export class SystemsParser {
 
       const list = Array.isArray(systemList) ? systemList : [systemList]
 
-      return list.map((s: any) => ({
-        name: String(s.name),
-        fullname: String(s.fullname || s.name),
-        path: String(s.path),
-        extension: String(s.extension || ''),
-        command: String(s.command || ''),
-        platform: String(s.platform || ''),
-        theme: String(s.theme || s.name),
-        hardware: String(s.hardware || 'console'),
-        emulators: this.parseEmulators(s.emulators)
-      }))
+      return list.map((s: any) => {
+        const sName = String(s.name || '').toLowerCase()
+        let sHardware = String(s.hardware || '')
+        if (!sHardware) {
+          if (['library', 'magazine', 'manuals', 'retrobat', 'screenshots', 'windows'].includes(sName)) {
+            sHardware = 'system'
+          } else {
+            sHardware = 'console'
+          }
+        }
+
+        return {
+          name: String(s.name),
+          fullname: String(s.fullname || s.name),
+          path: String(s.path),
+          extension: String(s.extension || ''),
+          command: String(s.command || ''),
+          platform: String(s.platform || ''),
+          theme: String(s.theme || s.name),
+          hardware: sHardware,
+          emulators: this.parseEmulators(s.emulators)
+        }
+      })
     } catch (error) {
       console.error(`Error parsing systems file ${filePath}:`, error)
       return []

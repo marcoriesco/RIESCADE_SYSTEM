@@ -1,3 +1,5 @@
-2026-04-15 17:14:40	[15116]	ERROR	HttpReq::onError (3) : Couldn't connect to server
-2026-04-15 17:14:44	[14028]	ERROR	System "mess" is missing name, extension, or command!
-2026-04-15 17:41:45	[20652]	ERROR	GL error: glDeleteTextures(1, &_texture) failed with error code: 1282
+2026-05-14 19:52:05	[8668]	ERROR	System "mess" is missing name, extension, or command!
+2026-05-14 19:52:06	[21256]	ERROR	System "switch2" path does not exist !
+2026-05-14 19:52:07	[15448]	ERROR	HttpReq::onError (3) : Couldn't connect to server
+2026-05-14 19:53:14	[9764]	ERROR	System "mess" is missing name, extension, or command!
+2026-05-14 19:53:46	[4432]	ERROR	System "mess" is missing name, extension, or command!

@@ -186,6 +186,18 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('get-file-content', async (_, filePath: string) => {
+    try {
+      if (existsSync(filePath)) {
+        return readFileSync(filePath, 'utf-8')
+      }
+      return null
+    } catch (e) {
+      console.error('Failed to read file content:', e)
+      return null
+    }
+  })
+
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })

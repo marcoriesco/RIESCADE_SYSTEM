@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { WebThemeRenderer } from './theme/WebThemeRenderer'
-import { InputConfigOverlay } from './InputConfigOverlay'
+// import { InputConfigOverlay } from './InputConfigOverlay'
 
 const localeModules = import.meta.glob('../locales/*.json', { eager: true })
 const locales: Record<string, any> = {}
@@ -143,6 +143,24 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       const current = item.id.startsWith('theme_opt_') 
         ? getThemeSetting(item.settingName, 'false')
         : getSetting(item.settingName, 'false')
+      
+      // Special logic for multi-value strings (comma separated)
+      if (item.type === 'toggle' && item.value !== undefined && !item.settingType) {
+        const currentString = String(current || '')
+        const values = currentString.split(',').filter(v => v.trim() !== '')
+        const isSelected = values.includes(item.value)
+        
+        let newValues: string[]
+        if (isSelected) {
+          newValues = values.filter(v => v !== item.value)
+        } else {
+          newValues = [...values, item.value]
+        }
+        
+        updateSetting(item.settingName, newValues.join(','))
+        return
+      }
+
       const isOn = current === 'true' || current === true || current === '1' || current === 1
       const newVal = isOn ? 'false' : 'true'
       
@@ -277,6 +295,124 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         ]
       },
       {
+        id: 'game_collections', label: t('GAME COLLECTIONS'), submenu: [
+          { id: 'group_collections_display', label: t('COLEÇÕES A SEREM EXIBIDAS'), type: 'group' },
+          { id: 'systems_displayed', label: t('SISTEMAS EXIBIDOS'), type: 'select', value: '<309 selecionados>', settingName: 'VisibleSystems', options: [{ label: '<309 selecionados>', value: 'all' }] },
+          { id: 'auto_collections', label: t('COLEÇÕES DE JOGOS AUTOMÁTICOS'), submenu: [
+            { id: 'group_std_cols', label: t('PADRÃO'), type: 'group' },
+            { id: 'col_all', label: t('TODOS OS JOGOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'all' },
+            { id: 'col_recent', label: t('ÚLTIMOS JOGADOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'recent' },
+            { id: 'col_favorites', label: t('FAVORITOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'favorites' },
+            { id: 'col_never', label: t('NUNCA JOGADOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'neverplayed' },
+            { id: 'col_retro', label: t('RETROACHIEVEMENTS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'retroachievements' },
+            
+            { id: 'group_players_cols', label: t('JOGADORES'), type: 'group' },
+            { id: 'col_2p', label: t('2 JOGADORES'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '2players' },
+            { id: 'col_4p', label: t('4 JOGADORES'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '4players' },
+
+            { id: 'group_arcade_cols', label: t('ARCADE & HARDWARE'), type: 'group' },
+            { id: 'col_arcade', label: t('ARCADE (GERAL)'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'arcade' },
+            { id: 'col_vert', label: t('VERTICAL ARCADE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'vertical' },
+            { id: 'col_lightgun', label: t('LIGHTGUN'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'lightgun' },
+            { id: 'col_wheel', label: t('WHEEL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'wheel' },
+            { id: 'col_trackball', label: t('TRACKBALL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'trackball' },
+            { id: 'col_spinner', label: t('SPINNER'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'spinner' },
+            { id: 'col_zcapcom', label: t('CAPCOM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcapcom' },
+            { id: 'col_zneogeo', label: t('NEOGEO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zneogeo' },
+            { id: 'col_zkonami', label: t('KONAMI'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zkonami' },
+            { id: 'col_zsega', label: t('SEGA'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsega' },
+            { id: 'col_znintendo', label: t('NINTENDO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znintendo' },
+            { id: 'col_ztaito', label: t('TAITO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'ztaito' },
+            { id: 'col_znamco', label: t('NAMCO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znamco' },
+            { id: 'col_zcps1', label: t('CPS1'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcps1' },
+            { id: 'col_zcps2', label: t('CPS2'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcps2' },
+            { id: 'col_zcps3', label: t('CPS3'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcps3' },
+            { id: 'col_zcave', label: t('CAVE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcave' },
+            { id: 'col_zmidway', label: t('MIDWAY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmidway' },
+            { id: 'col_zirem', label: t('IREM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zirem' },
+            { id: 'col_zsnk', label: t('SNK'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsnk' },
+
+            { id: 'group_genres_cols', label: t('GÊNEROS'), type: 'group' },
+            { id: 'col__action', label: t('ACTION'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_action' },
+            { id: 'col__adventure', label: t('ADVENTURE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_adventure' },
+            { id: 'col__beatemup', label: t('BEAT\'EM UP'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_beatemup' },
+            { id: 'col__fight', label: t('FIGHT'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_fight' },
+            { id: 'col__platform', label: t('PLATFORM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_platform' },
+            { id: 'col__puzzle', label: t('PUZZLE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_puzzle' },
+            { id: 'col__racedriving', label: t('RACING'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_racedriving' },
+            { id: 'col__roleplayings', label: t('RPG'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_roleplayings' },
+            { id: 'col__shootemup', label: t('SHOOT\'EM UP'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_shootemup' },
+            { id: 'col__shooter', label: t('SHOOTER'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_shooter' },
+            { id: 'col__sports', label: t('SPORTS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_sports' },
+            { id: 'col__strategy', label: t('STRATEGY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_strategy' },
+            { id: 'col__simulation', label: t('SIMULATION'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_simulation' },
+            { id: 'col__various', label: t('VARIOUS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_various' },
+            
+            { id: 'group_other_arcades', label: t('OUTROS ARCADES'), type: 'group' },
+            { id: 'col_zatomiswave', label: t('ATOMISWAVE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zatomiswave' },
+            { id: 'col_znaomi', label: t('NAOMI'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znaomi' },
+            { id: 'col_zmodel2', label: t('MODEL 2'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmodel2' },
+            { id: 'col_zmodel3', label: t('MODEL 3'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmodel3' },
+            { id: 'col_zdaphne', label: t('DAPHNE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zdaphne' },
+            { id: 'col_zatari', label: t('ATARI ARCADE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zatari' },
+            { id: 'col_zatlus', label: t('ATLUS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zatlus' },
+            { id: 'col_zbanpresto', label: t('BANPRESTO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zbanpresto' },
+            { id: 'col_zdataeast', label: t('DATA EAST'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zdataeast' },
+            { id: 'col_zeighting', label: t('EIGHTING'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zeighting' },
+            { id: 'col_zexidy', label: t('EXIDY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zexidy' },
+            { id: 'col_zgaelco', label: t('GAELCO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zgaelco' },
+            { id: 'col_zgottlieb', label: t('GOTTLIEB'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zgottlieb' },
+            { id: 'col_zigs', label: t('IGS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zigs' },
+            { id: 'col_zjaleco', label: t('JALECO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zjaleco' },
+            { id: 'col_zkaneko', label: t('KANEKO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zkaneko' },
+            { id: 'col_zmitchell', label: t('MITCHELL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmitchell' },
+            { id: 'col_znichibutsu', label: t('NICHIBUTSU'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znichibutsu' },
+            { id: 'col_znmk', label: t('NMK'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znmk' },
+            { id: 'col_zpsikyo', label: t('PSIKYO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zpsikyo' },
+            { id: 'col_zsammy', label: t('SAMMY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsammy' },
+            { id: 'col_zsegastv', label: t('SEGA ST-V'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsegastv' },
+            { id: 'col_zseibukaihatsu', label: t('SEIBU KAIHATSU'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zseibukaihatsu' },
+            { id: 'col_zsemicom', label: t('SEMICOM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsemicom' },
+            { id: 'col_zseta', label: t('SETA'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zseta' },
+            { id: 'col_ztechnos', label: t('TECHNOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'ztechnos' },
+            { id: 'col_ztecmo', label: t('TECMO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'ztecmo' },
+            { id: 'col_ztoaplan', label: t('TOAPLAN'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'ztoaplan' },
+            { id: 'col_zuniversal', label: t('UNIVERSAL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zuniversal' },
+            { id: 'col_zvisco', label: t('VISCO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zvisco' }
+          ]},
+          { id: 'custom_collections', label: t('COLEÇÕES DE JOGO PERSONALIZADOS'), type: 'select', value: '<0 selecionados>', settingName: 'CollectionSystemsCustom', options: [{ label: '<0 selecionados>', value: 'none' }] },
+          { id: 'grouped_systems', label: t('SISTEMAS AGRUPADOS'), type: 'select', value: '<40 selecionados>', settingName: 'SystemsGrouped', options: [{ label: '<40 selecionados>', value: 'all' }] },
+          
+          { id: 'group_create_custom', label: t('CRIAR COLEÇÃO PERSONALIZADA'), type: 'group' },
+          { id: 'create_editable', label: t('CRIAR NOVA COLEÇÃO EDITÁVEL'), type: 'action' },
+          { id: 'create_dynamic', label: t('CRIAR NOVA COLEÇÃO DINÂMICA'), type: 'action' },
+
+          { id: 'group_collection_options', label: t('OPÇÕES'), type: 'group' },
+          { id: 'sort_systems', label: t('ORDENAÇÃO DOS SISTEMAS'), type: 'select', settingName: 'SortSystems', options: [
+            { label: 'NÃO', value: '' },
+            { label: 'POR ORDEM ALFABÉTICA', value: 'alpha' },
+            { label: 'POR FABRICANTE', value: 'manufacturer' },
+            { label: 'POR TIPO DE HARDWARE ENTÃO ALFABETICAMENTE', value: 'hardware' },
+            { label: 'POR TIPO DE HARDWARE ENTÃO ANO', value: 'hardware-year' },
+            { label: 'POR FABRICANTE E TIPO', value: 'subgroup' },
+            { label: 'POR ANO DE LANÇAMENTO', value: 'releaseDate' }
+          ]},
+          { id: 'start_on_system', label: t('INICIAR NO SISTEMA'), type: 'select', settingName: 'StartupSystem', options: [
+            { label: 'RESTAURAR O ÚLTIMO SELECIONADO', value: 'last' },
+            { label: 'TODOS OS JOGOS', value: 'all' }
+          ]},
+          { id: 'start_gamelist', label: t('INICIAR NA LISTA DE JOGOS'), type: 'toggle', settingName: 'StartOnGamelist', settingType: 'bool' },
+          { id: 'group_custom_themes', label: t('AGRUPAR TEMAS PERSONALIZADOS'), type: 'select', settingName: 'CustomCollectionsBundle', options: [
+            { label: 'ALWAYS', value: 'true' }, 
+            { label: 'NEVER', value: 'false' }
+          ]},
+          { id: 'show_sys_name_collections', label: t('EXIBIR NOME DO SISTEMA NAS COLEÇÕES'), type: 'toggle', settingName: 'CollectionShowSystemName', settingType: 'bool' },
+          { id: 'show_hidden_games_collections', label: t('EXIBIR JOGOS DE SISTEMAS OCULTOS NAS COLEÇÕES'), type: 'toggle', settingName: 'CollectionShowHidden', settingType: 'bool' },
+          { id: 'show_empty_systems', label: t('EXIBIR SISTEMAS VAZIOS'), type: 'toggle', settingName: 'LoadEmptySystems', settingType: 'bool' },
+          { id: 'hide_single_system_groups', label: t('NÃO MOSTRAR GRUPOS COM APENAS UM SISTEMA'), type: 'toggle', settingName: 'HideSingleSystemGroups', settingType: 'bool' },
+        ]
+      },
+      {
         id: 'system_settings', label: t('SYSTEM SETTINGS'), submenu: [
           { id: 'language', label: t('LANGUAGE'), type: 'select', settingName: 'Language', options: 
             Object.keys(locales).sort().map(lang => ({ 
@@ -286,11 +422,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
           },
           { id: 'show_fps', label: t('SHOW FRAMERATE'), type: 'toggle', settingName: 'DrawFramerate', settingType: 'bool' },
           { id: 'vram_limit', label: t('VRAM LIMIT'), type: 'slider', settingName: 'MaxVRAM', settingType: 'int', min: 40, max: 1000, step: 10, suffix: ' Mb' }
-        ]
-      },
-      {
-        id: 'controller_settings', label: t('CONTROLLERS'), submenu: [
-          { id: 'configure_input', label: t('CONFIGURE INPUT'), type: 'action', onClick: () => setShowInputConfig(true) }
         ]
       },
       { id: 'quit', label: t('QUIT'), type: 'action', onClick: () => window.api?.executeCommand('exit-frontend') }
@@ -408,7 +539,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
     )
 
     if (item.type === 'toggle') {
-      const isOn = val === 'true' || val === true || val === '1' || val === 1
+      let isOn = val === 'true' || val === true || val === '1' || val === 1
+      
+      // Multi-toggle check
+      if (item.value !== undefined && !item.settingType) {
+        const values = String(val || '').split(',').filter(v => v.trim() !== '')
+        isOn = values.includes(item.value)
+      }
+
       return (
         <div className={`menu-toggle ${isOn ? 'on' : 'off'}`}>
           <div className="toggle-thumb" />
@@ -574,7 +712,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         .menu-submenu-arrow { opacity: 0.5; font-size: 1.2em; }
         .riescade-menu-item.selected .menu-submenu-arrow { opacity: 1; }
       ` }} />
-      {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />}
+      {/* {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />} */}
       
       {showInputModal && (
         <div className="riescade-modal-overlay">
