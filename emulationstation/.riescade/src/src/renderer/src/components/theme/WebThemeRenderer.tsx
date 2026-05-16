@@ -282,6 +282,25 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         props.onError = () => setLoadedLinks(prev => prev + 1)
       }
 
+      // Special handling for broken images if data-riescade-hide-on-error is present
+      if (tagName === 'img' && props['data-riescade-hide-on-error']) {
+        if (!props.src) {
+          props.style = { ...props.style, display: 'none' }
+        }
+        
+        const originalOnError = props.onError
+        props.onError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+          e.currentTarget.style.display = 'none'
+          if (originalOnError) originalOnError(e)
+        }
+
+        const originalOnLoad = props.onLoad
+        props.onLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+          e.currentTarget.style.display = '' // Restore original display
+          if (originalOnLoad) originalOnLoad(e)
+        }
+      }
+
       if (tagName === 'style') {
         return <style key={index} dangerouslySetInnerHTML={{ __html: el.textContent || '' }} />
       }

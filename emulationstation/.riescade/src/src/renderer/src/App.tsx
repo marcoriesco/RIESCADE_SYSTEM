@@ -277,7 +277,106 @@ function App() {
 		}
 	}, [systems.length, theme]);
 
-	const currentSystem = systems[systemIndex];
+	const filteredSystems = useMemo(() => {
+		const visibleSystemsSetting = settings.VisibleSystems?.value || '';
+		const visibleSystemsList = String(visibleSystemsSetting).split(',').filter(v => v.trim() !== '');
+		return visibleSystemsList.length > 0 
+			? systems.filter(s => visibleSystemsList.includes(s.name) || s.name === 'all' || s.name === 'favorites')
+			: systems;
+	}, [systems, settings]);
+
+	const getFriendlySystemName = (sys: any) => {
+		if (!sys) return '';
+		const name = sys.name;
+		const mapping: Record<string, string> = {
+			'all': 'TODOS OS JOGOS',
+			'favorites': 'FAVORITOS',
+			'recent': 'ÚLTIMOS JOGADOS',
+			'neverplayed': 'NUNCA JOGADOS',
+			'retroachievements': 'RETROACHIEVEMENTS',
+			'2players': '2 JOGADORES',
+			'4players': '4 JOGADORES',
+			'arcade': 'ARCADE (GERAL)',
+			'vertical': 'VERTICAL ARCADE',
+			'lightgun': 'LIGHTGUN',
+			'wheel': 'WHEEL',
+			'trackball': 'TRACKBALL',
+			'spinner': 'SPINNER',
+			'_action': 'ACTION',
+			'_adult': 'ADULT',
+			'_adventure': 'ADVENTURE',
+			'_asiaticboard': 'ASIATIC BOARD',
+			'_beatemup': 'BEAT\'EM UP',
+			'_casino': 'CASINO',
+			'_casual': 'CASUAL',
+			'_demo': 'DEMO',
+			'_educational': 'EDUCATIONAL',
+			'_fight': 'FIGHT',
+			'_huntingandfishing': 'HUNTING & FISHING',
+			'_musicanddance': 'MUSIC & DANCE',
+			'_pinball': 'PINBALL',
+			'_platform': 'PLATFORM',
+			'_playingcards': 'PLAYING CARDS',
+			'_puzzle': 'PUZZLE',
+			'_quiz': 'QUIZ',
+			'_racedriving': 'RACING',
+			'_reflection': 'REFLECTION',
+			'_roleplayings': 'RPG',
+			'_shootemup': 'SHOOT\'EM UP',
+			'_shooter': 'SHOOTER',
+			'_sports': 'SPORTS',
+			'_sportswithanimals': 'SPORTS WITH ANIMALS',
+			'_strategy': 'STRATEGY',
+			'_simulation': 'SIMULATION',
+			'_various': 'VARIOUS',
+			'zatomiswave': 'ATOMISWAVE',
+			'znaomi': 'NAOMI',
+			'zmodel2': 'MODEL 2',
+			'zmodel3': 'MODEL 3',
+			'zdaphne': 'DAPHNE',
+			'zatari': 'ATARI ARCADE',
+			'zatlus': 'ATLUS',
+			'zbanpresto': 'BANPRESTO',
+			'zcapcom': 'CAPCOM',
+			'zdataeast': 'DATA EAST',
+			'zeighting': 'EIGHTING',
+			'zexidy': 'EXIDY',
+			'zgaelco': 'GAELCO',
+			'zgottlieb': 'GOTTLIEB',
+			'zigs': 'IGS',
+			'zjaleco': 'JALECO',
+			'zkaneko': 'KANEKO',
+			'zkonami': 'KONAMI',
+			'zmidway': 'MIDWAY',
+			'zmitchell': 'MITCHELL',
+			'znamco': 'NAMCO',
+			'zneogeo': 'NEOGEO',
+			'znichibutsu': 'NICHIBUTSU',
+			'znmk': 'NMK',
+			'zpsikyo': 'PSIKYO',
+			'zsammy': 'SAMMY',
+			'zsega': 'SEGA',
+			'zsegastv': 'SEGA ST-V',
+			'zseibukaihatsu': 'SEIBU KAIHATSU',
+			'zsemicom': 'SEMICOM',
+			'zseta': 'SETA',
+			'zsnk': 'SNK',
+			'ztaito': 'TAITO',
+			'ztechnos': 'TECHNOS',
+			'ztecmo': 'TECMO',
+			'ztoaplan': 'TOAPLAN',
+			'zuniversal': 'UNIVERSAL',
+			'zvisco': 'VISCO',
+			'zcps1': 'CPS1',
+			'zcps2': 'CPS2',
+			'zcps3': 'CPS3',
+			'zcave': 'CAVE',
+			'zirem': 'IREM'
+		};
+		return mapping[name] || sys.fullname || sys.name.toUpperCase();
+	};
+
+	const currentSystem = filteredSystems[systemIndex];
 	const currentGame = games[selectedGameIndex];
 
 	// ─── Theme Data ───
@@ -289,6 +388,7 @@ function App() {
 
 	const themeData = useMemo(() => {
 		const sys = selectedSystem || currentSystem;
+		const sysFullName = getFriendlySystemName(sys);
 
 		// Flatten global settings
 		const flattenedSettings = Object.entries(settings).reduce((acc, [k, v]: [string, any]) => {
@@ -298,15 +398,15 @@ function App() {
 
 		const baseData: any = {
 			...flattenedSettings,
-			systems,
+			systems: filteredSystems,
 			games,
 			'global:themeRevision': themeRevision,
-			'system.fullName': sys?.fullname || 'All Games',
+			'system.fullName': sysFullName,
 			'system.name': sys?.name || 'all',
 			'system.theme': sys?.theme || sys?.name || 'auto-allgames',
 			'system.gamecount': sys?.gamecount || 0,
 			'system.hardwareType': sys?.hardware || 'console',
-			'system:fullName': sys?.fullname || 'All Games',
+			'system:fullName': sysFullName,
 			'system:name': sys?.name || 'all',
 			'system:gamecount': sys?.gamecount || 0,
 			'system:theme': sys?.theme || sys?.name || 'auto-allgames',
@@ -409,51 +509,51 @@ function App() {
 
 			if (!selectedSystem) {
 				// System view navigation
-				if (systems.length === 0) return;
+				if (filteredSystems.length === 0) return;
 				
 				const systemHtml = theme?.views?.system || '';
 				const isVertical = systemHtml.includes('type="vertical"');
 
 				if (isVertical) {
-					if (e.key === 'ArrowDown') setSystemIndex((prev) => (prev + 1) % systems.length);
-					if (e.key === 'ArrowUp') setSystemIndex((prev) => (prev - 1 + systems.length) % systems.length);
+					if (e.key === 'ArrowDown') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
+					if (e.key === 'ArrowUp') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
 				} else {
-					if (e.key === 'ArrowRight') setSystemIndex((prev) => (prev + 1) % systems.length);
-					if (e.key === 'ArrowLeft') setSystemIndex((prev) => (prev - 1 + systems.length) % systems.length);
+					if (e.key === 'ArrowRight') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
+					if (e.key === 'ArrowLeft') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
 				}
 
 				// Quick jump by hardware group
 				if (e.key === 'PageUp') {
-					const currentHw = systems[systemIndex]?.hardware || '';
-					let next = (systemIndex + 1) % systems.length;
+					const currentHw = filteredSystems[systemIndex]?.hardware || '';
+					let next = (systemIndex + 1) % filteredSystems.length;
 					while (next !== systemIndex) {
-						if ((systems[next]?.hardware || '') !== currentHw) {
+						if ((filteredSystems[next]?.hardware || '') !== currentHw) {
 							setSystemIndex(next);
 							break;
 						}
-						next = (next + 1) % systems.length;
+						next = (next + 1) % filteredSystems.length;
 					}
 				}
 				if (e.key === 'PageDown') {
-					const currentHw = systems[systemIndex]?.hardware || '';
-					let prev = (systemIndex - 1 + systems.length) % systems.length;
+					const currentHw = filteredSystems[systemIndex]?.hardware || '';
+					let prev = (systemIndex - 1 + filteredSystems.length) % filteredSystems.length;
 					while (prev !== systemIndex) {
-						if ((systems[prev]?.hardware || '') !== currentHw) {
-							const targetHw = systems[prev]?.hardware || '';
+						if ((filteredSystems[prev]?.hardware || '') !== currentHw) {
+							const targetHw = filteredSystems[prev]?.hardware || '';
 							let first = prev;
 							while (
 								first > 0 &&
-								(systems[first - 1]?.hardware || '') === targetHw
+								(filteredSystems[first - 1]?.hardware || '') === targetHw
 							)
 								first--;
 							setSystemIndex(first);
 							break;
 						}
-						prev = (prev - 1 + systems.length) % systems.length;
+						prev = (prev - 1 + filteredSystems.length) % filteredSystems.length;
 					}
 				}
 
-				if (e.key === 'Enter') setSelectedSystem(systems[systemIndex]);
+				if (e.key === 'Enter') setSelectedSystem(filteredSystems[systemIndex]);
 			} else {
 				// Gamelist navigation
 				if (e.key === 'Backspace' || e.key === 'Escape') {
@@ -557,6 +657,7 @@ function App() {
 		isInitializing,
 		isLaunching,
 		enterPressTimer,
+		settings,
 	]);
 
 	// ─── Rendering ───
@@ -597,6 +698,7 @@ function App() {
 				onClose={() => setIsMenuOpen(false)}
 				theme={theme}
 				themeData={themeData}
+				allSystems={systems}
 			/>
 			{selectedSystem && currentGame && (
 				<GameOptionsOverlay

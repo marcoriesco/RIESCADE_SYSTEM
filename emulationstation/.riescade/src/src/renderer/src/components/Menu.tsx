@@ -24,6 +24,7 @@ interface MenuItem {
   step?: number
   suffix?: string
   isPassword?: boolean
+  showCount?: boolean
 }
 
 interface MenuProps {
@@ -31,9 +32,10 @@ interface MenuProps {
   onClose: () => void
   theme?: any
   themeData?: any
+  allSystems?: any[]
 }
 
-export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData }) => {
+export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [] }) => {
   const [settings, setSettings] = useState<Record<string, any>>({})
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
@@ -140,24 +142,36 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
 
   const handleToggle = (item: MenuItem) => {
     if (item.settingName) {
+      const fallback = (item.value !== undefined && !item.settingType) ? '' : 'false'
       const current = item.id.startsWith('theme_opt_') 
-        ? getThemeSetting(item.settingName, 'false')
-        : getSetting(item.settingName, 'false')
+        ? getThemeSetting(item.settingName, fallback)
+        : getSetting(item.settingName, fallback)
       
       // Special logic for multi-value strings (comma separated)
       if (item.type === 'toggle' && item.value !== undefined && !item.settingType) {
-        const currentString = String(current || '')
-        const values = currentString.split(',').filter(v => v.trim() !== '')
-        const isSelected = values.includes(item.value)
+        const values = String(current || '').split(',').filter(v => v.trim() !== '')
+        
+        // Special logic for VisibleSystems: if empty, it means ALL are selected
+        let currentValues = values
+        if (item.settingName === 'VisibleSystems' && values.length === 0) {
+          currentValues = allSystems.map((s: any) => s.name)
+        }
+
+        const isSelected = currentValues.includes(item.value)
         
         let newValues: string[]
         if (isSelected) {
-          newValues = values.filter(v => v !== item.value)
+          newValues = currentValues.filter(v => v !== item.value)
         } else {
-          newValues = [...values, item.value]
+          newValues = [...currentValues, item.value]
         }
         
-        updateSetting(item.settingName, newValues.join(','))
+        // If all systems are selected, we can save an empty string to keep config clean
+        if (item.settingName === 'VisibleSystems' && newValues.length === allSystems.length) {
+          updateSetting(item.settingName, '')
+        } else {
+          updateSetting(item.settingName, newValues.join(','))
+        }
         return
       }
 
@@ -297,8 +311,62 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       {
         id: 'game_collections', label: t('GAME COLLECTIONS'), submenu: [
           { id: 'group_collections_display', label: t('COLEÇÕES A SEREM EXIBIDAS'), type: 'group' },
-          { id: 'systems_displayed', label: t('SISTEMAS EXIBIDOS'), type: 'select', value: '<309 selecionados>', settingName: 'VisibleSystems', options: [{ label: '<309 selecionados>', value: 'all' }] },
-          { id: 'auto_collections', label: t('COLEÇÕES DE JOGOS AUTOMÁTICOS'), submenu: [
+          { 
+            id: 'systems_displayed', 
+            label: t('SISTEMAS EXIBIDOS'), 
+            showCount: true,
+            submenu: (() => {
+              const systemsSource = allSystems || []
+              // Filter out auto collections and anything that isn't a "real" system
+              const realSystems = systemsSource.filter((s: any) => {
+                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
+                const isGenre = s.name.startsWith('_')
+                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
+                // Real systems usually have extensions and valid paths
+                const hasExtension = s.extension && s.extension.length > 0
+                return !isAuto && !isGenre && !isCustom && hasExtension
+              })
+              
+              // Group by hardware
+              const groups: Record<string, any[]> = {}
+              realSystems.forEach((s: any) => {
+                const hw = s.hardware || t('OUTROS')
+                if (!groups[hw]) groups[hw] = []
+                groups[hw].push(s)
+              })
+
+              // Sort groups alphabetically, but keep 'OUTROS' at the end
+              const sortedGroups = Object.keys(groups).sort((a, b) => {
+                if (a === t('OUTROS')) return 1
+                if (b === t('OUTROS')) return -1
+                return a.localeCompare(b)
+              })
+
+              const finalItems: MenuItem[] = []
+
+              sortedGroups.forEach(groupName => {
+                finalItems.push({ id: `group_hw_${groupName}`, label: groupName.toUpperCase(), type: 'group' })
+                
+                // Sort systems within group alphabetically by fullName
+                const sortedSystems = groups[groupName].sort((a, b) => 
+                  (a.fullName || a.name).localeCompare(b.fullName || b.name)
+                )
+
+                sortedSystems.forEach(sys => {
+                  finalItems.push({
+                    id: `sys_vis_${sys.name}`,
+                    label: sys.fullName || sys.name.toUpperCase(),
+                    type: 'toggle',
+                    settingName: 'VisibleSystems',
+                    value: sys.name
+                  })
+                })
+              })
+
+              return finalItems
+            })()
+          },
+          { id: 'auto_collections', label: t('COLEÇÕES DE JOGOS AUTOMÁTICOS'), showCount: true, submenu: [
             { id: 'group_std_cols', label: t('PADRÃO'), type: 'group' },
             { id: 'col_all', label: t('TODOS OS JOGOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'all' },
             { id: 'col_recent', label: t('ÚLTIMOS JOGADOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'recent' },
@@ -334,18 +402,31 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
 
             { id: 'group_genres_cols', label: t('GÊNEROS'), type: 'group' },
             { id: 'col__action', label: t('ACTION'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_action' },
+            { id: 'col__adult', label: t('ADULT'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_adult' },
             { id: 'col__adventure', label: t('ADVENTURE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_adventure' },
+            { id: 'col__asiaticboard', label: t('ASIATIC BOARD'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_asiaticboard' },
             { id: 'col__beatemup', label: t('BEAT\'EM UP'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_beatemup' },
+            { id: 'col__casino', label: t('CASINO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_casino' },
+            { id: 'col__casual', label: t('CASUAL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_casual' },
+            { id: 'col__demo', label: t('DEMO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_demo' },
+            { id: 'col__educational', label: t('EDUCATIONAL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_educational' },
             { id: 'col__fight', label: t('FIGHT'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_fight' },
+            { id: 'col__huntingandfishing', label: t('HUNTING & FISHING'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_huntingandfishing' },
+            { id: 'col__musicanddance', label: t('MUSIC & DANCE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_musicanddance' },
+            { id: 'col__pinball', label: t('PINBALL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_pinball' },
             { id: 'col__platform', label: t('PLATFORM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_platform' },
+            { id: 'col__playingcards', label: t('PLAYING CARDS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_playingcards' },
             { id: 'col__puzzle', label: t('PUZZLE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_puzzle' },
+            { id: 'col__quiz', label: t('QUIZ'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_quiz' },
             { id: 'col__racedriving', label: t('RACING'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_racedriving' },
+            { id: 'col__reflection', label: t('REFLECTION'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_reflection' },
             { id: 'col__roleplayings', label: t('RPG'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_roleplayings' },
             { id: 'col__shootemup', label: t('SHOOT\'EM UP'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_shootemup' },
             { id: 'col__shooter', label: t('SHOOTER'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_shooter' },
-            { id: 'col__sports', label: t('SPORTS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_sports' },
-            { id: 'col__strategy', label: t('STRATEGY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_strategy' },
             { id: 'col__simulation', label: t('SIMULATION'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_simulation' },
+            { id: 'col__sports', label: t('SPORTS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_sports' },
+            { id: 'col__sportswithanimals', label: t('SPORTS WITH ANIMALS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_sportswithanimals' },
+            { id: 'col__strategy', label: t('STRATEGY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_strategy' },
             { id: 'col__various', label: t('VARIOUS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_various' },
             
             { id: 'group_other_arcades', label: t('OUTROS ARCADES'), type: 'group' },
@@ -532,19 +613,23 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
   }, [handleKeyDown])
 
   const renderItemValue = (item: MenuItem) => {
-    const val = item.value !== undefined ? item.value : (
-      item.settingName ? (
-        item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName) : getSetting(item.settingName)
-      ) : undefined
-    )
+    // Priority: pendingSettings > settings > fallback
+    const currentSettingVal = item.settingName 
+      ? (item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName) : getSetting(item.settingName))
+      : undefined
 
     if (item.type === 'toggle') {
-      let isOn = val === 'true' || val === true || val === '1' || val === 1
+      let isOn = currentSettingVal === 'true' || currentSettingVal === true || currentSettingVal === '1' || currentSettingVal === 1
       
-      // Multi-toggle check
+      // Multi-toggle check (e.g. CollectionSystemsAuto which is "all,recent,favorites")
       if (item.value !== undefined && !item.settingType) {
-        const values = String(val || '').split(',').filter(v => v.trim() !== '')
-        isOn = values.includes(item.value)
+        const values = String(currentSettingVal || '').split(',').filter(v => v.trim() !== '')
+        
+        if (item.settingName === 'VisibleSystems' && values.length === 0) {
+          isOn = true // Default to all visible
+        } else {
+          isOn = values.includes(item.value)
+        }
       }
 
       return (
@@ -554,7 +639,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       )
     }
     if (item.type === 'select') {
-      const currentVal = val !== undefined ? val : item.options?.[0]?.value
+      const currentVal = currentSettingVal !== undefined ? currentSettingVal : item.options?.[0]?.value
       const label = item.options?.find(o => o.value === currentVal)?.label || currentVal
       return (
         <div className="menu-select">
@@ -568,13 +653,42 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
       return <div className="menu-slider">{getSetting(item.settingName!, item.min ?? 0)}{item.suffix || '%'}</div>
     }
     if (item.type === 'input') {
-      const displayVal = item.isPassword ? '••••••••' : (val || '')
+      const displayVal = item.isPassword ? '••••••••' : (currentSettingVal || '')
       return <div className="menu-input-preview">{displayVal || t('EMPTY')}</div>
     }
     if (item.type === 'info') {
       return <div className="menu-info">{item.value}</div>
     }
     if (item.submenu) {
+      // Calculate selected count for submenus with toggles, but only if requested
+      if (item.showCount) {
+        let selectedCount = 0
+        item.submenu.forEach(sub => {
+          if (sub.type === 'toggle' && sub.settingName) {
+            const subVal = sub.id.startsWith('theme_opt_') ? getThemeSetting(sub.settingName) : getSetting(sub.settingName)
+            let isSubOn = subVal === 'true' || subVal === true || subVal === '1' || subVal === 1
+            if (sub.value !== undefined && !sub.settingType) {
+              const values = String(subVal || '').split(',').filter(v => v.trim() !== '')
+              if (sub.settingName === 'VisibleSystems' && values.length === 0) {
+                isSubOn = true
+              } else {
+                isSubOn = values.includes(sub.value)
+              }
+            }
+            if (isSubOn) selectedCount++
+          }
+        })
+
+        if (selectedCount > 0) {
+          return (
+            <div className="menu-submenu-preview">
+              <span className="menu-selected-count">{selectedCount} {t('SELECIONADOS')}</span>
+              <span className="menu-submenu-arrow">›</span>
+            </div>
+          )
+        }
+      }
+
       return <span className="menu-submenu-arrow">›</span>
     }
     return null
@@ -711,6 +825,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData })
         .riescade-menu-list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
         .menu-submenu-arrow { opacity: 0.5; font-size: 1.2em; }
         .riescade-menu-item.selected .menu-submenu-arrow { opacity: 1; }
+        .menu-submenu-preview { display: flex; align-items: center; gap: 10px; }
+        .menu-selected-count { font-size: 0.75rem; font-weight: 800; opacity: 0.6; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 10px; }
+        .riescade-menu-item.selected .menu-selected-count { opacity: 0.9; background: rgba(255,255,255,0.2); }
       ` }} />
       {/* {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />} */}
       

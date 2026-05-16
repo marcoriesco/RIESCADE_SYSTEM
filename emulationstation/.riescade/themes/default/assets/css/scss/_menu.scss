@@ -41,6 +41,10 @@
     max-height: 70vh;
 }
 
+.riescade-menu-list {
+    max-height: 70vh;
+}
+
 /* Você pode forçar estilos nos itens do menu gerados pelo React usando !important */
 .riescade-menu-item {
     padding: 5px 30px !important;
@@ -76,6 +80,7 @@
 .menu-select {
     color: #fff;
 }
+
 /* Rodapé do Menu */
 .riescade-menu-footer {
     background: none !important;
