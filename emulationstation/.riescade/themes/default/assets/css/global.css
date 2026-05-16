@@ -17,7 +17,7 @@
 .riescade-modal-container {
   font-family: "Roboto Condensed", sans-serif !important;
   font-weight: 400;
-  width: 35vw !important;
+  width: 45vw !important;
   background: rgba(0, 0, 0, 0.8) !important;
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 2px 2px 40px rgb(0, 0, 0);
@@ -35,6 +35,7 @@
   gap: 15px;
 }
 .riescade-menu-header .riescade-menu-title {
+  font-size: 1.75rem;
   color: var(--theme-color);
 }
 
@@ -50,10 +51,11 @@
 
 /* Você pode forçar estilos nos itens do menu gerados pelo React usando !important */
 .riescade-menu-item {
+  color: #999 !important;
   padding: 5px 30px !important;
 }
 .riescade-menu-item .riescade-menu-label {
-  font-size: 1.5rem !important;
+  font-size: 1.75rem !important;
   font-weight: 300 !important;
 }
 .riescade-menu-item.selected {
@@ -87,7 +89,7 @@
   display: none !important;
 }
 .riescade-menu-footer .riescade-menu-version {
-  font-size: 0.8rem !important;
+  font-size: 0.9rem !important;
   font-weight: 400 !important;
 }
 

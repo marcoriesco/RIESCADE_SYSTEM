@@ -140,6 +140,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     }
   }, [settings, themes])
 
+  // Auto-scroll to selected item
+  useEffect(() => {
+    if (isOpen) {
+      const selectedEl = document.querySelector('.riescade-menu-item.selected')
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      }
+    }
+  }, [selectedIndex, activeMenuStack, isOpen])
+
   const handleToggle = (item: MenuItem) => {
     if (item.settingName) {
       const fallback = (item.value !== undefined && !item.settingType) ? '' : 'false'
