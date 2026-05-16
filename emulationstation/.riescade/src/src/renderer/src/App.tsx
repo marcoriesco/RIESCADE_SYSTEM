@@ -278,11 +278,29 @@ function App() {
 	}, [systems.length, theme]);
 
 	const filteredSystems = useMemo(() => {
-		const visibleSystemsSetting = settings.VisibleSystems?.value || '';
-		const visibleSystemsList = String(visibleSystemsSetting).split(',').filter(v => v.trim() !== '');
-		return visibleSystemsList.length > 0 
-			? systems.filter(s => visibleSystemsList.includes(s.name) || s.name === 'all' || s.name === 'favorites')
+		const visibleSetting = settings.VisibleSystems?.value || '';
+		const hiddenSetting = settings.HiddenSystems?.value || '';
+		const autoSetting = settings.CollectionSystemsAuto?.value || '';
+		
+		const visibleList = String(visibleSetting).split(',').filter(v => v.trim() !== '');
+		const hiddenList = String(hiddenSetting).split(';').filter(v => v.trim() !== '');
+		const autoList = String(autoSetting).split(',').filter(v => v.trim() !== '');
+
+		let baseSystems = visibleList.length > 0 
+			? systems.filter(s => 
+				visibleList.includes(s.name) || 
+				s.name === 'all' || 
+				s.name === 'favorites' ||
+				autoList.includes(s.name)
+			)
 			: systems;
+
+		// Subtract hidden systems
+		if (hiddenList.length > 0) {
+			baseSystems = baseSystems.filter(s => !hiddenList.includes(s.name));
+		}
+
+		return baseSystems;
 	}, [systems, settings]);
 
 	const getFriendlySystemName = (sys: any) => {
