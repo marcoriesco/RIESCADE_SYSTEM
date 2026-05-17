@@ -119,7 +119,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         window.api.getThemeSettings(theme.name).then(setThemeSettings)
       }
 
-      setActiveMenuStack([{ items: getMainMenuItems(), title: 'MAIN MENU' }])
+      setActiveMenuStack([{ items: getMainMenuItems(), title: t('MAIN MENU') }])
       setSelectedIndex(0)
       // Animate in
       requestAnimationFrame(() => setVisible(true))
@@ -714,14 +714,24 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             </div>
           )
         }
+        const isMainMenu = activeMenuStack.length === 1
         return (
           <div
             key={item.id}
             className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
           >
-            <span className="riescade-menu-label">
-              {item.label}
-            </span>
+            {isMainMenu ? (
+              <div className="riescade-menu-label-container">
+                <span className="riescade-menu-icon" id={item.id}></span>
+                <span className="riescade-menu-label">
+                  {item.label}
+                </span>
+              </div>
+            ) : (
+              <span className="riescade-menu-label">
+                {item.label}
+              </span>
+            )}
             <div className="riescade-menu-value">{renderItemValue(item)}</div>
           </div>
         )
@@ -805,6 +815,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .riescade-menu-item.selected { background: #3b82f6; color: #fff; }
         .riescade-menu-label { font-weight: 500; font-size: 0.95rem; text-transform: uppercase; }
         .riescade-menu-item.selected .riescade-menu-label { font-weight: 800; }
+        .riescade-menu-label-container { display: flex; align-items: center; gap: 10px; }
+        .riescade-menu-icon { display: inline-block; width: 2.2em; height: 2em; background-size: contain; background-repeat: no-repeat; background-position: center; }
         .riescade-menu-group { padding: 20px 30px 10px; color: #888; font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .riescade-menu-footer { background: #ddd; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; }
         .riescade-menu-footer-actions { display: flex; gap: 30px; font-size: 0.8rem; color: #444; font-weight: 700; }
@@ -833,7 +845,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .riescade-menu-item.selected .menu-select .arrow { opacity: 1; }
         .riescade-menu-list-container::-webkit-scrollbar { width: 6px; }
         .riescade-menu-list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-        .menu-submenu-arrow { opacity: 0.5; font-size: 1.2em; }
+        .menu-submenu-arrow { opacity: 0.5; font-size: 2em; }
         .riescade-menu-item.selected .menu-submenu-arrow { opacity: 1; }
         .menu-submenu-preview { display: flex; align-items: center; gap: 10px; }
         .menu-selected-count { font-size: 0.75rem; font-weight: 800; opacity: 0.6; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 10px; }

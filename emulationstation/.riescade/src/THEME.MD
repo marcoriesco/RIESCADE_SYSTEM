@@ -200,10 +200,45 @@ The menu is **not** custom HTML anymore. It is a React component that you style 
 - `.riescade-menu-group`: Label for groups (e.g., "GAME SETTINGS").
 - `.riescade-menu-item`: The item row.
   - `.selected`: When the item is focused.
+- `.riescade-menu-label-container`: Container wrapping the icon and the text label (only present for first-level main menu items).
+- `.riescade-menu-icon`: Icon placeholder inside `riescade-menu-label-container`. The element has its `id` attribute set to the specific item ID (e.g., `id="game_settings"`), allowing easy CSS targeting for icons.
 - `.riescade-menu-label`: Item text.
 - `.riescade-menu-value`: The area for toggle/select values.
 - `.riescade-menu-footer`: Bottom bar.
 - `.riescade-menu-version`: App and ES version text.
+
+#### Main Menu Custom Item Layout (with Icons)
+For the main menu items, the HTML structure is generated as follows, enabling custom icon additions via CSS:
+```html
+<div class="riescade-menu-item selected">
+  <div class="riescade-menu-label-container">
+    <span class="riescade-menu-icon" id="game_settings"></span>
+    <span class="riescade-menu-label">AJUSTES DE JOGO</span>
+  </div>
+  <div class="riescade-menu-value">
+    <span class="menu-submenu-arrow">›</span>
+  </div>
+</div>
+```
+
+Example CSS styling for main menu icons:
+```css
+.riescade-menu-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#game_settings {
+  background-image: url('../images/icons/game_settings.png');
+}
+#ui_settings {
+  background-image: url('../images/icons/ui_settings.png');
+}
+```
 
 ### Toggle/Select Classes
 - `.menu-toggle`: The switch container (`.on` / `.off`).

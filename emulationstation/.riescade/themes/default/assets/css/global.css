@@ -7,6 +7,11 @@
    MENU VIEW LAYOUT
    ======================================================== */
 /* Fundo escurecido e borrado da tela inteira */
+.riescade-menu-overlay {
+  align-items: flex-start !important;
+  padding-top: 15vh !important;
+}
+
 .riescade-menu-overlay,
 .riescade-modal-overlay {
   background: rgba(0, 0, 0, 0.7) !important;
@@ -18,10 +23,12 @@
   font-family: "Roboto Condensed", sans-serif !important;
   font-weight: 400;
   width: 45vw !important;
-  background: rgba(0, 0, 0, 0.8) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 2px 2px 40px rgb(0, 0, 0);
   margin-bottom: 10vh;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
 }
 
 /* Cabeçalho do Menu */
@@ -52,7 +59,25 @@
 /* Você pode forçar estilos nos itens do menu gerados pelo React usando !important */
 .riescade-menu-item {
   color: #999 !important;
-  padding: 5px 30px !important;
+  padding: 5px 15px !important;
+}
+.riescade-menu-item .riescade-menu-icon#game_settings {
+  background-image: url(../icons/controllers.png);
+}
+.riescade-menu-item .riescade-menu-icon#ui_settings {
+  background-image: url(../icons/ui.png);
+}
+.riescade-menu-item .riescade-menu-icon#sound_settings {
+  background-image: url(../icons/sound.png);
+}
+.riescade-menu-item .riescade-menu-icon#game_collections {
+  background-image: url(../icons/advanced.png);
+}
+.riescade-menu-item .riescade-menu-icon#system_settings {
+  background-image: url(../icons/config.png);
+}
+.riescade-menu-item .riescade-menu-icon#quit {
+  background-image: url(../icons/quit.png);
 }
 .riescade-menu-item .riescade-menu-label {
   font-size: 1.75rem !important;
@@ -82,7 +107,7 @@
 /* Rodapé do Menu */
 .riescade-menu-footer {
   background: none !important;
-  padding: 20px 25px 10px !important;
+  padding: 20px 25px !important;
   justify-content: center !important;
 }
 .riescade-menu-footer .riescade-menu-footer-actions {
