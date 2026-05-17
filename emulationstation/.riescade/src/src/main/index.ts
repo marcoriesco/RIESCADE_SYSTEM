@@ -75,11 +75,26 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('launch-game', async (_, game: Game, system: System) => {
-    return launcherService.launch(game, system, activeControllers)
+    let targetSystem = system
+    if (system.name === 'collections') {
+      const realSystem = libraryService.getSystems().find(s => s.name.toLowerCase() === game.system.toLowerCase())
+      if (realSystem) {
+        targetSystem = realSystem
+      }
+    }
+    return launcherService.launch(game, targetSystem, activeControllers)
   })
 
   ipcMain.handle('update-game', async (_, systemName: string, gameData: Game) => {
     return libraryService.updateGame(systemName, gameData)
+  })
+
+  ipcMain.handle('get-custom-collections', async () => {
+    return libraryService.getCustomCollections()
+  })
+
+  ipcMain.handle('get-collection-games', async (_, collectionName: string) => {
+    return libraryService.getCollectionGames(collectionName)
   })
 
   // ─── IPC: Themes ───

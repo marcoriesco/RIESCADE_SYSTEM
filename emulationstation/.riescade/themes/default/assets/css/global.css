@@ -61,6 +61,11 @@
   color: #999 !important;
   padding: 5px 15px !important;
 }
+.riescade-menu-item .riescade-menu-group {
+  padding: 20px 15px 5px !important;
+  color: var(--theme-color) !important;
+  border-bottom: none !important;
+}
 .riescade-menu-item .riescade-menu-icon#game_settings {
   background-image: url(../icons/controllers.png);
 }
@@ -216,7 +221,7 @@ body {
   gap: 1.5vw;
 }
 .riescade-footer .helpsystem .helpsystem-image {
-  transform: scale(0.7);
+  transform: scale(0.8);
 }
 .riescade-footer .controller-activity {
   display: flex;

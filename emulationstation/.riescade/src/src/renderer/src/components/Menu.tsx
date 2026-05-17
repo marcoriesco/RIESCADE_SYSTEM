@@ -50,6 +50,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [showInputModal, setShowInputModal] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
+  const [customCollections, setCustomCollections] = useState<string[]>([])
 
   const getSetting = (name: string, fallback: any = ''): any => {
     return (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value) ?? fallback
@@ -114,6 +115,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       })
       window.api.getThemes().then(setThemes)
       window.api.getVersion?.().then(setVersions)
+      window.api.getCustomCollections().then(setCustomCollections)
       
       if (theme?.name) {
         window.api.getThemeSettings(theme.name).then(setThemeSettings)
@@ -138,7 +140,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         return updated
       })
     }
-  }, [settings, themes])
+  }, [settings, themes, customCollections])
 
   // Auto-scroll to selected item
   useEffect(() => {
@@ -439,7 +441,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col__strategy', label: t('STRATEGY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_strategy' },
             { id: 'col__various', label: t('VARIOUS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_various' },
             
-            { id: 'group_other_arcades', label: t('OUTROS ARCADES'), type: 'group' },
+            { id: 'group_other_arcades', label: t('MANUFACTURERS'), type: 'group' },
             { id: 'col_zatomiswave', label: t('ATOMISWAVE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zatomiswave' },
             { id: 'col_znaomi', label: t('NAOMI'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znaomi' },
             { id: 'col_zmodel2', label: t('MODEL 2'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmodel2' },
@@ -471,13 +473,27 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col_zuniversal', label: t('UNIVERSAL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zuniversal' },
             { id: 'col_zvisco', label: t('VISCO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zvisco' }
           ]},
-          { id: 'custom_collections', label: t('COLEÇÕES DE JOGO PERSONALIZADOS'), type: 'select', value: '<0 selecionados>', settingName: 'CollectionSystemsCustom', options: [{ label: '<0 selecionados>', value: 'none' }] },
+          { 
+            id: 'custom_collections_submenu', 
+            label: t('COLEÇÕES DE JOGO PERSONALIZADOS'), 
+            showCount: true,
+            submenu: (() => {
+              const collectionsSource = customCollections || []
+              if (collectionsSource.length === 0) {
+                return [{ id: 'no_collections_found', label: t('NENHUMA COLEÇÃO ENCONTRADA'), type: 'info', value: '' }]
+              }
+
+              return collectionsSource.map(colName => ({
+                id: `col_custom_${colName}`,
+                label: colName.toUpperCase(),
+                type: 'toggle',
+                settingName: 'CollectionSystemsCustom',
+                value: colName
+              }))
+            })()
+          },
           { id: 'grouped_systems', label: t('SISTEMAS AGRUPADOS'), type: 'select', value: '<40 selecionados>', settingName: 'SystemsGrouped', options: [{ label: '<40 selecionados>', value: 'all' }] },
           
-          { id: 'group_create_custom', label: t('CRIAR COLEÇÃO PERSONALIZADA'), type: 'group' },
-          { id: 'create_editable', label: t('CRIAR NOVA COLEÇÃO EDITÁVEL'), type: 'action' },
-          { id: 'create_dynamic', label: t('CRIAR NOVA COLEÇÃO DINÂMICA'), type: 'action' },
-
           { id: 'group_collection_options', label: t('OPÇÕES'), type: 'group' },
           { id: 'sort_systems', label: t('ORDENAÇÃO DOS SISTEMAS'), type: 'select', settingName: 'SortSystems', options: [
             { label: 'NÃO', value: '' },
@@ -493,14 +509,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { label: 'TODOS OS JOGOS', value: 'all' }
           ]},
           { id: 'start_gamelist', label: t('INICIAR NA LISTA DE JOGOS'), type: 'toggle', settingName: 'StartOnGamelist', settingType: 'bool' },
-          { id: 'group_custom_themes', label: t('AGRUPAR TEMAS PERSONALIZADOS'), type: 'select', settingName: 'CustomCollectionsBundle', options: [
-            { label: 'ALWAYS', value: 'true' }, 
-            { label: 'NEVER', value: 'false' }
-          ]},
           { id: 'show_sys_name_collections', label: t('EXIBIR NOME DO SISTEMA NAS COLEÇÕES'), type: 'toggle', settingName: 'CollectionShowSystemName', settingType: 'bool' },
           { id: 'show_hidden_games_collections', label: t('EXIBIR JOGOS DE SISTEMAS OCULTOS NAS COLEÇÕES'), type: 'toggle', settingName: 'CollectionShowHidden', settingType: 'bool' },
           { id: 'show_empty_systems', label: t('EXIBIR SISTEMAS VAZIOS'), type: 'toggle', settingName: 'LoadEmptySystems', settingType: 'bool' },
-          { id: 'hide_single_system_groups', label: t('NÃO MOSTRAR GRUPOS COM APENAS UM SISTEMA'), type: 'toggle', settingName: 'HideSingleSystemGroups', settingType: 'bool' },
         ]
       },
       {

@@ -39,4 +39,5 @@ export interface Game {
   system: string
   emulator?: string
   core?: string
+  isCollectionFolder?: boolean
 }

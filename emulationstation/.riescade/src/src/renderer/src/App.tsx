@@ -59,6 +59,7 @@ function App() {
 	const [systemIndex, setSystemIndex] = useState(0);
 	const [selectedSystem, setSelectedSystem] = useState<System | null>(null);
 	const [selectedGameIndex, setSelectedGameIndex] = useState(0);
+	const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLaunching, setIsLaunching] = useState(false);
 	const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
@@ -265,9 +266,19 @@ function App() {
 		if (selectedSystem) {
 			setGames([]);
 			setSelectedGameIndex(0);
+			setSelectedCollection(null);
 			window.api.getGames(selectedSystem.name).then((g: Game[]) => setGames(g));
 		}
 	}, [selectedSystem]);
+
+	// Load games when collection selected
+	useEffect(() => {
+		if (selectedSystem && selectedSystem.name === 'collections' && selectedCollection) {
+			setGames([]);
+			setSelectedGameIndex(0);
+			window.api.getCollectionGames(selectedCollection).then((g: Game[]) => setGames(g));
+		}
+	}, [selectedCollection, selectedSystem]);
 
 	// End splash screen
 	useEffect(() => {
@@ -291,6 +302,7 @@ function App() {
 				visibleList.includes(s.name) || 
 				s.name === 'all' || 
 				s.name === 'favorites' ||
+				s.name === 'collections' ||
 				autoList.includes(s.name)
 			)
 			: systems;
@@ -300,6 +312,13 @@ function App() {
 			baseSystems = baseSystems.filter(s => !hiddenList.includes(s.name));
 		}
 
+		// Only show 'collections' if we have at least one enabled custom collection!
+		const customSetting = settings.CollectionSystemsCustom?.value || '';
+		const enabledCols = String(customSetting).split(',').map(s => s.trim()).filter(s => s.length > 0);
+		if (enabledCols.length === 0) {
+			baseSystems = baseSystems.filter(s => s.name !== 'collections');
+		}
+
 		return baseSystems;
 	}, [systems, settings]);
 
@@ -307,6 +326,7 @@ function App() {
 		if (!sys) return '';
 		const name = sys.name;
 		const mapping: Record<string, string> = {
+			'collections': 'COLEÇÕES',
 			'all': 'TODOS OS JOGOS',
 			'favorites': 'FAVORITOS',
 			'recent': 'ÚLTIMOS JOGADOS',
@@ -577,6 +597,12 @@ function App() {
 				if (e.key === 'Backspace' || e.key === 'Escape') {
 					if (isGameOptionsOpen) {
 						setIsGameOptionsOpen(false);
+					} else if (selectedCollection) {
+						setSelectedCollection(null);
+						window.api.getGames(selectedSystem.name).then((g: Game[]) => {
+							setGames(g);
+							setSelectedGameIndex(0);
+						});
 					} else {
 						setSelectedSystem(null);
 					}
@@ -639,16 +665,20 @@ function App() {
 				if (isGameOptionsOpen) return;
 
 				if (e.key === 'Enter' && currentGame && !isLaunching) {
-					setIsLaunching(true);
-					window.api
-						.launchGame(currentGame, selectedSystem)
-						.then(() => {
-							setTimeout(() => setIsLaunching(false), 5000);
-						})
-						.catch((err) => {
-							console.error('Launch game failed or exited with code:', err);
-							setTimeout(() => setIsLaunching(false), 5000);
-						});
+					if (currentGame.isCollectionFolder) {
+						setSelectedCollection(currentGame.path);
+					} else {
+						setIsLaunching(true);
+						window.api
+							.launchGame(currentGame, selectedSystem)
+							.then(() => {
+								setTimeout(() => setIsLaunching(false), 5000);
+							})
+							.catch((err) => {
+								console.error('Launch game failed or exited with code:', err);
+								setTimeout(() => setIsLaunching(false), 5000);
+							});
+					}
 				}
 			}
 		};

@@ -8,6 +8,8 @@ const api = {
   getGames: (systemName: string) => ipcRenderer.invoke('get-games', systemName),
   updateGame: (systemName: string, gameData: any) => ipcRenderer.invoke('update-game', systemName, gameData),
   launchGame: (game: any, system: any) => ipcRenderer.invoke('launch-game', game, system),
+  getCustomCollections: () => ipcRenderer.invoke('get-custom-collections'),
+  getCollectionGames: (collectionName: string) => ipcRenderer.invoke('get-collection-games', collectionName),
 
   // Themes
   getThemes: () => ipcRenderer.invoke('get-themes'),

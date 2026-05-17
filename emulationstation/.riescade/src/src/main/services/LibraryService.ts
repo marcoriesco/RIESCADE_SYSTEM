@@ -1,9 +1,9 @@
-import { join } from 'path'
-import { existsSync } from 'fs'
+import { join, resolve, relative } from 'path'
+import { existsSync, readdirSync, readFileSync } from 'fs'
 import { SystemsParser } from '../parsers/SystemsParser'
 import { GamelistParser } from '../parsers/GamelistParser'
 import { SettingsParser } from '../parsers/SettingsParser'
-import { getConfigPath, getRomsPath } from '../utils/paths'
+import { getConfigPath, getRomsPath, getRetroBatPath } from '../utils/paths'
 import { System, Game } from '../../shared/types'
 
 export class LibraryService {
@@ -20,21 +20,43 @@ export class LibraryService {
     const settings = new SettingsParser()
     const sortMode = settings.getSetting('SortSystems', 'string') || 'hardware'
 
+    // Add collections virtual system
+    const customSetting = settings.getSetting('CollectionSystemsCustom', 'string') || ''
+    const enabledCols = String(customSetting).split(',').map(s => s.trim()).filter(s => s.length > 0)
+    const gamecount = enabledCols.length
+
+    systems.push({
+      name: 'collections',
+      fullname: 'Coleções',
+      path: 'virtual://collections',
+      extension: '',
+      command: '',
+      platform: 'pc',
+      theme: 'custom-collections',
+      hardware: 'custom-collections',
+      emulators: [],
+      gamecount: gamecount
+    })
+
     return systems.sort((sys1, sys2) => {
       const getPriority = (sys: System) => {
         const name = sys.name.toLowerCase()
         const isAuto = sys.hardware === 'auto collection'
         
+        // 5. Coleções (Custom Collections)
+        if (name === 'collections') return 5
+
         // 1. Arcade Manufacturers (z*)
         if (isAuto && name.startsWith('z')) return 1
         
         // 2. All other Auto Collections
         if (isAuto) return 2
         
-        // 3. Special / Maintenance Systems
-        if (['library', 'magazine', 'manuals', 'retrobat', 'screenshots'].includes(name)) return 3
-        
-        // 4. Real Game Systems (The rest)
+        // 3. Real Game Systems (The rest)
+        const isSpecial = ['library', 'magazine', 'manuals', 'retrobat', 'screenshots'].includes(name) || sys.hardware === 'system'
+        if (!isSpecial) return 3
+
+        // 4. Special / Maintenance Systems
         return 4
       }
 
@@ -43,8 +65,8 @@ export class LibraryService {
 
       if (p1 !== p2) return p1 - p2
 
-      // Within the same priority (especially priority 4), sort by hardware THEN name
-      if (p1 === 4) {
+      // Within the same priority (especially priority 3), sort by hardware THEN name
+      if (p1 === 3) {
         const hw1 = (sys1.hardware || 'console').toLowerCase()
         const hw2 = (sys2.hardware || 'console').toLowerCase()
         if (hw1 !== hw2) return hw1.localeCompare(hw2)
@@ -57,6 +79,24 @@ export class LibraryService {
   }
 
   public getGames(systemName: string): Game[] {
+    if (systemName === 'collections') {
+      const settings = new SettingsParser()
+      const customSetting = settings.getSetting('CollectionSystemsCustom', 'string') || ''
+      const enabledCols = String(customSetting).split(',').map(s => s.trim()).filter(s => s.length > 0)
+      
+      return enabledCols.map(colName => ({
+        id: `collection_${colName}`,
+        name: colName,
+        desc: `Coleção de jogos: ${colName}`,
+        path: colName,
+        system: 'collections',
+        favorite: false,
+        hidden: false,
+        playcount: 0,
+        isCollectionFolder: true
+      } as any))
+    }
+
     const configPath = getConfigPath()
     const gamelistPath = join(configPath, 'gamelists', systemName, 'gamelist.xml')
     const romsGamelistPath = join(getRomsPath(), systemName, 'gamelist.xml')
@@ -69,6 +109,103 @@ export class LibraryService {
     }
 
     return games.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+  }
+
+  public getCustomCollections(): string[] {
+    const collectionsDir = join(getConfigPath(), 'collections')
+    if (!existsSync(collectionsDir)) return []
+    
+    try {
+      const files = readdirSync(collectionsDir)
+      const collections: string[] = []
+      files.forEach(f => {
+        if (f.startsWith('custom-') && f.endsWith('.cfg')) {
+          const colName = f.substring(7, f.length - 4)
+          collections.push(colName)
+        }
+      })
+      // Sort alphabetically
+      return collections.sort((a, b) => a.localeCompare(b))
+    } catch (e) {
+      console.error('Failed to read custom collections:', e)
+      return []
+    }
+  }
+
+  public getCollectionGames(collectionName: string): Game[] {
+    const configPath = getConfigPath()
+    const cfgPath = join(configPath, 'collections', `custom-${collectionName}.cfg`)
+    if (!existsSync(cfgPath)) return []
+
+    try {
+      const content = readFileSync(cfgPath, 'utf-8')
+      const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0)
+
+      const allSystems = this.getSystems()
+      const collectionGames: Game[] = []
+
+      // Cache the parsed games for systems we encounter
+      const parsedSystemsGames = new Map<string, Game[]>()
+
+      for (const line of lines) {
+        // E.g. line: ./roms/cps3/sfiii.zip
+        let resolvedRomPath = line.replace(/^\.\//, '') // remove ./
+        const absoluteRomPath = resolve(getRetroBatPath(), resolvedRomPath).replace(/\\/g, '/')
+
+        // Extract system name from path
+        const normalized = absoluteRomPath.toLowerCase()
+        const match = normalized.match(/\/roms\/([^/]+)\//)
+        const systemName = match ? match[1] : ''
+
+        if (!systemName) continue
+
+        // Get games of this system
+        const sysKey = systemName.toLowerCase()
+        if (!parsedSystemsGames.has(sysKey)) {
+          parsedSystemsGames.set(sysKey, this.getGames(systemName))
+        }
+        const systemGames = parsedSystemsGames.get(sysKey) || []
+
+        // Find the system object to get its ROMs path
+        const systemObj = allSystems.find(s => s.name.toLowerCase() === sysKey)
+        const systemRomDir = systemObj ? systemObj.path : join(getRomsPath(), systemName)
+
+        // Find the game in systemGames that matches the path
+        const foundGame = systemGames.find(g => {
+          // Resolve both to absolute paths
+          const gameAbsPath = resolve(systemRomDir, g.path).replace(/\\/g, '/')
+          return gameAbsPath.toLowerCase() === absoluteRomPath.toLowerCase()
+        })
+
+        if (foundGame) {
+          collectionGames.push({
+            ...foundGame,
+          })
+        } else {
+          // Create placeholder game
+          const filename = absoluteRomPath.split('/').pop() || ''
+          const displayName = filename.replace(/\.[^/.]+$/, '') // remove extension
+          
+          // Make path relative to system ROM directory
+          const relativeRomPath = './' + relative(systemRomDir, absoluteRomPath).replace(/\\/g, '/')
+
+          collectionGames.push({
+            id: absoluteRomPath,
+            name: displayName,
+            path: relativeRomPath,
+            system: systemName,
+            favorite: false,
+            hidden: false,
+            playcount: 0
+          })
+        }
+      }
+
+      return collectionGames.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+    } catch (e) {
+      console.error(`Failed to read games for collection ${collectionName}:`, e)
+      return []
+    }
   }
 
   public updateGame(systemName: string, gameData: Game): void {

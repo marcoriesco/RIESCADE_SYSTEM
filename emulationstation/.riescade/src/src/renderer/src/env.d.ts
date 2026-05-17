@@ -8,6 +8,8 @@ declare global {
       getGames: (systemName: string) => Promise<any>
       updateGame: (systemName: string, gameData: any) => Promise<void>
       launchGame: (game: any, system: any) => Promise<any>
+      getCustomCollections: () => Promise<string[]>
+      getCollectionGames: (collectionName: string) => Promise<any[]>
       getThemes: () => Promise<any>
       getActiveTheme: () => Promise<string>
       loadTheme: (themeName: string) => Promise<any>
