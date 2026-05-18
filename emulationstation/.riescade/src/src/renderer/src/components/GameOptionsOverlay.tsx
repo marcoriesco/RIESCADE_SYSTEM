@@ -32,10 +32,12 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     if (game.marquee.startsWith('http') || game.marquee.startsWith('file://') || game.marquee.startsWith('data:')) {
       return game.marquee
     }
-    const systemPath = system.path || ''
-    const cleanPath = game.marquee.replace(/^\.\//, '')
-    const joined = systemPath.replace(/\\/g, '/') + '/' + cleanPath
-    return `file:///${joined}`
+    const normalized = game.marquee.replace(/\\/g, '/')
+    if (normalized.match(/^[a-zA-Z]:/) || normalized.startsWith('/')) {
+      return `file:///${normalized.replace(/^\/+/, '')}`
+    }
+    const systemPath = (system.path || '').replace(/\\/g, '/')
+    return `file:///${systemPath}/${normalized.replace(/^\.\//, '')}`
   }
 
   const getRootItems = (currentGame: Game, gameCols: string[], sys: System, allCols: string[]) => {
