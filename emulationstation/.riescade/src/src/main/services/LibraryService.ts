@@ -98,13 +98,21 @@ export class LibraryService {
     }
 
     const configPath = getConfigPath()
-    const gamelistPath = join(configPath, 'gamelists', systemName, 'gamelist.xml')
-    const romsGamelistPath = join(getRomsPath(), systemName, 'gamelist.xml')
+    let gamelistPath = join(configPath, 'gamelists', systemName, 'gamelist.xml')
+    let romsGamelistPath = join(getRomsPath(), systemName, 'gamelist.xml')
+
+    // Fix collision between physical arcade system and virtual auto-arcade collection
+    if (systemName === 'auto-arcade') {
+      gamelistPath = join(configPath, 'gamelists', 'arcade', 'gamelist.xml')
+      romsGamelistPath = ''
+    } else if (systemName === 'arcade') {
+      gamelistPath = '' // Physical arcade should only load roms/arcade/gamelist.xml
+    }
     
     let games: Game[] = []
-    if (existsSync(gamelistPath)) {
+    if (gamelistPath && existsSync(gamelistPath)) {
       games = this.gamelistParser.parse(gamelistPath, systemName)
-    } else if (existsSync(romsGamelistPath)) {
+    } else if (romsGamelistPath && existsSync(romsGamelistPath)) {
       games = this.gamelistParser.parse(romsGamelistPath, systemName)
     }
 
@@ -223,5 +231,66 @@ export class LibraryService {
       games[index] = { ...games[index], ...gameData }
       this.gamelistParser.save(targetPath, games)
     }
+  }
+
+  public getCollectionsForGame(systemName: string, gamePath: string): string[] {
+    const collections = this.getCustomCollections()
+    const cleanGamePath = gamePath.replace(/^\.\//, '')
+    const targetLine = `./roms/${systemName}/${cleanGamePath}`.toLowerCase()
+
+    const fs = require('fs')
+    const configPath = getConfigPath()
+    const matching: string[] = []
+
+    for (const col of collections) {
+      const cfgPath = join(configPath, 'collections', `custom-${col}.cfg`)
+      if (fs.existsSync(cfgPath)) {
+        const content = fs.readFileSync(cfgPath, 'utf-8')
+        const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0)
+        if (lines.some(l => l.toLowerCase() === targetLine)) {
+          matching.push(col)
+        }
+      }
+    }
+
+    return matching
+  }
+
+  public toggleGameInCollection(collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove'): boolean {
+    const configPath = getConfigPath()
+    const collectionsDir = join(configPath, 'collections')
+    const fs = require('fs')
+    if (!fs.existsSync(collectionsDir)) {
+      fs.mkdirSync(collectionsDir, { recursive: true })
+    }
+
+    const cfgPath = join(collectionsDir, `custom-${collectionName}.cfg`)
+    
+    // Read existing lines
+    let lines: string[] = []
+    if (fs.existsSync(cfgPath)) {
+      const content = fs.readFileSync(cfgPath, 'utf-8')
+      lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0)
+    }
+
+    const cleanGamePath = gamePath.replace(/^\.\//, '')
+    const targetLine = `./roms/${systemName}/${cleanGamePath}`
+
+    const exists = lines.some(l => l.toLowerCase() === targetLine.toLowerCase())
+
+    if (action === 'add') {
+      if (!exists) {
+        lines.push(targetLine)
+        fs.writeFileSync(cfgPath, lines.join('\n') + '\n', 'utf-8')
+        return true
+      }
+    } else if (action === 'remove') {
+      if (exists) {
+        lines = lines.filter(l => l.toLowerCase() !== targetLine.toLowerCase())
+        fs.writeFileSync(cfgPath, lines.join('\n') + '\n', 'utf-8')
+        return true
+      }
+    }
+    return false
   }
 }

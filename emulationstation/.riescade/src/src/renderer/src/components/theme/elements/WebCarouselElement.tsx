@@ -132,6 +132,7 @@ export const WebCarouselElement: React.FC<Props> = ({
             itemHeight={itemHeight}
             itemBackground={itemBackground}
             itemBackgroundSource={itemBackgroundSource}
+            data={data}
           />
         )
       })}
@@ -142,7 +143,7 @@ export const WebCarouselElement: React.FC<Props> = ({
 const CarouselItemNode = ({ 
   item, isVertical, logoScale, logoSelectedScale, assetPath, themePath, itemClass, 
   activeSlot, gap, itemWidth, itemHeight, itemBackground, itemBackgroundSource,
-  isCentered, distance, itemsCount
+  isCentered, distance, itemsCount, data
 }: any) => {
   const [imageFailed, setImageFailed] = React.useState(false)
   const { data: itemData, offset, isSelected } = item
@@ -173,7 +174,6 @@ const CarouselItemNode = ({
   }
 
   const opacity = isSelected ? 1.0 : 0.8
-  const saturation = isSelected ? 1 : 0.8
   const zIndex = isSelected ? 100 : 50 - absOffset
 
   const sysTheme = itemData.theme || itemData.name
@@ -191,6 +191,7 @@ const CarouselItemNode = ({
     <div
       className={`${itemClass} ${isSelected ? 'selected' : ''}`}
       data-riescade-name={itemData.name}
+      data-riescade-type={item.isGame ? data?.['system.hardwareType'] : itemData.hardware}
       style={{
         position: 'absolute',
         left: isVertical ? '50%' : posValue,
@@ -205,7 +206,6 @@ const CarouselItemNode = ({
         justifyContent: isCentered ? 'center' : 'flex-end',
         paddingBottom: isCentered ? '0' : (isSelected ? '40px' : '20px'),
         opacity: isVisible ? opacity : 0,
-        filter: `saturate(${saturation})`,
         zIndex,
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         willChange: 'transform, opacity',
@@ -214,21 +214,41 @@ const CarouselItemNode = ({
       } as any}
     >
       {!imageFailed ? (
-        <img
-          src={assetPath}
-          style={{
-            maxWidth: isCentered ? '100%' : '70%',
-            maxHeight: isCentered ? '60%' : '25%',
-            objectFit: 'contain',
-            position: 'relative',
-            zIndex: 2,
-            filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))'
-          }}
-          alt={itemData.name}
-          onError={(e) => {
-            setImageFailed(true)
-          }}
-        />
+        !item.isGame ? (
+          <div className="riescade-carousel-image-wrapper">
+            <img
+              src={assetPath}
+              style={{
+                maxWidth: isCentered ? '100%' : '70%',
+                maxHeight: isCentered ? '60%' : '25%',
+                objectFit: 'contain',
+                position: 'relative',
+                zIndex: 2,
+                filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))'
+              }}
+              alt={itemData.name}
+              onError={(e) => {
+                setImageFailed(true)
+              }}
+            />
+          </div>
+        ) : (
+          <img
+            src={assetPath}
+            style={{
+              maxWidth: isCentered ? '100%' : '70%',
+              maxHeight: isCentered ? '60%' : '25%',
+              objectFit: 'contain',
+              position: 'relative',
+              zIndex: 2,
+              filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))'
+            }}
+            alt={itemData.name}
+            onError={(e) => {
+              setImageFailed(true)
+            }}
+          />
+        )
       ) : (
         <span className="riescade-carousel-text">
           {itemData.fullname || itemData.name}

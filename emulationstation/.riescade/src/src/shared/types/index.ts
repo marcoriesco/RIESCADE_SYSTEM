@@ -7,6 +7,7 @@ export interface System {
   platform: string
   theme: string
   hardware?: string
+  group?: string
   emulators: Emulator[]
   gamecount?: number
 }

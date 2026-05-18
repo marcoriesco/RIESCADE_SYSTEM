@@ -72,20 +72,52 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         return next
       })
     } else {
-      setPendingSettings(prev => ({ ...prev, [name]: stringVal }))
+      setPendingSettings(prev => {
+        const updated = { ...prev, [name]: stringVal }
+        
+        // If it requires immediate reload, save and reload right away!
+        const immediateReload = [
+          'RIESCADE.ThemeSet',
+          'Language',
+          'VisibleSystems',
+          'CollectionSystemsAuto',
+          'CollectionSystemsCustom',
+          'SystemsGrouped'
+        ].includes(name)
+
+        if (immediateReload) {
+          setTimeout(async () => {
+            await handleSaveQuietly(updated)
+            window.api.executeCommand('reload-frontend')
+          }, 50)
+        }
+
+        return updated
+      })
     }
   }
 
   const updateThemeSetting = (name: string, value: any) => {
     const stringVal = String(value)
-    // For theme settings, we don't have the "original" state easily available in a single object like settings,
-    // but we can check if it matches what was loaded initially.
-    setThemeSettings(prev => ({ ...prev, [name]: stringVal }))
+    setThemeSettings(prev => {
+      const updated = { ...prev, [name]: stringVal }
+      
+      // Theme settings usually require a reload of the frontend to apply.
+      // Let's save and reload immediately to "aplicar diretamente"!
+      setTimeout(async () => {
+        if (theme?.name) {
+          await window.api.saveThemeSetting(theme.name, name, stringVal)
+        }
+        window.api.executeCommand('reload-frontend')
+      }, 50)
+      
+      return updated
+    })
   }
 
-  const handleSave = async () => {
+  const handleSaveQuietly = async (pending = pendingSettings) => {
     // 1. Save global settings
-    for (const [name, value] of Object.entries(pendingSettings)) {
+    for (const [name, value] of Object.entries(pending)) {
       const type = settings[name]?.type || 'string'
       await window.api.saveSetting(name, value, type)
     }
@@ -96,15 +128,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         await window.api.saveThemeSetting(theme.name, key, value)
       }
     }
+  }
 
-    // Check if theme changed or if reload is needed
-    if (pendingSettings['RIESCADE.ThemeSet']) {
-      window.api.executeCommand('reload-frontend')
-    } else {
-      // Just close and refresh
-      onClose()
-      window.api.executeCommand('reload-frontend')
-    }
+  const handleSave = async () => {
+    await handleSaveQuietly(pendingSettings)
+    onClose()
+    window.api.executeCommand('reload-frontend')
   }
 
   useEffect(() => {
@@ -147,7 +176,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (isOpen) {
       const selectedEl = document.querySelector('.riescade-menu-item.selected')
       if (selectedEl) {
-        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'instant' })
       }
     }
   }, [selectedIndex, activeMenuStack, isOpen])
@@ -361,13 +390,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 
                 // Sort systems within group alphabetically by fullName
                 const sortedSystems = groups[groupName].sort((a, b) => 
-                  (a.fullName || a.name).localeCompare(b.fullName || b.name)
+                  (a.fullname || a.name).localeCompare(b.fullname || b.name)
                 )
 
                 sortedSystems.forEach(sys => {
                   finalItems.push({
                     id: `sys_vis_${sys.name}`,
-                    label: sys.fullName || sys.name.toUpperCase(),
+                    label: sys.fullname || sys.name.toUpperCase(),
                     type: 'toggle',
                     settingName: 'VisibleSystems',
                     value: sys.name
@@ -492,7 +521,64 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               }))
             })()
           },
-          { id: 'grouped_systems', label: t('SISTEMAS AGRUPADOS'), type: 'select', value: '<40 selecionados>', settingName: 'SystemsGrouped', options: [{ label: '<40 selecionados>', value: 'all' }] },
+          { 
+            id: 'grouped_systems', 
+            label: t('SISTEMAS AGRUPADOS'), 
+            showCount: true,
+            submenu: (() => {
+              const systemsSource = allSystems || []
+              // Filter systems that have a group tag defined, are real systems, and are NOT the master system itself
+              const realSystems = systemsSource.filter((s: any) => {
+                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
+                const isGenre = s.name.startsWith('_')
+                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
+                const hasExtension = s.extension && s.extension.length > 0
+                const isMaster = s.group && s.name.toLowerCase() === s.group.toLowerCase()
+                return !isAuto && !isGenre && !isCustom && hasExtension && s.group && !isMaster
+              })
+              
+              if (realSystems.length === 0) {
+                return [{ id: 'no_groupable_systems', label: t('NENHUM SISTEMA AGRUPÁVEL ENCONTRADO'), type: 'info', value: '' }]
+              }
+
+              // Group by the actual group property (case-insensitive keys)
+              const groups: Record<string, any[]> = {}
+              realSystems.forEach((s: any) => {
+                const grp = String(s.group).toLowerCase()
+                if (!groups[grp]) groups[grp] = []
+                groups[grp].push(s)
+              })
+
+              const sortedGroups = Object.keys(groups).sort()
+
+              const finalItems: MenuItem[] = []
+
+              sortedGroups.forEach(groupName => {
+                // Find the master system for this group name to get its fullname
+                const masterSys = systemsSource.find((s: any) => s.name.toLowerCase() === groupName.toLowerCase())
+                const displayLabel = masterSys ? (masterSys.fullname || masterSys.name) : groupName
+
+                finalItems.push({ id: `group_grp_hw_${groupName}`, label: displayLabel.toUpperCase(), type: 'group' })
+                
+                // Sort systems within group alphabetically by fullname
+                const sortedSystems = groups[groupName].sort((a, b) => 
+                  (a.fullname || a.name).localeCompare(b.fullname || b.name)
+                )
+
+                sortedSystems.forEach(sys => {
+                  finalItems.push({
+                    id: `sys_grp_${sys.name}`,
+                    label: sys.fullname || sys.name.toUpperCase(),
+                    type: 'toggle',
+                    settingName: 'SystemsGrouped',
+                    value: sys.name
+                  })
+                })
+              })
+
+              return finalItems
+            })()
+          },
           
           { id: 'group_collection_options', label: t('OPÇÕES'), type: 'group' },
           { id: 'sort_systems', label: t('ORDENAÇÃO DOS SISTEMAS'), type: 'select', settingName: 'SortSystems', options: [
@@ -578,10 +664,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           setActiveMenuStack(prev => [...prev, { items: item.submenu!, title: item.label }])
           setSelectedIndex(0)
         } else if (item.type === 'select' && item.options) {
+          const currentSettingVal = String(item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!))
+          const activeIndex = item.options.findIndex(opt => String(opt.value) === currentSettingVal)
+
           // Convert options to a temporary submenu
           const optionsSubmenu: MenuItem[] = item.options.map(opt => ({
             id: `opt_${opt.value}`,
-            label: `${opt.label}${String(opt.value) === String(item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)) ? '  ◀' : ''}`.toUpperCase(),
+            label: opt.label.toUpperCase(),
             type: 'action',
             onClick: () => {
               if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName!, opt.value)
@@ -591,7 +680,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             }
           }))
           setActiveMenuStack(prev => [...prev, { items: optionsSubmenu, title: item.label }])
-          setSelectedIndex(0)
+          setSelectedIndex(activeIndex !== -1 ? activeIndex : 0)
         } else if (item.type === 'toggle') {
           handleToggle(item)
         } else if (item.type === 'input') {
@@ -611,14 +700,18 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         else if (item.type === 'slider') handleSlider(item, -1)
       } else if (e.key === 'Backspace' || e.key === 'Escape') {
         if (activeMenuStack.length > 1) {
+          // Going back from a submenu: save quietly!
+          handleSaveQuietly(pendingSettings)
           setActiveMenuStack(prev => prev.slice(0, -1))
           setSelectedIndex(0)
         } else {
-          // Check for pending changes
+          // Exiting the main menu entirely
           const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).some(k => themeSettings[k] !== themeData[`options:${k}`])
           if (hasChanges) {
-            setModalSelectedIndex(0)
-            setShowSaveModal(true)
+            handleSaveQuietly(pendingSettings).then(() => {
+              onClose()
+              window.api.executeCommand('reload-frontend')
+            })
           } else {
             onClose()
           }
@@ -642,8 +735,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (item.type === 'toggle') {
       let isOn = currentSettingVal === 'true' || currentSettingVal === true || currentSettingVal === '1' || currentSettingVal === 1
       
-      // Multi-toggle check (e.g. CollectionSystemsAuto which is "all,recent,favorites")
-      if (item.value !== undefined && !item.settingType) {
+      const isMultiCheck = item.value !== undefined && !item.settingType
+      if (isMultiCheck) {
         const values = String(currentSettingVal || '').split(',').filter(v => v.trim() !== '')
         
         if (item.settingName === 'VisibleSystems' && values.length === 0) {
@@ -651,6 +744,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         } else {
           isOn = values.includes(item.value)
         }
+
+        return (
+          <div className={`menu-checkbox ${isOn ? 'checked' : 'unchecked'}`}>
+            {isOn && <span className="checkmark">✔</span>}
+          </div>
+        )
       }
 
       return (
@@ -851,6 +950,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .menu-toggle.on { background: #4ade80; }
         .menu-toggle.on .toggle-thumb { transform: translateX(20px); }
         .toggle-thumb { width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.15s ease; }
+        .menu-checkbox { width: 20px; height: 20px; border: 2px solid #aaa; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); transition: all 0.15s ease; }
+        .menu-checkbox.checked { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+        .menu-checkbox .checkmark { font-size: 12px; font-weight: bold; }
         .menu-select { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.9rem; }
         .menu-select .arrow { opacity: 0.3; }
         .riescade-menu-item.selected .menu-select .arrow { opacity: 1; }

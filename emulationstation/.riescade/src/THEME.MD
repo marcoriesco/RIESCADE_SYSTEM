@@ -75,6 +75,7 @@ Refers to the currently selected system (e.g., "NES", "Genesis").
 - `{system:theme}`: The theme folder name used for this system.
 - `{system:gamecount}`: Total number of games available in this system.
 - `{system:hardwareType}`: The hardware category (e.g., `console`, `handheld`, `arcade`).
+- `{system:isCollections}`: `true` if currently looking at the list of dynamic custom collections folders (Layer 2), `false` otherwise. Useful for applying collection-specific styles.
 
 ### 🕹️ Game Variables (`game:`)
 Refers to the currently highlighted game in the gamelist.
@@ -264,3 +265,24 @@ Example CSS styling for main menu icons:
 1. **Live Reload**: Any change to `.html` or `.json` files will trigger an instant reload in the app.
 2. **SCSS Compilation**: Place your `.scss` files in `assets/css/scss/`. The app will automatically compile them to `.css` on save.
 3. **Hot Reload (Menu)**: When saving settings in the menu, the app performs a soft-refresh (Ctrl+R) to apply CSS changes without closing the process.
+
+---
+
+## 📂 Custom Game Collections (Coleções de Jogos Personalizados)
+
+RIESCADE dynamic custom game collections are compiled from files inside the `emulationstation/.emulationstation/collections/custom-[Name].cfg` path. 
+
+### 🧭 Three-Layer Navigation Flow
+
+When entering the virtual **Coleções** system carousel item, navigation transitions seamlessly through three layers:
+
+1. **Layer 1 (System Carousel):** Shows the virtual **Coleções** system (System name: `collections`, theme folder: `custom-collections`).
+2. **Layer 2 (Collections Folders list):** Lists all active custom collections as folder nodes.
+   - `{system:isCollections}` evaluates to **`true`**.
+   - Game media is dynamically resolved from the theme assets inside subfolders (stripping the `custom-` prefix and pointing to `collections/` subdirectories):
+     - `{game:marquee}` and `{game:wheel}` ➔ `themes/[active_theme]/assets/logos/collections/[CollectionName].png`
+     - `{game:image}`, `{game:thumbnail}`, `{game:fanart}`, `{game:titleshot}` and `{game:mix}` ➔ `themes/[active_theme]/assets/arts/collections/[CollectionName].jpg`
+3. **Layer 3 (Collection Games list):** Selecting a collection folder (pressing `Enter` / Button A) loads its parsed games list.
+   - `{system:isCollections}` evaluates to **`false`**.
+   - Game media automatically reverts back to the original game ROM's metadata parsed from its home system (e.g., matching boxart/videos from `cps3`, `snes`, etc.), making standard templates fully reusable without visual clutter.
+   - Pressionar `Backspace` / `Escape` / Botão B retorna da Camada 3 ➔ Camada 2, e depois da Camada 2 ➔ Camada 1.

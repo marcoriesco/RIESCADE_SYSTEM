@@ -46,12 +46,48 @@
   align-items: center;
 }
 
+
+// HACK OPTIONS COLORS
+[data-riescade-view="system"],
+[data-riescade-view="auto collection"]
+[data-riescade-view="custom-collections"] {
+  .riescade-carousel-image-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    border-radius: 26px;
+  }
+}
+
+[data-riescade-type="system"].selected,
+[data-riescade-type="auto collection"].selected,
+[data-riescade-type="custom-collections"].selected {
+  .riescade-carousel-image-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      max-height: 140px;
+      overflow: hidden;
+      background-color: var(--theme-color);
+      border-radius: 26px;
+
+      img {
+        max-height: 100% !important;
+        opacity: 1;
+        mix-blend-mode: multiply;
+      }
+    }
+}
+
 .riescade-carousel-item {
-  &.selected img {
+   &.selected img {
     filter: saturate(1) !important;
   }
   img {
-      filter: saturate(0) !important;
+    filter: saturate(0) !important;
   }
 }
 

@@ -3,6 +3,7 @@ import { WebThemeRenderer } from './components/theme/WebThemeRenderer';
 import { Menu } from './components/Menu';
 import { GameOptionsOverlay } from './components/GameOptionsOverlay';
 import { LaunchScreen } from './components/LaunchScreen';
+import { HardwareSelectOverlay } from './components/HardwareSelectOverlay';
 
 // Simple types inline - no need for separate store
 interface System {
@@ -14,6 +15,7 @@ interface System {
 	platform: string;
 	theme: string;
 	hardware?: string;
+	group?: string;
 	emulators: any[];
 	gamecount?: number;
 }
@@ -63,6 +65,7 @@ function App() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLaunching, setIsLaunching] = useState(false);
 	const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
+	const [isHardwareSelectOpen, setIsHardwareSelectOpen] = useState(false);
 	const [isInitializing, setIsInitializing] = useState(true);
 	const [enterPressTimer, setEnterPressTimer] = useState<NodeJS.Timeout | null>(
 		null,
@@ -267,9 +270,32 @@ function App() {
 			setGames([]);
 			setSelectedGameIndex(0);
 			setSelectedCollection(null);
-			window.api.getGames(selectedSystem.name).then((g: Game[]) => setGames(g));
+			window.api.getGames(selectedSystem.name).then((masterGames: Game[]) => {
+				const groupedSetting = settings.SystemsGrouped?.value || '';
+				const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
+
+				// Find child systems that belong to this group AND are enabled for grouping
+				const childSystems = systems.filter(s => 
+					s.group && 
+					s.group.toLowerCase() === selectedSystem.name.toLowerCase() && 
+					groupedList.includes(s.name)
+				);
+
+				if (childSystems.length > 0) {
+					Promise.all(childSystems.map(s => window.api.getGames(s.name))).then((allChildGames) => {
+						const merged = [...masterGames];
+						allChildGames.forEach(childGames => {
+							merged.push(...childGames);
+						});
+						merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+						setGames(merged);
+					});
+				} else {
+					setGames(masterGames);
+				}
+			});
 		}
-	}, [selectedSystem]);
+	}, [selectedSystem, systems, settings.SystemsGrouped]);
 
 	// Load games when collection selected
 	useEffect(() => {
@@ -292,10 +318,12 @@ function App() {
 		const visibleSetting = settings.VisibleSystems?.value || '';
 		const hiddenSetting = settings.HiddenSystems?.value || '';
 		const autoSetting = settings.CollectionSystemsAuto?.value || '';
+		const groupedSetting = settings.SystemsGrouped?.value || '';
 		
 		const visibleList = String(visibleSetting).split(',').filter(v => v.trim() !== '');
 		const hiddenList = String(hiddenSetting).split(';').filter(v => v.trim() !== '');
 		const autoList = String(autoSetting).split(',').filter(v => v.trim() !== '');
+		const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
 
 		let baseSystems = visibleList.length > 0 
 			? systems.filter(s => 
@@ -303,13 +331,28 @@ function App() {
 				s.name === 'all' || 
 				s.name === 'favorites' ||
 				s.name === 'collections' ||
-				autoList.includes(s.name)
+				autoList.includes(s.name) ||
+				// Or if it is a group master and has at least one grouped child system that is enabled in visibleList!
+				systems.some(child => 
+					child.group && 
+					child.group.toLowerCase() === s.name.toLowerCase() && 
+					groupedList.includes(child.name) && 
+					visibleList.includes(child.name)
+				)
 			)
 			: systems;
 
 		// Subtract hidden systems
 		if (hiddenList.length > 0) {
 			baseSystems = baseSystems.filter(s => !hiddenList.includes(s.name));
+		}
+
+		// Subtract grouped systems
+		if (groupedList.length > 0) {
+			baseSystems = baseSystems.filter(s => 
+				!groupedList.includes(s.name) || 
+				(s.group && s.group.toLowerCase() === s.name.toLowerCase())
+			);
 		}
 
 		// Only show 'collections' if we have at least one enabled custom collection!
@@ -325,6 +368,17 @@ function App() {
 	const getFriendlySystemName = (sys: any) => {
 		if (!sys) return '';
 		const name = sys.name;
+
+		if (name === 'arcade') {
+			if (sys.hardware === 'auto collection') {
+				return 'ARCADE (GERAL)';
+			}
+			return 'ARCADE';
+		}
+		if (name === 'auto-arcade') {
+			return 'ARCADE (GERAL)';
+		}
+
 		const mapping: Record<string, string> = {
 			'collections': 'COLEÇÕES',
 			'all': 'TODOS OS JOGOS',
@@ -334,7 +388,6 @@ function App() {
 			'retroachievements': 'RETROACHIEVEMENTS',
 			'2players': '2 JOGADORES',
 			'4players': '4 JOGADORES',
-			'arcade': 'ARCADE (GERAL)',
 			'vertical': 'VERTICAL ARCADE',
 			'lightgun': 'LIGHTGUN',
 			'wheel': 'WHEEL',
@@ -434,10 +487,34 @@ function App() {
 			return acc;
 		}, {} as any);
 
+		const isCollectionsVal = !!(selectedSystem && selectedSystem.name === 'collections' && !selectedCollection);
+
+		// Pre-populate collection folder media in the games array for carousel elements!
+		const resolvedGames = (isCollectionsVal && theme?.path)
+			? games.map(g => {
+				if (g.isCollectionFolder) {
+					const normalizedThemePath = theme.path.replace(/\\/g, '/');
+					return {
+						...g,
+						marquee: `file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`,
+						wheel: `file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`,
+						image: `file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`,
+						fanart: `file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`,
+						thumbnail: `file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`,
+					};
+				}
+				return g;
+			})
+			: games;
+
 		const baseData: any = {
 			...flattenedSettings,
 			systems: filteredSystems,
-			games,
+			games: resolvedGames,
+			isCollections: isCollectionsVal,
+			iscollections: isCollectionsVal,
+			'system.isCollections': isCollectionsVal,
+			'system:isCollections': isCollectionsVal,
 			'global:themeRevision': themeRevision,
 			'system.fullName': sysFullName,
 			'system.name': sys?.name || 'all',
@@ -475,23 +552,41 @@ function App() {
 				return p.replace(/\\/g, '/');
 			};
 
+			let gameImage = resolveMedia(currentGame.image);
+			let gameThumbnail = resolveMedia(currentGame.thumbnail);
+			let gameVideo = resolveMedia(currentGame.video);
+			let gameMarquee = resolveMedia(currentGame.marquee || currentGame.wheel);
+			let gameFanart = resolveMedia(currentGame.fanart || currentGame.image);
+			let gameWheel = resolveMedia(currentGame.wheel || currentGame.marquee || currentGame.image);
+
+			// Dynamic theme resolution for collection folders (Layer 2)
+			if (isCollectionsVal && currentGame.isCollectionFolder && theme?.path) {
+				const normalizedThemePath = theme.path.replace(/\\/g, '/');
+				
+				// Standard theme paths for this collection folder using absolute file:/// URLs
+				const logoPath = `file:///${normalizedThemePath}/assets/logos/collections/${currentGame.name}.png`;
+				const artPath = `file:///${normalizedThemePath}/assets/arts/collections/${currentGame.name}.jpg`;
+
+				gameMarquee = logoPath;
+				gameWheel = logoPath;
+				gameImage = artPath;
+				gameFanart = artPath;
+				gameThumbnail = artPath;
+			}
+
 			return {
 				...baseData,
 				...currentGame,
 				'game:name': currentGame.name,
 				'game:desc': currentGame.desc,
-				'game:image': resolveMedia(currentGame.image),
-				'game:thumbnail': resolveMedia(currentGame.thumbnail),
-				'game:video': resolveMedia(currentGame.video),
-				'game:marquee': resolveMedia(currentGame.marquee || currentGame.wheel),
-				'game:fanart': resolveMedia(currentGame.fanart || currentGame.image),
-				'game:titleshot': resolveMedia(
-					currentGame.titleshot || currentGame.image,
-				),
-				'game:wheel': resolveMedia(
-					currentGame.wheel || currentGame.marquee || currentGame.image,
-				),
-				'game:mix': currentGame.mix || currentGame.image,
+				'game:image': gameImage,
+				'game:thumbnail': gameThumbnail,
+				'game:video': gameVideo,
+				'game:marquee': gameMarquee,
+				'game:fanart': gameFanart,
+				'game:titleshot': resolveMedia(currentGame.titleshot || currentGame.image) || gameImage,
+				'game:wheel': gameWheel,
+				'game:mix': currentGame.mix || currentGame.image || gameImage,
 				'game:rating': currentGame.rating,
 				'game:releasedate': currentGame.releasedate,
 				'game:developer': currentGame.developer,
@@ -512,6 +607,7 @@ function App() {
 		isMenuOpen,
 		isGameOptionsOpen,
 		theme,
+		selectedCollection,
 	]);
 
 	const handleUpdateGame = (updatedGame: Game) => {
@@ -543,7 +639,7 @@ function App() {
 				return;
 			}
 
-			if (isMenuOpen || isInitializing || isGameOptionsOpen || isLaunching) return;
+			if (isMenuOpen || isInitializing || isGameOptionsOpen || isLaunching || isHardwareSelectOpen) return;
 
 			if (!selectedSystem) {
 				// System view navigation
@@ -592,6 +688,11 @@ function App() {
 				}
 
 				if (e.key === 'Enter') setSelectedSystem(filteredSystems[systemIndex]);
+
+				if (e.key === 'Control') {
+					setIsHardwareSelectOpen(true);
+					return;
+				}
 			} else {
 				// Gamelist navigation
 				if (e.key === 'Backspace' || e.key === 'Escape') {
@@ -701,6 +802,7 @@ function App() {
 		games.length,
 		isMenuOpen,
 		isGameOptionsOpen,
+		isHardwareSelectOpen,
 		currentGame,
 		isInitializing,
 		isLaunching,
@@ -734,6 +836,7 @@ function App() {
 				height: '100vh',
 				overflow: 'hidden',
 				background: '#000',
+				['--theme-color' as any]: themeData['options:colors'] || themeData['colors'] || '#3b82f6',
 			}}
 		>
 			<WebThemeRenderer
@@ -748,6 +851,17 @@ function App() {
 				themeData={themeData}
 				allSystems={systems}
 			/>
+			<HardwareSelectOverlay
+				isOpen={isHardwareSelectOpen}
+				onClose={() => setIsHardwareSelectOpen(false)}
+				systems={filteredSystems}
+				onSelectSystem={(systemName) => {
+					const idx = filteredSystems.findIndex(s => s.name === systemName);
+					if (idx !== -1) {
+						setSystemIndex(idx);
+					}
+				}}
+			/>
 			{selectedSystem && currentGame && (
 				<GameOptionsOverlay
 					isOpen={isGameOptionsOpen}
@@ -757,6 +871,7 @@ function App() {
 					theme={theme}
 					themeData={themeData}
 					onUpdate={handleUpdateGame}
+					addNotification={addNotification}
 				/>
 			)}
 

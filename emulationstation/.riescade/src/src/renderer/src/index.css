@@ -60,6 +60,7 @@ header h1 {
   font-size: 3.2em;
   line-height: 1.1;
   background: linear-gradient(to right, #f042b0, #ff8c42);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 1rem;
@@ -138,7 +139,7 @@ header h1 {
 .riescade-notification-status {
   width: 10px;
   height: 10px;
-  borderRadius: 50%;
+  border-radius: 50%;
   background: #3b82f6; /* Default info color */
 }
 
@@ -162,8 +163,8 @@ header h1 {
 @keyframes riescadeNotificationSlideIn {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
-}  backdrop-filter: blur(10px);
 }
+
 
 .system-card.active {
   border-color: #f042b0;

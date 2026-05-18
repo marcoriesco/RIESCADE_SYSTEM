@@ -27,8 +27,9 @@
 
 	&.gamelist-bg-default {
 		z-index: 1;
-		background-image: url('../_parts/default.png');
 		background-size: 100% 100%;
+		filter: saturate(0);
+		opacity: 0.1;	
 	}
 
 	.gamelist-bg-fanart {

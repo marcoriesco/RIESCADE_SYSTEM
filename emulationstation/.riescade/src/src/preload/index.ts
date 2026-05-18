@@ -10,6 +10,8 @@ const api = {
   launchGame: (game: any, system: any) => ipcRenderer.invoke('launch-game', game, system),
   getCustomCollections: () => ipcRenderer.invoke('get-custom-collections'),
   getCollectionGames: (collectionName: string) => ipcRenderer.invoke('get-collection-games', collectionName),
+  getCollectionsForGame: (systemName: string, gamePath: string) => ipcRenderer.invoke('get-collections-for-game', systemName, gamePath),
+  toggleGameInCollection: (collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove') => ipcRenderer.invoke('toggle-game-in-collection', collectionName, systemName, gamePath, action),
 
   // Themes
   getThemes: () => ipcRenderer.invoke('get-themes'),

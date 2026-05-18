@@ -97,6 +97,14 @@ app.whenReady().then(() => {
     return libraryService.getCollectionGames(collectionName)
   })
 
+  ipcMain.handle('get-collections-for-game', async (_, systemName: string, gamePath: string) => {
+    return libraryService.getCollectionsForGame(systemName, gamePath)
+  })
+
+  ipcMain.handle('toggle-game-in-collection', async (_, collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove') => {
+    return libraryService.toggleGameInCollection(collectionName, systemName, gamePath, action)
+  })
+
   // ─── IPC: Themes ───
   ipcMain.handle('get-themes', async () => {
     return themeService.getAvailableThemes()

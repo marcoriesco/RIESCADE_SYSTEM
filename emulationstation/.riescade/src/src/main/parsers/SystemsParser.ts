@@ -46,18 +46,44 @@ export class SystemsParser {
     const settings = new SettingsParser()
     const showEmpty = settings.getSetting('LoadEmptySystems', 'bool')
 
-    // Filter systems that have existing ROM folders and count games
-    const filteredSystems = systems.filter(s => {
+    // Resolve all system paths and count games first
+    const resolvedSystems = systems.map(s => {
       const fullPath = this.resolveRomPath(s.path)
-      if (existsSync(fullPath)) {
-        const count = this.countGames(fullPath)
-        s.gamecount = count
-        s.path = fullPath 
-        
-        if (count === 0 && !showEmpty) return false
+      const pathExists = existsSync(fullPath)
+      const count = pathExists ? this.countGames(fullPath) : 0
+      
+      return {
+        ...s,
+        path: fullPath,
+        gamecount: count,
+        _pathExists: pathExists
+      }
+    })
+
+    // Filter systems that have existing ROM folders or act as master groups for systems with games
+    const filteredSystems = resolvedSystems.filter(s => {
+      // 1. Keep if it has a physical ROM path and contains games (or showEmpty is active)
+      if (s._pathExists && (s.gamecount > 0 || showEmpty)) {
         return true
       }
+
+      // 2. Keep if it is a group master (another system has s.group === s.name) and that system has games
+      const hasGroupedChildrenWithGames = resolvedSystems.some(child => 
+        child.group && 
+        child.group.toLowerCase() === s.name.toLowerCase() && 
+        child._pathExists && 
+        child.gamecount > 0
+      )
+
+      if (hasGroupedChildrenWithGames) {
+        return true
+      }
+
       return false
+    }).map(s => {
+      // Clean up the temporary field
+      const { _pathExists, ...rest } = s as any
+      return rest
     })
 
     // Inject Auto Collections
@@ -151,6 +177,7 @@ export class SystemsParser {
           platform: String(s.platform || ''),
           theme: String(s.theme || s.name),
           hardware: sHardware,
+          group: s.group ? String(s.group) : undefined,
           emulators: this.parseEmulators(s.emulators)
         }
       })

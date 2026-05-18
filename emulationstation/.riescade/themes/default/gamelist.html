@@ -1,10 +1,10 @@
-<div data-riescade-view="gamelist" style="--theme-color: {options:colors};">
+<div data-riescade-view="gamelist">
   <link rel="stylesheet" href="./assets/css/global.css" />
   <link rel="stylesheet" href="./assets/css/gamelist.css" />
 
   <!-- Camadas de Fundo -->
   <div class="gamelist-bg-layer">
-    <div class="gamelist-bg-layer gamelist-bg-default"></div>
+    <div class="gamelist-bg-layer gamelist-bg-default" style="background-image: url('./assets/arts/{system:theme}.jpg')"></div>
     <img class="gamelist-bg-layer gamelist-bg-fanart" src="{game:fanart}" data-riescade-hide-on-error="true" />
     <div class="gamelist-bg-layer gamelist-overlay"></div>
     <div class="gamelist-bg-layer gamelist-overlay-right"></div>
@@ -27,15 +27,15 @@
     <div class="gamelist-left-col">
       <div class="thumbnail-container" data-riescade-key="game">
         <img
-          src="{game:thumbnail}"
+          src="{system:isCollections ? '' : '{game:thumbnail}'}"
           class="gamelist-thumbnail"
           onerror="this.src = './assets/logos/{system:theme}.png'"
         />
       </div>
 
-      <div class="gamelist-meta" data-riescade-key="game">
+      <div class="gamelist-meta {system:isCollections ? 'hide' : ''}" data-riescade-key="game">
         <h2 class="gamelist-meta-title">{game:name}</h2>
-        <div class="gamelist-meta-info">{game:releasedate:Y}, {game:developer}</div>
+        <div class="gamelist-meta-info">{game:releasedate ? '{game:releasedate:Y},' : ''} {game:developer ? '{game:developer}' : ''}</div>
       </div>
     </div>
 
