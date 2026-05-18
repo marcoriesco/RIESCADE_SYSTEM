@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { WebThemeRenderer } from './components/theme/WebThemeRenderer';
 import { Menu } from './components/Menu';
 import { GameOptionsOverlay } from './components/GameOptionsOverlay';
@@ -75,34 +75,44 @@ function App() {
 	>([]);
 	const [themeRevision, setThemeRevision] = useState(0);
 	const [settings, setSettings] = useState<any>({});
+	const [hasRestoredLastSystem, setHasRestoredLastSystem] = useState(false);
+	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
+
+	// Listen for systems loading progress from the main process
+	useEffect(() => {
+		const removeProgress = window.api.on(
+			'systems-loading-progress',
+			(_: any, progress: number) => {
+				setSystemsLoadingProgress(progress);
+			},
+		);
+		return () => removeProgress();
+	}, []);
 
 	// ─── Initial Load ───
 	useEffect(() => {
-		// Load systems and settings
-		Promise.all([
-			window.api.getSystems(),
-			window.api.getSettings()
-		]).then(([s, initialSettings]: [System[], any]) => {
-			setSystems(s);
-			setSettings(initialSettings);
-			
-			// Restore LastSystem
-			const lastSystem = initialSettings.LastSystem?.value;
-			if (lastSystem) {
-				const idx = s.findIndex(sys => sys.name === lastSystem);
-				if (idx !== -1) setSystemIndex(idx);
-			}
-		});
-
-		// Load theme
-		const loadTheme = (themeName: string) => {
+		// Load theme first so splash screen is rendered immediately
+		const loadTheme = (themeName: string, isInitial = false) => {
 			if (themeName) {
-				window.api.loadTheme(themeName).then((t: any) => setTheme(t));
+				window.api.loadTheme(themeName).then((t: any) => {
+					setTheme(t);
+					
+					if (isInitial) {
+						// After theme is set and rendered, load systems and settings
+						Promise.all([
+							window.api.getSystems(),
+							window.api.getSettings()
+						]).then(([s, initialSettings]: [System[], any]) => {
+							setSystems(s);
+							setSettings(initialSettings);
+						});
+					}
+				});
 			}
 		};
 
 		window.api.getActiveTheme().then((themeName: string) => {
-			loadTheme(themeName);
+			loadTheme(themeName, true);
 		});
 
 		// Listen for theme file changes (Live Reload)
@@ -111,7 +121,7 @@ function App() {
 			(_: any, themeName: string) => {
 				console.log('Theme changed on disk, reloading...', themeName);
 				setThemeRevision((prev) => prev + 1);
-				loadTheme(themeName);
+				loadTheme(themeName, false);
 			},
 		);
 
@@ -364,6 +374,18 @@ function App() {
 
 		return baseSystems;
 	}, [systems, settings]);
+
+	// Restore LastSystem based on computed filteredSystems list
+	useEffect(() => {
+		if (filteredSystems.length > 0 && settings.LastSystem?.value && !hasRestoredLastSystem) {
+			const lastSystem = settings.LastSystem.value;
+			const idx = filteredSystems.findIndex(sys => sys.name === lastSystem);
+			if (idx !== -1) {
+				setSystemIndex(idx);
+			}
+			setHasRestoredLastSystem(true);
+		}
+	}, [filteredSystems, settings, hasRestoredLastSystem]);
 
 	const getFriendlySystemName = (sys: any) => {
 		if (!sys) return '';
@@ -817,7 +839,8 @@ function App() {
 		const normalizedPath = theme.path.replace(/\\/g, '/');
 		const processedHtml = theme.views.start
 			.replace(/src="\.\//g, `src="file:///${normalizedPath}/`)
-			.replace(/href="\.\//g, `href="file:///${normalizedPath}/`);
+			.replace(/href="\.\//g, `href="file:///${normalizedPath}/`)
+			.replace(/{systems-loading}/g, String(systemsLoadingProgress));
 
 		return (
 			<div 
@@ -846,7 +869,13 @@ function App() {
 			/>
 			<Menu
 				isOpen={isMenuOpen}
-				onClose={() => setIsMenuOpen(false)}
+				onClose={() => {
+					setIsMenuOpen(false);
+					// Refresh settings when menu closes to reflect changes like DrawFramerate
+					window.api.getSettings().then((latestSettings: any) => {
+						setSettings(latestSettings);
+					});
+				}}
 				theme={theme}
 				themeData={themeData}
 				allSystems={systems}
@@ -893,8 +922,70 @@ function App() {
 					</div>
 				))}
 			</div>
+
+			{/* FPS Counter Layer */}
+			<FPSCounter visible={settings.DrawFramerate?.value === true || settings.DrawFramerate?.value === 'true'} />
 		</div>
 	);
 }
+
+// Sleek, highly-optimized FPS counter component using requestAnimationFrame
+const FPSCounter: React.FC<{ visible: boolean }> = ({ visible }) => {
+	const [fps, setFps] = React.useState(0);
+	const frameCount = React.useRef(0);
+	const lastTime = React.useRef(performance.now());
+
+	React.useEffect(() => {
+		if (!visible) return;
+
+		let animId: number;
+		const tick = () => {
+			frameCount.current++;
+			const now = performance.now();
+			const elapsed = now - lastTime.current;
+
+			if (elapsed >= 1000) {
+				setFps(Math.round((frameCount.current * 1000) / elapsed));
+				frameCount.current = 0;
+				lastTime.current = now;
+			}
+			animId = requestAnimationFrame(tick);
+		};
+
+		animId = requestAnimationFrame(tick);
+		return () => cancelAnimationFrame(animId);
+	}, [visible]);
+
+	if (!visible) return null;
+
+	return (
+		<div
+			style={{
+				position: 'fixed',
+				top: '12px',
+				right: '12px',
+				background: 'rgba(0, 0, 0, 0.75)',
+				color: '#00ff66',
+				fontFamily: '"Outfit", "Inter", monospace',
+				fontSize: '11px',
+				fontWeight: 800,
+				letterSpacing: '1px',
+				padding: '4px 8px',
+				borderRadius: '4px',
+				zIndex: 999999,
+				pointerEvents: 'none',
+				boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+				border: '1px solid rgba(0, 255, 102, 0.25)',
+				display: 'flex',
+				alignItems: 'center',
+				gap: '4px',
+				textShadow: '0 0 4px rgba(0, 255, 102, 0.4)',
+			}}
+		>
+			<span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00ff66', display: 'inline-block', boxShadow: '0 0 6px #00ff66' }} />
+			{fps} FPS
+		</div>
+	);
+};
 
 export default App;

@@ -211,6 +211,15 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       const tagName = el.tagName.toLowerCase()
       if (tagName === 'script') return null
 
+      // Map SVG lowercased tags back to camelCase for React
+      const svgTagMap: Record<string, string> = {
+        lineargradient: 'linearGradient',
+        radialgradient: 'radialGradient',
+        clippath: 'clipPath',
+        textpath: 'textPath'
+      }
+      const reactTagName = svgTagMap[tagName] || tagName
+
       // Surgical Strike: Block fanart/media if we are launching a game (and not in loading view)
       if (data['game:launching'] === true && !isLaunchingView) {
         const src = el.getAttribute('src') || ''
@@ -226,7 +235,15 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         }
       }
 
-      const props: any = { key: index }
+      let key = index
+      const keyAttr = el.getAttribute('data-riescade-key')
+      if (keyAttr === 'game' && (data.id || data['game:name'] || data.path)) {
+        key = `${index}-${data.id || data['game:name'] || data.path}`
+      } else if (keyAttr === 'system' && (data['system:name'] || data['system.name'])) {
+        key = `${index}-${data['system:name'] || data['system.name']}`
+      }
+
+      const props: any = { key }
 
       const isCustomElement = tagName.includes('-')
 
@@ -339,10 +356,10 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
       const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
       if (voidElements.includes(tagName)) {
-        return React.createElement(tagName, props)
+        return React.createElement(reactTagName, props)
       }
 
-      return React.createElement(tagName, props, children.length > 0 ? children : undefined)
+      return React.createElement(reactTagName, props, children.length > 0 ? children : undefined)
     }
 
     const headChildren = Array.from(doc.head.childNodes).map((child, i) => convertNode(child, `h-${i}`))

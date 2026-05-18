@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
-import { readFileSync, existsSync, readdirSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs'
 import { join, resolve } from 'path'
 import { System } from '../../shared/types'
 import { getConfigPath } from '../utils/paths'
@@ -47,11 +47,25 @@ export class SystemsParser {
     const showEmpty = settings.getSetting('LoadEmptySystems', 'bool')
 
     // Resolve all system paths and count games first
+    const { BrowserWindow } = require('electron')
+    let resolvedCount = 0
     const resolvedSystems = systems.map(s => {
       const fullPath = this.resolveRomPath(s.path)
       const pathExists = existsSync(fullPath)
       const count = pathExists ? this.countGames(fullPath) : 0
       
+      resolvedCount++
+      const progress = Math.round((resolvedCount / systems.length) * 100)
+      
+      try {
+        const mainWindow = BrowserWindow.getAllWindows()[0]
+        if (mainWindow) {
+          mainWindow.webContents.send('systems-loading-progress', progress)
+        }
+      } catch (err) {
+        // Safe check in case window is not initialized yet
+      }
+
       return {
         ...s,
         path: fullPath,
