@@ -1,5 +1,5 @@
 import { exec } from 'child_process'
-import { join } from 'path'
+import { join, resolve, dirname } from 'path'
 import { writeFileSync, existsSync, mkdirSync } from 'fs'
 import { tmpdir } from 'os'
 import { Game, System } from '../../shared/types'
@@ -16,11 +16,39 @@ interface ControllerInfo {
 
 export class LauncherService {
   public launch(game: Game, system: System, activeControllers: ControllerInfo[] = []): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolvePromise, reject) => {
       const retroBatPath = getRetroBatPath()
       const launcherPath = join(retroBatPath, 'emulationstation', 'emulatorLauncher.exe')
       
-      const romPath = join(retroBatPath, 'roms', system.name, game.path)
+      // Resolve Rom Path relative to system.path instead of hardcoding roms directory
+      const romPath = resolve(system.path, game.path)
+
+      // If it's a retrobat/menu shortcut (.menu file), parse it and run the emulator directly
+      if (game.path.endsWith('.menu') || (system.extension && system.extension.toLowerCase().includes('.menu'))) {
+        try {
+          const fs = require('fs')
+          if (fs.existsSync(romPath)) {
+            const menuContent = fs.readFileSync(romPath, 'utf-8')
+            const lines = menuContent.split(/\r?\n/).map((l: string) => l.trim()).filter((l: string) => l.length > 0)
+            if (lines.length > 0) {
+              const relativeExe = lines[0].startsWith('\\') ? lines[0] : '\\' + lines[0]
+              const exePath = join(retroBatPath, 'emulators', relativeExe)
+              const menuArgs = lines.slice(1).join(' ')
+              const command = `"${exePath}" ${menuArgs}`
+              console.log(`Launching menu shortcut: ${command}`)
+              exec(command, { cwd: dirname(exePath) }, (error) => {
+                if (error) {
+                  console.warn('Menu shortcut exited with code:', error.code)
+                }
+                resolvePromise()
+              })
+              return
+            }
+          }
+        } catch (err) {
+          console.error('Failed to read or launch .menu file:', err)
+        }
+      }
       
       // Create a temporary gameinfo XML as ES does
       const tempDir = join(tmpdir(), 'riescade.tmp')
@@ -129,7 +157,7 @@ export class LauncherService {
         if (error) {
           console.warn('Launcher exited with code:', error.code)
         }
-        resolve()
+        resolvePromise()
       })
     })
   }

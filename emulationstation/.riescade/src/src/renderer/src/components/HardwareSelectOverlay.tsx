@@ -51,37 +51,38 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
     groups[hw].push(sys)
   })
 
-  // Build items list
+  // Build selectable categories list
   const menuItems: any[] = []
   CATEGORIES_ORDER.forEach(cat => {
     const sysList = groups[cat] || []
     if (sysList.length > 0) {
-      menuItems.push({ id: `group_${cat}`, label: CATEGORIES_DISPLAY[cat] || cat.toUpperCase(), type: 'group' })
-      
       // Sort alphabetically by fullname
       const sorted = [...sysList].sort((a, b) => 
         (a.fullname || a.name).localeCompare(b.fullname || b.name)
       )
       
-      sorted.forEach(sys => {
-        menuItems.push({
-          id: `sys_${sys.name}`,
-          label: sys.fullname || sys.name.toUpperCase(),
-          type: 'item',
-          systemName: sys.name
-        })
+      const subLabelText = sorted.map(sys => {
+        if (sys.name === 'arcade' && sys.hardware === 'auto collection') {
+          return 'ARCADE (GERAL)'
+        }
+        if (sys.name === 'auto-arcade') {
+          return 'ARCADE (GERAL)'
+        }
+        return sys.fullname || sys.name.toUpperCase()
+      }).join(', ')
+
+      menuItems.push({
+        id: `group_${cat}`,
+        label: CATEGORIES_DISPLAY[cat] || cat.toUpperCase(),
+        subLabel: subLabelText,
+        systemName: sorted[0].name // Selecting this category points to its first system
       })
     }
   })
 
-  const getFirstSelectableIndex = (items: any[]): number => {
-    const idx = items.findIndex(item => item.type !== 'group')
-    return idx !== -1 ? idx : 0
-  }
-
   useEffect(() => {
     if (isOpen) {
-      setSelectedIndex(getFirstSelectableIndex(menuItems))
+      setSelectedIndex(0)
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)
@@ -93,20 +94,12 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
       if (!isOpen || menuItems.length === 0) return
 
       if (e.key === 'ArrowDown') {
-        setSelectedIndex(prev => {
-          let next = (prev + 1) % menuItems.length
-          while (menuItems[next]?.type === 'group' && next !== prev) next = (next + 1) % menuItems.length
-          return next
-        })
+        setSelectedIndex(prev => (prev + 1) % menuItems.length)
       } else if (e.key === 'ArrowUp') {
-        setSelectedIndex(prev => {
-          let next = (prev - 1 + menuItems.length) % menuItems.length
-          while (menuItems[next]?.type === 'group' && next !== prev) next = (next - 1 + menuItems.length) % menuItems.length
-          return next
-        })
+        setSelectedIndex(prev => (prev - 1 + menuItems.length) % menuItems.length)
       } else if (e.key === 'Enter') {
         const item = menuItems[selectedIndex]
-        if (item && item.type === 'item') {
+        if (item) {
           onSelectSystem(item.systemName)
           onClose()
         }
@@ -133,25 +126,25 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
           </div>
           <div className="riescade-menu-list-container">
             <div className="riescade-menu-list">
-              {menuItems.map((item, index) => {
-                if (item.type === 'group') {
-                  return (
-                    <div key={item.id} className="riescade-menu-group">
-                      {item.label}
-                    </div>
-                  )
-                }
-                return (
-                  <div
-                    key={item.id}
-                    className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
-                  >
+              {menuItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
+                  onClick={() => {
+                    onSelectSystem(item.systemName)
+                    onClose()
+                  }}
+                >
+                  <div className="riescade-menu-item-content">
                     <span className="riescade-menu-label">
                       {item.label}
                     </span>
+                    <span className="riescade-menu-sublabel">
+                      {item.subLabel}
+                    </span>
                   </div>
-                )
-              })}
+                </div>
+              ))}
             </div>
           </div>
           <div className="riescade-menu-footer">
@@ -180,13 +173,14 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
           opacity: 0; 
           transition: opacity 0.3s ease; 
           pointer-events: none; 
+          padding-top: 0 !important;
         }
         .riescade-menu-overlay.hardware-select.visible { 
           opacity: 1; 
           pointer-events: auto; 
         }
         .riescade-menu-overlay.hardware-select .riescade-menu-container { 
-          width: 420px; 
+          width: 30vw !important; 
           height: 100vh; 
           background: #dfdfdf; 
           display: flex; 
@@ -206,7 +200,7 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
         }
         .riescade-menu-overlay.hardware-select .riescade-menu-title { 
           margin: 0; 
-          color: #333; 
+          color: var(--theme-color, #3b82f6); 
           font-size: 1.2rem; 
           font-weight: 900; 
           letter-spacing: 3px; 
@@ -215,39 +209,53 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
         .riescade-menu-overlay.hardware-select .riescade-menu-list-container { 
           background: #fff; 
           flex: 1;
-          overflow-y: auto; 
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-height: 100% !important;
         }
+          
+        .riescade-menu-overlay.hardware-select .riescade-menu-list-container::-webkit-scrollbar { width: 6px; }
+        .riescade-menu-overlay.hardware-select .riescade-menu-list-container::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+        .riescade-menu-overlay.hardware-select .riescade-menu-list { max-height: 100% !important; }
+
         .riescade-menu-overlay.hardware-select .riescade-menu-item { 
-          padding: 12px 30px; 
+          padding: 16px 30px; 
           display: flex; 
-          align-items: center; 
-          justify-content: space-between; 
-          border-bottom: 1px solid rgba(0,0,0,0.1); 
-          transition: background 0.15s ease, color 0.15s ease; 
+          flex-direction: column;
+          align-items: flex-start; 
+          justify-content: center; 
+          border-bottom: 1px solid rgba(0,0,0,0.06); 
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); 
           color: #444; 
           cursor: pointer;
         }
         .riescade-menu-overlay.hardware-select .riescade-menu-item.selected { 
           background: var(--theme-color, #3b82f6); 
           color: #fff; 
+          padding-left: 36px;
+        }
+        .riescade-menu-overlay.hardware-select .riescade-menu-item-content {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          width: 100%;
         }
         .riescade-menu-overlay.hardware-select .riescade-menu-label { 
-          font-weight: 500; 
-          font-size: 0.95rem; 
-          text-transform: uppercase; 
-        }
-        .riescade-menu-overlay.hardware-select .riescade-menu-item.selected .riescade-menu-label { 
           font-weight: 800; 
-        }
-        .riescade-menu-overlay.hardware-select .riescade-menu-group { 
-          padding: 20px 30px 10px; 
-          color: #888; 
-          font-size: 0.8rem; 
-          font-weight: 800; 
-          letter-spacing: 2px; 
+          font-size: 1.05rem; 
           text-transform: uppercase; 
-          border-bottom: 1px solid rgba(0,0,0,0.05); 
-          background: #fdfdfd;
+          letter-spacing: 1px;
+        }
+        .riescade-menu-overlay.hardware-select .riescade-menu-sublabel { 
+          font-size: 1em; 
+          color: #777; 
+          line-height: 1.3;
+          font-weight: 400;
+          white-space: nowrap;
+          transition: color 0.2s ease;
+        }
+        .riescade-menu-overlay.hardware-select .riescade-menu-item.selected .riescade-menu-sublabel { 
+          color: rgba(255, 255, 255, 0.8); 
         }
         .riescade-menu-overlay.hardware-select .riescade-menu-footer { 
           background: #ddd; 

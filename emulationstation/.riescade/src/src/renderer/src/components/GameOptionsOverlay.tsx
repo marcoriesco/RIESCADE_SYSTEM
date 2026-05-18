@@ -333,14 +333,15 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           align-items: stretch; 
           opacity: 0; 
           transition: opacity 0.3s ease; 
-          pointer-events: none; 
+          pointer-events: none;
+          padding-top: 0 !important;
         }
         .riescade-menu-overlay.game-options.visible { 
           opacity: 1; 
           pointer-events: auto; 
         }
         .riescade-menu-overlay.game-options .riescade-menu-container { 
-          width: 420px; 
+          width: 30vw !important;
           height: 100vh; 
           background: #dfdfdf; 
           display: flex; 
@@ -365,7 +366,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
         .riescade-menu-overlay.game-options .riescade-menu-title { 
           margin: 0; 
-          color: #333; 
+          color: var(--theme-color, #3b82f6); 
           font-size: 1.2rem; 
           font-weight: 900; 
           letter-spacing: 3px; 
@@ -373,7 +374,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
         .riescade-menu-overlay.game-options .riescade-menu-subtitle { 
           font-size: 0.8rem; 
-          color: #666; 
+          color: #ffffff; 
           margin-top: 5px; 
           text-transform: uppercase;
           font-weight: 700;
@@ -394,7 +395,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         .riescade-menu-overlay.game-options .riescade-menu-list-container { 
           background: #fff; 
           flex: 1;
-          overflow-y: auto; 
+          overflow-x: hidden;
+          overflow-y: auto;
+          max-height: 100% !important;
         }
         .riescade-menu-overlay.game-options .riescade-menu-item { 
           padding: 12px 30px; 
@@ -426,7 +429,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           letter-spacing: 2px; 
           text-transform: uppercase; 
           border-bottom: 1px solid rgba(0,0,0,0.05); 
-          background: #fdfdfd;
         }
         .riescade-menu-overlay.game-options .riescade-menu-value {
           display: flex;

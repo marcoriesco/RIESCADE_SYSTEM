@@ -1,5 +1,5 @@
-import { join, resolve, relative } from 'path'
-import { existsSync, readdirSync, readFileSync } from 'fs'
+import { join, resolve, relative, dirname } from 'path'
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs'
 import { SystemsParser } from '../parsers/SystemsParser'
 import { GamelistParser } from '../parsers/GamelistParser'
 import { SettingsParser } from '../parsers/SettingsParser'
@@ -97,26 +97,111 @@ export class LibraryService {
       } as any))
     }
 
+    const systems = this.systemsParser.parse()
+    const system = systems.find(s => s.name.toLowerCase() === systemName.toLowerCase())
+
     const configPath = getConfigPath()
     let gamelistPath = join(configPath, 'gamelists', systemName, 'gamelist.xml')
     let romsGamelistPath = join(getRomsPath(), systemName, 'gamelist.xml')
+    let systemGamelistPath = system ? join(system.path, 'gamelist.xml') : ''
 
     // Fix collision between physical arcade system and virtual auto-arcade collection
     if (systemName === 'auto-arcade') {
       gamelistPath = join(configPath, 'gamelists', 'arcade', 'gamelist.xml')
       romsGamelistPath = ''
+      systemGamelistPath = ''
     } else if (systemName === 'arcade') {
       gamelistPath = '' // Physical arcade should only load roms/arcade/gamelist.xml
     }
     
     let games: Game[] = []
+    let source = 'none'
+
     if (gamelistPath && existsSync(gamelistPath)) {
       games = this.gamelistParser.parse(gamelistPath, systemName)
-    } else if (romsGamelistPath && existsSync(romsGamelistPath)) {
+      if (games.length > 0) source = 'gamelistPath'
+    }
+    
+    if (games.length === 0 && romsGamelistPath && existsSync(romsGamelistPath)) {
       games = this.gamelistParser.parse(romsGamelistPath, systemName)
+      if (games.length > 0) source = 'romsGamelistPath'
+    }
+    
+    if (games.length === 0 && systemGamelistPath && existsSync(systemGamelistPath)) {
+      games = this.gamelistParser.parse(systemGamelistPath, systemName)
+      if (games.length > 0) source = 'systemGamelistPath'
+    }
+
+    // Fallback: scan physical directory if gamelist did not yield any games
+    if (games.length === 0 && system && existsSync(system.path)) {
+      const extensions = (system.extension || '').split(/\s+/).filter(e => e.trim().length > 0)
+      games = this.scanPhysicalGames(system.path, extensions, systemName)
+      if (games.length > 0) source = 'physicalScan'
+    }
+
+    try {
+      const logStr = `getGames systemName: ${systemName}\n  systemFound: ${!!system}\n  systemPath: ${system ? system.path : 'N/A'}\n  gamelistPath: ${gamelistPath} (exists: ${existsSync(gamelistPath)})\n  romsGamelistPath: ${romsGamelistPath} (exists: ${romsGamelistPath ? existsSync(romsGamelistPath) : false})\n  systemGamelistPath: ${systemGamelistPath} (exists: ${systemGamelistPath ? existsSync(systemGamelistPath) : false})\n  finalSource: ${source}\n  gamesCount: ${games.length}\n\n`
+      readFileSync(join(configPath, '..', '.riescade', 'src', 'debug_games.log')) // Force dependency
+      const fs = require('fs')
+      fs.appendFileSync(join(configPath, '..', '.riescade', 'src', 'debug_games.log'), logStr, 'utf-8')
+    } catch(e) {
+      try {
+        const fs = require('fs')
+        const logStr = `getGames systemName: ${systemName}\n  systemFound: ${!!system}\n  systemPath: ${system ? system.path : 'N/A'}\n  finalSource: ${source}\n  gamesCount: ${games.length}\n\n`
+        fs.appendFileSync(join(configPath, '..', '.riescade', 'src', 'debug_games.log'), logStr, 'utf-8')
+      } catch (err) {}
     }
 
     return games.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+  }
+
+  private scanPhysicalGames(systemPath: string, extensions: string[], systemName: string): Game[] {
+    const games: Game[] = []
+    const extSet = new Set(extensions.map(e => e.toLowerCase().trim()))
+
+    const scanDir = (dir: string) => {
+      if (!existsSync(dir)) return
+      try {
+        const files = readdirSync(dir)
+
+        for (const file of files) {
+          const fullPath = join(dir, file)
+          const stat = statSync(fullPath)
+
+          if (stat.isDirectory()) {
+            scanDir(fullPath)
+          } else {
+            const ext = (file.includes('.') ? file.substring(file.lastIndexOf('.')) : '').toLowerCase()
+            if (extSet.has(ext)) {
+              const relPath = './' + relative(systemPath, fullPath).replace(/\\/g, '/')
+              const displayName = file.substring(0, file.length - ext.length)
+
+              const game: Game = {
+                id: fullPath.replace(/\\/g, '/'),
+                name: displayName,
+                path: relPath,
+                system: systemName,
+                favorite: false,
+                hidden: false,
+                playcount: 0
+              } as any
+
+              // If it's the screenshots system, set the image property to the absolute path of the file itself!
+              if (systemName === 'screenshots') {
+                game.image = fullPath.replace(/\\/g, '/')
+              }
+
+              games.push(game)
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`Error scanning directory ${dir}:`, err)
+      }
+    }
+
+    scanDir(systemPath)
+    return games
   }
 
   public getCustomCollections(): string[] {

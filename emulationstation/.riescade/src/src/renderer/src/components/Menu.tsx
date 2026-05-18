@@ -51,6 +51,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [inputValue, setInputValue] = useState('')
   const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
   const [customCollections, setCustomCollections] = useState<string[]>([])
+  const [needsReload, setNeedsReload] = useState(false)
 
   const getSetting = (name: string, fallback: any = ''): any => {
     return (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value) ?? fallback
@@ -75,7 +76,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       setPendingSettings(prev => {
         const updated = { ...prev, [name]: stringVal }
         
-        // If it requires immediate reload, save and reload right away!
+        // If it requires reload, save quietly and flag that a reload is needed when exiting/going back
         const immediateReload = [
           'RIESCADE.ThemeSet',
           'Language',
@@ -86,9 +87,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ].includes(name)
 
         if (immediateReload) {
+          setNeedsReload(true)
           setTimeout(async () => {
             await handleSaveQuietly(updated)
-            window.api.executeCommand('reload-frontend')
           }, 50)
         }
 
@@ -103,12 +104,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       const updated = { ...prev, [name]: stringVal }
       
       // Theme settings usually require a reload of the frontend to apply.
-      // Let's save and reload immediately to "aplicar diretamente"!
+      // Set reload required but do not reload immediately!
+      setNeedsReload(true)
       setTimeout(async () => {
         if (theme?.name) {
           await window.api.saveThemeSetting(theme.name, name, stringVal)
         }
-        window.api.executeCommand('reload-frontend')
       }, 50)
       
       return updated
@@ -138,6 +139,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
   useEffect(() => {
     if (isOpen) {
+      setNeedsReload(false)
       window.api.getSettings().then(s => {
         setSettings(s)
         setPendingSettings({})
@@ -702,12 +704,20 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         if (activeMenuStack.length > 1) {
           // Going back from a submenu: save quietly!
           handleSaveQuietly(pendingSettings)
-          setActiveMenuStack(prev => prev.slice(0, -1))
-          setSelectedIndex(0)
+          if (activeMenuStack.length === 2 && needsReload) {
+            // Returning to the Main Menu (activeMenuStack.length becomes 1)
+            // Save and reload frontend!
+            setTimeout(() => {
+              window.api.executeCommand('reload-frontend')
+            }, 100)
+          } else {
+            setActiveMenuStack(prev => prev.slice(0, -1))
+            setSelectedIndex(0)
+          }
         } else {
           // Exiting the main menu entirely
           const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).some(k => themeSettings[k] !== themeData[`options:${k}`])
-          if (hasChanges) {
+          if (hasChanges || needsReload) {
             handleSaveQuietly(pendingSettings).then(() => {
               onClose()
               window.api.executeCommand('reload-frontend')
@@ -718,7 +728,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
       }
     },
-    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData]
+    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData, needsReload]
   )
 
   useEffect(() => {

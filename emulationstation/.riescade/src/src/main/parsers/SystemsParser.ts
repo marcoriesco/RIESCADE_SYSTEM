@@ -60,6 +60,13 @@ export class SystemsParser {
       }
     })
 
+    try {
+      const debugContent = resolvedSystems.map(s => `System: ${s.name}, Path: ${s.path}, Exists: ${s._pathExists}, Count: ${s.gamecount}`).join('\n')
+      writeFileSync(join(configPath, '..', '.riescade', 'src', 'debug_systems.log'), debugContent, 'utf-8')
+    } catch (e) {
+      console.error('Failed to write debug_systems.log:', e)
+    }
+
     // Filter systems that have existing ROM folders or act as master groups for systems with games
     const filteredSystems = resolvedSystems.filter(s => {
       // 1. Keep if it has a physical ROM path and contains games (or showEmpty is active)
