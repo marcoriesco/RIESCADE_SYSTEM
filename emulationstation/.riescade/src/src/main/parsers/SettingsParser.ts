@@ -130,9 +130,14 @@ export class SettingsParser {
       ]
       if (affectingSettings.includes(name)) {
         try {
-          const { SystemsParser } = require('./SystemsParser')
-          SystemsParser.clearCache()
-        } catch (e) {}
+          const { LibraryService } = require('../services/LibraryService')
+          LibraryService.clearCache()
+        } catch (e) {
+          try {
+            const { SystemsParser } = require('./SystemsParser')
+            SystemsParser.clearCache()
+          } catch (err) {}
+        }
       }
     } catch (error) {
       console.error('Error saving setting:', error)

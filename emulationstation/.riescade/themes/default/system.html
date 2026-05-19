@@ -10,15 +10,35 @@
   <!-- HEADER GLOBAL -->
 <div class="riescade-header">
     <div class="header-left">
-        <div class="system-name">
-            {system:fullName}
-            <span class="system-gamecount">({system:gamecount} games)</span>
+        <div class="system-name system-{system:name}">
+            <span class="custom-title retrobat-title">Configurar emuladores</span>
+            <span class="custom-title collections-title">Coleções</span>
+            <span class="custom-title favorites-title">Favoritos</span>
+            <span class="custom-title library-title">Acessar Biblioteca</span>
+            <span class="custom-title screenshots-title">Acessar Screenshots</span>
+            <span class="custom-title magazine-title">Acessar Revistas</span>
+            <span class="custom-title all-title">Todos os jogos</span>
+            <span class="fallback-title">{system:fullName}</span>
+            
+            <span class="system-gamecount">
+                <span class="custom-count retrobat-count">({system:gamecount} emuladores)</span>
+                <span class="custom-count collections-count">({system:gamecount} coleções)</span>
+                <span class="custom-count library-count">({system:gamecount} mídias)</span>
+                <span class="custom-count screenshots-count">({system:gamecount} imagens)</span>
+                <span class="custom-count magazine-count">({system:gamecount} revistas)</span>
+                <span class="fallback-count">({system:gamecount} jogos)</span>
+            </span>
         </div>
     </div>
     <div class="header-center centered">
         <riescade-clock format="HH:mm" />
     </div>
-    <div class="header-right"></div>
+    <div class="header-right">
+      <div class="user-profile">
+        <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'RIESCADE'}</span>
+        <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/_parts/riescade.png'}" />
+      </div>
+    </div>
 </div>
 
 
@@ -45,11 +65,11 @@
 
     <!-- Helpsystem Customizado -->
     <div class="helpsystem centered">
-        <img src="./assets/_parts/helpsystem/system-ps4.png" class="helpsystem-image" />
+        <img src="./assets/_parts/helpsystem/system-{options:controller}.png" class="helpsystem-image" />
     </div>
 
     <riescade-controller-activity class="controller-activity">
-        <img src="./assets/indicators/ps4.svg" class="controller-activity-icon" />
+        <img src="./assets/indicators/{options:controller}.svg" class="controller-activity-icon" />
     </riescade-controller-activity>
   </div>
 

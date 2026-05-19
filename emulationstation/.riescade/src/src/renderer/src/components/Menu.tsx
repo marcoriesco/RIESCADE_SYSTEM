@@ -60,6 +60,66 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const currentLang = getSetting('Language', 'en_US')
   const t = (key: string): string => locales[currentLang]?.[key] || key
 
+  const visibleSystems = React.useMemo(() => {
+    const visibleSetting = getSetting('VisibleSystems', '')
+    const hiddenSetting = getSetting('HiddenSystems', '')
+    const autoSetting = getSetting('CollectionSystemsAuto', '')
+    const groupedSetting = getSetting('SystemsGrouped', '')
+    
+    const visibleList = String(visibleSetting).split(',').filter(v => v.trim() !== '')
+    const hiddenList = String(hiddenSetting).split(';').filter(v => v.trim() !== '')
+    const autoList = String(autoSetting).split(',').filter(v => v.trim() !== '')
+    const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '')
+
+    let baseSystems = visibleList.length > 0 
+      ? allSystems.filter(s => 
+        visibleList.includes(s.name) || 
+        s.name === 'all' || 
+        s.name === 'favorites' ||
+        s.name === 'collections' ||
+        autoList.includes(s.name) ||
+        allSystems.some(child => 
+          child.group && 
+          child.group.toLowerCase() === s.name.toLowerCase() && 
+          groupedList.includes(child.name) && 
+          visibleList.includes(child.name)
+        )
+      )
+      : allSystems;
+
+    if (hiddenList.length > 0) {
+      baseSystems = baseSystems.filter(s => !hiddenList.includes(s.name))
+    }
+
+    if (groupedList.length > 0) {
+      baseSystems = baseSystems.filter(s => 
+        !groupedList.includes(s.name) || 
+        (s.group && s.group.toLowerCase() === s.name.toLowerCase())
+      )
+    }
+
+    const customSetting = getSetting('CollectionSystemsCustom', '')
+    const enabledCols = String(customSetting).split(',').map(s => s.trim()).filter(s => s.length > 0)
+    if (enabledCols.length === 0) {
+      baseSystems = baseSystems.filter(s => s.name !== 'collections')
+    }
+
+    return baseSystems
+  }, [allSystems, pendingSettings, settings])
+
+  const getFriendlySystemName = (sys: any) => {
+    if (!sys) return ''
+    const name = sys.name
+    if (name === 'all') return t('TODOS OS JOGOS')
+    if (name === 'favorites') return t('FAVORITOS')
+    if (name === 'collections') return t('COLEÇÕES')
+    if (name === 'recent') return t('ÚLTIMOS JOGADOS')
+    if (name === 'neverplayed') return t('NUNCA JOGADOS')
+    if (name === 'retroachievements') return 'RETROACHIEVEMENTS'
+    if (name === 'arcade') return 'ARCADE'
+    return sys.fullname || sys.name.toUpperCase()
+  }
+
   const getThemeSetting = (name: string, fallback: any = ''): any => {
     return themeSettings[name] ?? fallback
   }
@@ -422,7 +482,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col_4p', label: t('4 JOGADORES'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '4players' },
 
             { id: 'group_arcade_cols', label: t('ARCADE & HARDWARE'), type: 'group' },
-            { id: 'col_arcade', label: t('ARCADE (GERAL)'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'arcade' },
             { id: 'col_vert', label: t('VERTICAL ARCADE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'vertical' },
             { id: 'col_lightgun', label: t('LIGHTGUN'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'lightgun' },
             { id: 'col_wheel', label: t('WHEEL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'wheel' },
@@ -594,10 +653,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'start_on_system', label: t('INICIAR NO SISTEMA'), type: 'select', settingName: 'StartupSystem', options: [
             { label: 'RESTAURAR O ÚLTIMO SELECIONADO', value: 'last' },
-            { label: 'TODOS OS JOGOS', value: 'all' }
+            ...visibleSystems.map(sys => ({
+              label: getFriendlySystemName(sys).toUpperCase(),
+              value: sys.name
+            }))
           ]},
           { id: 'start_gamelist', label: t('INICIAR NA LISTA DE JOGOS'), type: 'toggle', settingName: 'StartOnGamelist', settingType: 'bool' },
-          { id: 'show_sys_name_collections', label: t('EXIBIR NOME DO SISTEMA NAS COLEÇÕES'), type: 'toggle', settingName: 'CollectionShowSystemName', settingType: 'bool' },
           { id: 'show_hidden_games_collections', label: t('EXIBIR JOGOS DE SISTEMAS OCULTOS NAS COLEÇÕES'), type: 'toggle', settingName: 'CollectionShowHidden', settingType: 'bool' },
           { id: 'show_empty_systems', label: t('EXIBIR SISTEMAS VAZIOS'), type: 'toggle', settingName: 'LoadEmptySystems', settingType: 'bool' },
         ]

@@ -1,5 +1,6 @@
 import { exec } from 'child_process'
 import { app, BrowserWindow } from 'electron'
+import { LibraryService } from './LibraryService'
 
 export class SystemService {
   public executeCommand(command: string): void {
@@ -23,6 +24,9 @@ export class SystemService {
         app.exit(0)
         break
       case 'reload-frontend':
+        try {
+          LibraryService.clearCache()
+        } catch (e) {}
         BrowserWindow.getAllWindows().forEach(w => w.reload())
         break
       case 'exit-frontend':

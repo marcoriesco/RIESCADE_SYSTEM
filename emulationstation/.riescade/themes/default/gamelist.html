@@ -19,7 +19,12 @@
       <div class="header-center centered">
           <riescade-clock format="HH:mm" />
       </div>
-      <div class="header-right"></div>
+    <div class="header-right">
+      <div class="user-profile">
+        <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'RIESCADE'}</span>
+        <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/_parts/riescade.png'}" />
+      </div>
+    </div>
   </div>
 
   <!-- Conteúdo da Gamelist -->
@@ -61,11 +66,11 @@
 
     <!-- Helpsystem Customizado -->
     <div class="helpsystem centered">
-        <img src="./assets/_parts/helpsystem/gamelist-ps4.png" class="helpsystem-image" />
+        <img src="./assets/_parts/helpsystem/gamelist-{options:controller}.png" class="helpsystem-image" />
     </div>
 
     <div class="controller-activity">
-        <img src="./assets/indicators/ps4.svg" class="controller-activity-icon" />
+        <img src="./assets/indicators/{options:controller}.svg" class="controller-activity-icon" />
     </div>
   </div>
   

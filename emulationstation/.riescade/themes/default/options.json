@@ -15,5 +15,17 @@
       { "value": "#ffc233", "label": "YELLOW" }
     ],
     "default": "9f0043"
+  },
+    {
+    "id": "controller",
+    "name": "Controller Icon",
+    "type": "select",
+    "options": [
+      { "value": "ps4", "label": "PS4" },
+      { "value": "xbox", "label": "XBOX" },
+      { "value": "switch", "label": "SWITCH" },
+      { "value": "arcade", "label": "ARCADE" }
+    ],
+    "default": "ps4"
   }
 ]

@@ -24,7 +24,6 @@ export class LibraryService {
     LibraryService.isPreloaded = false
     LibraryService.cachedGames.clear()
     try {
-      const { SystemsParser } = require('../parsers/SystemsParser')
       SystemsParser.clearCache()
     } catch (e) {}
   }
@@ -82,7 +81,9 @@ export class LibraryService {
     for (const col of autoCollections) {
       try {
         const colGames = this.resolveAutoCollectionGames(col)
-        LibraryService.cachedGames.set(col.toLowerCase(), colGames)
+        const isDuplicate = physicalSystems.some(s => s.name.toLowerCase() === col.toLowerCase())
+        const cacheKey = isDuplicate ? `auto-${col}` : col
+        LibraryService.cachedGames.set(cacheKey.toLowerCase(), colGames)
       } catch (err) {
         console.error(`Failed to preload auto collection ${col}:`, err)
       }
@@ -122,7 +123,9 @@ export class LibraryService {
     for (const col of autoCollections) {
       try {
         const colGames = this.resolveAutoCollectionGames(col)
-        LibraryService.cachedGames.set(col.toLowerCase(), colGames)
+        const isDuplicate = physicalSystems.some(s => s.name.toLowerCase() === col.toLowerCase())
+        const cacheKey = isDuplicate ? `auto-${col}` : col
+        LibraryService.cachedGames.set(cacheKey.toLowerCase(), colGames)
       } catch (err) {}
     }
 
@@ -230,10 +233,8 @@ export class LibraryService {
     let baseSystems = visibleList.length > 0 
       ? systems.filter(s => 
           visibleList.includes(s.name) || 
-          s.name === 'all' || 
-          s.name === 'favorites' ||
           s.name === 'collections' ||
-          ['recent', 'neverplayed', 'retroachievements', '2players', '4players', 'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'].includes(s.name) ||
+          s.path.startsWith('virtual://') ||
           systems.some(child => 
             child.group && 
             child.group.toLowerCase() === s.name.toLowerCase() && 
@@ -558,21 +559,22 @@ export class LibraryService {
   }
 
   public updateGame(systemName: string, gameData: Game): void {
+    const targetSystem = gameData.system || systemName
     const configPath = getConfigPath()
-    const gamelistPath = join(configPath, 'gamelists', systemName, 'gamelist.xml')
-    const romsGamelistPath = join(getRomsPath(), systemName, 'gamelist.xml')
+    const gamelistPath = join(configPath, 'gamelists', targetSystem, 'gamelist.xml')
+    const romsGamelistPath = join(getRomsPath(), targetSystem, 'gamelist.xml')
     
     const targetPath = existsSync(gamelistPath) ? gamelistPath : romsGamelistPath
     if (!existsSync(targetPath)) return
 
-    const games = this.gamelistParser.parse(targetPath, systemName)
+    const games = this.gamelistParser.parse(targetPath, targetSystem)
     const index = games.findIndex(g => g.path === gameData.path)
     
     if (index !== -1) {
       games[index] = { ...games[index], ...gameData }
       this.gamelistParser.save(targetPath, games)
 
-      const cached = LibraryService.cachedGames.get(systemName.toLowerCase())
+      const cached = LibraryService.cachedGames.get(targetSystem.toLowerCase())
       if (cached) {
         const cIdx = cached.findIndex(g => g.path === gameData.path)
         if (cIdx !== -1) {

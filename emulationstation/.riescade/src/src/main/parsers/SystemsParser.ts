@@ -119,7 +119,7 @@ export class SystemsParser {
     // Inject Auto Collections
     const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
     if (autoColsString) {
-      const enabledCols = autoColsString.split(',').filter(c => c.trim() !== '')
+      const enabledCols = autoColsString.split(',').filter(c => c.trim() !== '' && c.trim().toLowerCase() !== 'arcade')
       
       // Map specific collection names to their ES theme folders
       const specificThemes: Record<string, string> = {
@@ -134,8 +134,7 @@ export class SystemsParser {
         'lightgun': 'auto-lightgun',
         'wheel': 'auto-wheel',
         'trackball': 'auto-trackball',
-        'spinner': 'auto-spinner',
-        'arcade': 'arcade'
+        'spinner': 'auto-spinner'
       }
 
       enabledCols.forEach(col => {

@@ -2,7 +2,31 @@
    RIESCADE - GLOBAL / BASE STYLES
    ======================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:wght@400&display=swap");
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('../fonts/InterTight-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('../fonts/InterTight-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('../fonts/InterTight-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Roboto Condensed';
+  src: url('../fonts/RobotoCondensed-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
 @import "./menu.scss";
 
 $theme-color: #9f0043;
@@ -11,6 +35,7 @@ $text-muted: rgba(255, 255, 255, 0.56);
 $font-main: "Inter Tight", sans-serif;
 $font-clock: "Inter Tight", sans-serif;
 $font-hardware: "Inter Tight", sans-serif;
+$font-shadow: 1px 1px 1px #000000;
 
 :root {
   --theme-color: #{$theme-color};
@@ -19,6 +44,7 @@ $font-hardware: "Inter Tight", sans-serif;
   --font-main: #{$font-main};
   --font-clock: #{$font-clock};
   --font-hardware: #{$font-hardware};
+  --font-shadow: #{$font-shadow};
 }
 
 body {
@@ -46,7 +72,128 @@ body {
   font-weight: 300;
   font-size: 2.2em;
   color: var(--text-primary);
-  text-shadow: 2px 2px 2px #000000;
+  text-shadow: var(--font-shadow);
+}
+
+
+.riescade-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 12vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2vw;
+  box-sizing: border-box;
+  z-index: 100;
+
+  .system-name {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+    text-shadow: var(--font-shadow);
+
+    .custom-title {
+      display: none;
+    }
+    .fallback-title {
+      display: inline;
+    }
+
+    &.system-retrobat {
+      .fallback-title { display: none; }
+      .retrobat-title { display: inline; }
+      .system-gamecount {
+        .fallback-count { display: none; }
+        .retrobat-count { display: inline; }
+      }
+    }
+    &.system-collections {
+      .fallback-title { display: none; }
+      .collections-title { display: inline; }
+      .system-gamecount {
+        .fallback-count { display: none; }
+        .collections-count { display: inline; }
+      }
+    }
+    &.system-favorites {
+      .fallback-title { display: none; }
+      .favorites-title { display: inline; }
+    }
+    &.system-library {
+      .fallback-title { display: none; }
+      .library-title { display: inline; }
+      .system-gamecount {
+        .fallback-count { display: none; }
+        .library-count { display: inline; }
+      }
+    }
+    &.system-screenshots {
+      .fallback-title { display: none; }
+      .screenshots-title { display: inline; }
+      .system-gamecount {
+        .fallback-count { display: none; }
+        .screenshots-count { display: inline; }
+      }
+    }
+    &.system-magazine {
+      .fallback-title { display: none; }
+      .magazine-title { display: inline; }
+      .system-gamecount {
+        .fallback-count { display: none; }
+        .magazine-count { display: inline; }
+      }
+    }
+    &.system-all {
+      .fallback-title { display: none; }
+      .all-title { display: inline; }
+    }
+  }
+  .system-gamecount {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--theme-color);
+    text-align: center;
+    text-shadow: var(--font-shadow);
+
+    .custom-count {
+      display: none;
+    }
+    .fallback-count {
+      display: inline;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .user-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-shadow: var(--font-shadow);
+    }
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid var(--theme-color);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.6), 0 0 4px rgba(255, 255, 255, 0.4);
+      object-fit: cover;
+    }
+  }
 }
 
 /* FOOER */
@@ -92,6 +239,7 @@ body {
     opacity: 0.5;
 
     &.active {
+      color: var(--theme-color);
       opacity: 1;
     }
 
@@ -100,36 +248,8 @@ body {
     }
 
     .controller-activity-icon {
-      height: 3vh; /* Equivalente ao 0.03 do ES */
+      height: 3vh;
       filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
     }
-  }
-}
-
-.riescade-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 12vh;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 2vw;
-  box-sizing: border-box;
-  z-index: 100;
-
-  .system-name {
-    font-size: 1.85rem;
-    font-weight: 300;
-    text-align: center;
-    text-shadow: 2px 2px 2px #000000;
-  }
-  .system-gamecount {
-    font-size: 1.5rem;
-    font-weight: 300;
-    color: var(--theme-color);
-    text-align: center;
-    text-shadow: 2px 2px 2px #000000;
   }
 }

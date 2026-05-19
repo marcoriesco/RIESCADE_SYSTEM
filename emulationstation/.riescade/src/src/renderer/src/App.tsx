@@ -342,11 +342,8 @@ function App() {
 		let baseSystems = visibleList.length > 0 
 			? systems.filter(s => 
 				visibleList.includes(s.name) || 
-				s.name === 'all' || 
-				s.name === 'favorites' ||
 				s.name === 'collections' ||
-				autoList.includes(s.name) ||
-				// Or if it is a group master and has at least one grouped child system that is enabled in visibleList!
+				s.path.startsWith('virtual://') ||
 				systems.some(child => 
 					child.group && 
 					child.group.toLowerCase() === s.name.toLowerCase() && 
@@ -379,14 +376,34 @@ function App() {
 		return baseSystems;
 	}, [systems, settings]);
 
-	// Restore LastSystem based on computed filteredSystems list
+	// Restore StartupSystem / LastSystem and handle StartOnGamelist on startup
 	useEffect(() => {
-		if (filteredSystems.length > 0 && settings.LastSystem?.value && !hasRestoredLastSystem) {
-			const lastSystem = settings.LastSystem.value;
-			const idx = filteredSystems.findIndex(sys => sys.name === lastSystem);
-			if (idx !== -1) {
-				setSystemIndex(idx);
+		if (filteredSystems.length > 0 && !hasRestoredLastSystem) {
+			// 1. Determine which system to startup on
+			const startupSetting = settings.StartupSystem?.value || 'last';
+			let targetSystemName = '';
+
+			if (startupSetting === 'last') {
+				targetSystemName = settings.LastSystem?.value || '';
+			} else {
+				targetSystemName = startupSetting;
 			}
+
+			let resolvedIndex = 0;
+			if (targetSystemName) {
+				const idx = filteredSystems.findIndex(sys => sys.name === targetSystemName);
+				if (idx !== -1) {
+					resolvedIndex = idx;
+					setSystemIndex(idx);
+				}
+			}
+
+			// 2. Handle StartOnGamelist
+			const startOnGamelist = settings.StartOnGamelist?.value === true || settings.StartOnGamelist?.value === 'true';
+			if (startOnGamelist && filteredSystems[resolvedIndex]) {
+				setSelectedSystem(filteredSystems[resolvedIndex]);
+			}
+
 			setHasRestoredLastSystem(true);
 		}
 	}, [filteredSystems, settings, hasRestoredLastSystem]);
@@ -395,25 +412,19 @@ function App() {
 		if (!sys) return '';
 		const name = sys.name;
 
-		if (name === 'arcade') {
-			if (sys.hardware === 'auto collection') {
-				return 'ARCADE (GERAL)';
-			}
+		if (name === 'arcade' || name === 'auto-arcade') {
 			return 'ARCADE';
-		}
-		if (name === 'auto-arcade') {
-			return 'ARCADE (GERAL)';
 		}
 
 		const mapping: Record<string, string> = {
-			'collections': 'COLEÇÕES',
-			'all': 'TODOS OS JOGOS',
-			'favorites': 'FAVORITOS',
-			'recent': 'ÚLTIMOS JOGADOS',
-			'neverplayed': 'NUNCA JOGADOS',
-			'retroachievements': 'RETROACHIEVEMENTS',
-			'2players': '2 JOGADORES',
-			'4players': '4 JOGADORES',
+			'collections': 'Coleçõs',
+			'all': 'Todos os jogos',
+			'favorites': 'Favoritos',
+			'recent': 'Últimos jogados',
+			'neverplayed': 'Nunca jogados',
+			'retroachievements': 'RetroAchivements',
+			'2players': '2 Jogadores',
+			'4players': '4 Jogadores',
 			'vertical': 'VERTICAL ARCADE',
 			'lightgun': 'LIGHTGUN',
 			'wheel': 'WHEEL',
@@ -600,10 +611,23 @@ function App() {
 				gameThumbnail = artPath;
 			}
 
+			const isCollectionSystem = selectedSystem && (
+				selectedSystem.name === 'collections' ||
+				selectedSystem.path.startsWith('virtual://') ||
+				['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players', 'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'].includes(selectedSystem.name.toLowerCase())
+			);
+
+			const gameSystem = systems.find(s => s.name.toLowerCase() === currentGame.system.toLowerCase());
+			const sysDisplayName = gameSystem ? gameSystem.name : currentGame.system;
+
+			const displayNameWithSystem = isCollectionSystem
+				? `${currentGame.name} <span class="gamelist-meta-system">[${sysDisplayName}]</span>`
+				: currentGame.name;
+
 			return {
 				...baseData,
 				...currentGame,
-				'game:name': currentGame.name,
+				'game:name': displayNameWithSystem,
 				'game:desc': currentGame.desc,
 				'game:image': gameImage,
 				'game:thumbnail': gameThumbnail,
@@ -641,9 +665,24 @@ function App() {
 		const wasFavorite = currentGame?.favorite;
 		window.api.updateGame(selectedSystem.name, updatedGame).then(() => {
 			// Refresh local games list
-			setGames((prev) =>
-				prev.map((g) => (g.path === updatedGame.path ? updatedGame : g)),
-			);
+			setGames((prev) => {
+				const isFavoritesCol = selectedSystem.name.toLowerCase() === 'favorites';
+				let nextGames = prev;
+				if (isFavoritesCol && !updatedGame.favorite) {
+					nextGames = prev.filter((g) => g.path !== updatedGame.path);
+				} else {
+					nextGames = prev.map((g) => (g.path === updatedGame.path ? updatedGame : g));
+				}
+
+				// Adjust index if needed
+				setSelectedGameIndex((prevIdx) => {
+					if (nextGames.length === 0) return 0;
+					if (prevIdx >= nextGames.length) return nextGames.length - 1;
+					return prevIdx;
+				});
+
+				return nextGames;
+			});
 
 			// Notify on favorite change
 			if (updatedGame.favorite !== wasFavorite) {

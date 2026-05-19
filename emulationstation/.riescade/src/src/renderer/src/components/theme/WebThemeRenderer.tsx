@@ -31,17 +31,71 @@ const styleStringToObject = (styleString: string) => {
 }
 
 export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false }) => {
-  const [loadedLinks, setLoadedLinks] = useState(0)
-  const [totalLinks, setTotalLinks] = useState(0)
+  const [cssMap, setCssMap] = useState<Record<string, string>>({})
+  const [cssLoaded, setCssLoaded] = useState(!isLaunchingView)
 
-  // Scan HTML for link tags whenever htmlContent changes
   useEffect(() => {
+    if (!isLaunchingView) return;
+
     const parser = new DOMParser()
     const doc = parser.parseFromString(htmlContent, 'text/html')
-    const links = doc.querySelectorAll('link[rel="stylesheet"]')
-    setTotalLinks(links.length)
-    setLoadedLinks(0)
-  }, [htmlContent])
+    const links = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'))
+    
+    if (links.length === 0) {
+      setCssLoaded(true)
+      return
+    }
+
+    const resolveLocalPath = (val: string) => {
+      if (!val) return ''
+      if (val.startsWith('file://') || val.startsWith('http') || val.match(/^[a-zA-Z]:/)) {
+        return resolvePath(val, data)
+      }
+      if (val.startsWith('./') || val.startsWith('../')) {
+        if (val.startsWith('./')) {
+          return resolvePath(`${themePath}/${val.substring(2)}`, data)
+        } else {
+          const parts = themePath.replace(/\\/g, '/').split('/')
+          let upDirs = 0
+          let p = val
+          while (p.startsWith('../')) { upDirs++; p = p.substring(3) }
+          const basePath = parts.slice(0, parts.length - upDirs).join('/')
+          return resolvePath(`${basePath}/${p}`, data)
+        }
+      }
+      return resolvePath(val, data)
+    }
+
+    let loadedCount = 0;
+    const newCssMap: Record<string, string> = {}
+
+    links.forEach(link => {
+      const href = link.getAttribute('href')
+      if (href) {
+        const resolved = resolveLocalPath(href)
+        const localPath = resolved.replace('file:///', '')
+        
+        window.api.getFileContent(localPath).then((content: string) => {
+          newCssMap[href] = content
+          loadedCount++
+          if (loadedCount === links.length) {
+            setCssMap(newCssMap)
+            setCssLoaded(true)
+          }
+        }).catch((err: any) => {
+          console.error("Failed to load CSS:", localPath, err)
+          loadedCount++
+          if (loadedCount === links.length) {
+            setCssMap(newCssMap)
+            setCssLoaded(true)
+          }
+        })
+      } else {
+        loadedCount++
+        if (loadedCount === links.length) setCssLoaded(true)
+      }
+    })
+  }, [htmlContent, themePath, isLaunchingView])
 
   const reactTree = useMemo(() => {
     // 1. Replace all variables and expressions in the raw HTML string
@@ -293,10 +347,9 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         props[propName] = value
       })
 
-      // Tracking CSS link loads
+      // Tracking CSS link loads (no longer needed, but keeping props clean)
       if (tagName === 'link' && props.rel === 'stylesheet') {
-        props.onLoad = () => setLoadedLinks(prev => prev + 1)
-        props.onError = () => setLoadedLinks(prev => prev + 1)
+        // removed tracking
       }
 
       // Special handling for broken images if data-riescade-hide-on-error is present
@@ -355,6 +408,15 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       }
 
       const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
+      
+      // Inline pre-fetched CSS to guarantee synchronous layout and zero FOUC
+      if (tagName === 'link' && props.rel === 'stylesheet' && isLaunchingView) {
+        const originalHref = el.getAttribute('href') || ''
+        if (cssMap[originalHref]) {
+          return <style key={key} dangerouslySetInnerHTML={{ __html: cssMap[originalHref] }} />
+        }
+      }
+
       if (voidElements.includes(tagName)) {
         return React.createElement(reactTagName, props)
       }
@@ -366,14 +428,14 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
     const bodyChildren = Array.from(doc.body.childNodes).map((child, i) => convertNode(child, `b-${i}`))
 
     return [...headChildren, ...bodyChildren]
-  }, [htmlContent, data, themePath, menuItemsNode, isLaunchingView])
+  }, [htmlContent, data, themePath, menuItemsNode, isLaunchingView, cssMap])
 
-  const isReady = totalLinks === 0 || loadedLinks >= totalLinks
+  if (!cssLoaded) return null; // Wait for CSS to be fully fetched before returning any DOM
 
   return (
     <div style={{ 
       width: '100%', 
-      height: '100%' 
+      height: '100%'
     }}>
       {reactTree}
     </div>
