@@ -1,26 +1,19 @@
 <link rel="stylesheet" href="./assets/css/global.css" />
 <link rel="stylesheet" href="./assets/css/start.css" />
 
-<div class="intro-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(to right, var(--theme-color), #333333); display: flex; align-items: center; justify-content: center; overflow: hidden; font-family: sans-serif;">
-  <!-- Simple CSS Loader -->
-  <div class="intro-loader">
-      <div style="width: {systems-loading}%; height: 100%; background: #fff; transition: width 0.15s ease-out;"></div>
-  </div>
-
+<div class="intro-screen">
   <!-- Splash Image -->
-  <img src="./assets/_parts/splash.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" />
+  <img class="splash-image" src="./assets/_parts/splash.png" />
 
-  <!-- Loading Message Container -->
-  <div style="position: absolute; bottom: 5%; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-    <span style="color: #fff; text-transform: uppercase; letter-spacing: 5px; font-size: 1.2rem; font-weight: 700; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">Carregando plataformas... {systems-loading}%</span> 
+  <div class="progress-container">
+    <div class="progress-bar" style="width: {systems-loading}%;"></div>
   </div>
 
-  <style>
-    @keyframes loading-bar {
-      0% { transform: translateX(-100%); width: 20%; }
-      50% { width: 50%; }
-      100% { transform: translateX(500%); width: 20%; }
-    }
-  </style>
-
+  <!-- Loading Overlay Container -->
+  <div class="loading-overlay">
+    <!-- Glowing Progress Bar Container -->
+    <div class="loading-text">
+      Carregando plataformas... <span class="percentage">{systems-loading}%</span>
+    </div>
+  </div>
 </div>

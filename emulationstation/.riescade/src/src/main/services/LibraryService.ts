@@ -6,6 +6,8 @@ import { SettingsParser } from '../parsers/SettingsParser'
 import { getConfigPath, getRomsPath, getRetroBatPath } from '../utils/paths'
 import { System, Game } from '../../shared/types'
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 export class LibraryService {
   private systemsParser: SystemsParser
   private gamelistParser: GamelistParser
@@ -15,8 +17,125 @@ export class LibraryService {
     this.gamelistParser = new GamelistParser()
   }
 
+  private static cachedGames: Map<string, Game[]> = new Map()
+  private static isPreloaded = false
+
+  public static clearCache(): void {
+    LibraryService.isPreloaded = false
+    LibraryService.cachedGames.clear()
+    try {
+      const { SystemsParser } = require('../parsers/SystemsParser')
+      SystemsParser.clearCache()
+    } catch (e) {}
+  }
+
+  public async preloadAll(): Promise<void> {
+    if (LibraryService.isPreloaded) return
+
+    const { BrowserWindow } = require('electron')
+    const sendProgress = (p: number) => {
+      try {
+        const win = BrowserWindow.getAllWindows()[0]
+        if (win) {
+          win.webContents.send('systems-loading-progress', p)
+        }
+      } catch (err) {}
+    }
+
+    sendProgress(5)
+    await delay(100)
+
+    const displayed = this.getDisplayedSystems()
+    
+    const autoCollections = [
+      'all', 'favorites', 'recent', 'neverplayed',
+      'retroachievements', '2players', '4players',
+      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
+    ]
+    const physicalSystems = displayed.filter(s => 
+      !s.path.startsWith('virtual://') && 
+      s.name !== 'collections' && 
+      !autoCollections.includes(s.name.toLowerCase())
+    )
+
+    sendProgress(20)
+    await delay(50)
+
+    let loadedCount = 0
+    for (const sys of physicalSystems) {
+      try {
+        const games = this.getGamesRaw(sys.name)
+        LibraryService.cachedGames.set(sys.name.toLowerCase(), games)
+      } catch (err) {
+        console.error(`Failed to preload games for ${sys.name}:`, err)
+      }
+      loadedCount++
+      const progress = 20 + Math.round((loadedCount / physicalSystems.length) * 60)
+      sendProgress(progress)
+      await delay(10)
+    }
+
+    sendProgress(80)
+    await delay(50)
+
+    let colCount = 0
+    for (const col of autoCollections) {
+      try {
+        const colGames = this.resolveAutoCollectionGames(col)
+        LibraryService.cachedGames.set(col.toLowerCase(), colGames)
+      } catch (err) {
+        console.error(`Failed to preload auto collection ${col}:`, err)
+      }
+      colCount++
+      const progress = 80 + Math.round((colCount / autoCollections.length) * 20)
+      sendProgress(progress)
+      await delay(10)
+    }
+
+    LibraryService.isPreloaded = true
+    sendProgress(100)
+  }
+
+  public preloadAllSync(): void {
+    if (LibraryService.isPreloaded) return
+
+    const displayed = this.getDisplayedSystems()
+    
+    const autoCollections = [
+      'all', 'favorites', 'recent', 'neverplayed',
+      'retroachievements', '2players', '4players',
+      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
+    ]
+    const physicalSystems = displayed.filter(s => 
+      !s.path.startsWith('virtual://') && 
+      s.name !== 'collections' && 
+      !autoCollections.includes(s.name.toLowerCase())
+    )
+
+    for (const sys of physicalSystems) {
+      try {
+        const games = this.getGamesRaw(sys.name)
+        LibraryService.cachedGames.set(sys.name.toLowerCase(), games)
+      } catch (err) {}
+    }
+
+    for (const col of autoCollections) {
+      try {
+        const colGames = this.resolveAutoCollectionGames(col)
+        LibraryService.cachedGames.set(col.toLowerCase(), colGames)
+      } catch (err) {}
+    }
+
+    LibraryService.isPreloaded = true
+  }
+
   public getSystems(): System[] {
-    const systems = this.systemsParser.parse()
+    if (!LibraryService.isPreloaded) {
+      this.preloadAllSync()
+    }
+
+    const parsed = this.systemsParser.parse()
+    const systems = parsed.map(s => ({ ...s }))
     const settings = new SettingsParser()
     const sortMode = settings.getSetting('SortSystems', 'string') || 'hardware'
 
@@ -25,17 +144,35 @@ export class LibraryService {
     const enabledCols = String(customSetting).split(',').map(s => s.trim()).filter(s => s.length > 0)
     const gamecount = enabledCols.length
 
-    systems.push({
-      name: 'collections',
-      fullname: 'Coleções',
-      path: 'virtual://collections',
-      extension: '',
-      command: '',
-      platform: 'pc',
-      theme: 'custom-collections',
-      hardware: 'custom-collections',
-      emulators: [],
-      gamecount: gamecount
+    if (!systems.some(s => s.name === 'collections')) {
+      systems.push({
+        name: 'collections',
+        fullname: 'Coleções',
+        path: 'virtual://collections',
+        extension: '',
+        command: '',
+        platform: 'pc',
+        theme: 'custom-collections',
+        hardware: 'custom-collections',
+        emulators: [],
+        gamecount: gamecount
+      })
+    }
+
+    // Set gamecount from preloaded cache
+    systems.forEach(s => {
+      if (s.name === 'collections') {
+        const customSetting = settings.getSetting('CollectionSystemsCustom', 'string') || ''
+        s.gamecount = String(customSetting).split(',').map(str => str.trim()).filter(str => str.length > 0).length
+        return
+      }
+
+      const cached = LibraryService.cachedGames.get(s.name.toLowerCase())
+      if (cached) {
+        s.gamecount = cached.length
+      } else {
+        s.gamecount = 0
+      }
     })
 
     return systems.sort((sys1, sys2) => {
@@ -78,8 +215,83 @@ export class LibraryService {
     })
   }
 
+  public getDisplayedSystems(): System[] {
+    const settings = new SettingsParser()
+    const visibleSetting = settings.getSetting('VisibleSystems', 'string') || ''
+    const hiddenSetting = settings.getSetting('HiddenSystems', 'string') || ''
+    const groupedSetting = settings.getSetting('SystemsGrouped', 'string') || ''
+    
+    const visibleList = String(visibleSetting).split(',').filter(v => v.trim() !== '')
+    const hiddenList = String(hiddenSetting).split(';').filter(v => v.trim() !== '')
+    const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '')
+
+    const systems = this.systemsParser.parse()
+
+    let baseSystems = visibleList.length > 0 
+      ? systems.filter(s => 
+          visibleList.includes(s.name) || 
+          s.name === 'all' || 
+          s.name === 'favorites' ||
+          s.name === 'collections' ||
+          ['recent', 'neverplayed', 'retroachievements', '2players', '4players', 'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'].includes(s.name) ||
+          systems.some(child => 
+            child.group && 
+            child.group.toLowerCase() === s.name.toLowerCase() && 
+            groupedList.includes(child.name) && 
+            visibleList.includes(child.name)
+          )
+        )
+      : systems
+
+    if (hiddenList.length > 0) {
+      baseSystems = baseSystems.filter(s => !hiddenList.includes(s.name))
+    }
+
+    if (groupedList.length > 0) {
+      baseSystems = baseSystems.filter(s => 
+        !groupedList.includes(s.name) || 
+        (s.group && s.group.toLowerCase() === s.name.toLowerCase())
+      )
+    }
+
+    const autoCollections = [
+      'all', 'favorites', 'recent', 'neverplayed',
+      'retroachievements', '2players', '4players',
+      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
+    ]
+
+    return baseSystems.filter(s => 
+      s.name !== 'collections' && 
+      !s.path.startsWith('virtual://') && 
+      !autoCollections.includes(s.name.toLowerCase())
+    )
+  }
+
+  public getGamesFromDisplayedSystems(): Game[] {
+    const displayed = this.getDisplayedSystems()
+    const allGames: Game[] = []
+    
+    for (const sys of displayed) {
+      const cached = LibraryService.cachedGames.get(sys.name.toLowerCase())
+      if (cached) {
+        allGames.push(...cached)
+      } else {
+        const sysGames = this.getGamesRaw(sys.name)
+        allGames.push(...sysGames)
+      }
+    }
+
+    return allGames
+  }
+
   public getGames(systemName: string): Game[] {
-    if (systemName === 'collections') {
+    const nameLower = systemName.toLowerCase()
+    
+    if (LibraryService.cachedGames.has(nameLower)) {
+      return LibraryService.cachedGames.get(nameLower)!
+    }
+
+    if (nameLower === 'collections') {
       const settings = new SettingsParser()
       const customSetting = settings.getSetting('CollectionSystemsCustom', 'string') || ''
       const enabledCols = String(customSetting).split(',').map(s => s.trim()).filter(s => s.length > 0)
@@ -97,6 +309,10 @@ export class LibraryService {
       } as any))
     }
 
+    return this.getGamesRaw(systemName)
+  }
+
+  public getGamesRaw(systemName: string): Game[] {
     const systems = this.systemsParser.parse()
     const system = systems.find(s => s.name.toLowerCase() === systemName.toLowerCase())
 
@@ -155,21 +371,72 @@ export class LibraryService {
     return games.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
   }
 
+  private resolveAutoCollectionGames(colKey: string): Game[] {
+    const allDisplayedGames = this.getGamesFromDisplayedSystems()
+    colKey = colKey.toLowerCase()
+
+    let filtered: Game[] = []
+
+    if (colKey === 'all') {
+      filtered = allDisplayedGames
+    } else if (colKey === 'favorites') {
+      filtered = allDisplayedGames.filter(g => g.favorite === true || String(g.favorite) === 'true' || String(g.favorite) === '1')
+    } else if (colKey === 'recent') {
+      filtered = allDisplayedGames.filter(g => (g.playcount && g.playcount > 0) || g.lastplayed)
+      filtered.sort((a, b) => String(b.lastplayed || '').localeCompare(String(a.lastplayed || '')))
+    } else if (colKey === 'neverplayed') {
+      filtered = allDisplayedGames.filter(g => !g.playcount || g.playcount === 0)
+    } else if (colKey === '2players') {
+      filtered = allDisplayedGames.filter(g => {
+        const p = String(g.players || '').trim()
+        return p === '2' || p.includes('2') || (p.includes('-') && p.split('-')[0] <= '2' && p.split('-')[1] >= '2')
+      })
+    } else if (colKey === '4players') {
+      filtered = allDisplayedGames.filter(g => {
+        const p = String(g.players || '').trim()
+        return p === '4' || p.includes('4') || (p.includes('-') && p.split('-')[0] <= '4' && p.split('-')[1] >= '4')
+      })
+    } else if (colKey === 'retroachievements') {
+      filtered = allDisplayedGames.filter(g => g.cheevosId || g.cheevosHash)
+    } else {
+      filtered = allDisplayedGames.filter(g => {
+        const nameLower = String(g.name || '').toLowerCase()
+        const descLower = String(g.desc || '').toLowerCase()
+        const genreLower = String(g.genre || '').toLowerCase()
+        return nameLower.includes(colKey) || descLower.includes(colKey) || genreLower.includes(colKey)
+      })
+    }
+
+    if (colKey !== 'recent') {
+      filtered.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+    }
+
+    return filtered
+  }
+
   private scanPhysicalGames(systemPath: string, extensions: string[], systemName: string): Game[] {
     const games: Game[] = []
     const extSet = new Set(extensions.map(e => e.toLowerCase().trim()))
 
-    const scanDir = (dir: string) => {
+    // Limit scanning recursion to depth 2 to prevent freezing on huge/system directories
+    const scanDir = (dir: string, depth: number) => {
+      if (depth > 2) return
       if (!existsSync(dir)) return
       try {
         const files = readdirSync(dir)
 
         for (const file of files) {
           const fullPath = join(dir, file)
-          const stat = statSync(fullPath)
+          
+          let stat;
+          try {
+            stat = statSync(fullPath)
+          } catch (e) {
+            continue; // Skip inaccessible or broken links/files
+          }
 
           if (stat.isDirectory()) {
-            scanDir(fullPath)
+            scanDir(fullPath, depth + 1)
           } else {
             const ext = (file.includes('.') ? file.substring(file.lastIndexOf('.')) : '').toLowerCase()
             if (extSet.has(ext)) {
@@ -200,7 +467,7 @@ export class LibraryService {
       }
     }
 
-    scanDir(systemPath)
+    scanDir(systemPath, 0)
     return games
   }
 
@@ -217,7 +484,6 @@ export class LibraryService {
           collections.push(colName)
         }
       })
-      // Sort alphabetically
       return collections.sort((a, b) => a.localeCompare(b))
     } catch (e) {
       console.error('Failed to read custom collections:', e)
@@ -236,36 +502,28 @@ export class LibraryService {
 
       const allSystems = this.getSystems()
       const collectionGames: Game[] = []
-
-      // Cache the parsed games for systems we encounter
       const parsedSystemsGames = new Map<string, Game[]>()
 
       for (const line of lines) {
-        // E.g. line: ./roms/cps3/sfiii.zip
-        let resolvedRomPath = line.replace(/^\.\//, '') // remove ./
+        let resolvedRomPath = line.replace(/^\.\//, '')
         const absoluteRomPath = resolve(getRetroBatPath(), resolvedRomPath).replace(/\\/g, '/')
 
-        // Extract system name from path
         const normalized = absoluteRomPath.toLowerCase()
         const match = normalized.match(/\/roms\/([^/]+)\//)
         const systemName = match ? match[1] : ''
 
         if (!systemName) continue
 
-        // Get games of this system
         const sysKey = systemName.toLowerCase()
         if (!parsedSystemsGames.has(sysKey)) {
           parsedSystemsGames.set(sysKey, this.getGames(systemName))
         }
         const systemGames = parsedSystemsGames.get(sysKey) || []
 
-        // Find the system object to get its ROMs path
         const systemObj = allSystems.find(s => s.name.toLowerCase() === sysKey)
         const systemRomDir = systemObj ? systemObj.path : join(getRomsPath(), systemName)
 
-        // Find the game in systemGames that matches the path
         const foundGame = systemGames.find(g => {
-          // Resolve both to absolute paths
           const gameAbsPath = resolve(systemRomDir, g.path).replace(/\\/g, '/')
           return gameAbsPath.toLowerCase() === absoluteRomPath.toLowerCase()
         })
@@ -275,11 +533,9 @@ export class LibraryService {
             ...foundGame,
           })
         } else {
-          // Create placeholder game
           const filename = absoluteRomPath.split('/').pop() || ''
-          const displayName = filename.replace(/\.[^/.]+$/, '') // remove extension
+          const displayName = filename.replace(/\.[^/.]+$/, '')
           
-          // Make path relative to system ROM directory
           const relativeRomPath = './' + relative(systemRomDir, absoluteRomPath).replace(/\\/g, '/')
 
           collectionGames.push({
@@ -315,6 +571,30 @@ export class LibraryService {
     if (index !== -1) {
       games[index] = { ...games[index], ...gameData }
       this.gamelistParser.save(targetPath, games)
+
+      const cached = LibraryService.cachedGames.get(systemName.toLowerCase())
+      if (cached) {
+        const cIdx = cached.findIndex(g => g.path === gameData.path)
+        if (cIdx !== -1) {
+          cached[cIdx] = { ...cached[cIdx], ...gameData }
+        }
+      }
+
+      this.rebuildAutoCollections()
+    }
+  }
+
+  private rebuildAutoCollections(): void {
+    const autoCollections = [
+      'all', 'favorites', 'recent', 'neverplayed',
+      'retroachievements', '2players', '4players',
+      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
+    ]
+    for (const col of autoCollections) {
+      try {
+        const colGames = this.resolveAutoCollectionGames(col)
+        LibraryService.cachedGames.set(col.toLowerCase(), colGames)
+      } catch (err) {}
     }
   }
 

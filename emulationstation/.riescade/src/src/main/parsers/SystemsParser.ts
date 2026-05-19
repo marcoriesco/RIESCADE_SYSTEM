@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, readdirSync, opendirSync } from 'fs'
 import { join, resolve } from 'path'
 import { System } from '../../shared/types'
 import { getConfigPath } from '../utils/paths'
@@ -7,6 +7,11 @@ import { SettingsParser } from './SettingsParser'
 
 export class SystemsParser {
   private parser: XMLParser
+  private static cachedSystems: System[] | null = null
+
+  public static clearCache(): void {
+    SystemsParser.cachedSystems = null
+  }
 
   constructor() {
     this.parser = new XMLParser({
@@ -20,6 +25,10 @@ export class SystemsParser {
   }
 
   public parse(): System[] {
+    if (SystemsParser.cachedSystems) {
+      return SystemsParser.cachedSystems;
+    }
+
     const configPath = getConfigPath()
     const mainSystemsPath = join(configPath, 'es_systems.cfg')
     
@@ -55,7 +64,7 @@ export class SystemsParser {
       const count = pathExists ? this.countGames(fullPath) : 0
       
       resolvedCount++
-      const progress = Math.round((resolvedCount / systems.length) * 100)
+      const progress = Math.round((resolvedCount / systems.length) * 20)
       
       try {
         const mainWindow = BrowserWindow.getAllWindows()[0]
@@ -165,6 +174,7 @@ export class SystemsParser {
       })
     }
 
+    SystemsParser.cachedSystems = filteredSystems
     return filteredSystems
   }
 
@@ -219,7 +229,18 @@ export class SystemsParser {
   private countGames(path: string): number {
     try {
       if (!existsSync(path)) return 0
-      return readdirSync(path).filter(f => !f.startsWith('.')).length
+      const dir = opendirSync(path)
+      let hasFiles = false
+      let entry = dir.readSync()
+      while (entry) {
+        if (!entry.name.startsWith('.')) {
+          hasFiles = true
+          break
+        }
+        entry = dir.readSync()
+      }
+      dir.closeSync()
+      return hasFiles ? 1 : 0
     } catch {
       return 0
     }

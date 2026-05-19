@@ -82,11 +82,17 @@
     }
 }
 
+.riescade-carousel-text {
+    font-size: 2em;
+}
+
 .riescade-carousel-item {
    &.selected img {
+    opacity: 1 !important;
     filter: saturate(1) !important;
   }
   img {
+    opacity: 0.5 !important;
     filter: saturate(0) !important;
   }
 }

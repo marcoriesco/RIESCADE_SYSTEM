@@ -118,6 +118,22 @@ export class SettingsParser {
     try {
       const xmlContent = '<?xml version="1.0"?>\n' + this.builder.build(jsonObj)
       writeFileSync(settingsPath, xmlContent, 'utf-8')
+
+      // Clear systems cache on settings change that might affect system configuration
+      const affectingSettings = [
+        'VisibleSystems',
+        'HiddenSystems',
+        'SystemsGrouped',
+        'LoadEmptySystems',
+        'CollectionSystemsAuto',
+        'CollectionSystemsCustom'
+      ]
+      if (affectingSettings.includes(name)) {
+        try {
+          const { SystemsParser } = require('./SystemsParser')
+          SystemsParser.clearCache()
+        } catch (e) {}
+      }
     } catch (error) {
       console.error('Error saving setting:', error)
     }

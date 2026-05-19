@@ -70,7 +70,8 @@ export const WebCarouselElement: React.FC<Props> = ({
           data: item,
           offset: diff,
           isSelected: diff === 0,
-          isGame
+          isGame,
+          originalIndex: idx
         })
       }
     })
@@ -113,9 +114,12 @@ export const WebCarouselElement: React.FC<Props> = ({
       {itemsToShow.map((item) => {
         const itemData = item.data
         const assetPath = getAssetPath(itemData, item.isGame)
+        const key = item.isGame
+          ? `${itemData.system || 'game'}-${itemData.path || 'path'}-${item.originalIndex}`
+          : `${itemData.name || 'sys'}-${item.originalIndex}`
         return (
           <CarouselItemNode 
-            key={itemData.path || itemData.name}
+            key={key}
             item={item}
             isVertical={isVertical}
             logoScale={logoScale}

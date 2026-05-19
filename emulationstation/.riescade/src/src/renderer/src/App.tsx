@@ -98,14 +98,18 @@ function App() {
 					setTheme(t);
 					
 					if (isInitial) {
-						// After theme is set and rendered, load systems and settings
-						Promise.all([
-							window.api.getSystems(),
-							window.api.getSettings()
-						]).then(([s, initialSettings]: [System[], any]) => {
-							setSystems(s);
-							setSettings(initialSettings);
-						});
+						// Wait a tiny bit (100ms) to ensure React has fully rendered and painted the splash screen to the DOM
+						setTimeout(() => {
+							window.api.preloadLibrary().then(() => {
+								Promise.all([
+									window.api.getSystems(),
+									window.api.getSettings()
+								]).then(([s, initialSettings]: [System[], any]) => {
+									setSystems(s);
+									setSettings(initialSettings);
+								});
+							});
+						}, 100);
 					}
 				});
 			}
@@ -319,7 +323,7 @@ function App() {
 	// End splash screen
 	useEffect(() => {
 		if (systems.length > 0 && theme) {
-			const timer = setTimeout(() => setIsInitializing(false), 3000);
+			const timer = setTimeout(() => setIsInitializing(false), 500);
 			return () => clearTimeout(timer);
 		}
 	}, [systems.length, theme]);

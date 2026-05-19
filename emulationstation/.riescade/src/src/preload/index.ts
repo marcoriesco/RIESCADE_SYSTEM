@@ -4,6 +4,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Simplified API - all config is done through EmulationStation
 const api = {
   // Library
+  preloadLibrary: () => ipcRenderer.invoke('preload-library'),
   getSystems: () => ipcRenderer.invoke('get-systems'),
   getGames: (systemName: string) => ipcRenderer.invoke('get-games', systemName),
   updateGame: (systemName: string, gameData: any) => ipcRenderer.invoke('update-game', systemName, gameData),

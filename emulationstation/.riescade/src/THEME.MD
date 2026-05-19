@@ -68,6 +68,10 @@ These are always available regardless of the view.
 - `{global:screenHeight}`: Current window height in pixels.
 - `{global:themeRevision}`: An incrementing number used for cache-busting assets during development.
 
+### 🚀 Start Screen Variables (`start.html`)
+These variables are specifically designed for the initial app splash screen layout (`start.html`).
+- `{systems-loading}`: Returns the current progress percentage of system/emulator parsing and cache loading (an integer from `0` to `100`). This is extremely useful for rendering dynamic loading text or custom styled progress bar widths (e.g., `<div style="width: {systems-loading}%;"></div>`).
+
 ### 🎮 System Variables (`system:`)
 Refers to the currently selected system (e.g., "NES", "Genesis").
 - `{system:fullName}`: The full display name (e.g., `Super Nintendo Entertainment System`).

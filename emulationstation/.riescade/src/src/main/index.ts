@@ -66,6 +66,11 @@ app.whenReady().then(() => {
   createWindow()
 
   // ─── IPC: Library ───
+  ipcMain.handle('preload-library', async () => {
+    await libraryService.preloadAll()
+    return true
+  })
+
   ipcMain.handle('get-systems', async () => {
     return libraryService.getSystems()
   })
