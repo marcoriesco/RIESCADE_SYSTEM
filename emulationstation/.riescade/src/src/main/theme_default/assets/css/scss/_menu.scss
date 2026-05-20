@@ -24,16 +24,16 @@
     background: var(--theme-color); 
 }
 
-
 /* Cabeçalho do Menu */
 .riescade-menu-header {
     background: none !important;
     padding: 20px;
     text-align: center;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
     
     .riescade-menu-title {
         font-size: 1.75rem;
@@ -60,14 +60,17 @@
 /* Você pode forçar estilos nos itens do menu gerados pelo React usando !important */
 .riescade-menu-item {
     color: #999 !important;
-    padding: 5px 15px !important;
+    padding: 0 15px !important;
 
     .riescade-menu-icon {
         &#game_settings {
-            background-image: url(../icons/controllers.png);
+            background-image: url(../icons/games.png);
         }
         &#ui_settings {
             background-image: url(../icons/ui.png);
+        }
+        &#controller_settings {
+            background-image: url(../icons/controllers.png);
         }
         &#sound_settings {
             background-image: url(../icons/sound.png);
@@ -75,9 +78,15 @@
         &#game_collections {
             background-image: url(../icons/advanced.png);
         }
+        &#scraper {
+            background-image: url(../icons/scraper.png);
+        }        
+        &#updates_downloads {
+            background-image: url(../icons/updates.png);
+        }
         &#system_settings {
             background-image: url(../icons/config.png);
-        }
+        }        
         &#quit {
             background-image: url(../icons/quit.png);
         }
@@ -134,7 +143,8 @@
         line-height: 1 !important;
     }
 }
-.menu-select {
+.menu-select, .menu-input-preview {
+    font-size: 1.25rem !important;
     color: #fff;
 }
 

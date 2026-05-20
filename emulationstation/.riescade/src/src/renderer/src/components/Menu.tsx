@@ -1762,8 +1762,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .riescade-menu-overlay.visible { opacity: 1; pointer-events: auto; }
         .riescade-menu-container { width: 600px; background: #dfdfdf; display: flex; flex-direction: column; font-family: "Inter", sans-serif; transform: scale(0.95); transition: transform 0.2s ease; }
         .riescade-menu-overlay.visible .riescade-menu-container { transform: scale(1); }
-        .riescade-menu-header { background: #eee; padding: 15px 25px; text-align: center; }
-        .riescade-menu-title { margin: 0; color: #333; font-size: 1.2rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+        .riescade-menu-header { background: #eee; padding: 15px 0; text-align: center; }
+        .riescade-menu-title { margin: 0; color: #333; font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
         .riescade-menu-subtitle { font-size: 0.8rem; color: #666; margin-top: 5px; }
         .riescade-menu-list-container { height: auto; background: #fff; overflow-y: auto; }
         .riescade-menu-item { padding: 12px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.1); transition: background 0.15s ease, color 0.15s ease; color: #444; }
@@ -1812,10 +1812,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .menu-selected-count { font-size: 0.75rem; font-weight: 800; opacity: 0.6; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 10px; }
         .riescade-menu-item.selected .menu-selected-count { opacity: 0.9; background: rgba(255,255,255,0.2); }
 
-        .riescade-menu-tabs { display: flex; gap: 0; padding: 12px 25px 0; }
-        .riescade-menu-tab { padding: 8px 20px 10px; font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: rgba(0,0,0,0.35); border-bottom: 3px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; user-select: none; }
-        .riescade-menu-tab:hover { color: rgba(0,0,0,0.6); }
-        .riescade-menu-tab.active { color: #e91e63; border-bottom-color: #e91e63; }
+        .riescade-menu-tabs { width:100%; display: flex; justify-content: flex-start; gap: 0; padding: 12px 25px 0; }
+        .riescade-menu-tab { width:auto; padding: 5px 20px; font-size: 1.2rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: #999; border-bottom: 3px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; user-select: none; }
+        .riescade-menu-tab:hover { color: var(--theme-color); }
+        .riescade-menu-tab.active { color: var(--theme-color); border-bottom-color: var(--theme-color); }
       ` }} />
       {/* {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />} */}
       
