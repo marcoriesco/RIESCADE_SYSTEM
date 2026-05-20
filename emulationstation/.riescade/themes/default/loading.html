@@ -2,24 +2,24 @@
   <link rel="stylesheet" href="./assets/css/global.css" />
   <link rel="stylesheet" href="./assets/css/loading.css" />
 
-  <img class="loading-bg" src="{game:fanart}" onerror="this.style.display='none';" />
+  <img class="loading-bg" src="{game:fanart}" onerror="this.style.display='none';" hideLoadingElement />
   
   <div class="loading-overlay"></div>
 
-  <div class="loading-content">
+  <div class="loading-content" hideLoadingElement>
     <div class="game-logo-container">
       <img src="{game:marquee}" onerror="this.style.display='none';" />
     </div>
 
-    <h1 class="loading-title">{game:name}</h1>
+    <h1 class="loading-title" hideLoadingElement>{game:name}</h1>
   </div>
 
-  <div class="loading-text-row">
-    <span class="loading-text">Carregando</span>
+  <div class="loading-text-row" keepLoadingElement>
+    <span class="loading-text" keepLoadingElementText="Aguardando emulatorLauncher kill">Carregando</span>
     <span class="loading-dots">...</span>
   </div>
 
-  <div class="loading-spinner-container">
+  <div class="loading-spinner-container" keepLoadingElement>
     <svg class="loading-icon" width="256" height="256" viewBox="0 0 256 256" fill="none">
       <defs>
         <linearGradient id="grad" x1="40" y1="40" x2="216" y2="216" gradientUnits="userSpaceOnUse">

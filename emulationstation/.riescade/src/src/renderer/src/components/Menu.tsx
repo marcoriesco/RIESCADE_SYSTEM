@@ -9,15 +9,36 @@ Object.entries(localeModules).forEach(([path, module]: [string, any]) => {
   if (lang) locales[lang] = module.default || module
 })
 
+const isOptionMatch = (optVal: any, settingVal: any) => {
+  if (optVal === settingVal) return true
+  const isOptNull = optVal === null || optVal === undefined || optVal === '' || optVal === 'null'
+  const isSetNull = settingVal === null || settingVal === undefined || settingVal === '' || settingVal === 'null'
+  return isOptNull && isSetNull
+}
+
+const findMenuItemBySettingName = (items: MenuItem[], settingName: string): MenuItem | undefined => {
+  for (const item of items) {
+    if (item.settingName === settingName) {
+      return item
+    }
+    if (item.submenu) {
+      const found = findMenuItemBySettingName(item.submenu, settingName)
+      if (found) return found
+    }
+  }
+  return undefined
+}
+
 interface MenuItem {
   id: string
   label: string
+  description?: string
   onClick?: () => void
   submenu?: MenuItem[]
   type?: 'toggle' | 'select' | 'slider' | 'action' | 'info' | 'group' | 'input'
   settingName?: string
   settingType?: 'string' | 'bool' | 'int' | 'float'
-  options?: { label: string; value: any }[]
+  options?: { label: string; value: any; description?: string }[]
   value?: any
   min?: number
   max?: number
@@ -178,8 +199,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
   const handleSaveQuietly = async (pending = pendingSettings) => {
     // 1. Save global settings
+    const allItems = getMainMenuItems()
     for (const [name, value] of Object.entries(pending)) {
-      const type = settings[name]?.type || 'string'
+      const menuItem = findMenuItemBySettingName(allItems, name)
+      const type = menuItem?.settingType || settings[name]?.type || 'string'
       await window.api.saveSetting(name, value, type)
     }
 
@@ -292,7 +315,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ? getThemeSetting(item.settingName, item.options[0].value)
         : getSetting(item.settingName, item.options[0].value)
         
-      let idx = item.options.findIndex(o => String(o.value) === String(current))
+      let idx = item.options.findIndex(o => isOptionMatch(o.value, current))
       if (idx === -1) idx = 0
       const next = (idx + direction + item.options.length) % item.options.length
       
@@ -324,11 +347,33 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'cheevos_user', label: t('USUÁRIO'), type: 'input', settingName: 'global.cheevos.username', settingType: 'string' },
             { id: 'cheevos_pass', label: t('SENHA'), type: 'input', settingName: 'global.cheevos.password', settingType: 'string', isPassword: true },
           ]},
-          { id: 'group_autosave', label: t('AUTO SAVE'), type: 'group' },
-          { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool' },
-          { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'global.rewind', settingType: 'bool' },
+          { id: 'group_autosave', label: t('ESTADOS DE SALVAMENTO'), type: 'group' },
+          { id: 'autosave', label: t('SALVAR/CARREGAR AUTOMÁTICO'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool', description: t('Carrega o estado de salvamento mais recente ao iniciar o jogo e salva o estado ao sair do jogo.') },
+          { 
+            id: 'autosave_increment', 
+            label: t('TIPO DE INCREMENTO'), 
+            type: 'select', 
+            settingName: 'global.incrementalsavestates', 
+            settingType: 'int',
+            options: [
+              { label: t('POR ESTADO DE SALVAMENTO'), value: null, description: t('Nunca sobrescreve estados de salvamento antigos, sempre crie novos.') },
+              { label: t('POR ESPAÇO DE SALVAMENTO'), value: '0', description: t('Incrementa novo espaço em um novo jogo.') },
+              { label: t('NÃO INCREMENTAR'), value: '2', description: t('Usa o espaço atual em um novo jogo.') }
+            ]
+          },
+          { 
+            id: 'autosave_manager', 
+            label: t('EXIBIR GERENCIADOR'), 
+            type: 'select', 
+            settingName: 'global.savestates', 
+            description: t('Exibe o gerenciador de estado de salvamento antes de iniciar um jogo.'),
+            options: [
+              { label: t('NÃO'), value: '0' },
+              { label: t('SEMPRE'), value: '1' },
+              { label: t('SE DISPONÍVEL'), value: '2' }
+            ]
+          },
           { id: 'group_display', label: t('DISPLAY CONFIGURATION'), type: 'group' },
-          { id: 'smooth_games', label: t('SMOOTH GAMES'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
           { id: 'shaders', label: t('SHADER SET'), type: 'select', settingName: 'global.shaderset', options: [
             { label: t('NONE'), value: 'none' }, 
             { label: 'RIESCADE', value: '[riescade]' },
@@ -361,14 +406,339 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'decorations', label: t('DECORATIONS'), type: 'select', settingName: 'global.bezel', options: [
             { label: t('NONE'), value: 'none' }, { label: t('AUTO'), value: 'auto' }
           ]},
+          { id: 'tattoo_submenu', label: t('TATTOO'), submenu: [
+            { id: 'global_tattoo', label: t('MOSTRAR IMAGEM SOBREPOSTA À MOLDURA'), type: 'toggle', settingName: 'global.tattoo', settingType: 'bool', description: t('Show a control image overlaid on top of the bezel.') },
+            { id: 'global_tattoo_corner', label: t('POSIÇÃO DA SOBREPOSIÇÃO'), type: 'select', settingName: 'global.tattoo_corner', description: t('Select corner of the screen where the tattoo will appear.'), options: [
+              { label: t('AUTO'), value: 'auto' },
+              { label: t('TOP LEFT'), value: 'NW' },
+              { label: t('TOP RIGHT'), value: 'NE' },
+              { label: t('BOTTOM RIGHT'), value: 'SE' },
+              { label: t('BOTTOM LEFT'), value: 'SW' }
+            ]},
+            { id: 'global_resize_tattoo', label: t('REDIMENSIONAR SOBREPOSIÇÃO'), type: 'toggle', settingName: 'global.resize_tattoo', settingType: 'bool', description: t('Reduz/expande a sobreposição para caber na borda da moldura.') }
+          ]},
           { id: 'game_ratio', label: t('GAME ASPECT RATIO'), type: 'select', settingName: 'global.ratio', options: [
             { label: t('AUTO'), value: 'auto' }, { label: '4/3', value: '4/3' }, { label: '16/9', value: '16/9' },
             { label: '16/10', value: '16/10' }, { label: 'FULL', value: 'full' }
           ]},
-          { id: 'forcefullscreen', label: t('FORCE FULLSCREEN'), type: 'toggle', settingName: 'global.forcefullscreen', settingType: 'bool' },
-          { id: 'exclusivefs', label: t('EXCLUSIVE FULLSCREEN'), type: 'toggle', settingName: 'global.exclusivefs', settingType: 'bool' },
-          { id: 'disableautocontrollers', label: t('DISABLE AUTOCONTROLLERS'), type: 'toggle', settingName: 'global.disableautocontrollers', settingType: 'bool' },
-
+          { id: 'forcefullscreen', label: t('FORCE FULLSCREEN'), type: 'toggle', settingName: 'global.forcefullscreen', settingType: 'bool', description: t('Force emulator in fullscreen even if RetroBat is windowed') },
+          { id: 'exclusivefs', label: t('PREFER EXCLUSIVE FULLSCREEN'), type: 'toggle', settingName: 'global.exclusivefs', settingType: 'bool', description: t('When available, prefer exclusive fullscreen for emulators.') },
+          { id: 'nopauseonlostfocus', label: t('NEVER PAUSE EMULATION ON LOST FOCUS'), type: 'toggle', settingName: 'global.nopauseonlostfocus', settingType: 'bool', description: t('This setting will prevent pause in emulation when losing focus.') },
+          { id: 'integerscale', label: t('ESCALA INTEIRA (PIXEL PERFEITO)'), type: 'toggle', settingName: 'global.integerscale', settingType: 'bool' },
+          { id: 'smooth_games', label: t('JOGOS SUAVES (FILTRO BILINEAR)'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
+          { id: 'discord_rich_presence', label: t('DISCORD RICH PRESENCE'), type: 'toggle', settingName: 'global.discord', settingType: 'bool', description: t('Enable Discord Rich Presence service, this will update Discord status to show the games being played.') },
+          { id: 'disableautocontrollers', label: t('CONFIGURAR CONTROLES AUTOMATICAMENTE'), type: 'toggle', settingName: 'global.disableautocontrollers', settingType: 'bool' },
+          {
+            id: 'switch_submenu',
+            label: t('SWITCH'),
+            description: t('SAVES IN RETROBAT SAVES FOLDER') + ' : ' + (getSetting('yuzu_mutualize', 'false') === 'true' ? t('LIGADO') : t('DESLIGADO')),
+            submenu: [
+              { id: 'yuzu_mutualize', label: t('SAVES IN RETROBAT SAVES FOLDER'), type: 'toggle', settingName: 'yuzu_mutualize', settingType: 'bool', description: t('Switch on to use RetroBat saves folder for Citron and Eden saves (instead of emulator folder).') }
+            ]
+          },
+          { id: 'group_stores', label: t('GAME STORES AND LAUNCHERS'), type: 'group' },
+          { id: 'windows_games_submenu', label: t('WINDOWS GAMES'), submenu: [
+            { id: 'global_scanStore', label: t('SCAN INSTALLED STORE GAMES (STEAM, EPIC...)'), type: 'toggle', settingName: 'global.scanStore', settingType: 'bool' },
+            { id: 'global_scanStoreUninstalled', label: t('INCLUDE UNINSTALLED GAMES'), type: 'toggle', settingName: 'global.scanStoreUninstalled', settingType: 'bool' },
+            { id: 'global_storekeep', label: t('KEEP GAMES ADDED MANUALLY'), type: 'toggle', settingName: 'global.storekeep', settingType: 'bool', description: t('By default, RetroBat keeps sync between installed games and roms folder.') },
+            { id: 'global_killsteam', label: t('KILL LAUNCHER WHEN EXIT'), type: 'toggle', settingName: 'global.killsteam', settingType: 'bool', description: t('Set this to ON to quit steam or Epic Game Launcher when quitting game.') },
+            { id: 'global_batexesearch', label: t('TRY TO READ EXECUTABLE IN BAT FILES'), type: 'toggle', settingName: 'global.batexesearch', settingType: 'bool', description: t('Disable this option to run directly a .bat or .cmd file without RetroBat trying to find the executable inside.') }
+          ]},
+          { id: 'n64_recompscan', label: t('SCAN N64 RECOMPILATION'), type: 'toggle', settingName: 'n64_recompscan', settingType: 'bool' },
+          { id: 'game_launchers_submenu', label: t('GAME LAUNCHERS'), submenu: [
+            { id: 'global_exodosScan', label: t('SCAN EXODOS GAMES'), type: 'toggle', settingName: 'global.exodosScan', settingType: 'bool' },
+            { id: 'global_exodosPath', label: t('EXODOS EXECUTABLE PATH'), type: 'input', settingName: 'global.exodosPath', settingType: 'string', description: t('Path to the folder where ExoDos is located, mandatory for RetroBat to be able to scan ExoDOS games.') },
+            { id: 'global_exowin3xScan', label: t('SCAN EXOWIN3X GAMES'), type: 'toggle', settingName: 'global.exowin3xScan', settingType: 'bool' },
+            { id: 'global_exowin3xPath', label: t('EXOWIN3X EXECUTABLE PATH'), type: 'input', settingName: 'global.exowin3xPath', settingType: 'string', description: t('Path to the folder where ExoWin3x is located, mandatory for RetroBat to be able to scan ExoWin3x games.') },
+            { id: 'global_exowin9xScan', label: t('SCAN EXOWIN9X GAMES'), type: 'toggle', settingName: 'global.exowin9xScan', settingType: 'bool' },
+            { id: 'global_exowin9xPath', label: t('EXOWIN9X EXECUTABLE PATH'), type: 'input', settingName: 'global.exowin9xPath', settingType: 'string', description: t('Path to the folder where ExoWin9x is located, mandatory for RetroBat to be able to scan ExoWin9x games.') },
+            { id: 'global_agsPath', label: t('AGS EXECUTABLE PATH'), type: 'input', settingName: 'global.agsPath', settingType: 'string', description: t('Path to the folder where AGS WinUAE is located, if filled RetroBat will add ags launcher to amiga system.') }
+          ]},
+          { id: 'group_compression', label: t('COMPRESSION'), type: 'group' },
+          { id: 'decompressedfolders', label: t('DECOMPRESSION'), type: 'select', settingName: 'decompressedfolders', description: t('Keep or delete games files once extracted (squashfs, 7z)'), options: [
+            { label: t('AUTOMÁTICO'), value: 'ask' },
+            { label: t('KEEP'), value: 'keep' },
+            { label: t('DELETE'), value: 'delete' }
+          ]},
+          { id: 'decompressedpath', label: t('DECOMPRESSION PATH'), type: 'input', settingName: 'decompressedpath', settingType: 'string', description: t('Change path for decompressed games (default is roms/.uncompressed).') },
+          { id: 'nevermount', label: t('NEVER TRY TO MOUNT AS DRIVE'), type: 'toggle', settingName: 'nevermount', settingType: 'bool', description: t('Always decompress archives, even if dokan could be used to mount as a drive letter.') },
+          { id: 'group_controls', label: t('CONTROLS'), type: 'group' },
+          { id: 'special_controllers_submenu', label: t('SPECIAL CONTROLLERS'), submenu: [
+            { id: 'analogDpad', label: t('DPAD AS ANALOG'), type: 'toggle', settingName: 'analogDpad', settingType: 'bool' },
+            { id: 'n64_special_trigger', label: t('N64 TRIGGER INVERT'), type: 'toggle', settingName: 'n64_special_trigger', settingType: 'bool', description: t('For n64 controllers with 2 triggers, use R2 instead of L2 as Z button.') },
+            { id: 'ps_controller_enhanced', label: t('PS4/PS5 ENHANCED'), type: 'toggle', settingName: 'ps_controller_enhanced', settingType: 'bool', description: t('Enable enhanced features for DS4 and DualSense, this will break compatibility with emulators using dinput until switch off.') }
+          ]},
+          { id: 'group_guns', label: t('GUNS'), type: 'group' },
+          { id: 'sinden_submenu', label: t('SINDEN'), submenu: [
+            { id: 'global_sindenJoyMode', label: t('SINDEN BUTTONS CONFIGURATION'), type: 'select', settingName: 'global.sindenJoyMode', description: t('Define how to configure Sinden Gun.'), options: [
+              { label: t('STANDARD'), value: 'standard' },
+              { label: t('GAMEPAD MODE'), value: 'joypad' },
+              { label: t('NO CONFIGURATION'), value: 'none' }
+            ]},
+            { id: 'sindenKill', label: t('KILL SINDEN SOFTWARE'), type: 'toggle', settingName: 'sindenKill', settingType: 'bool', description: t('When using a Sinden gun, kill the Lightgun software when game ends.') }
+          ]},
+          { id: 'wiimote_submenu', label: t('WIIMOTE'), submenu: [
+            { id: 'WiimoteMode', label: t('WIIMOTE CONNECTION MODE'), type: 'select', settingName: 'WiimoteMode', description: t('Define how your wiimote is connected to the DolphinBar.'), options: [
+              { label: t('MODE 2 (NORMAL)'), value: 'normal' },
+              { label: t('MODE 2 (GAME)'), value: 'game' },
+              { label: t('MODE 4 (WIIMOTEGUN)'), value: 'wiimotegun' }
+            ]},
+            { id: 'WiimoteKbOrder', label: t('WIIMOTE FIX ASSOCIATION'), type: 'toggle', settingName: 'WiimoteKbOrder', settingType: 'bool', description: t('For some emulators, can be used to fix wiimote keyboard and mouse association when using 2 wiimotes.') }
+          ]},
+          { id: 'group_retroarch', label: t('RETROARCH OPTIONS'), type: 'group' },
+          { id: 'video_submenu', label: t('VÍDEO'), submenu: [
+            { id: 'RotateScreen', label: t('SCREEN ORIENTATION'), type: 'select', settingName: 'RotateScreen', description: t('This setting will rotate your windows desktop, it will not be set back when exiting game.'), options: [
+              { label: t('Normal'), value: '0' },
+              { label: '90°', value: '1' },
+              { label: '180°', value: '2' },
+              { label: '270°', value: '3' }
+            ]},
+            { id: 'RotateVideo', label: t('VIDEO ROTATION'), type: 'select', settingName: 'RotateVideo', options: [
+              { label: t('Normal'), value: '0' },
+              { label: '90°', value: '1' },
+              { label: '180°', value: '2' },
+              { label: '270°', value: '3' }
+            ]},
+            { id: 'MonitorIndex', label: t('MONITOR INDEX'), type: 'select', settingName: 'MonitorIndex', description: t('Games will be displayed on the monitor corresponding to the selected index.'), options: Array.from({ length: 11 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'GPUIndex', label: t('GRAPHIC CARD INDEX'), type: 'select', settingName: 'GPUIndex', description: t('Change this only if multiple GPU are used by your system.'), options: Array.from({ length: 5 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'CRTSwitch', label: t('CRT SCREEN OUTPUT'), type: 'select', settingName: 'CRTSwitch', options: [
+              { label: t('OFF'), value: '0' },
+              { label: '15KHz', value: '1' },
+              { label: '31KHz (Standard)', value: '2' },
+              { label: '31KHz (120Hz)', value: '3' },
+              { label: t('FROM INI FILE'), value: '4' }
+            ]},
+            { id: 'CRTSuperRes', label: t('CRT SCREEN RESOLUTION'), type: 'select', settingName: 'CRTSuperRes', options: [
+              { label: t('Native'), value: '0' },
+              { label: t('Dynamic'), value: '1' },
+              { label: '1920', value: '1920' },
+              { label: '2560', value: '2560' },
+              { label: '3840', value: '3840' }
+            ]},
+            { id: 'enable_hdr', label: t('ENABLE HDR'), type: 'toggle', settingName: 'enable_hdr', settingType: 'bool', description: t('Enable HDR for HDR-compatible displays.') },
+            { id: 'video_scale_integer_scaling', label: t('INTEGER SCALE TYPE'), type: 'select', settingName: 'video_scale_integer_scaling', options: [
+              { label: t('UNDERSCALE'), value: '0' },
+              { label: t('OVERSCALE'), value: '1' },
+              { label: t('SMART'), value: '2' }
+            ]}
+          ]},
+          { id: 'visual_rendering_submenu', label: t('VISUAL RENDERING'), submenu: [
+            { id: 'use_shader_override', label: t('ALLOW GAME/CORE SHADERS OVERRIDE'), type: 'toggle', settingName: 'use_shader_override', settingType: 'bool', description: t('Enable this to enable shaders even when RetroBat has no shader set.') }
+          ]},
+          {
+            id: 'screen_sync_submenu',
+            label: t('SCREEN SYNC'),
+            description: t('G-SYNC/FREESYNC COMPATIBILITY') + ' : ' + (getSetting('vrr_runloop_enable', 'false') === 'true' ? t('LIGADO') : t('DESLIGADO')),
+            submenu: [
+              { id: 'vrr_runloop_enable', label: t('G-SYNC/FREESYNC COMPATIBILITY'), type: 'toggle', settingName: 'vrr_runloop_enable', settingType: 'bool', description: t('Sync to exact content framerate. Only for G-Sync/FreeSync/HDMI-2.1-VRR compatible monitors.') },
+              { id: 'video_vsync', label: t('VERTICAL SYNC'), type: 'select', settingName: 'video_vsync', options: [
+                { label: t('NÃO'), value: 'false' },
+                { label: t('SIM'), value: 'true' },
+                { label: t('ADAPTATIVE'), value: 'adaptative' }
+              ]},
+              { id: 'video_hard_sync', label: t('HARD SYNC'), type: 'select', settingName: 'video_hard_sync', description: t('Only compatible with OpenGL, hard-sync GPU and CPU. Reduce latency at the cost of inscreased performance requirements.'), options: [
+                { label: t('NÃO'), value: 'false' },
+                { label: '0 frame', value: '0' },
+                { label: '1 frame', value: '1' },
+                { label: '2 frames', value: '2' },
+                { label: '3 frames', value: '3' }
+              ]},
+              { id: 'video_swap_interval', label: t('SWAP INTERVAL'), type: 'select', settingName: 'video_swap_interval', description: t('Set this to effectively halve monitor refresh rate.'), options: [
+                { label: '1', value: '1' },
+                { label: '2', value: '2' },
+                { label: '3', value: '3' },
+                { label: '4', value: '4' }
+              ]},
+              { id: 'video_black_frame_insertion', label: t('BLACK FRAMES INSERTION'), type: 'select', settingName: 'video_black_frame_insertion', description: t('Useful on some high refresh rate screen to eliminate ghosting.'), options: [
+                { label: '1', value: '1' },
+                { label: '2', value: '2' },
+                { label: '3', value: '3' },
+                { label: '4', value: '4' }
+              ]},
+              { id: 'video_max_swapchain_images', label: t('MAX SWAP CHAIN IMAGES'), type: 'select', settingName: 'video_max_swapchain_images', description: t('Vulkan only: tells the video driver to use a specified buffering mode.'), options: [
+                { label: '2', value: '2' },
+                { label: '3', value: '3' },
+                { label: '4', value: '4' }
+              ]}
+            ]
+          },
+          { id: 'audio_submenu', label: t('AUDIO'), submenu: [
+            { id: 'audio_resampler', label: t('RESAMPLER'), type: 'select', settingName: 'audio_resampler', options: [
+              { label: 'sinc', value: 'sinc' },
+              { label: 'CC', value: 'CC' },
+              { label: 'nearest', value: 'nearest' },
+              { label: t('NONE'), value: 'null' }
+            ]},
+            { id: 'audio_resampler_quality', label: t('QUALITY'), type: 'select', settingName: 'audio_resampler_quality', options: [
+              { label: t('Lowest'), value: '1' },
+              { label: t('Lower'), value: '2' },
+              { label: t('Normal'), value: '3' },
+              { label: t('Higher'), value: '4' },
+              { label: t('Highest'), value: '5' }
+            ]},
+            { id: 'audio_volume', label: t('VOLUME GAIN'), type: 'slider', settingName: 'audio_volume', settingType: 'int', min: -80, max: 12, step: 2, suffix: ' dB' },
+            { id: 'audio_mixer_volume', label: t('MIXER VOLUME GAIN'), type: 'slider', settingName: 'audio_mixer_volume', settingType: 'int', min: -80, max: 12, step: 2, suffix: ' dB' },
+            { id: 'audio_dsp_plugin', label: t('DSP PLUGIN'), type: 'select', settingName: 'audio_dsp_plugin', options: [
+              { label: t('NONE'), value: 'none' },
+              { label: t('BASS BOOST'), value: ':\\filters\\audio\\BassBoost.dsp' },
+              { label: t('CHIPTUNE ENHANCE'), value: ':\\filters\\audio\\ChipTuneEnhance.dsp' },
+              { label: t('CHORUS'), value: ':\\filters\\audio\\Chorus.dsp' },
+              { label: t('CRYSTALIZER'), value: ':\\filters\\audio\\Crystalizer.dsp' },
+              { label: t('ECHO'), value: ':\\filters\\audio\\Echo.dsp' },
+              { label: t('ECHO REVERB'), value: ':\\filters\\audio\\EchoReverb.dsp' },
+              { label: t('EQ'), value: ':\\filters\\audio\\EQ.dsp' },
+              { label: t('HIGH SHELF DAMPEN'), value: ':\\filters\\audio\\HighShelfDampen.dsp' },
+              { label: t('IIR'), value: ':\\filters\\audio\\IIR.dsp' },
+              { label: t('LOW PASS CPS'), value: ':\\filters\\audio\\LowPassCPS.dsp' },
+              { label: t('MONO'), value: ':\\filters\\audio\\Mono.dsp' },
+              { label: t('PANNING'), value: ':\\filters\\audio\\Panning.dsp' },
+              { label: t('PHASER'), value: ':\\filters\\audio\\Phaser.dsp' },
+              { label: t('REVERB'), value: ':\\filters\\audio\\Reverb.dsp' },
+              { label: t('TREMOLO'), value: ':\\filters\\audio\\Tremolo.dsp' },
+              { label: t('VIBRATO'), value: ':\\filters\\audio\\Vibrato.dsp' },
+              { label: t('WAHWAH'), value: ':\\filters\\audio\\WahWah.dsp' }
+            ]},
+            { id: 'audio_sync', label: t('AUDIO SYNC'), type: 'toggle', settingName: 'audio_sync', settingType: 'bool' }
+          ]},
+          { id: 'emulation_submenu', label: t('EMULATION'), submenu: [
+            { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'rewind', settingType: 'bool' },
+            { id: 'global_fastforward_ratio', label: t('FAST FORWARD RATIO'), type: 'slider', settingName: 'global.fastforward_ratio', settingType: 'int', min: 0, max: 50, step: 1, suffix: 'x' },
+            { id: 'fastforward_toggle', label: t('FAST FORWARD BEHAVIOR'), type: 'select', settingName: 'fastforward_toggle', description: t('Define whether the fast-forward shortcuts acts as a toggle or needs to be held.'), options: [
+              { label: t('HOLD'), value: '0' },
+              { label: t('TOGGLE'), value: '1' }
+            ]},
+            { id: 'global_applyPatch', label: t('SOFTPATCHING'), type: 'select', settingName: 'global.applyPatch', description: t('Define if patch should be applied and where patch files are located, AUTO will apply patches if they are located near rom with same name as rom file.'), options: [
+              { label: t('DISABLED'), value: 'none' },
+              { label: t('PATCH IN PATCH SUBFOLDER'), value: 'patchFolder' },
+              { label: t('PATCH IN ROM SUBFOLDER'), value: 'subFolder' }
+            ]},
+            { id: 'game_specific_options', label: t('ALLOW GAME/CORE OPTIONS OVERRIDE'), type: 'toggle', settingName: 'game_specific_options', settingType: 'bool', description: t('By default, RetroBat discards core specific option files.') }
+          ]},
+          { id: 'latency_reduction_submenu', label: t('REDUÇÃO DE LATÊNCIA'), submenu: [
+            { id: 'runahead', label: t('RUN-AHEAD FRAMES'), type: 'slider', settingName: 'runahead', settingType: 'int', min: 0, max: 12, step: 1, suffix: ' f' },
+            { id: 'preemptive_frames', label: t('USE PREEMPTIVE FRAMES'), type: 'toggle', settingName: 'preemptive_frames', settingType: 'bool', description: t('Use preemptive frames instead of run-ahead, the run-ahead frame number applies.') },
+            { id: 'secondinstance', label: t('RUN-AHEAD USE SECOND INSTANCE'), type: 'toggle', settingName: 'secondinstance', settingType: 'bool' },
+            { id: 'video_frame_delay_auto', label: t('AUTOMATIC FRAME DELAY'), type: 'toggle', settingName: 'video_frame_delay_auto', settingType: 'bool', description: t('Automatically decrease frame delay temporarily to prevent frame drops. Turn off if this worsens audio/video stuttering.') },
+            { id: 'input_poll_type_behavior', label: t('INPUT POLLING BEHAVIOUR'), type: 'select', settingName: 'input_poll_type_behavior', description: t('Depending on the configuration, can increase or decrease latency.'), options: [
+              { label: t('EARLY'), value: '0' },
+              { label: t('NORMAL'), value: '1' },
+              { label: t('LATE'), value: '2' }
+            ]}
+          ]},
+          { id: 'ai_translation_submenu', label: t('TRADUÇÃO DO TEXTO DO JOGO POR IA'), submenu: [
+            { id: 'ai_service_enabled', label: t('ENABLE AI TRANSLATION SERVICE'), type: 'toggle', settingName: 'ai_service_enabled', settingType: 'bool' },
+            { id: 'ai_target_lang', label: t('TARGET LANGUAGE'), type: 'select', settingName: 'ai_target_lang', options: [
+              { label: 'Dansk', value: 'Da' },
+              { label: 'Deutsch', value: 'De' },
+              { label: 'English', value: 'En' },
+              { label: 'Español', value: 'Es' },
+              { label: 'Français', value: 'Fr' },
+              { label: 'Hrvatski', value: 'Hr' },
+              { label: 'Italiano', value: 'It' },
+              { label: 'Magyar', value: 'Hu' },
+              { label: 'Nederlands', value: 'Nl' },
+              { label: 'Norsk', value: 'Nn' },
+              { label: 'Polski', value: 'Po' },
+              { label: 'Português', value: 'Pt' },
+              { label: 'Română', value: 'Ro' },
+              { label: 'Svenska', value: 'Sv' },
+              { label: 'Türkçe', value: 'Tr' },
+              { label: 'Čeština', value: 'Cs' },
+              { label: 'Ελληνικά (Greek)', value: 'El' },
+              { label: 'Русский (Russian)', value: 'Ru' },
+              { label: '日本語 (Japanese)', value: 'Ja' },
+              { label: '简体中文 (Chinese)', value: 'Zh' },
+              { label: '한국어 (Korean)', value: 'Ko' }
+            ]},
+            { id: 'ai_service_url', label: t('AI TRANSLATION SERVICE URL'), type: 'input', settingName: 'ai_service_url', settingType: 'string' },
+            { id: 'ai_service_pause', label: t('PAUSE ON TRANSLATED SCREEN'), type: 'toggle', settingName: 'ai_service_pause', settingType: 'bool' }
+          ]},
+          {
+            id: 'ui_elements_submenu',
+            label: t('INTERFACE DO USUÁRIO'),
+            description: t('SHOW MENU ELEMENTS') + ' : ' + String(getSetting('OptionsMenu', 'full')).toUpperCase(),
+            submenu: [
+              { id: 'OptionsMenu', label: t('SHOW MENU ELEMENTS'), type: 'select', settingName: 'OptionsMenu', description: t('Show or hide RetroArch settings. Auto is the recommended setting.'), options: [
+                { label: t('minimal'), value: 'minimal' },
+                { label: t('full'), value: 'full' }
+              ]},
+              { id: 'OnScreenMsg', label: t('NOTIFICATIONS'), type: 'toggle', settingName: 'OnScreenMsg', settingType: 'bool', description: t('Display or not on-screen notifications.') },
+              { id: 'DrawStats', label: t('DRAW STATISTICS'), type: 'select', settingName: 'DrawStats', description: t('Display different level of information about performance statistics.'), options: [
+                { label: t('FPS ONLY'), value: 'fps_only' },
+                { label: t('MEMORY USAGE ONLY'), value: 'mem_only' },
+                { label: t('FPS + MEMORY USAGE'), value: 'fps_mem' },
+                { label: t('TECHNICAL STATS'), value: 'tech_stats' }
+              ]},
+              { id: 'PressTwice', label: t('PRESS HOTKEYS TWICE TO EXIT'), type: 'toggle', settingName: 'PressTwice', settingType: 'bool' },
+              { id: 'input_menu_toggle_gamepad_combo', label: t('GAMEPAD MENU COMBO'), type: 'select', settingName: 'input_menu_toggle_gamepad_combo', options: [
+                { label: t('NONE'), value: '0' },
+                { label: 'DOWN+Y+R1+L1', value: '1' },
+                { label: 'L3+R3', value: '2' },
+                { label: 'L3+R1', value: '5' },
+                { label: 'L1+R1', value: '6' },
+                { label: 'HOLD START', value: '7' },
+                { label: 'HOLD SELECT', value: '8' },
+                { label: 'L2+R2', value: '10' }
+              ]},
+              { id: 'discord', label: t('DISCORD RICH PRESENCE'), type: 'toggle', settingName: 'discord', settingType: 'bool', description: t('Enable Discord Rich Presence service, this will update Discord status to show the games being played.') }
+            ]
+          },
+          {
+            id: 'drivers_submenu',
+            label: t('DRIVERS'),
+            description: t('VÍDEO') + ' : ' + String(getSetting('video_driver', 'vulkan')).toUpperCase(),
+            submenu: [
+              { id: 'video_driver', label: t('VÍDEO'), type: 'select', settingName: 'video_driver', description: t('The driver vulkan will generally offer better performance if hardware compatible. Some libretro cores will force the choosen driver.'), options: [
+                { label: 'opengl', value: 'gl' },
+                { label: 'opengl core', value: 'glcore' },
+                { label: 'directx 12', value: 'd3d12' },
+                { label: 'directx 11', value: 'd3d11' },
+                { label: 'directx 10', value: 'd3d10' },
+                { label: 'directx 9', value: 'd3d9' },
+                { label: 'vulkan', value: 'vulkan' }
+              ]},
+              { id: 'audio_driver', label: t('AUDIO'), type: 'select', settingName: 'audio_driver', description: t('Choose the audio driver compatible with the hardware.'), options: [
+                { label: 'xaudio', value: 'xaudio' },
+                { label: 'directsound', value: 'dsound' },
+                { label: 'SDL', value: 'sdl2' },
+                { label: 'wasapi', value: 'wasapi' }
+              ]},
+              { id: 'input_driver', label: t('CONTROLLERS'), type: 'select', settingName: 'input_driver', description: t('The driver xinput will enable features like rumble effects. Choose sdl for compatibility with a wide range of controllers.'), options: [
+                { label: 'SDL', value: 'sdl2' },
+                { label: 'XINPUT', value: 'xinput' },
+                { label: 'DINPUT', value: 'dinput' }
+              ]}
+            ]
+          },
+          { id: 'controls_submenu', label: t('CONTROLS'), submenu: [
+            { id: 'pause_on_disconnect', label: t('PAUSE ON DISCONNECT'), type: 'toggle', settingName: 'pause_on_disconnect', settingType: 'bool' },
+            { id: 'analog_deadzone', label: t('ANALOG DEADZONE'), type: 'select', settingName: 'analog_deadzone', description: t('Ignore analog stick movement below this threshold.'), options: Array.from({ length: 11 }, (_, i) => {
+              const val = (i * 0.1).toFixed(1)
+              return { label: val, value: val }
+            })},
+            { id: 'analog_sensitivity', label: t('ANALOG SENSITIVITY'), type: 'select', settingName: 'analog_sensitivity', description: t('Sets the sensitivity of the analog sticks.'), options: Array.from({ length: 11 }, (_, i) => {
+              const val = String(i - 5)
+              return { label: val, value: val }
+            })},
+            { id: 'keyboard_arcade', label: t('CONFIGURE SPECIAL KEYBOARD STICK'), type: 'select', settingName: 'keyboard_arcade', description: t('use this option when using a pad recognized as keyboard (ipac, etc.)'), options: [
+              { label: t('NONE'), value: 'null' },
+              { label: 'IPAC2', value: 'ipac2' },
+              { label: 'X-ARCADE TANKSTICK', value: 'tankstick' }
+            ]},
+            { id: 'arcade_stick', label: t('USE CUSTOM ARCADE STICK MAPPING'), type: 'toggle', settingName: 'arcade_stick', settingType: 'bool', description: t('Allows you to perform a dedicated mapping for your arcade stick based in arcade_sticks.json file.') },
+            { id: 'revertXIndex', label: t('SWITCH XINPUT INDEX'), type: 'toggle', settingName: 'revertXIndex', settingType: 'bool', description: t('Enable this if XInput controllers index are switched.') },
+            { id: 'p1_stick_index', label: t('FORCE ARCADE STICK INDEX P1'), type: 'select', settingName: 'p1_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'p2_stick_index', label: t('FORCE ARCADE STICK INDEX P2'), type: 'select', settingName: 'p2_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'buttonTrigger', label: t('USE BUTTON FOR TRIGGER'), type: 'toggle', settingName: 'buttonTrigger', settingType: 'bool', description: t('Force button instead of axis for triggers, can help with Sony controllers.') }
+          ]},
+          { id: 'guns_submenu', label: t('GUNS'), submenu: [
+            { id: 'p1_gunIndex', label: t('P1 MOUSE/GUN INDEX'), type: 'select', settingName: 'p1_gunIndex', description: t('Define mouse index to use for player 1.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'p2_gunIndex', label: t('P2 MOUSE/GUN INDEX'), type: 'select', settingName: 'p2_gunIndex', description: t('Define mouse index to use for player 2.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'p3_gunIndex', label: t('P3 MOUSE/GUN INDEX'), type: 'select', settingName: 'p3_gunIndex', description: t('Define mouse index to use for player 3.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'p4_gunIndex', label: t('P4 MOUSE/GUN INDEX'), type: 'select', settingName: 'p4_gunIndex', description: t('Define mouse index to use for player 4.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) }
+          ]},
+          { id: 'group_system_settings', label: t('AJUSTES DE SISTEMA'), type: 'group' },
+          { id: 'advanced_system_settings', label: t('CONFIGURAÇÃO AVANÇADA POR SISTEMA'), submenu: [] }
         ]
       },
       {
@@ -727,14 +1097,15 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           setActiveMenuStack(prev => [...prev, { items: item.submenu!, title: item.label }])
           setSelectedIndex(0)
         } else if (item.type === 'select' && item.options) {
-          const currentSettingVal = String(item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!))
-          const activeIndex = item.options.findIndex(opt => String(opt.value) === currentSettingVal)
+          const currentSettingVal = item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)
+          const activeIndex = item.options.findIndex(opt => isOptionMatch(opt.value, currentSettingVal))
 
           // Convert options to a temporary submenu
           const optionsSubmenu: MenuItem[] = item.options.map(opt => ({
             id: `opt_${opt.value}`,
             label: opt.label.toUpperCase(),
             type: 'action',
+            description: opt.description,
             onClick: () => {
               if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName!, opt.value)
               else updateSetting(item.settingName!, opt.value)
@@ -831,12 +1202,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     }
     if (item.type === 'select') {
       const currentVal = currentSettingVal !== undefined ? currentSettingVal : item.options?.[0]?.value
-      const label = item.options?.find(o => o.value === currentVal)?.label || currentVal
+      const label = item.options?.find(o => isOptionMatch(o.value, currentVal))?.label || currentVal
       return (
         <div className="menu-select">
-          <span className="arrow">«</span>
+          <span className="arrow">◁</span>
           <span className="value">{label}</span>
-          <span className="arrow">»</span>
+          <span className="arrow">▷</span>
         </div>
       )
     }
@@ -904,14 +1275,28 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             {isMainMenu ? (
               <div className="riescade-menu-label-container">
                 <span className="riescade-menu-icon" id={item.id}></span>
+                <div className="riescade-menu-text-container">
+                  <span className="riescade-menu-label">
+                    {item.label}
+                  </span>
+                  {item.description && (
+                    <span className="riescade-menu-description">
+                      {item.description}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="riescade-menu-text-container">
                 <span className="riescade-menu-label">
                   {item.label}
                 </span>
+                {item.description && (
+                  <span className="riescade-menu-description">
+                    {item.description}
+                  </span>
+                )}
               </div>
-            ) : (
-              <span className="riescade-menu-label">
-                {item.label}
-              </span>
             )}
             <div className="riescade-menu-value">{renderItemValue(item)}</div>
           </div>
@@ -997,6 +1382,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .riescade-menu-label { font-weight: 500; font-size: 0.95rem; text-transform: uppercase; }
         .riescade-menu-item.selected .riescade-menu-label { font-weight: 800; }
         .riescade-menu-label-container { display: flex; align-items: center; gap: 10px; }
+        .riescade-menu-text-container { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; }
+        .riescade-menu-description { font-size: 0.75rem; color: #777; font-weight: 400; text-transform: none; line-height: 1.3; margin-top: 2px; }
+        .riescade-menu-item.selected .riescade-menu-description { color: rgba(255, 255, 255, 0.8); }
         .riescade-menu-icon { display: inline-block; width: 2.2em; height: 2em; background-size: contain; background-repeat: no-repeat; background-position: center; }
         .riescade-menu-group { padding: 20px 30px 10px; color: #888; font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .riescade-menu-footer { background: #ddd; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; }

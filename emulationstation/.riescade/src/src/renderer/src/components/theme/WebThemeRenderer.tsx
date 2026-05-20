@@ -10,6 +10,7 @@ interface Props {
   themePath: string
   menuItemsNode?: React.ReactNode
   isLaunchingView?: boolean
+  isTransitioning?: boolean
   onReady?: () => void
 }
 
@@ -31,7 +32,7 @@ const styleStringToObject = (styleString: string) => {
   }, {} as any)
 }
 
-export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false, onReady }) => {
+export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false, isTransitioning = false, onReady }) => {
   const [cssMap, setCssMap] = useState<Record<string, string>>({})
   const [cssLoaded, setCssLoaded] = useState(!isLaunchingView)
 
@@ -383,6 +384,26 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       }
 
       const children = Array.from(el.childNodes).map((child, i) => convertNode(child, `${index}-${i}`))
+      let finalChildren = children
+
+      if (isLaunchingView) {
+        const hasHide = el.hasAttribute('hideloadingelement') || el.hasAttribute('hideLoadingElement')
+        const keepTextVal = el.getAttribute('keeploadingelementtext') || el.getAttribute('keepLoadingElementText')
+
+        if (hasHide) {
+          const existingStyle = props.style || {}
+          props.style = {
+            ...existingStyle,
+            transition: 'opacity 0.5s ease-in-out',
+            opacity: isTransitioning ? 0 : (existingStyle.opacity !== undefined ? existingStyle.opacity : 1),
+            pointerEvents: isTransitioning ? 'none' : (existingStyle.pointerEvents || 'auto')
+          }
+        }
+
+        if (keepTextVal && isTransitioning) {
+          finalChildren = [keepTextVal]
+        }
+      }
       
       const { key: _, ...restProps } = props
 
@@ -428,14 +449,14 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         return React.createElement(reactTagName, props)
       }
 
-      return React.createElement(reactTagName, props, children.length > 0 ? children : undefined)
+      return React.createElement(reactTagName, props, finalChildren.length > 0 ? finalChildren : undefined)
     }
 
     const headChildren = Array.from(doc.head.childNodes).map((child, i) => convertNode(child, `h-${i}`))
     const bodyChildren = Array.from(doc.body.childNodes).map((child, i) => convertNode(child, `b-${i}`))
 
     return [...headChildren, ...bodyChildren]
-  }, [htmlContent, data, themePath, menuItemsNode, isLaunchingView, cssMap])
+  }, [htmlContent, data, themePath, menuItemsNode, isLaunchingView, cssMap, isTransitioning])
 
   if (!cssLoaded) return null; // Wait for CSS to be fully fetched before returning any DOM
 

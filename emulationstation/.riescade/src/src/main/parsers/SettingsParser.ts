@@ -109,11 +109,13 @@ export class SettingsParser {
       jsonObj.config[t] = jsonObj.config[t].filter((item: any) => item['@_name'] !== name)
     })
 
-    // Add new
-    jsonObj.config[type].push({
-      '@_name': name,
-      '@_value': String(value)
-    })
+    // Add new (only if value is not null, undefined, empty, or string "null")
+    if (value !== null && value !== undefined && String(value) !== '' && String(value) !== 'null') {
+      jsonObj.config[type].push({
+        '@_name': name,
+        '@_value': String(value)
+      })
+    }
 
     try {
       const xmlContent = '<?xml version="1.0"?>\n' + this.builder.build(jsonObj)
