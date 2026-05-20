@@ -46,6 +46,8 @@ interface MenuItem {
   suffix?: string
   isPassword?: boolean
   showCount?: boolean
+  tabs?: string[]
+  tab?: number
 }
 
 interface MenuProps {
@@ -61,7 +63,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
   const [themes, setThemes] = useState<string[]>([])
-  const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string }[]>([])
+  const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string; tabs?: string[]; activeTab?: number }[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
   const [showInputConfig, setShowInputConfig] = useState(false)
@@ -75,7 +77,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [needsReload, setNeedsReload] = useState(false)
 
   const getSetting = (name: string, fallback: any = ''): any => {
-    return (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value) ?? fallback
+    let val = (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value)
+    if (val === undefined || val === null || val === '') {
+      if (name.endsWith('.emulator')) {
+        return 'auto'
+      }
+    }
+    return val ?? fallback
   }
 
   const currentLang = getSetting('Language', 'en_US')
@@ -125,7 +133,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       baseSystems = baseSystems.filter(s => s.name !== 'collections')
     }
 
-    return baseSystems
+    return baseSystems.filter(s => s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware')
   }, [allSystems, pendingSettings, settings])
 
   const getFriendlySystemName = (sys: any) => {
@@ -273,13 +281,27 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ? getThemeSetting(item.settingName, fallback)
         : getSetting(item.settingName, fallback)
       
+      // Special logic for DisabledManualScrapers (semicolon separated list of disabled scrapers)
+      if (item.settingName === 'DisabledManualScrapers' && item.value !== undefined) {
+        const values = String(current || '').split(';').filter(v => v.trim() !== '')
+        const isExcluded = values.includes(item.value)
+        let newValues: string[]
+        if (isExcluded) {
+          newValues = values.filter(v => v !== item.value)
+        } else {
+          newValues = [...values, item.value]
+        }
+        updateSetting(item.settingName, newValues.join(';'))
+        return
+      }
+
       // Special logic for multi-value strings (comma separated)
       if (item.type === 'toggle' && item.value !== undefined && !item.settingType) {
         const values = String(current || '').split(',').filter(v => v.trim() !== '')
         
-        // Special logic for VisibleSystems: if empty, it means ALL are selected
+        // Special logic for VisibleSystems/ScraperSystems: if empty, it means ALL are selected
         let currentValues = values
-        if (item.settingName === 'VisibleSystems' && values.length === 0) {
+        if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && values.length === 0) {
           currentValues = allSystems.map((s: any) => s.name)
         }
 
@@ -293,7 +315,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
         
         // If all systems are selected, we can save an empty string to keep config clean
-        if (item.settingName === 'VisibleSystems' && newValues.length === allSystems.length) {
+        if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && newValues.length === allSystems.length) {
           updateSetting(item.settingName, '')
         } else {
           updateSetting(item.settingName, newValues.join(','))
@@ -347,6 +369,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'cheevos_user', label: t('USUÁRIO'), type: 'input', settingName: 'global.cheevos.username', settingType: 'string' },
             { id: 'cheevos_pass', label: t('SENHA'), type: 'input', settingName: 'global.cheevos.password', settingType: 'string', isPassword: true },
           ]},
+          { id: 'netplay_submenu', label: t('NETPLAY SETTINGS'), submenu: [
+            { id: 'netplay_enable', label: t('ENABLE NETPLAY'), type: 'toggle', settingName: 'global.netplay', settingType: 'bool' },
+            { id: 'netplay_nickname', label: t('NICKNAME'), type: 'input', settingName: 'global.netplay.nickname', settingType: 'string' },
+            { id: 'netplay_port', label: t('PORT'), type: 'input', settingName: 'global.netplay.port', settingType: 'string' }
+          ]},
+          { id: 'group_bios', label: t('BIOS SETTINGS'), type: 'group' },
+          { id: 'missing_bios_submenu', label: t('MISSING BIOS CHECK'), submenu: [
+            { id: 'no_missing_bios', label: t('NO MISSING BIOS FILES'), type: 'info', value: '' }
+          ]},
+          { id: 'check_bios_launch', label: t('CHECK BIOS FILES BEFORE RUNNING A GAME'), type: 'toggle', settingName: 'CheckBiosesAtLaunch', settingType: 'bool' },
           { id: 'group_autosave', label: t('ESTADOS DE SALVAMENTO'), type: 'group' },
           { id: 'autosave', label: t('SALVAR/CARREGAR AUTOMÁTICO'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool', description: t('Carrega o estado de salvamento mais recente ao iniciar o jogo e salva o estado ao sair do jogo.') },
           { 
@@ -417,6 +449,18 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             ]},
             { id: 'global_resize_tattoo', label: t('REDIMENSIONAR SOBREPOSIÇÃO'), type: 'toggle', settingName: 'global.resize_tattoo', settingType: 'bool', description: t('Reduz/expande a sobreposição para caber na borda da moldura.') }
           ]},
+          {
+            id: 'global_videomode',
+            label: t('VIDEO MODE'),
+            type: 'select',
+            settingName: 'global.videomode',
+            options: [
+              { label: t('AUTO'), value: 'auto' },
+              { label: '1080p 60Hz', value: '1920x1080@60' },
+              { label: '1080p 50Hz', value: '1920x1080@50' },
+              { label: '720p 60Hz', value: '1280x720@60' }
+            ]
+          },
           { id: 'game_ratio', label: t('GAME ASPECT RATIO'), type: 'select', settingName: 'global.ratio', options: [
             { label: t('AUTO'), value: 'auto' }, { label: '4/3', value: '4/3' }, { label: '16/9', value: '16/9' },
             { label: '16/10', value: '16/10' }, { label: 'FULL', value: 'full' }
@@ -462,31 +506,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'decompressedpath', label: t('DECOMPRESSION PATH'), type: 'input', settingName: 'decompressedpath', settingType: 'string', description: t('Change path for decompressed games (default is roms/.uncompressed).') },
           { id: 'nevermount', label: t('NEVER TRY TO MOUNT AS DRIVE'), type: 'toggle', settingName: 'nevermount', settingType: 'bool', description: t('Always decompress archives, even if dokan could be used to mount as a drive letter.') },
-          { id: 'group_controls', label: t('CONTROLS'), type: 'group' },
-          { id: 'special_controllers_submenu', label: t('SPECIAL CONTROLLERS'), submenu: [
-            { id: 'analogDpad', label: t('DPAD AS ANALOG'), type: 'toggle', settingName: 'analogDpad', settingType: 'bool' },
-            { id: 'n64_special_trigger', label: t('N64 TRIGGER INVERT'), type: 'toggle', settingName: 'n64_special_trigger', settingType: 'bool', description: t('For n64 controllers with 2 triggers, use R2 instead of L2 as Z button.') },
-            { id: 'ps_controller_enhanced', label: t('PS4/PS5 ENHANCED'), type: 'toggle', settingName: 'ps_controller_enhanced', settingType: 'bool', description: t('Enable enhanced features for DS4 and DualSense, this will break compatibility with emulators using dinput until switch off.') }
-          ]},
-          { id: 'group_guns', label: t('GUNS'), type: 'group' },
-          { id: 'sinden_submenu', label: t('SINDEN'), submenu: [
-            { id: 'global_sindenJoyMode', label: t('SINDEN BUTTONS CONFIGURATION'), type: 'select', settingName: 'global.sindenJoyMode', description: t('Define how to configure Sinden Gun.'), options: [
-              { label: t('STANDARD'), value: 'standard' },
-              { label: t('GAMEPAD MODE'), value: 'joypad' },
-              { label: t('NO CONFIGURATION'), value: 'none' }
-            ]},
-            { id: 'sindenKill', label: t('KILL SINDEN SOFTWARE'), type: 'toggle', settingName: 'sindenKill', settingType: 'bool', description: t('When using a Sinden gun, kill the Lightgun software when game ends.') }
-          ]},
-          { id: 'wiimote_submenu', label: t('WIIMOTE'), submenu: [
-            { id: 'WiimoteMode', label: t('WIIMOTE CONNECTION MODE'), type: 'select', settingName: 'WiimoteMode', description: t('Define how your wiimote is connected to the DolphinBar.'), options: [
-              { label: t('MODE 2 (NORMAL)'), value: 'normal' },
-              { label: t('MODE 2 (GAME)'), value: 'game' },
-              { label: t('MODE 4 (WIIMOTEGUN)'), value: 'wiimotegun' }
-            ]},
-            { id: 'WiimoteKbOrder', label: t('WIIMOTE FIX ASSOCIATION'), type: 'toggle', settingName: 'WiimoteKbOrder', settingType: 'bool', description: t('For some emulators, can be used to fix wiimote keyboard and mouse association when using 2 wiimotes.') }
-          ]},
           { id: 'group_retroarch', label: t('RETROARCH OPTIONS'), type: 'group' },
-          { id: 'video_submenu', label: t('VÍDEO'), submenu: [
+          { id: 'video_submenu', label: t('VIDEO'), submenu: [
             { id: 'RotateScreen', label: t('SCREEN ORIENTATION'), type: 'select', settingName: 'RotateScreen', description: t('This setting will rotate your windows desktop, it will not be set back when exiting game.'), options: [
               { label: t('Normal'), value: '0' },
               { label: '90°', value: '1' },
@@ -614,7 +635,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             ]},
             { id: 'game_specific_options', label: t('ALLOW GAME/CORE OPTIONS OVERRIDE'), type: 'toggle', settingName: 'game_specific_options', settingType: 'bool', description: t('By default, RetroBat discards core specific option files.') }
           ]},
-          { id: 'latency_reduction_submenu', label: t('REDUÇÃO DE LATÊNCIA'), submenu: [
+          { id: 'latency_reduction_submenu', label: t('LATENCY REDUCTION'), submenu: [
             { id: 'runahead', label: t('RUN-AHEAD FRAMES'), type: 'slider', settingName: 'runahead', settingType: 'int', min: 0, max: 12, step: 1, suffix: ' f' },
             { id: 'preemptive_frames', label: t('USE PREEMPTIVE FRAMES'), type: 'toggle', settingName: 'preemptive_frames', settingType: 'bool', description: t('Use preemptive frames instead of run-ahead, the run-ahead frame number applies.') },
             { id: 'secondinstance', label: t('RUN-AHEAD USE SECOND INSTANCE'), type: 'toggle', settingName: 'secondinstance', settingType: 'bool' },
@@ -625,7 +646,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               { label: t('LATE'), value: '2' }
             ]}
           ]},
-          { id: 'ai_translation_submenu', label: t('TRADUÇÃO DO TEXTO DO JOGO POR IA'), submenu: [
+          { id: 'ai_translation_submenu', label: t('AI GAME TRANSLATION'), submenu: [
             { id: 'ai_service_enabled', label: t('ENABLE AI TRANSLATION SERVICE'), type: 'toggle', settingName: 'ai_service_enabled', settingType: 'bool' },
             { id: 'ai_target_lang', label: t('TARGET LANGUAGE'), type: 'select', settingName: 'ai_target_lang', options: [
               { label: 'Dansk', value: 'Da' },
@@ -655,7 +676,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           {
             id: 'ui_elements_submenu',
-            label: t('INTERFACE DO USUÁRIO'),
+            label: t('USER INTERFACE'),
             description: t('SHOW MENU ELEMENTS') + ' : ' + String(getSetting('OptionsMenu', 'full')).toUpperCase(),
             submenu: [
               { id: 'OptionsMenu', label: t('SHOW MENU ELEMENTS'), type: 'select', settingName: 'OptionsMenu', description: t('Show or hide RetroArch settings. Auto is the recommended setting.'), options: [
@@ -686,9 +707,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           {
             id: 'drivers_submenu',
             label: t('DRIVERS'),
-            description: t('VÍDEO') + ' : ' + String(getSetting('video_driver', 'vulkan')).toUpperCase(),
+            description: t('VIDEO') + ' : ' + String(getSetting('video_driver', 'vulkan')).toUpperCase(),
             submenu: [
-              { id: 'video_driver', label: t('VÍDEO'), type: 'select', settingName: 'video_driver', description: t('The driver vulkan will generally offer better performance if hardware compatible. Some libretro cores will force the choosen driver.'), options: [
+              { id: 'video_driver', label: t('VIDEO'), type: 'select', settingName: 'video_driver', description: t('The driver vulkan will generally offer better performance if hardware compatible. Some libretro cores will force the choosen driver.'), options: [
                 { label: 'opengl', value: 'gl' },
                 { label: 'opengl core', value: 'glcore' },
                 { label: 'directx 12', value: 'd3d12' },
@@ -710,46 +731,169 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               ]}
             ]
           },
-          { id: 'controls_submenu', label: t('CONTROLS'), submenu: [
-            { id: 'pause_on_disconnect', label: t('PAUSE ON DISCONNECT'), type: 'toggle', settingName: 'pause_on_disconnect', settingType: 'bool' },
-            { id: 'analog_deadzone', label: t('ANALOG DEADZONE'), type: 'select', settingName: 'analog_deadzone', description: t('Ignore analog stick movement below this threshold.'), options: Array.from({ length: 11 }, (_, i) => {
-              const val = (i * 0.1).toFixed(1)
-              return { label: val, value: val }
-            })},
-            { id: 'analog_sensitivity', label: t('ANALOG SENSITIVITY'), type: 'select', settingName: 'analog_sensitivity', description: t('Sets the sensitivity of the analog sticks.'), options: Array.from({ length: 11 }, (_, i) => {
-              const val = String(i - 5)
-              return { label: val, value: val }
-            })},
-            { id: 'keyboard_arcade', label: t('CONFIGURE SPECIAL KEYBOARD STICK'), type: 'select', settingName: 'keyboard_arcade', description: t('use this option when using a pad recognized as keyboard (ipac, etc.)'), options: [
-              { label: t('NONE'), value: 'null' },
-              { label: 'IPAC2', value: 'ipac2' },
-              { label: 'X-ARCADE TANKSTICK', value: 'tankstick' }
-            ]},
-            { id: 'arcade_stick', label: t('USE CUSTOM ARCADE STICK MAPPING'), type: 'toggle', settingName: 'arcade_stick', settingType: 'bool', description: t('Allows you to perform a dedicated mapping for your arcade stick based in arcade_sticks.json file.') },
-            { id: 'revertXIndex', label: t('SWITCH XINPUT INDEX'), type: 'toggle', settingName: 'revertXIndex', settingType: 'bool', description: t('Enable this if XInput controllers index are switched.') },
-            { id: 'p1_stick_index', label: t('FORCE ARCADE STICK INDEX P1'), type: 'select', settingName: 'p1_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
-            { id: 'p2_stick_index', label: t('FORCE ARCADE STICK INDEX P2'), type: 'select', settingName: 'p2_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
-            { id: 'buttonTrigger', label: t('USE BUTTON FOR TRIGGER'), type: 'toggle', settingName: 'buttonTrigger', settingType: 'bool', description: t('Force button instead of axis for triggers, can help with Sony controllers.') }
-          ]},
-          { id: 'guns_submenu', label: t('GUNS'), submenu: [
-            { id: 'p1_gunIndex', label: t('P1 MOUSE/GUN INDEX'), type: 'select', settingName: 'p1_gunIndex', description: t('Define mouse index to use for player 1.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
-            { id: 'p2_gunIndex', label: t('P2 MOUSE/GUN INDEX'), type: 'select', settingName: 'p2_gunIndex', description: t('Define mouse index to use for player 2.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
-            { id: 'p3_gunIndex', label: t('P3 MOUSE/GUN INDEX'), type: 'select', settingName: 'p3_gunIndex', description: t('Define mouse index to use for player 3.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
-            { id: 'p4_gunIndex', label: t('P4 MOUSE/GUN INDEX'), type: 'select', settingName: 'p4_gunIndex', description: t('Define mouse index to use for player 4.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) }
-          ]},
-          { id: 'group_system_settings', label: t('AJUSTES DE SISTEMA'), type: 'group' },
-          { id: 'advanced_system_settings', label: t('CONFIGURAÇÃO AVANÇADA POR SISTEMA'), submenu: [] }
+          {
+            id: 'controls_submenu',
+            label: t('CONTROLS'),
+            submenu: [
+              { id: 'analogDpad', label: t('DPAD AS ANALOG'), type: 'toggle', settingName: 'analogDpad', settingType: 'bool' },
+              { id: 'n64_special_trigger', label: t('N64 TRIGGER INVERT'), type: 'toggle', settingName: 'n64_special_trigger', settingType: 'bool', description: t('For n64 controllers with 2 triggers, use R2 instead of L2 as Z button.') },
+              { id: 'ps_controller_enhanced', label: t('PS4/PS5 ENHANCED'), type: 'toggle', settingName: 'ps_controller_enhanced', settingType: 'bool', description: t('Enable enhanced features for DS4 and DualSense, this will break compatibility with emulators using dinput until switch off.') },
+              { id: 'analog_deadzone', label: t('ANALOG DEADZONE'), type: 'select', settingName: 'analog_deadzone', description: t('Ignore analog stick movement below this threshold.'), options: Array.from({ length: 11 }, (_, i) => {
+                const val = (i * 0.1).toFixed(1)
+                return { label: val, value: val }
+              })},
+              { id: 'analog_sensitivity', label: t('ANALOG SENSITIVITY'), type: 'select', settingName: 'analog_sensitivity', description: t('Sets the sensitivity of the analog sticks.'), options: Array.from({ length: 11 }, (_, i) => {
+                const val = String(i - 5)
+                return { label: val, value: val }
+              })},
+              { id: 'keyboard_arcade', label: t('CONFIGURE SPECIAL KEYBOARD STICK'), type: 'select', settingName: 'keyboard_arcade', description: t('use this option when using a pad recognized as keyboard (ipac, etc.)'), options: [
+                { label: t('NONE'), value: 'null' },
+                { label: 'IPAC2', value: 'ipac2' },
+                { label: 'X-ARCADE TANKSTICK', value: 'tankstick' }
+              ]},
+              { id: 'arcade_stick', label: t('USE CUSTOM ARCADE STICK MAPPING'), type: 'toggle', settingName: 'arcade_stick', settingType: 'bool', description: t('Allows you to perform a dedicated mapping for your arcade stick based in arcade_sticks.json file.') },
+              { id: 'p1_stick_index', label: t('FORCE ARCADE STICK INDEX P1'), type: 'select', settingName: 'p1_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'p2_stick_index', label: t('FORCE ARCADE STICK INDEX P2'), type: 'select', settingName: 'p2_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'buttonTrigger', label: t('USE BUTTON FOR TRIGGER'), type: 'toggle', settingName: 'buttonTrigger', settingType: 'bool', description: t('Force button instead of axis for triggers, can help with Sony controllers.') }
+            ]
+          },
+          {
+            id: 'guns_submenu',
+            label: t('GUNS'),
+            submenu: [
+              { id: 'p1_gunIndex', label: t('P1 MOUSE/GUN INDEX'), type: 'select', settingName: 'p1_gunIndex', description: t('Define mouse index to use for player 1.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'p2_gunIndex', label: t('P2 MOUSE/GUN INDEX'), type: 'select', settingName: 'p2_gunIndex', description: t('Define mouse index to use for player 2.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'p3_gunIndex', label: t('P3 MOUSE/GUN INDEX'), type: 'select', settingName: 'p3_gunIndex', description: t('Define mouse index to use for player 3.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'p4_gunIndex', label: t('P4 MOUSE/GUN INDEX'), type: 'select', settingName: 'p4_gunIndex', description: t('Define mouse index to use for player 4.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'sinden_submenu', label: t('SINDEN'), submenu: [
+                { id: 'global_sindenJoyMode', label: t('SINDEN BUTTONS CONFIGURATION'), type: 'select', settingName: 'global.sindenJoyMode', description: t('Define how to configure Sinden Gun.'), options: [
+                  { label: t('STANDARD'), value: 'standard' },
+                  { label: t('GAMEPAD MODE'), value: 'joypad' },
+                  { label: t('NO CONFIGURATION'), value: 'none' }
+                ]},
+                { id: 'sindenKill', label: t('KILL SINDEN SOFTWARE'), type: 'toggle', settingName: 'sindenKill', settingType: 'bool', description: t('When using a Sinden gun, kill the Lightgun software when game ends.') }
+              ]},
+              { id: 'wiimote_submenu', label: t('WIIMOTE'), submenu: [
+                { id: 'WiimoteMode', label: t('WIIMOTE CONNECTION MODE'), type: 'select', settingName: 'WiimoteMode', description: t('Define how your wiimote is connected to the DolphinBar.'), options: [
+                  { label: t('MODE 2 (NORMAL)'), value: 'normal' },
+                  { label: t('MODE 2 (GAME)'), value: 'game' },
+                  { label: t('MODE 4 (WIIMOTEGUN)'), value: 'wiimotegun' }
+                ]},
+                { id: 'WiimoteKbOrder', label: t('WIIMOTE FIX ASSOCIATION'), type: 'toggle', settingName: 'WiimoteKbOrder', settingType: 'bool', description: t('For some emulators, can be used to fix wiimote keyboard and mouse association when using 2 wiimotes.') }
+              ]}
+            ]
+          },
+          { id: 'group_system_settings', label: t('SYSTEM SETTINGS'), type: 'group' },
+          {
+            id: 'advanced_system_settings',
+            label: t('PER SYSTEM ADVANCED CONFIGURATION'),
+            submenu: (() => {
+              const systemsSource = allSystems || []
+              const realSystems = systemsSource.filter((s: any) => {
+                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
+                const isGenre = s.name.startsWith('_')
+                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
+                const hasExtension = s.extension && s.extension.length > 0
+                return !isAuto && !isGenre && !isCustom && hasExtension && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
+              })
+
+              return realSystems.map(sys => ({
+                id: `sys_adv_${sys.name}`,
+                label: (sys.fullname || sys.name).toUpperCase(),
+                submenu: [
+                  {
+                    id: `sys_adv_${sys.name}_emulator`,
+                    label: t('EMULATOR'),
+                    type: 'select',
+                    settingName: `${sys.name}.emulator`,
+                    options: [
+                      { label: t('AUTOMÁTICO'), value: 'auto' },
+                      ...(sys.emulators?.map((e: any) => ({
+                        label: e.name.toUpperCase(),
+                        value: e.name
+                      })) || [])
+                    ]
+                  },
+                  {
+                    id: `sys_adv_${sys.name}_ratio`,
+                    label: t('GAME ASPECT RATIO'),
+                    type: 'select',
+                    settingName: `${sys.name}.ratio`,
+                    options: [
+                      { label: t('AUTO'), value: 'auto' },
+                      { label: '4/3', value: '4/3' },
+                      { label: '16/9', value: '16/9' },
+                      { label: '16/10', value: '16/10' },
+                      { label: 'FULL', value: 'full' }
+                    ]
+                  },
+                  {
+                    id: `sys_adv_${sys.name}_shaderset`,
+                    label: t('SHADER SET'),
+                    type: 'select',
+                    settingName: `${sys.name}.shaderset`,
+                    options: [
+                      { label: t('AUTO'), value: 'auto' },
+                      { label: t('NONE'), value: 'none' },
+                      { label: 'RIESCADE', value: '[riescade]' },
+                      { label: 'CRT-NEW-PIXIE', value: 'crt-new-pixie' },
+                      { label: 'CRT-ROYALE', value: 'crt-royale' },
+                      { label: 'CURVATURE', value: 'curvature' },
+                      { label: 'ENHANCED', value: 'enhanced' },
+                      { label: 'FLATTEN-GLOW', value: 'flatten-glow' },
+                      { label: 'HANDHELD', value: 'handheld' },
+                      { label: 'NTSC', value: 'ntsc' },
+                      { label: 'NTSC-256PX', value: 'ntsc-256px' },
+                      { label: 'NTSC-320PX', value: 'ntsc-320px' },
+                      { label: 'NTSC-NES', value: 'ntsc-nes' },
+                      { label: 'NTSC-SVIDEO', value: 'ntsc-svideo' },
+                      { label: 'NTSC-VCR', value: 'ntsc-vcr' },
+                      { label: 'RETRO', value: 'retro' },
+                      { label: 'SCALEFX', value: 'scalefx' },
+                      { label: 'SCALEFX-AA', value: 'scalefx-aa' },
+                      { label: 'SCALEFX-HYBRID', value: 'scalefx-hybrid' },
+                      { label: 'SCALEHQ', value: 'scalehq' },
+                      { label: 'SCANLINES', value: 'scanlines' },
+                      { label: 'SINDENBORDER', value: 'sindenborder' },
+                      { label: 'TECHNICOLOR', value: 'technicolor' },
+                      { label: 'TVOUT', value: 'tvout' },
+                      { label: 'TVOUT-INTERLACING', value: 'tvout-interlacing' },
+                      { label: 'VHS', value: 'vhs' },
+                      { label: 'XBRZ-5X', value: 'xbrz-5x' },
+                      { label: 'ZFAST', value: 'zfast' }
+                    ]
+                  },
+                  {
+                    id: `sys_adv_${sys.name}_bezel`,
+                    label: t('DECORATIONS'),
+                    type: 'select',
+                    settingName: `${sys.name}.bezel`,
+                    options: [
+                      { label: t('AUTO'), value: 'auto' },
+                      { label: t('NONE'), value: 'none' }
+                    ]
+                  },
+                  {
+                    id: `sys_adv_${sys.name}_smooth`,
+                    label: t('JOGOS SUAVES (FILTRO BILINEAR)'),
+                    type: 'toggle',
+                    settingName: `${sys.name}.smooth`,
+                    settingType: 'bool'
+                  }
+                ]
+              }))
+            })()
+          }
         ]
       },
       {
-        id: 'ui_settings', label: t('USER INTERFACE'), submenu: [
+        id: 'ui_settings', label: t('USER INTERFACE SETTINGS'), submenu: [
           { id: 'theme_set', label: t('THEME'), type: 'select', settingName: 'RIESCADE.ThemeSet',
             options: themes.length ? themes.map(t => ({ label: t.toUpperCase(), value: t })) : [{ label: 'DEFAULT', value: 'default' }]
           },
           { 
             id: 'theme_cfg_submenu', 
             label: t('THEME CONFIGURATION'), 
-            // Only show options if we haven't changed the theme in the menu
             submenu: (() => {
               if (pendingSettings['RIESCADE.ThemeSet'] && pendingSettings['RIESCADE.ThemeSet'] !== theme?.name) {
                 return [{ id: 'theme_cfg_pending', label: t('Save changes to see new options'), type: 'info' }] as MenuItem[]
@@ -774,15 +918,34 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ]
       },
       {
-        id: 'sound_settings', label: t('SOUND'), submenu: [
-          { id: 'system_volume', label: t('SYSTEM VOLUME'), type: 'slider', settingName: 'Volume', settingType: 'int', min: 0, max: 100, step: 5, suffix: '%' },
-          { id: 'music_volume', label: t('MUSIC VOLUME'), type: 'slider', settingName: 'MusicVolume', settingType: 'int', min: 0, max: 100, step: 5, suffix: '%' },
-          { id: 'frontend_music', label: t('FRONTEND MUSIC'), type: 'toggle', settingName: 'audio.bgmusic', settingType: 'bool' },
-          { id: 'video_audio', label: t('VIDEO PREVIEW AUDIO'), type: 'toggle', settingName: 'VideoAudio', settingType: 'bool' }
+        id: 'controller_settings', label: t('CONTROLLER SETTINGS'), submenu: [
+          { id: 'configure_input', label: t('CONFIGURE INPUT'), type: 'action', onClick: () => {} }
         ]
       },
       {
-        id: 'game_collections', label: t('GAME COLLECTIONS'), submenu: [
+        id: 'sound_settings', label: t('SOUND SETTINGS'), submenu: [
+          { id: 'group_volume', label: t('VOLUME'), type: 'group' },
+          { id: 'system_volume', label: t('SYSTEM VOLUME'), type: 'slider', settingName: 'Volume', settingType: 'int', min: 0, max: 100, step: 1, suffix: '%' },
+          { id: 'music_volume', label: t('MUSIC VOLUME'), type: 'slider', settingName: 'MusicVolume', settingType: 'int', min: 0, max: 100, step: 1, suffix: '%' },
+          { id: 'volume_popup', label: t('SHOW OVERLAY WHEN VOLUME CHANGES'), type: 'toggle', settingName: 'VolumePopup', settingType: 'bool' },
+          
+          { id: 'group_music', label: t('MUSIC'), type: 'group' },
+          { id: 'frontend_music', label: t('FRONTEND MUSIC'), type: 'toggle', settingName: 'audio.bgmusic', settingType: 'bool' },
+          { id: 'display_titles', label: t('DISPLAY SONG TITLES'), type: 'toggle', settingName: 'audio.display_titles', settingType: 'bool' },
+          { id: 'display_titles_time', label: t('SONG TITLE DISPLAY DURATION'), type: 'slider', settingName: 'audio.display_titles_time', settingType: 'int', min: 2, max: 120, step: 2, suffix: 's' },
+          { id: 'persystem', label: t('ONLY PLAY SYSTEM-SPECIFIC MUSIC FOLDER'), type: 'toggle', settingName: 'audio.persystem', settingType: 'bool' },
+          { id: 'thememusics', label: t('PLAY SYSTEM-SPECIFIC MUSIC'), type: 'toggle', settingName: 'audio.thememusics', settingType: 'bool' },
+          { id: 'video_lowers_music', label: t('LOWER MUSIC WHEN PLAYING VIDEO'), type: 'toggle', settingName: 'VideoLowersMusic', settingType: 'bool' },
+          { id: 'use_favorite_music', label: t('PLAY ONLY SONGS FROM YOUR FAVORITES PLAYLIST'), type: 'toggle', settingName: 'audio.useFavoriteMusic', settingType: 'bool' },
+          { id: 'selection_favorite_songs', label: t('SELECTION OF FAVORITE SONGS'), type: 'action', onClick: () => { alert(t('SELECTION OF FAVORITE SONGS')) } },
+          
+          { id: 'group_sounds', label: t('SOUNDS'), type: 'group' },
+          { id: 'enable_sounds', label: t('ENABLE NAVIGATION SOUNDS'), type: 'toggle', settingName: 'EnableSounds', settingType: 'bool' },
+          { id: 'video_audio', label: t('ENABLE VIDEO PREVIEW AUDIO'), type: 'toggle', settingName: 'VideoAudio', settingType: 'bool' }
+        ]
+      },
+      {
+        id: 'game_collections', label: t('GAME COLLECTION SETTINGS'), submenu: [
           { id: 'group_collections_display', label: t('COLEÇÕES A SEREM EXIBIDAS'), type: 'group' },
           { 
             id: 'systems_displayed', 
@@ -790,17 +953,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             showCount: true,
             submenu: (() => {
               const systemsSource = allSystems || []
-              // Filter out auto collections and anything that isn't a "real" system
               const realSystems = systemsSource.filter((s: any) => {
                 const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
                 const isGenre = s.name.startsWith('_')
                 const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
-                // Real systems usually have extensions and valid paths
                 const hasExtension = s.extension && s.extension.length > 0
-                return !isAuto && !isGenre && !isCustom && hasExtension
+                return !isAuto && !isGenre && !isCustom && hasExtension && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
               })
               
-              // Group by hardware
               const groups: Record<string, any[]> = {}
               realSystems.forEach((s: any) => {
                 const hw = s.hardware || t('OUTROS')
@@ -808,7 +968,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 groups[hw].push(s)
               })
 
-              // Sort groups alphabetically, but keep 'OUTROS' at the end
               const sortedGroups = Object.keys(groups).sort((a, b) => {
                 if (a === t('OUTROS')) return 1
                 if (b === t('OUTROS')) return -1
@@ -820,7 +979,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               sortedGroups.forEach(groupName => {
                 finalItems.push({ id: `group_hw_${groupName}`, label: groupName.toUpperCase(), type: 'group' })
                 
-                // Sort systems within group alphabetically by fullName
                 const sortedSystems = groups[groupName].sort((a, b) => 
                   (a.fullname || a.name).localeCompare(b.fullname || b.name)
                 )
@@ -918,9 +1076,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col_zigs', label: t('IGS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zigs' },
             { id: 'col_zjaleco', label: t('JALECO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zjaleco' },
             { id: 'col_zkaneko', label: t('KANEKO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zkaneko' },
-            { id: 'col_zmitchell', label: t('MITCHELL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmitchell' },
+            { id: 'col_mitchell', label: t('MITCHELL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmitchell' },
             { id: 'col_znichibutsu', label: t('NICHIBUTSU'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znichibutsu' },
-            { id: 'col_znmk', label: t('NMK'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znmk' },
+            { id: 'col_znk', label: t('NMK'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znk' },
             { id: 'col_zpsikyo', label: t('PSIKYO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zpsikyo' },
             { id: 'col_zsammy', label: t('SAMMY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsammy' },
             { id: 'col_zsegastv', label: t('SEGA ST-V'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsegastv' },
@@ -958,21 +1116,19 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             showCount: true,
             submenu: (() => {
               const systemsSource = allSystems || []
-              // Filter systems that have a group tag defined, are real systems, and are NOT the master system itself
               const realSystems = systemsSource.filter((s: any) => {
                 const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
                 const isGenre = s.name.startsWith('_')
                 const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
                 const hasExtension = s.extension && s.extension.length > 0
                 const isMaster = s.group && s.name.toLowerCase() === s.group.toLowerCase()
-                return !isAuto && !isGenre && !isCustom && hasExtension && s.group && !isMaster
+                return !isAuto && !isGenre && !isCustom && hasExtension && s.group && !isMaster && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
               })
               
               if (realSystems.length === 0) {
                 return [{ id: 'no_groupable_systems', label: t('NENHUM SISTEMA AGRUPÁVEL ENCONTRADO'), type: 'info', value: '' }]
               }
 
-              // Group by the actual group property (case-insensitive keys)
               const groups: Record<string, any[]> = {}
               realSystems.forEach((s: any) => {
                 const grp = String(s.group).toLowerCase()
@@ -985,13 +1141,11 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               const finalItems: MenuItem[] = []
 
               sortedGroups.forEach(groupName => {
-                // Find the master system for this group name to get its fullname
                 const masterSys = systemsSource.find((s: any) => s.name.toLowerCase() === groupName.toLowerCase())
                 const displayLabel = masterSys ? (masterSys.fullname || masterSys.name) : groupName
 
                 finalItems.push({ id: `group_grp_hw_${groupName}`, label: displayLabel.toUpperCase(), type: 'group' })
                 
-                // Sort systems within group alphabetically by fullname
                 const sortedSystems = groups[groupName].sort((a, b) => 
                   (a.fullname || a.name).localeCompare(b.fullname || b.name)
                 )
@@ -1010,7 +1164,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               return finalItems
             })()
           },
-          
           { id: 'group_collection_options', label: t('OPÇÕES'), type: 'group' },
           { id: 'sort_systems', label: t('ORDENAÇÃO DOS SISTEMAS'), type: 'select', settingName: 'SortSystems', options: [
             { label: 'NÃO', value: '' },
@@ -1034,15 +1187,201 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ]
       },
       {
+        id: 'scraper', label: t('SCRAPER'), tabs: ['SCRAPE', 'OPTIONS', 'ACCOUNTS'], submenu: [
+          // === TAB 0: SCRAPE ===
+          { id: 'group_scrape_source', label: t('SOURCE'), type: 'group', tab: 0 },
+          { id: 'scrape_from', label: t('SCRAPE FROM'), type: 'select', settingName: 'Scraper', tab: 0, options: [
+            { label: 'SCREEN SCRAPER', value: 'ScreenScraper' },
+            { label: 'THE GAMES DB', value: 'TheGamesDB' },
+            { label: 'HFSDB', value: 'HfsDB' },
+            { label: 'IGDB', value: 'IGDB' },
+            { label: 'ARCADEDB', value: 'ArcadeDB' }
+          ]},
+          { id: 'group_scrape_filters', label: t('FILTERS'), type: 'group', tab: 0 },
+          { id: 'scrape_filter', label: t('GAMES TO SCRAPE FOR'), type: 'select', settingName: 'ScrapperFilter', tab: 0, options: [
+            { label: t('TODOS OS JOGOS'), value: 'all' },
+            { label: t('FALTANDO QUALQUER MÍDIA'), value: 'missing' },
+            { label: t('FALTANDO TODAS AS MÍDIAS'), value: 'missing_all' }
+          ]},
+          { 
+            id: 'scrape_ignore_recent', 
+            label: t('IGNORE RECENTLY SCRAPED GAMES'), 
+            type: 'select', 
+            settingName: 'ScrapperIgnoreRecent', 
+            tab: 0,
+            options: [
+              { label: t('NÃO'), value: '0' },
+              { label: t('LAST DAY'), value: '1' },
+              { label: t('LAST WEEK'), value: '7' },
+              { label: t('LAST 15 DAYS'), value: '15' },
+              { label: t('LAST MONTH'), value: '31' },
+              { label: t('LAST 3 MONTHS'), value: '90' },
+              { label: t('LAST YEAR'), value: '365' }
+            ]
+          },
+          {
+            id: 'scraper_systems_included',
+            label: t('SYSTEMS INCLUDED'),
+            showCount: true,
+            tab: 0,
+            submenu: (() => {
+              const systemsSource = allSystems || []
+              const scrapableSystems = systemsSource.filter((s: any) => {
+                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
+                const isGenre = s.name.startsWith('_')
+                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
+                const hasExtension = s.extension && s.extension.length > 0
+                return !isAuto && !isGenre && !isCustom && hasExtension && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
+              })
+
+              if (scrapableSystems.length === 0) {
+                return [{ id: 'no_scraper_systems', label: t('NO SYSTEMS FOUND'), type: 'info', value: '' }] as MenuItem[]
+              }
+
+              return scrapableSystems
+                .sort((a, b) => (a.fullname || a.name).localeCompare(b.fullname || b.name))
+                .map(sys => ({
+                  id: `scraper_sys_${sys.name}`,
+                  label: sys.fullname || sys.name.toUpperCase(),
+                  type: 'toggle',
+                  settingName: 'ScraperSystems',
+                  value: sys.name
+                })) as MenuItem[]
+            })()
+          },
+          { id: 'group_scrape_actions', label: t('AÇÕES'), type: 'group', tab: 0 },
+          { id: 'scrape_now', label: t('SCRAPE NOW'), type: 'action', tab: 0, onClick: () => {
+            alert(t('SCRAPE NOW'))
+          }},
+
+          // === TAB 1: OPTIONS ===
+          { id: 'group_scrape_settings', label: t('SETTINGS'), type: 'group', tab: 1 },
+          { id: 'scrape_image_src', label: t('IMAGE SOURCE'), type: 'select', settingName: 'ScrapperImageSrc', tab: 1, options: [
+            { label: t('NONE'), value: '' },
+            { label: t('SCREENSHOT'), value: 'ss' },
+            { label: t('TITLE SCREENSHOT'), value: 'sstitle' },
+            { label: t('MIX V1'), value: 'mixrbv1' },
+            { label: t('MIX V2'), value: 'mixrbv2' },
+            { label: t('BOX 2D'), value: 'box-2D' },
+            { label: t('BOX 3D'), value: 'box-3D' },
+            { label: t('FAN ART'), value: 'fanart' }
+          ]},
+          { id: 'scrape_thumb_src', label: t('BOX SOURCE'), type: 'select', settingName: 'ScrapperThumbSrc', tab: 1, options: [
+            { label: t('NONE'), value: '' },
+            { label: t('BOX 2D'), value: 'box-2D' },
+            { label: t('BOX 3D'), value: 'box-3D' }
+          ]},
+          { id: 'scrape_logo_src', label: t('LOGO SOURCE'), type: 'select', settingName: 'ScrapperLogoSrc', tab: 1, options: [
+            { label: t('NONE'), value: '' },
+            { label: t('HD WHEEL'), value: 'wheel-hd' },
+            { label: t('WHEEL'), value: 'wheel' },
+            { label: t('MARQUEE'), value: 'marquee' }
+          ]},
+          { id: 'scrape_region', label: t('PREFERED REGION'), type: 'select', settingName: 'ScraperRegion', tab: 1, options: [
+            { label: t('AUTOMÁTICO'), value: '' },
+            { label: t('EUROPE'), value: 'eu' },
+            { label: t('USA'), value: 'us' },
+            { label: t('JAPAN'), value: 'jp' },
+            { label: t('WORLD'), value: 'wor' }
+          ]},
+          { id: 'scrape_names', label: t('OVERWRITE NAMES'), type: 'toggle', settingName: 'ScrapeNames', settingType: 'bool', tab: 1 },
+          { id: 'scrape_desc', label: t('OVERWRITE DESCRIPTIONS'), type: 'toggle', settingName: 'ScrapeDescription', settingType: 'bool', tab: 1 },
+          { id: 'scrape_overwrite', label: t('OVERWRITE MEDIAS'), type: 'toggle', settingName: 'ScrapeOverWrite', settingType: 'bool', tab: 1 },
+          { id: 'group_scrape_for', label: t('SCRAPE FOR'), type: 'group', tab: 1 },
+          { id: 'scrape_short_title', label: t('SHORT NAME'), type: 'toggle', settingName: 'ScrapeShortTitle', settingType: 'bool', tab: 1 },
+          { id: 'scrape_ratings_toggle', label: t('COMMUNITY RATING'), type: 'toggle', settingName: 'ScrapeRatings', settingType: 'bool', tab: 1 },
+          { id: 'scrape_videos_toggle', label: t('VIDEO'), type: 'toggle', settingName: 'ScrapeVideos', settingType: 'bool', tab: 1 },
+          { id: 'scrape_fanart', label: t('FANART'), type: 'toggle', settingName: 'ScrapeFanart', settingType: 'bool', tab: 1 },
+          { id: 'scrape_bezel', label: t('BEZEL (16:9)'), type: 'toggle', settingName: 'ScrapeBezel', settingType: 'bool', tab: 1 },
+          { id: 'scrape_boxback', label: t('BOX BACKSIDE'), type: 'toggle', settingName: 'ScrapeBoxBack', settingType: 'bool', tab: 1 },
+          { id: 'scrape_map', label: t('MAP'), type: 'toggle', settingName: 'ScrapeMap', settingType: 'bool', tab: 1 },
+          { id: 'scrape_manual', label: t('MANUAL'), type: 'toggle', settingName: 'ScrapeManual', settingType: 'bool', tab: 1 },
+          { id: 'scrape_padtokey', label: t('PADTOKEY SETTINGS'), type: 'toggle', settingName: 'ScrapePadToKey', settingType: 'bool', tab: 1 },
+          { id: 'group_manual_scrape', label: t('MANUAL SCRAPE'), type: 'group', tab: 1 },
+          {
+            id: 'included_scrapers_submenu',
+            label: t('INCLUDED SCRAPERS'),
+            showCount: true,
+            tab: 1,
+            submenu: [
+              { id: 'inc_scrape_screenscraper', label: 'SCREEN SCRAPER', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'ScreenScraper' },
+              { id: 'inc_scrape_thegamesdb', label: 'THE GAMES DB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'TheGamesDB' },
+              { id: 'inc_scrape_hfsdb', label: 'HFSDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'HfsDB' },
+              { id: 'inc_scrape_igdb', label: 'IGDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'IGDB' },
+              { id: 'inc_scrape_arcadedb', label: 'ARCADEDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'ArcadeDB' }
+            ]
+          },
+
+          // === TAB 2: ACCOUNTS ===
+          { id: 'group_screenscraper_account', label: t('SCREENSCRAPER'), type: 'group', tab: 2 },
+          { id: 'screenscraper_user', label: t('USERNAME'), type: 'input', settingName: 'ScreenScraperUser', settingType: 'string', tab: 2 },
+          { id: 'screenscraper_pass', label: t('PASSWORD'), type: 'input', settingName: 'ScreenScraperPass', settingType: 'string', isPassword: true, tab: 2 },
+          { id: 'group_igdb_account', label: t('IGDB'), type: 'group', tab: 2 },
+          { id: 'igdb_client_id', label: t('CLIENT ID'), type: 'input', settingName: 'IGDBClientID', settingType: 'string', tab: 2 },
+          { id: 'igdb_secret', label: t('CLIENT SECRET'), type: 'input', settingName: 'IGDBSecret', settingType: 'string', isPassword: true, tab: 2 }
+        ]
+      },
+      {
+        id: 'updates_downloads', label: t('UPDATES & DOWNLOADS'), submenu: [
+          { id: 'group_software_updates', label: t('SOFTWARE UPDATES'), type: 'group' },
+          { id: 'updates_enabled', label: t('CHECK FOR UPDATES'), type: 'toggle', settingName: 'updates.enabled', settingType: 'bool' },
+          { id: 'updates_type', label: t('UPDATE TYPE'), type: 'select', settingName: 'updates.type', options: [
+            { label: t('ESTÁVEL'), value: 'stable' },
+            { label: t('BETA'), value: 'beta' },
+            { label: t('BETA (BUTTERFLY)'), value: 'butterfly' },
+            { label: t('INSTÁVEL'), value: 'unstable' }
+          ]},
+          { id: 'group_updates_actions', label: t('AÇÕES'), type: 'group' },
+          { id: 'start_update', label: t('START UPDATE'), type: 'action', onClick: () => {
+            alert(t('START UPDATE'))
+          }}
+        ]
+      },
+      {
         id: 'system_settings', label: t('SYSTEM SETTINGS'), submenu: [
-          { id: 'language', label: t('LANGUAGE'), type: 'select', settingName: 'Language', options: 
+          { id: 'group_system', label: t('SYSTEM'), type: 'group' },
+          { id: 'information_submenu', label: t('INFORMATION'), submenu: [
+            { id: 'info_version', label: t('VERSION'), type: 'info', value: versions.es || 'RIESCADE v2.0.0' },
+            { id: 'info_user_disk', label: t('USER DISK USAGE'), type: 'info', value: '142.5 GB / 476.2 GB (30%)' },
+            { id: 'info_sys_disk', label: t('SYSTEM DISK USAGE'), type: 'info', value: '45.1 GB / 118.0 GB (38%)' },
+            { id: 'group_info_cpu', label: t('CPU'), type: 'group' },
+            { id: 'info_cpu_model', label: t('CPU MODEL'), type: 'info', value: 'AMD Ryzen 5 5600X 6-Core Processor' },
+            { id: 'info_cpu_cores', label: t('CPU CORES'), type: 'info', value: '12 threads' },
+            { id: 'info_cpu_speed', label: t('CPU MAX FREQUENCY'), type: 'info', value: '4.6 GHz' },
+            { id: 'group_info_ram', label: t('RAM'), type: 'group' },
+            { id: 'info_ram_total', label: t('AVAILABLE MEMORY'), type: 'info', value: '11.8 GB / 15.9 GB' },
+            { id: 'group_info_graphics', label: t('GRAPHICS'), type: 'group' },
+            { id: 'info_gpu_model', label: t('GPU MODEL'), type: 'info', value: 'NVIDIA GeForce RTX 3060' },
+            { id: 'info_display_res', label: t('DISPLAY RESOLUTION'), type: 'info', value: '1920x1080@60Hz' },
+            { id: 'info_video_driver', label: t('VIDEO DRIVER'), type: 'info', value: 'OpenGL v4.6 (NVIDIA 551.23)' }
+          ]},
+          { id: 'language', label: t('LANGUAGE (REGION)'), type: 'select', settingName: 'Language', options: 
             Object.keys(locales).sort().map(lang => ({ 
               label: lang.toUpperCase().replace('_', '-'), 
               value: lang 
             }))
           },
-          { id: 'show_fps', label: t('SHOW FRAMERATE'), type: 'toggle', settingName: 'DrawFramerate', settingType: 'bool' },
-          { id: 'vram_limit', label: t('VRAM LIMIT'), type: 'slider', settingName: 'MaxVRAM', settingType: 'int', min: 40, max: 1000, step: 10, suffix: ' Mb' }
+          { id: 'clock_mode', label: t('SHOW CLOCK IN 12-HOUR FORMAT'), type: 'toggle', settingName: 'ClockMode12', settingType: 'bool' },
+          { id: 'power_saving', label: t('POWER SAVING MODE'), type: 'select', settingName: 'PowerSaverMode', options: [
+            { label: t('DISABLED'), value: 'disabled' },
+            { label: t('DEFAULT'), value: 'default' },
+            { label: t('ENHANCED'), value: 'enhanced' },
+            { label: t('INSTANT'), value: 'instant' }
+          ]},
+          { id: 'screen_reader', label: t('SCREEN READER (TEXT TO SPEECH)'), type: 'toggle', settingName: 'TTS', settingType: 'bool' },
+          { id: 'ui_mode', label: t('USER INTERFACE MODE'), type: 'select', settingName: 'UIMode', options: [
+            { label: t('FULL'), value: 'Full' },
+            { label: t('BASIC'), value: 'Basic' },
+            { label: t('KIOSK'), value: 'Kiosk' }
+          ]},
+          { id: 'group_advanced', label: t('ADVANCED'), type: 'group' },
+          { id: 'developer_options_submenu', label: t('FRONTEND DEVELOPER OPTIONS'), submenu: [
+            { id: 'group_dev_video', label: t('VIDEO OPTIONS'), type: 'group' },
+            { id: 'vram_limit', label: t('VRAM LIMIT'), type: 'slider', settingName: 'MaxVRAM', settingType: 'int', min: 40, max: 1000, step: 10, suffix: ' Mb' },
+            { id: 'show_fps', label: t('SHOW FRAMERATE'), type: 'toggle', settingName: 'DrawFramerate', settingType: 'bool' },
+            { id: 'vsync', label: t('VSYNC'), type: 'toggle', settingName: 'VSync', settingType: 'bool' },
+            { id: 'overscan', label: t('OVERSCAN'), type: 'toggle', settingName: 'Overscan', settingType: 'bool' }
+          ]}
         ]
       },
       { id: 'quit', label: t('QUIT'), type: 'action', onClick: () => window.api?.executeCommand('exit-frontend') }
@@ -1051,8 +1390,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     return items
   }
 
-  const currentMenu = activeMenuStack[activeMenuStack.length - 1]?.items || []
-  const menuTitle = activeMenuStack[activeMenuStack.length - 1]?.title || 'MAIN MENU'
+  const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
+  const currentMenu = currentStackItem ? (currentStackItem.tabs && currentStackItem.activeTab !== undefined ? currentStackItem.items.filter(item => item.tab === currentStackItem.activeTab) : currentStackItem.items) : []
+  const menuTitle = currentStackItem?.title || 'MAIN MENU'
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -1077,6 +1417,30 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         return
       }
 
+      if (currentStackItem && currentStackItem.tabs && currentStackItem.tabs.length > 0 && currentStackItem.activeTab !== undefined) {
+        if (e.key === 'PageUp' || e.key === 'q' || e.key === 'Q') {
+          const newTab = (currentStackItem.activeTab - 1 + currentStackItem.tabs.length) % currentStackItem.tabs.length
+          setActiveMenuStack(prev => {
+            const next = [...prev]
+            next[next.length - 1] = { ...next[next.length - 1], activeTab: newTab }
+            return next
+          })
+          setSelectedIndex(0)
+          e.preventDefault()
+          return
+        } else if (e.key === 'PageDown' || e.key === 'e' || e.key === 'E') {
+          const newTab = (currentStackItem.activeTab + 1) % currentStackItem.tabs.length
+          setActiveMenuStack(prev => {
+            const next = [...prev]
+            next[next.length - 1] = { ...next[next.length - 1], activeTab: newTab }
+            return next
+          })
+          setSelectedIndex(0)
+          e.preventDefault()
+          return
+        }
+      }
+
       if (currentMenu.length === 0) return
 
       if (e.key === 'ArrowDown') {
@@ -1094,7 +1458,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       } else if (e.key === 'Enter') {
         const item = currentMenu[selectedIndex]
         if (item.submenu) {
-          setActiveMenuStack(prev => [...prev, { items: item.submenu!, title: item.label }])
+          setActiveMenuStack(prev => [...prev, { items: item.submenu!, title: item.label, tabs: item.tabs, activeTab: item.tabs ? 0 : undefined }])
           setSelectedIndex(0)
         } else if (item.type === 'select' && item.options) {
           const currentSettingVal = item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)
@@ -1179,12 +1543,17 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       
       const isMultiCheck = item.value !== undefined && !item.settingType
       if (isMultiCheck) {
-        const values = String(currentSettingVal || '').split(',').filter(v => v.trim() !== '')
-        
-        if (item.settingName === 'VisibleSystems' && values.length === 0) {
-          isOn = true // Default to all visible
+        if (item.settingName === 'DisabledManualScrapers') {
+          const values = String(currentSettingVal || '').split(';').filter(v => v.trim() !== '')
+          isOn = !values.includes(item.value)
         } else {
-          isOn = values.includes(item.value)
+          const values = String(currentSettingVal || '').split(',').filter(v => v.trim() !== '')
+          
+          if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && values.length === 0) {
+            isOn = true // Default to all selected
+          } else {
+            isOn = values.includes(item.value)
+          }
         }
 
         return (
@@ -1231,7 +1600,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             let isSubOn = subVal === 'true' || subVal === true || subVal === '1' || subVal === 1
             if (sub.value !== undefined && !sub.settingType) {
               const values = String(subVal || '').split(',').filter(v => v.trim() !== '')
-              if (sub.settingName === 'VisibleSystems' && values.length === 0) {
+              if ((sub.settingName === 'VisibleSystems' || sub.settingName === 'ScraperSystems') && values.length === 0) {
                 isSubOn = true
               } else {
                 isSubOn = values.includes(sub.value)
@@ -1313,6 +1682,26 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         <div className="riescade-menu-container">
           <div className="riescade-menu-header">
             <h2 className="riescade-menu-title">{menuTitle}</h2>
+            {currentStackItem?.tabs && currentStackItem.tabs.length > 0 && (
+              <div className="riescade-menu-tabs">
+                {currentStackItem.tabs.map((tab, idx) => (
+                  <div
+                    key={tab}
+                    className={`riescade-menu-tab ${idx === currentStackItem.activeTab ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveMenuStack(prev => {
+                        const next = [...prev]
+                        next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
+                        return next
+                      })
+                      setSelectedIndex(0)
+                    }}
+                  >
+                    {t(tab)}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="riescade-menu-list-container">
@@ -1422,6 +1811,11 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .menu-submenu-preview { display: flex; align-items: center; gap: 10px; }
         .menu-selected-count { font-size: 0.75rem; font-weight: 800; opacity: 0.6; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 10px; }
         .riescade-menu-item.selected .menu-selected-count { opacity: 0.9; background: rgba(255,255,255,0.2); }
+
+        .riescade-menu-tabs { display: flex; gap: 0; padding: 12px 25px 0; }
+        .riescade-menu-tab { padding: 8px 20px 10px; font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: rgba(0,0,0,0.35); border-bottom: 3px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; user-select: none; }
+        .riescade-menu-tab:hover { color: rgba(0,0,0,0.6); }
+        .riescade-menu-tab.active { color: #e91e63; border-bottom-color: #e91e63; }
       ` }} />
       {/* {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />} */}
       
