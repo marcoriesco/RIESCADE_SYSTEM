@@ -10,6 +10,7 @@ interface Props {
   themePath: string
   menuItemsNode?: React.ReactNode
   isLaunchingView?: boolean
+  onReady?: () => void
 }
 
 const styleStringToObject = (styleString: string) => {
@@ -30,9 +31,15 @@ const styleStringToObject = (styleString: string) => {
   }, {} as any)
 }
 
-export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false }) => {
+export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false, onReady }) => {
   const [cssMap, setCssMap] = useState<Record<string, string>>({})
   const [cssLoaded, setCssLoaded] = useState(!isLaunchingView)
+
+  useEffect(() => {
+    if (cssLoaded && onReady) {
+      onReady()
+    }
+  }, [cssLoaded, onReady])
 
   useEffect(() => {
     if (!isLaunchingView) return;

@@ -12,17 +12,26 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
   const logo = game?.marquee || ''
   const name = game?.name || ''
   const [opacity, setOpacity] = useState(1)
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    // Fade to pure black after 2 seconds so when the game closes quickly, it still returns to black instead of "Carregando"
+    if (!theme?.isWebTheme || !theme.views?.loading) {
+      setIsReady(true)
+    }
+  }, [theme])
+
+  useEffect(() => {
+    if (!isReady) return
+
+    // Fade to pure black after 3.5 seconds so when the game closes quickly, it still returns to black instead of "Carregando"
     const timerOut = setTimeout(() => {
       setOpacity(0)
-    }, 10000)
+    }, 3500)
 
     return () => {
       clearTimeout(timerOut)
     }
-  }, [])
+  }, [isReady])
 
   const resolveFilePath = (path: string) => {
     if (!path) return ''
@@ -40,7 +49,10 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
         background: '#000',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        opacity: isReady ? 1 : 0,
+        transition: 'opacity 0.3s ease',
+        pointerEvents: isReady ? 'auto' : 'none'
       }}
     >
       <div style={{
@@ -57,6 +69,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
             data={themeData}
             themePath={theme.path}
             isLaunchingView={true}
+            onReady={() => setIsReady(true)}
           />
         ) : (
           <div style={{
