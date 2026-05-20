@@ -32,9 +32,9 @@ yarn-error.log*
 *.swo
 
 # User Data / Gaming Assets (Keep structure but ignore content if large)
-roms/
-bios/
+roms
+bios
+emulators
 saves/
-emulators/
 screenshots/
 records/
