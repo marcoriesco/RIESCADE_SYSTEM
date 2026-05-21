@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { ElectronAPI } from '@electron-toolkit/preload'
 
 declare global {
@@ -19,8 +20,18 @@ declare global {
       getThemeSettings: (themeName: string) => Promise<any>
       saveThemeSetting: (themeName: string, key: string, value: string) => Promise<any>
       getConfiguredControllers: () => Promise<any>
+      saveInputConfig: (data: { deviceName: string; deviceGUID: string; mappings: any }) => Promise<boolean>
+      getBluetoothDevices: () => Promise<any[]>
       executeCommand: (command: string, data?: any) => void
       getVersion: () => Promise<{ app: string; es: string }>
+      getCollectionsForGame: (systemName: string, gamePath: string) => Promise<string[]>
+      toggleGameInCollection: (collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove') => Promise<boolean>
+      getFileContent: (path: string) => Promise<string | null>
+      getHostname: () => Promise<string>
+      cleanGamelists: () => Promise<any>
+      resetGamelistUsage: () => Promise<any>
+      resetFileExtensions: () => Promise<any>
+      clearCaches: () => Promise<any>
       on: (channel: string, callback: (...args: any[]) => void) => () => void
     }
   }

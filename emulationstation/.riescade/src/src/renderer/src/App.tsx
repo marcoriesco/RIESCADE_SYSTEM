@@ -230,7 +230,9 @@ function App() {
 					updateControllers();
 					controllersInitialized = true;
 				}
-				if (time - lastInputTime > 200) {
+				// Skip gamepad-to-keyboard dispatch when InputConfigOverlay is active
+				// (it sets data-input-config-active on document.body to claim exclusive gamepad control)
+				if (time - lastInputTime > 200 && !document.body.hasAttribute('data-input-config-active')) {
 					let key = '';
 					if (gp.buttons[12]?.pressed || gp.axes[1] < -0.5) key = 'ArrowUp';
 					else if (gp.buttons[13]?.pressed || gp.axes[1] > 0.5)

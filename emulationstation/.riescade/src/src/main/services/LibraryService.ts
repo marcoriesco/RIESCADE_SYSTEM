@@ -613,8 +613,8 @@ export class LibraryService {
       const cfgPath = join(configPath, 'collections', `custom-${col}.cfg`)
       if (fs.existsSync(cfgPath)) {
         const content = fs.readFileSync(cfgPath, 'utf-8')
-        const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0)
-        if (lines.some(l => l.toLowerCase() === targetLine)) {
+        const lines = content.split(/\r?\n/).map((l: string) => l.trim()).filter((l: string) => l.length > 0)
+        if (lines.some((l: string) => l.toLowerCase() === targetLine)) {
           matching.push(col)
         }
       }
@@ -637,7 +637,7 @@ export class LibraryService {
     let lines: string[] = []
     if (fs.existsSync(cfgPath)) {
       const content = fs.readFileSync(cfgPath, 'utf-8')
-      lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0)
+      lines = content.split(/\r?\n/).map((l: string) => l.trim()).filter((l: string) => l.length > 0)
     }
 
     const cleanGamePath = gamePath.replace(/^\.\//, '')
@@ -659,5 +659,124 @@ export class LibraryService {
       }
     }
     return false
+  }
+
+  public cleanGamelists(): void {
+    const fs = require('fs')
+    const resolve = require('path').resolve
+    const systems = this.getSystems()
+    const configPath = getConfigPath()
+
+    for (const sys of systems) {
+      if (sys.name === 'collections' || sys.path.startsWith('virtual://')) continue
+
+      const gamelistPaths = [
+        join(configPath, 'gamelists', sys.name, 'gamelist.xml'),
+        join(getRomsPath(), sys.name, 'gamelist.xml'),
+        join(sys.path, 'gamelist.xml')
+      ]
+
+      for (const gp of gamelistPaths) {
+        if (fs.existsSync(gp)) {
+          try {
+            const games = this.gamelistParser.parse(gp, sys.name)
+            const cleanedGames: Game[] = []
+
+            for (const game of games) {
+              const absRomPath = resolve(sys.path, game.path)
+              if (fs.existsSync(absRomPath)) {
+                const mediaFields = ['image', 'video', 'marquee', 'thumbnail', 'fanart', 'mix', 'wheel']
+                mediaFields.forEach(field => {
+                  const mediaPath = (game as any)[field]
+                  if (mediaPath && typeof mediaPath === 'string' && !mediaPath.startsWith('http')) {
+                    if (!fs.existsSync(mediaPath)) {
+                      delete (game as any)[field]
+                    }
+                  }
+                })
+                cleanedGames.push(game)
+              }
+            }
+
+            this.gamelistParser.save(gp, cleanedGames)
+          } catch (e) {
+            console.error(`Failed to clean gamelist ${gp}:`, e)
+          }
+        }
+      }
+    }
+    LibraryService.clearCache()
+  }
+
+  public resetGamelistUsage(): void {
+    const fs = require('fs')
+    const systems = this.getSystems()
+    const configPath = getConfigPath()
+
+    for (const sys of systems) {
+      if (sys.name === 'collections' || sys.path.startsWith('virtual://')) continue
+
+      const gamelistPaths = [
+        join(configPath, 'gamelists', sys.name, 'gamelist.xml'),
+        join(getRomsPath(), sys.name, 'gamelist.xml'),
+        join(sys.path, 'gamelist.xml')
+      ]
+
+      for (const gp of gamelistPaths) {
+        if (fs.existsSync(gp)) {
+          try {
+            const games = this.gamelistParser.parse(gp, sys.name)
+            for (const game of games) {
+              game.playcount = 0
+              delete (game as any).lastplayed
+              delete (game as any).gametime
+            }
+            this.gamelistParser.save(gp, games)
+          } catch (e) {
+            console.error(`Failed to reset usage for ${gp}:`, e)
+          }
+        }
+      }
+    }
+    LibraryService.clearCache()
+  }
+
+  public resetFileExtensions(): void {
+    const settingsParser = new SettingsParser()
+    const systems = this.getSystems()
+    for (const sys of systems) {
+      if (sys.name === 'collections' || sys.path.startsWith('virtual://')) continue
+      settingsParser.saveSetting(sys.name + '.HiddenExt', '', 'string')
+    }
+  }
+
+  public clearCaches(): void {
+    const fs = require('fs')
+    const os = require('os')
+    const configPath = getConfigPath()
+    
+    const deleteDirFiles = (dir: string) => {
+      if (!fs.existsSync(dir)) return
+      try {
+        const files = fs.readdirSync(dir)
+        for (const file of files) {
+          const fullPath = join(dir, file)
+          const stat = fs.statSync(fullPath)
+          if (stat.isFile()) {
+            fs.unlinkSync(fullPath)
+          } else if (stat.isDirectory()) {
+            deleteDirFiles(fullPath)
+            try {
+              fs.rmdirSync(fullPath)
+            } catch (e) {}
+          }
+        }
+      } catch (e) {
+        console.error(`Failed to delete files in ${dir}:`, e)
+      }
+    }
+
+    deleteDirFiles(join(configPath, 'tmp'))
+    deleteDirFiles(join(os.tmpdir(), 'riescade'))
   }
 }

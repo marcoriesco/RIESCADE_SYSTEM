@@ -1,4 +1,5 @@
 {
-  "colors": "#9f0043",
-  "controller": "ps4"
+  "colors": "#9133c7",
+  "controller": "ps4",
+  "theme_style": "dark"
 }

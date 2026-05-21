@@ -41,4 +41,6 @@ export interface Game {
   emulator?: string
   core?: string
   isCollectionFolder?: boolean
+  cheevosId?: string
+  cheevosHash?: string
 }

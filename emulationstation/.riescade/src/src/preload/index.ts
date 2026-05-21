@@ -23,6 +23,11 @@ const api = {
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSetting: (name: string, value: any, type: 'string' | 'bool' | 'int' | 'float') =>
     ipcRenderer.invoke('save-setting', name, value, type),
+  getHostname: () => ipcRenderer.invoke('get-hostname'),
+  cleanGamelists: () => ipcRenderer.invoke('clean-gamelists'),
+  resetGamelistUsage: () => ipcRenderer.invoke('reset-gamelist-usage'),
+  resetFileExtensions: () => ipcRenderer.invoke('reset-file-extensions'),
+  clearCaches: () => ipcRenderer.invoke('clear-caches'),
 
   // Theme Settings
   getThemeSettings: (themeName: string) => ipcRenderer.invoke('get-theme-settings', themeName),
@@ -32,6 +37,9 @@ const api = {
 
   // Controllers
   getConfiguredControllers: () => ipcRenderer.invoke('get-configured-controllers'),
+  saveInputConfig: (data: { deviceName: string; deviceGUID: string; mappings: any }) =>
+    ipcRenderer.invoke('save-input-config', data),
+  getBluetoothDevices: () => ipcRenderer.invoke('get-bluetooth-devices'),
 
   // System commands
   executeCommand: (command: string, data?: any) => ipcRenderer.send('system-command', command, data),

@@ -9,7 +9,6 @@
     "build": "electron-vite build",
     "dist": "npm run build && electron-builder --win --dir",
     "deploy": "npm run dist && node scripts/deploy.js",
-    "postbuild": "node scripts/copy-default-theme.js",
     "preview": "electron-vite preview"
   },
   "dependencies": {

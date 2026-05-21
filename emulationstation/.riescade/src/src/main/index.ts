@@ -9,8 +9,9 @@ import { ThemeSettingsParser } from './parsers/ThemeSettingsParser'
 import { SystemService } from './services/SystemService'
 import { SassService } from './services/SassService'
 import { Game, System } from '../shared/types'
-import { watch, FSWatcher, readFileSync, existsSync } from 'fs'
-import { getRetroBatPath } from './utils/paths'
+import { watch, FSWatcher, readFileSync, existsSync, writeFileSync } from 'fs'
+import { getRetroBatPath, getConfigPath } from './utils/paths'
+import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 
 const libraryService = new LibraryService()
 const launcherService = new LauncherService()
@@ -39,7 +40,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow!.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -192,9 +193,130 @@ app.whenReady().then(() => {
     systemService.executeCommand(command)
   })
 
+  ipcMain.handle('save-input-config', async (_, { deviceName, deviceGUID, mappings }) => {
+    const configPath = join(getConfigPath(), 'es_input.cfg')
+    const lastConfigPath = join(getConfigPath(), 'es_last_input.cfg')
+
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+      parseAttributeValue: true,
+      ignoreDeclaration: true
+    })
+    const builder = new XMLBuilder({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+      format: true,
+      suppressEmptyNode: true,
+      ignoreDeclaration: true
+    })
+
+    let jsonObj: any = { inputList: { inputConfig: [] } }
+    if (existsSync(configPath)) {
+      try {
+        const content = readFileSync(configPath, 'utf-8')
+        jsonObj = parser.parse(content)
+        if (!jsonObj.inputList) jsonObj.inputList = {}
+        if (!jsonObj.inputList.inputConfig) jsonObj.inputList.inputConfig = []
+        if (!Array.isArray(jsonObj.inputList.inputConfig)) {
+          jsonObj.inputList.inputConfig = [jsonObj.inputList.inputConfig]
+        }
+      } catch (err) {
+        console.error('Failed to parse es_input.cfg:', err)
+      }
+    }
+
+    // Filter out existing mapping with the same GUID or Name
+    jsonObj.inputList.inputConfig = jsonObj.inputList.inputConfig.filter(
+      (cfg: any) => cfg['@_deviceGUID'] !== deviceGUID && cfg['@_deviceName'] !== deviceName
+    )
+
+    // Construct the new mapping config
+    const newInputConfig: any = {
+      '@_type': 'joystick',
+      '@_deviceName': deviceName,
+      '@_deviceGUID': deviceGUID,
+      input: Object.entries(mappings).map(([name, val]: [string, any]) => ({
+        '@_name': name,
+        '@_type': val.type,
+        '@_id': String(val.id),
+        '@_value': String(val.value)
+      }))
+    }
+
+    jsonObj.inputList.inputConfig.push(newInputConfig)
+
+    // Build the XML content
+    try {
+      const xmlContent = '<?xml version="1.0"?>\n' + builder.build(jsonObj)
+      writeFileSync(configPath, xmlContent, 'utf-8')
+
+      // Also write to es_last_input.cfg containing ONLY the last configured controller
+      const lastJsonObj = {
+        inputList: {
+          inputConfig: [newInputConfig]
+        }
+      }
+      const lastXmlContent = '<?xml version="1.0"?>\n' + builder.build(lastJsonObj)
+      writeFileSync(lastConfigPath, lastXmlContent, 'utf-8')
+      
+      console.log('Successfully saved controller config for:', deviceName)
+      return true
+    } catch (err) {
+      console.error('Failed to write es_input.cfg:', err)
+      return false
+    }
+  })
+
   ipcMain.handle('get-configured-controllers', async () => {
-    // Implement parsing es_input.cfg later if needed
-    return []
+    const configPath = join(getConfigPath(), 'es_input.cfg')
+    if (!existsSync(configPath)) return []
+    try {
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '@_',
+        parseAttributeValue: true,
+        ignoreDeclaration: true
+      })
+      const content = readFileSync(configPath, 'utf-8')
+      const jsonObj = parser.parse(content)
+      const configs = jsonObj.inputList?.inputConfig
+      if (!configs) return []
+      const configList = Array.isArray(configs) ? configs : [configs]
+      return configList.map((cfg: any) => ({
+        name: cfg['@_deviceName'],
+        guid: cfg['@_deviceGUID'],
+        type: cfg['@_type']
+      }))
+    } catch (err) {
+      console.error('Failed to read configured controllers:', err)
+      return []
+    }
+  })
+
+  ipcMain.handle('get-bluetooth-devices', async () => {
+    return new Promise((resolve) => {
+      const { exec } = require('child_process')
+      // PowerShell command to query paired bluetooth devices
+      const cmd = `powershell -Command "Get-PnpDevice -Class Bluetooth | Where-Object { $_.FriendlyName -and $_.InstanceId -like '*DEV_*' } | Select-Object -Property FriendlyName, InstanceId | ConvertTo-Json"`
+      exec(cmd, (err, stdout) => {
+        if (err) {
+          console.error('Error running bluetooth command:', err)
+          resolve([])
+          return
+        }
+        try {
+          const parsed = JSON.parse(stdout)
+          const list = Array.isArray(parsed) ? parsed : (parsed ? [parsed] : [])
+          resolve(list.map((d: any) => ({
+            name: d.FriendlyName || 'Unknown Bluetooth Device',
+            id: d.InstanceId || ''
+          })))
+        } catch (e) {
+          resolve([])
+        }
+      })
+    })
   })
 
   ipcMain.handle('get-version', async () => {
@@ -212,6 +334,26 @@ app.whenReady().then(() => {
       app: app.getVersion(),
       es: esVersion
     }
+  })
+
+  ipcMain.handle('get-hostname', async () => {
+    return require('os').hostname()
+  })
+
+  ipcMain.handle('clean-gamelists', async () => {
+    return libraryService.cleanGamelists()
+  })
+
+  ipcMain.handle('reset-gamelist-usage', async () => {
+    return libraryService.resetGamelistUsage()
+  })
+
+  ipcMain.handle('reset-file-extensions', async () => {
+    return libraryService.resetFileExtensions()
+  })
+
+  ipcMain.handle('clear-caches', async () => {
+    return libraryService.clearCaches()
   })
 
   ipcMain.handle('get-file-content', async (_, filePath: string) => {

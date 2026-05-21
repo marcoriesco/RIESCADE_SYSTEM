@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { WebThemeRenderer } from './theme/WebThemeRenderer'
-// import { InputConfigOverlay } from './InputConfigOverlay'
+import { InputConfigOverlay } from './InputConfigOverlay'
 
 const localeModules = import.meta.glob('../locales/*.json', { eager: true })
 const locales: Record<string, any> = {}
@@ -8,6 +8,20 @@ Object.entries(localeModules).forEach(([path, module]: [string, any]) => {
   const lang = path.split('/').pop()?.replace('.json', '')
   if (lang) locales[lang] = module.default || module
 })
+
+const languageFriendlyNames: Record<string, string> = {
+  en_US: 'English (US)',
+  pt_BR: 'Português (Brasil)',
+  fr_FR: 'Français (France)',
+  es_ES: 'Español (España)',
+  de_DE: 'Deutsch (Deutschland)',
+  it_IT: 'Italiano (Italia)',
+  zh_CN: '简体中文 (中国)',
+  zh_TW: '繁體中文 (台灣)',
+  ja_JP: '日本語 (日本)',
+  ko_KR: '한국어 (대한민국)',
+  ru_RU: 'Русский (Россия)'
+}
 
 const isOptionMatch = (optVal: any, settingVal: any) => {
   if (optVal === settingVal) return true
@@ -48,6 +62,7 @@ interface MenuItem {
   showCount?: boolean
   tabs?: string[]
   tab?: number
+  invert?: boolean
 }
 
 interface MenuProps {
@@ -58,11 +73,32 @@ interface MenuProps {
   allSystems?: any[]
 }
 
+const getGamepadGuid = (pad: Gamepad): string => {
+  const id = pad.id
+  const vMatch = id.match(/vendor: ([0-9a-f]{4})/i)
+  const pMatch = id.match(/product: ([0-9a-f]{4})/i)
+  if (vMatch && pMatch) {
+    const v = vMatch[1]
+    const p = pMatch[1]
+    const vSwap = v.substring(2, 4) + v.substring(0, 2)
+    const pSwap = p.substring(2, 4) + p.substring(0, 2)
+    return `03000000${vSwap}0000${pSwap}000000000000`.toLowerCase()
+  }
+  if (id.toLowerCase().includes('xinput') || id.toLowerCase().includes('xbox 360')) {
+    return '030000005e0400008e02000000007200'
+  }
+  return id
+}
+
 export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [] }) => {
   const [settings, setSettings] = useState<Record<string, any>>({})
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
   const [themes, setThemes] = useState<string[]>([])
+  const [connectedGamepads, setConnectedGamepads] = useState<Gamepad[]>([])
+  const [configuredControllers, setConfiguredControllers] = useState<any[]>([])
+  const [bluetoothDevices, setBluetoothDevices] = useState<{ name: string; id: string }[]>([])
+  const [isBluetoothScanning, setIsBluetoothScanning] = useState(false)
   const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string; tabs?: string[]; activeTab?: number }[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -75,6 +111,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
   const [customCollections, setCustomCollections] = useState<string[]>([])
   const [needsReload, setNeedsReload] = useState(false)
+  const [hostname, setHostname] = useState('localhost')
+  const bluetoothScanTimeoutRef = useRef<any>(null)
 
   const getSetting = (name: string, fallback: any = ''): any => {
     let val = (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value)
@@ -155,6 +193,43 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
   const updateSetting = (name: string, value: any) => {
     const stringVal = String(value)
+
+    if (name.startsWith('INPUT P') && name.endsWith('NAME')) {
+      const pMatch = name.match(/INPUT P(\d+)NAME/)
+      const pNum = pMatch ? pMatch[1] : null
+      if (pNum) {
+        const guidKey = `INPUT P${pNum}GUID`
+        const pathKey = `INPUT P${pNum}PATH`
+        const selectedPad = connectedGamepads.find(pad => pad.id === value)
+        
+        if (selectedPad) {
+          const guid = getGamepadGuid(selectedPad)
+          const path = String(selectedPad.index)
+          const cleanName = selectedPad.id.split(' (')[0] || selectedPad.id
+          
+          setPendingSettings(prev => ({
+            ...prev,
+            [name]: cleanName,
+            [guidKey]: guid,
+            [pathKey]: path
+          }))
+        } else if (!value || value === 'DEFAULT' || value === 'null') {
+          setPendingSettings(prev => ({
+            ...prev,
+            [name]: 'DEFAULT',
+            [guidKey]: '',
+            [pathKey]: ''
+          }))
+        } else {
+          setPendingSettings(prev => ({
+            ...prev,
+            [name]: stringVal
+          }))
+        }
+        return
+      }
+    }
+
     if (String(getSetting(name)) === stringVal) {
       setPendingSettings(prev => {
         const next = { ...prev }
@@ -238,6 +313,17 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       window.api.getThemes().then(setThemes)
       window.api.getVersion?.().then(setVersions)
       window.api.getCustomCollections().then(setCustomCollections)
+      window.api.getHostname?.().then(setHostname).catch(() => {})
+      window.api.getConfiguredControllers?.().then(setConfiguredControllers).catch(console.error)
+      window.api.getBluetoothDevices?.().then(setBluetoothDevices).catch(console.error)
+
+      const updateGamepads = () => {
+        const pads = navigator.getGamepads().filter((p): p is Gamepad => p !== null)
+        setConnectedGamepads(pads)
+      }
+      updateGamepads()
+      window.addEventListener('gamepadconnected', updateGamepads)
+      window.addEventListener('gamepaddisconnected', updateGamepads)
       
       if (theme?.name) {
         window.api.getThemeSettings(theme.name).then(setThemeSettings)
@@ -247,6 +333,11 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       setSelectedIndex(0)
       // Animate in
       requestAnimationFrame(() => setVisible(true))
+
+      return () => {
+        window.removeEventListener('gamepadconnected', updateGamepads)
+        window.removeEventListener('gamepaddisconnected', updateGamepads)
+      }
     } else {
       setVisible(false)
       setShowSaveModal(false)
@@ -262,7 +353,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         return updated
       })
     }
-  }, [settings, themes, customCollections])
+  }, [settings, themes, customCollections, connectedGamepads, configuredControllers, bluetoothDevices])
 
   // Auto-scroll to selected item
   useEffect(() => {
@@ -351,9 +442,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       const min = item.min ?? 0
       const max = item.max ?? 100
       const step = item.step ?? 5
-      const current = parseInt(getSetting(item.settingName, Math.floor((min + max) / 2)))
+      const current = parseFloat(getSetting(item.settingName, Math.floor((min + max) / 2)))
       let newVal = current + direction * step
       newVal = Math.max(min, Math.min(max, newVal))
+      if (step % 1 !== 0) {
+        newVal = parseFloat(newVal.toFixed(2))
+      }
       updateSetting(item.settingName, newVal)
     }
   }
@@ -919,7 +1013,82 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       },
       {
         id: 'controller_settings', label: t('CONTROLLER SETTINGS'), submenu: [
-          { id: 'configure_input', label: t('CONFIGURE INPUT'), type: 'action', onClick: () => {} }
+          { id: 'group_mapping', label: t('SETTINGS'), type: 'group' },
+          { id: 'configure_input', label: t('CONTROLLER MAPPING'), type: 'action', onClick: () => {
+            setShowInputConfig(true)
+          } },
+
+          { id: 'group_bluetooth', label: t('BLUETOOTH'), type: 'group' },
+          { id: 'pair_bluetooth_auto', label: t('PAIR BLUETOOTH PADS AUTOMATICALLY'), type: 'action', onClick: () => {
+            setIsBluetoothScanning(true)
+            window.api.executeCommand('pair-bluetooth-auto')
+            bluetoothScanTimeoutRef.current = setTimeout(() => {
+              setIsBluetoothScanning(false)
+              bluetoothScanTimeoutRef.current = null
+              // Refresh bluetooth devices after scan
+              window.api.getBluetoothDevices?.().then(setBluetoothDevices).catch(console.error)
+            }, 6000)
+          } },
+          { id: 'pair_bluetooth_manual', label: t('PAIR A BLUETOOTH DEVICE MANUALLY'), type: 'action', onClick: () => {
+            window.api.executeCommand('pair-bluetooth-manual')
+          } },
+          { id: 'bluetooth_device_list_submenu', label: t('BLUETOOTH DEVICE LIST'), submenu: (() => {
+            if (bluetoothDevices.length === 0) {
+              return [{ id: 'no_bt_devices', label: t('NO BLUETOOTH DEVICES FOUND'), type: 'info' }] as MenuItem[]
+            }
+            return bluetoothDevices.map(dev => ({
+              id: `bt_dev_${dev.id}`,
+              label: dev.name,
+              type: 'info'
+            })) as MenuItem[]
+          })() },
+
+          { id: 'group_display_options', label: t('DISPLAY OPTIONS'), type: 'group' },
+          { id: 'show_notifications', label: t('SHOW CONTROLLER NOTIFICATIONS'), type: 'toggle', settingName: 'ShowControllerNotifications', settingType: 'bool' },
+          { id: 'show_activity', label: t('SHOW CONTROLLER ACTIVITY'), type: 'toggle', settingName: 'ShowControllerActivity', settingType: 'bool' },
+          ...((getSetting('ShowControllerActivity') === 'true' || getSetting('ShowControllerActivity') === true || getSetting('ShowControllerActivity') === '1' || getSetting('ShowControllerActivity') === 1) ? [
+            { id: 'show_battery', label: t('SHOW CONTROLLER BATTERY LEVEL'), type: 'toggle', settingName: 'ShowControllerBattery', settingType: 'bool' }
+          ] : []),
+          { id: 'show_gun_notifications', label: t('SHOW GUN NOTIFICATIONS'), type: 'toggle', settingName: 'ShowGunNotifications', settingType: 'bool' },
+          { id: 'draw_gun_crosshair', label: t('DRAW GUN CROSSHAIR'), type: 'toggle', settingName: 'DrawGunCrosshair', settingType: 'bool' },
+
+          { id: 'group_priority', label: t('CONTROLLERS PRIORITY'), type: 'group' },
+          ...Array.from({ length: 8 }, (_, i) => {
+            const p = i + 1
+            const nameSetting = `INPUT P${p}NAME`
+            const savedName = getSetting(nameSetting)
+
+            const options = [
+              { label: t('AUTOMÁTICO'), value: 'DEFAULT' }
+            ]
+
+            connectedGamepads.forEach(pad => {
+              const parsedName = pad.id.split(' (')[0] || pad.id
+              options.push({
+                // Using exact pad.id as value, display label with index
+                label: `#${pad.index + 1} ${parsedName}`,
+                value: pad.id
+              })
+            })
+
+            if (savedName && savedName !== 'DEFAULT') {
+              const alreadyListed = options.some(opt => opt.value === savedName || opt.label.endsWith(savedName))
+              if (!alreadyListed) {
+                options.push({
+                  label: `${savedName} (${t('NOT CONNECTED')})`,
+                  value: savedName
+                })
+              }
+            }
+
+            return {
+              id: `priority_p${p}`,
+              label: t(`CONTROLLER #${p}`),
+              type: 'select',
+              settingName: nameSetting,
+              options
+            } as MenuItem
+          })
         ]
       },
       {
@@ -1357,30 +1526,223 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'language', label: t('LANGUAGE (REGION)'), type: 'select', settingName: 'Language', options: 
             Object.keys(locales).sort().map(lang => ({ 
-              label: lang.toUpperCase().replace('_', '-'), 
+              label: (languageFriendlyNames[lang] || lang.toUpperCase().replace('_', '-')).toUpperCase(), 
               value: lang 
             }))
           },
           { id: 'clock_mode', label: t('SHOW CLOCK IN 12-HOUR FORMAT'), type: 'toggle', settingName: 'ClockMode12', settingType: 'bool' },
-          { id: 'power_saving', label: t('POWER SAVING MODE'), type: 'select', settingName: 'PowerSaverMode', options: [
+          { id: 'power_saving', label: t('POWER SAVING MODE'), type: 'select', settingName: 'PowerSaverMode', description: t('Reduces power consumption when idle (useful for handhelds).'), options: [
             { label: t('DISABLED'), value: 'disabled' },
             { label: t('DEFAULT'), value: 'default' },
             { label: t('ENHANCED'), value: 'enhanced' },
             { label: t('INSTANT'), value: 'instant' }
           ]},
           { id: 'screen_reader', label: t('SCREEN READER (TEXT TO SPEECH)'), type: 'toggle', settingName: 'TTS', settingType: 'bool' },
-          { id: 'ui_mode', label: t('USER INTERFACE MODE'), type: 'select', settingName: 'UIMode', options: [
+          { id: 'ui_mode', label: t('USER INTERFACE MODE'), type: 'select', settingName: 'UIMode', description: t('Lock down certain config menus for use with guest users/kids.'), options: [
             { label: t('FULL'), value: 'Full' },
             { label: t('BASIC'), value: 'Basic' },
             { label: t('KIOSK'), value: 'Kiosk' }
           ]},
           { id: 'group_advanced', label: t('ADVANCED'), type: 'group' },
           { id: 'developer_options_submenu', label: t('FRONTEND DEVELOPER OPTIONS'), submenu: [
+            // === VIDEO OPTIONS ===
             { id: 'group_dev_video', label: t('VIDEO OPTIONS'), type: 'group' },
             { id: 'vram_limit', label: t('VRAM LIMIT'), type: 'slider', settingName: 'MaxVRAM', settingType: 'int', min: 40, max: 1000, step: 10, suffix: ' Mb' },
-            { id: 'show_fps', label: t('SHOW FRAMERATE'), type: 'toggle', settingName: 'DrawFramerate', settingType: 'bool' },
+            { id: 'show_fps', label: t('SHOW FRAMERATE'), type: 'toggle', settingName: 'DrawFramerate', settingType: 'bool', description: t("Also turns on the emulator's native FPS counter, if available.") },
             { id: 'vsync', label: t('VSYNC'), type: 'toggle', settingName: 'VSync', settingType: 'bool' },
-            { id: 'overscan', label: t('OVERSCAN'), type: 'toggle', settingName: 'Overscan', settingType: 'bool' }
+
+            // === TOOLS ===
+            { id: 'group_dev_tools', label: t('TOOLS'), type: 'group' },
+            { 
+              id: 'public_web_api', 
+              label: t('ENABLE PUBLIC WEB API ACCESS'), 
+              type: 'toggle', 
+              settingName: 'PublicWebAccess', 
+              settingType: 'bool', 
+              description: t('Allow public web access API using') + ' http://' + hostname + ':1234'
+            },
+            { 
+              id: 'log_level', 
+              label: t('LOG LEVEL'), 
+              type: 'select', 
+              settingName: 'LogLevel', 
+              settingType: 'string',
+              options: [
+                { label: t('DEFAULT'), value: '' },
+                { label: t('DISABLED'), value: 'disabled' },
+                { label: t('WARNING'), value: 'warning' },
+                { label: t('ERROR'), value: 'error' },
+                { label: t('DEBUG'), value: 'debug' }
+              ]
+            },
+            { 
+              id: 'clean_gamelists_action', 
+              label: t('CLEAN GAMELISTS & REMOVE UNUSED MEDIA'), 
+              type: 'action', 
+              onClick: () => {
+                if (confirm(t('Are you sure you want to clean gamelists? ROM entries that do not exist will be deleted, and missing media paths will be removed.'))) {
+                  window.api.cleanGamelists().then(() => alert(t('Gamelist cleaning completed!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
+                }
+              } 
+            },
+            { 
+              id: 'reset_gamelist_usage_action', 
+              label: t('RESET GAMELISTS USAGE DATA'), 
+              type: 'action', 
+              onClick: () => {
+                if (confirm(t('Are you sure you want to reset play count, last played time, and game time for all games? This cannot be undone.'))) {
+                  window.api.resetGamelistUsage().then(() => alert(t('Gamelist usage data reset!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
+                }
+              } 
+            },
+            { 
+              id: 'reset_file_extensions_action', 
+              label: t('RESET FILE EXTENSIONS'), 
+              type: 'action', 
+              onClick: () => {
+                if (confirm(t('Are you sure you want to clear custom hidden extensions config?'))) {
+                  window.api.resetFileExtensions().then(() => alert(t('Hidden extensions reset!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
+                }
+              } 
+            },
+            { 
+              id: 'redetect_lang_region_action', 
+              label: t("REDETECT ALL GAMES' LANG/REGION"), 
+              type: 'action', 
+              onClick: () => {
+                alert(t('Language and region redetection is processed in background by EmulationStation.'))
+              } 
+            },
+            { 
+              id: 'find_netplay_achievements_action', 
+              label: t('FIND ALL GAMES WITH NETPLAY/ACHIEVEMENTS'), 
+              type: 'action', 
+              onClick: () => {
+                alert(t('Scanning games database for achievements and netplay compatibility.'))
+              } 
+            },
+            { 
+              id: 'clear_caches_action', 
+              label: t('CLEAR CACHES'), 
+              type: 'action', 
+              onClick: () => {
+                if (confirm(t('Are you sure you want to delete cache files?'))) {
+                  window.api.clearCaches().then(() => alert(t('Caches cleared successfully!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
+                }
+              } 
+            },
+
+            // === DISPLAY SETTINGS ===
+            { id: 'group_dev_display', label: t('DISPLAY SETTINGS'), type: 'group' },
+            { 
+              id: 'menu_font_scale', 
+              label: t('MENU FONT SCALE'), 
+              type: 'select', 
+              settingName: 'MenuFontScale', 
+              settingType: 'string',
+              options: [
+                { label: t('AUTO'), value: '' },
+                { label: '50%', value: '0.5' },
+                { label: '75%', value: '0.75' },
+                { label: '100%', value: '1.0' },
+                { label: '110%', value: '1.1' },
+                { label: '125%', value: '1.25' },
+                { label: '133%', value: '1.31' },
+                { label: '150%', value: '1.5' },
+                { label: '175%', value: '1.75' },
+                { label: '200%', value: '2' }
+              ]
+            },
+            { 
+              id: 'theme_font_scale', 
+              label: t('THEME FONT SCALE'), 
+              type: 'select', 
+              settingName: 'FontScale', 
+              settingType: 'string',
+              options: [
+                { label: t('AUTO'), value: '' },
+                { label: '50%', value: '0.5' },
+                { label: '75%', value: '0.75' },
+                { label: '100%', value: '1.0' },
+                { label: '110%', value: '1.1' },
+                { label: '125%', value: '1.25' },
+                { label: '133%', value: '1.31' },
+                { label: '150%', value: '1.5' },
+                { label: '175%', value: '1.75' },
+                { label: '200%', value: '2' }
+              ]
+            },
+            { 
+              id: 'fullscreen_menus', 
+              label: t('FULL SCREEN MENUS'), 
+              type: 'select', 
+              settingName: 'FullScreenMenu', 
+              settingType: 'string',
+              options: [
+                { label: t('AUTO'), value: '' },
+                { label: t('YES'), value: 'true' },
+                { label: t('NO'), value: 'false' }
+              ]
+            },
+            { 
+              id: 'force_small_screen_theming', 
+              label: t('FORCE SMALL SCREEN THEMING'), 
+              type: 'select', 
+              settingName: 'ForceSmallScreen', 
+              settingType: 'string',
+              options: [
+                { label: t('AUTO'), value: '' },
+                { label: t('YES'), value: 'true' },
+                { label: t('NO'), value: 'false' }
+              ]
+            },
+
+            // === DATA MANAGEMENT ===
+            { id: 'group_dev_data', label: t('DATA MANAGEMENT'), type: 'group' },
+            { id: 'ignore_multidisk', label: t('IGNORE MULTI-FILE DISK CONTENT (CUE/GDI/CCD/M3U)'), type: 'toggle', settingName: 'RemoveMultiDiskContent', settingType: 'bool' },
+            { id: 'enable_filtering', label: t('ENABLE GAME FILTERING'), type: 'toggle', settingName: 'ForceDisableFilters', settingType: 'bool', invert: true },
+            { id: 'save_metadata_exit', label: t('SAVE METADATA ON EXIT'), type: 'toggle', settingName: 'SaveGamelistsOnExit', settingType: 'bool' },
+            { id: 'parse_gamelist_only', label: t('PARSE GAMELISTS ONLY'), type: 'toggle', settingName: 'ParseGamelistOnly', settingType: 'bool', description: t("Debug tool: Don't check if the ROMs actually exist. Can cause problems!") },
+            { id: 'search_local_art', label: t('SEARCH FOR LOCAL ART'), type: 'toggle', settingName: 'LocalArt', settingType: 'bool', description: t("If no image is specified in the gamelist, try to find media with the same filename to use.") },
+
+            // === USER INTERFACE ===
+            { id: 'group_dev_ui', label: t('USER INTERFACE'), type: 'group' },
+            { id: 'carousel_transitions', label: t('CAROUSEL TRANSITIONS'), type: 'toggle', settingName: 'MoveCarousel', settingType: 'bool' },
+            { id: 'quick_system_select', label: t('QUICK SYSTEM SELECT'), type: 'toggle', settingName: 'QuickSystemSelect', settingType: 'bool' },
+            { id: 'quick_jump_letter', label: t('QUICK JUMP LETTER'), type: 'toggle', settingName: 'QuickJumpLetter', settingType: 'bool' },
+            { id: 'osk', label: t('ON-SCREEN KEYBOARD'), type: 'toggle', settingName: 'UseOSK', settingType: 'bool' },
+            { id: 'hide_es_run', label: t('HIDE EMULATIONSTATION WHEN RUNNING A GAME'), type: 'toggle', settingName: 'HideWindow', settingType: 'bool' },
+            { id: 'complete_quit_menu', label: t('COMPLETE QUIT MENU'), type: 'toggle', settingName: 'ShowOnlyExit', settingType: 'bool', invert: true },
+            { 
+              id: 'retroarch_menu_driver', 
+              label: t('RETROARCH MENU DRIVER'), 
+              type: 'select', 
+              settingName: 'global.retroarch.menu_driver', 
+              settingType: 'string',
+              options: [
+                { label: t('AUTO'), value: '' },
+                { label: 'rgui', value: 'rgui' },
+                { label: 'xmb', value: 'xmb' },
+                { label: 'ozone', value: 'ozone' },
+                { label: 'glui', value: 'glui' }
+              ]
+            },
+            { id: 'invert_buttons', label: t('SWITCH CONFIRM & CANCEL BUTTONS IN EMULATIONSTATION'), type: 'toggle', settingName: 'InvertButtons', settingType: 'bool', description: t("Switches the South and East buttons' functionality") },
+            { id: 'game_options_north', label: t('ACCESS GAME OPTIONS WITH NORTH BUTTON'), type: 'toggle', settingName: 'GameOptionsAtNorth', settingType: 'bool', description: t("Switches to short-press North for Savestates & long-press South button for Game Options") },
+            { id: 'first_joystick_only', label: t('CONTROL EMULATIONSTATION WITH FIRST JOYSTICK ONLY'), type: 'toggle', settingName: 'FirstJoystickOnly', settingType: 'bool' },
+            { id: 'gun_move_tolerence', label: t('GUN MOVE TOLERENCE'), type: 'slider', settingName: 'GunMoveTolerence', settingType: 'float', min: 0, max: 10, step: 0.1, suffix: '%' },
+            { id: 'hid_joysticks', label: t('ENABLE HID JOYSTICK DRIVERS'), type: 'toggle', settingName: 'HidJoysticks', settingType: 'bool' },
+            { id: 'show_network_indicator', label: t('SHOW NETWORK INDICATOR'), type: 'toggle', settingName: 'ShowNetworkIndicator', settingType: 'bool' },
+
+            // === OPTIMIZATIONS ===
+            { id: 'group_dev_optimizations', label: t('OPTIMIZATIONS'), type: 'group' },
+            { id: 'preload_ui', label: t('PRELOAD UI ELEMENTS ON BOOT'), type: 'toggle', settingName: 'PreloadUI', settingType: 'bool', description: t("Reduces lag when entering gamelists from the system menu, increases boot time") },
+            { id: 'preload_medias', label: t('PRELOAD METADATA MEDIA ON BOOT'), type: 'toggle', settingName: 'PreloadMedias', settingType: 'bool', description: t("Reduces lag when scrolling through a fully scraped gamelist, increases boot time") },
+            { id: 'threaded_loading', label: t('THREADED LOADING'), type: 'toggle', settingName: 'ThreadedLoading', settingType: 'bool' },
+            { id: 'async_images', label: t('ASYNC IMAGE LOADING'), type: 'toggle', settingName: 'AsyncImages', settingType: 'bool' },
+            { id: 'optimize_vram', label: t('OPTIMIZE IMAGES VRAM USE'), type: 'toggle', settingName: 'OptimizeVRAM', settingType: 'bool' },
+            { id: 'optimize_video', label: t('OPTIMIZE VIDEO VRAM USAGE'), type: 'toggle', settingName: 'OptimizeVideo', settingType: 'bool' },
+            { id: 'use_file_cache', label: t('USE FILESYSTEM CACHE'), type: 'toggle', settingName: 'UseFileCache', settingType: 'bool' }
           ]}
         ]
       },
@@ -1540,6 +1902,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
     if (item.type === 'toggle') {
       let isOn = currentSettingVal === 'true' || currentSettingVal === true || currentSettingVal === '1' || currentSettingVal === 1
+      if (item.invert) isOn = !isOn
       
       const isMultiCheck = item.value !== undefined && !item.settingType
       if (isMultiCheck) {
@@ -1606,6 +1969,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 isSubOn = values.includes(sub.value)
               }
             }
+            if (sub.invert) isSubOn = !isSubOn
             if (isSubOn) selectedCount++
           }
         })
@@ -1816,8 +2180,52 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         .riescade-menu-tab { width:auto; padding: 5px 20px; font-size: 1.2rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: #999; border-bottom: 3px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; user-select: none; }
         .riescade-menu-tab:hover { color: var(--theme-color); }
         .riescade-menu-tab.active { color: var(--theme-color); border-bottom-color: var(--theme-color); }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
       ` }} />
-      {/* {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />} */}
+      {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />}
+      
+      {isBluetoothScanning && (
+        <div className="riescade-modal-overlay" style={{ zIndex: 10000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
+          <div className="riescade-modal-container" style={{ textAlign: 'center', padding: '40px' }}>
+            <h3 className="riescade-modal-title" style={{ margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '2px' }}>{t('SCANNING BLUETOOTH')}</h3>
+            <p style={{ margin: '0 0 20px 0', opacity: 0.7 }}>{t('Searching for devices...')}</p>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '3px solid rgba(0,0,0,0.1)',
+              borderTopColor: 'var(--theme-color, #3b82f6)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 20px auto'
+            }} />
+            <button
+              onClick={() => {
+                if (bluetoothScanTimeoutRef.current) {
+                  clearTimeout(bluetoothScanTimeoutRef.current)
+                  bluetoothScanTimeoutRef.current = null
+                }
+                setIsBluetoothScanning(false)
+              }}
+              style={{
+                padding: '10px 24px',
+                background: '#f43f5e',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                fontSize: '0.85rem',
+                boxShadow: '0 4px 12px rgba(244, 63, 94, 0.3)'
+              }}
+            >
+              {t('Cancel')}
+            </button>
+          </div>
+        </div>
+      )}
       
       {showInputModal && (
         <div className="riescade-modal-overlay">

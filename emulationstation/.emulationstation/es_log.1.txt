@@ -1,0 +1,664 @@
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/Timegal.bat", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/38ambushalley.actionmax", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/AlteredCarbon.bat", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/Arcade_Xperience_Vol1.bat", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/Asterix.bat", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/bluethunder.actionmax", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/Cliff.bat", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/hydrosub2021.actionmax", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/Titan_AE.bat", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/Chantze_HD.bat", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/ace.zip", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/astron.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/actionmax.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/badlands.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Agent328OB.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/bega.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/AlteredCarbon.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/cliff.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Arcade_Xperience_Vol1.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/cobra.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Arcade_Xperience_Vol2.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/cobraab.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Arcade_Xperience_Vol3.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/dle21.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Arcane.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Asterix.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Astroboy.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/badlands_lite.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/BD13.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/TheBraveLocomotive.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/calichase.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Chantze_HD.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/cliff_se_1080.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Future_Boy.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/cpower1.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/cpower2.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/cpower3.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/cpower4.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/cpowergh.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/cracke.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/crimepatrol-hd.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/drugwars-hd.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Daitarn_3.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Danmachi.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/DragonTrainer.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/dragons_lair_se.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/dragons_lair_1080.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/dragons_lair_classic.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/esh.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/dragons_lair_2_se.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/DL_TV.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/the-elder-scrolls.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/galaxy.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/esh_aurunmilla_se.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/gpworld.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/fastdraw.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/interstellar.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Fire_and_Ice.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/lair.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/freedomfighter.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/F13.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/lair2.zip", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/mach3.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/gallagher.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/roadblaster.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/gebonions.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/sdq.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/GoldenNINJA.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/tq.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/goldrake.daphne", skipping.
+2026-05-20 19:46:19	[2512]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/daphne/roms/uvt.zip", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/GRIZZY.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/GuardsMens.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/halahara.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Hambuster.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/jeeg.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Jinx.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/JUNGLE_JAIL.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/lbh-hd.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/LINEA.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/LU3.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/FumaConspiracy.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/maddog-hd.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/maddog2-hd.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/typing-md2.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/marbvice.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/mazinga.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Memo_Speed.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Metal_Family.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/minesweeper.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Mononoke.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/MVP.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Freddy.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/HayateHD.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Oeil-Pour-Oeil.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Oggy-Wan-Kenoggy.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/OperationTigerpool.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/PartyTime.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/patrolman.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/pinocchio.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/platoon.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/pursuit.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Puss_in_Boots.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/rick.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/RoadBlasterHD.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/RR.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/roadracer.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/rollercoaster.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/SacreesNonnes.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Samurai_Jack.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/scrat.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/seaside.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/SecretOfNimh.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Sintel.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Sonic_the_Hedgehog_1996.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/space_ace_se.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/space_ace_1080.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/spacepirates-hd.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/spacerocks.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/SpiderHand.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/StarshipTroopers.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/SuckerPunch.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Sugar_Rush.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/SuperDQ.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/SuperMoineHolypop.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Survival.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/tierras.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/time_gal_se.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/timetraveler.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Titan_AE.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Tittie_Tussle.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/triad.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Tron.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/UltimateAgeIce.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Venus_Wars.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/WARLIKE.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/warriors.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/Mercredi.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/rb.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/wsjr-hd.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/starblazers.daphne", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/singe/timetraveler3d.daphne", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/wii/medium_artwork", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/3do/D.m3u", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/3do/Daedalus Encounter, The.m3u", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/3do/Shockwave 2 - Beyond the Gate.m3u", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/3do/Wing Commander III - Heart of the Tiger.m3u", skipping.
+2026-05-20 19:46:19	[30676]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/oricatmos/gamelist.xml", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Austin Powers - Welcome to My Underground Lair!.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Bomberman Quest.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Chase H.Q. - Secret Police.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Dragon Warrior Monsters.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Legend of Zelda, The - Oracle of Ages.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Legend of Zelda, The - Oracle of Seasons.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Mario Golf.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Mario Tennis.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Metal Gear Solid.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Micro Machines V3.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Pokemon - Gold Version.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Pokemon - Silver Version.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Super Mario Bros. Deluxe.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Tetris DX.gbc", skipping.
+2026-05-20 19:46:19	[29836]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gba2players/Warlocked.gbc", skipping.
+2026-05-20 19:46:19	[3480]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/solarus/Ocean's Heart", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Beyond the Ice Palace 2.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Iron Meat.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Life Eater.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Lifecraft.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Monolith.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Oirbo.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Star of Providence.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Victory at Sea Atlantic - World War II Naval Warfare.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Diplomacy is Not an Option.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/INAYAH - Life after Gods.wsquashfs", skipping.
+2026-05-20 19:46:19	[20420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/gog/Somber Echoes.wsquashfs", skipping.
+2026-05-20 19:46:19	[9420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballm/Chuckys Killer Pinball.table", skipping.
+2026-05-20 19:46:19	[9420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballm/Dead by Daylight Pinball.table", skipping.
+2026-05-20 19:46:19	[9420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballm/Duke Nukem’s Big Shot Pinball.table", skipping.
+2026-05-20 19:46:19	[9420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballm/System Shock Pinball.table", skipping.
+2026-05-20 19:46:19	[9420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballm/Texas Chainsaw Massacre Pinball.table", skipping.
+2026-05-20 19:46:19	[9420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballm/The Thing Pinball.table", skipping.
+2026-05-20 19:46:19	[9420]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballm/Wrath of the Elder Gods – Directors Cut.table", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Mars.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_Age_of_Ultron.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_Avengers.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_Deadpool.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_DrStrange.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_FearItSelf.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_GhostRider.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_Guardians.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_InfinityGauntlet.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_IronMan.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_MoonKnight.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_SpiderMan.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_Venom.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_Wolverine.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_WWH.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MARVEL_XMen.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/MsSplosionMan.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Paranormal.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Pasha.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/PlantsVsZombies.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Portal.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Skyrim.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/SouthPark1.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/AliensPin.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Alien_Isolation.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Alien_vs_Predator.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/AmericanDad.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Archer.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Aerobatics.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/BobsBurgers.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Citadel.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Aerobatics_Retro.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Doom.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Aliens.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Epic_Quest.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Beast_Master.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/FamilyGuy.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/STARWARS_CloneWars.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Blackbelt.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/STARWARS_Episode_4.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Blackbelt_2018.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/STARWARS_Episode_5.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Blackbelt_Retro.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/STARWARS_Episode_6.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Caveman.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/STARWARS_MFO.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Cine_Star.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/STARWARS_Rebels.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Cine_Star_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/STARWARS_SFA.pxp", skipping.
+2026-05-20 19:46:19	[23084]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx2/PinballFX2/data_steam/Western.pxp", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Circus.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Circus_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Circus_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Clown.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Clown_2019.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Clown_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Combat.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Combat_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Combat_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Combat_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Devil_Riders.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Devil_Riders_2019.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Devil_Riders_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Earth_Wind_Fire.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Earth_Wind_Fire_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Earth_Wind_Fire_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Farfalla.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Farfalla_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Farfalla_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Farfalla_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Firefighter.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Fire_Mountain.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Fire_Mountain_2019.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Fire_Mountain_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Future_World.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Future_World_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/gamelist-generator.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Granada.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Hippie.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Hot_Wheels.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Hot_Wheels_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Hot_Wheels_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/House_of_Diamonds.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/House_of_Diamonds_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/House_of_Diamonds_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/House_of_Diamonds_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Locomotion.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Locomotion_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Locomotion_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Lucky_Fruit.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Magic_Castle.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Magic_Castle_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Magic_Castle_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Mexico_'86.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Mexico_'86_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Moon_Flight.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Mystic_Star.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Mystic_Star_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Nautilus.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Nautilus_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Nautilus_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Pinball_Champ.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Pinball_Champ_'82.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Pinball_Champ_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Pinball_Champ_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Pool_Champion.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Pool_Champion_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Pool_Champion_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_2_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_2_Remake.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_2_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_2_SS.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_Redux_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_Redux_Remake.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_Redux_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/POSTAL_Redux_SS.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Red_Show.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Red_Show_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Robot.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Robot_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Robot_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Robot_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Shooting_the_Rapids.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Shooting_the_Rapids_2016.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Shooting_the_Rapids_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Soccer_Kings.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Soccer_Kings_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Space_Shuttle.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Space_Shuttle_2016.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Space_Shuttle_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Space_Shuttle_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Speed_King.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Spooky.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Spooky_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Spooky_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Spooky_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Star's_Phoenix.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Star's_Phoenix_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Star_God.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Star_God_2019.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Star_God_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Strike.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Strike_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Supersonic.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Supersonic_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/The_Mummy.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Time_Machine.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Time_Machine_2019.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Time_Machine_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Top_Hand.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Tropical.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Tropical_2019.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Universe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Universe_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Universe_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Voyager.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Winter_Sports.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Winter_Sports_2018.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Wizard.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Wood's_Queen.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Wood's_Queen_2019.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Zankor.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Zankor_2017.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Zankor_Deluxe.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Zankor_Retro.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Zombie.bat", skipping.
+2026-05-20 19:46:19	[20884]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/zaccariapinball/Zombie_Invasion.bat", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Aliens.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/V12.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Western.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Fish_Tales.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Funhouse.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Getaway.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Hurricane.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Indiana_Jones.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Junkyard.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Medieval_Madness.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Monster_Bash.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_No_Good_Gofers.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Roadshow.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Space_Station.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_Tales_of_the_Arabian_Nights.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/WMS_White_Water.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/WMS_Medieval_Madness.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/AmericanDad.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Amusement_Park.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Archer.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Atlantis.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_Attack_from_Mars.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_Champion_Pub.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_Cirqus_Voltaire.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_Creature_from_the_Black_Lagoon.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_Dr_Dude.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_Party_Zone.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_TheatreOfMagic.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BETHESDA_Doom.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BETHESDA_Fallout.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BETHESDA_Skyrim.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BioLab.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BobsBurgers.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/CastleStorm.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Citadel.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/EarthDefense.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Eldorado.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Excalibur.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/FamilyGuy.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Hercules.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Looter.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Mars.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Age_of_Ultron.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Ant-Man.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Avengers.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_CaptainAmerica.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_CivilWar.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Deadpool.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_DrStrange.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_FantasticFour.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_FearItSelf.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_GhostRider.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Guardians.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_InfinityGauntlet.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_IronMan.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_MoonKnight.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_MsMarvel.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_SpiderMan.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Thor.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Venom.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Wolverine.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_WOP_TheNextGeneration.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_WWH.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_XMen.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Paranormal.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Pasha.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Portal.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/RedCup1.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/RedCup2.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/RedCup3.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Rome.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Shaman.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/SpaceBear1.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/SpaceBear2.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_AVCO2.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Boba_Fett.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_CloneWars.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Darth_Vader.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Droids.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Episode7.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Episode_4.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Episode_5.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Episode_6.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Han_Solo.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_LAPB.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Light_VS_Dark.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_Rebels.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/STARWARS_SFA.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Tesla.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/TheWalkingDead.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/UNIVERSAL_BTTF.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/UNIVERSAL_ET.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/UNIVERSAL_Jaws.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/UNIVERSAL_Jurassic_Park.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/AmericanDad.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/BALLY_Dr_Dude.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/BALLY_TheatreOfMagic.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/Eldorado.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/MARVEL_Deadpool.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/RedCup3.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/Shaman.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/SpaceBear1.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_Safe_Cracker.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/MARVEL_Blade.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Alien_vs_Predator.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/UNIVERSAL_Jurassic_Theme_Park.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/UNIVERSAL_Jurassic_World.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/LocalData/patch_data_tables/UNIVERSAL_Jurassic_Theme_Park.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/Alien_Isolation.pxp", skipping.
+2026-05-20 19:46:19	[21368]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/pinballfx3/PinballFX3/data/steam/BALLY_BlackRose.pxp", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/15 MINUTES TO LIVE.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/AMROGUE.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/ASPRIN.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/BALMUNG.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/BARE BONES.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/DREAS UP.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/EYESOUL.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/FLOCK BLOCK.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/FPS80 CHEAT VERSION.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/FPS80.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/GENJUUMIN SHOOTING.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/GRAVITRON EXPERIMENT.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/HI-EX.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/KATZU.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/LCD TETRIS.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/MAINFIGHTER GRAPHICS MOD.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/MAINFIGHTER.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/MOLE.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/NIGHTS SCORE ATTACK -.zip-80 VER.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/PIXEL JUMP.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/PUSH-EM.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/RAYCAST RACER.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/REBOUND 2 ELECTRIC BOOGALOO.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/SHADOW OVER THE TWELVE LANDS.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/SHEEP RUN.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/SLIDER.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/SPACER SHIPER SHOOTER.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/TERROR INSTINCT.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/tic80/TETRIS UPDATE 1.zip", skipping.
+2026-05-20 19:46:19	[12664]	ERROR	Error finding/creating FileData for "..zipRIS.zip", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ngage/AF.zip", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/chuckie.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/egghead.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/f14.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/gala.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/galxians.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/hardhath.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/hypervpr.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/jetsetmn.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/joeblade.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/jsw.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/jsw2.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/jungle.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/manicmin.cmd", skipping.
+2026-05-20 19:46:19	[18708]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/atom/repton.cmd", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Afterburner (1987)(Sega)(Jp-En).bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Alone In The Dark (19xx)(Infogrames)(Jp).bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Image Fight (1990)(Ving)(Jp-En).bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Indiana Jones and the Fate of Atlantis (1993)(LucasFilm)(Jp-En).bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Indiana Jones and the Last Crusade (1989)(LucasFilm)(Jp-En).bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Kyukyoku Tiger (aka Twin Cobra) (1994)(Ving)(Jp-En)[mp3 source].bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Loom (1991)(LucasFilm)(Jp-En).bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Viewpoint (1993)(Ving)(Jp-En)[mp3 source].bin", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/fmtowns/Zak McKracken and The Alien Mindbenders (1990)(Lucasarts)(Jp-En).bin", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/sgb/gamelist.xml", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/sgb/_Super Game Boy_missing.txt", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	System "mess" is missing name, extension, or command!
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/9 - The Dark Side of Notre Dame.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Awakening - The Dreamless Castle.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Castle - Never Judge a Book by Its Cover.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Curse at Twilight - Thief of Souls.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Dance of Death.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Dark Canvas - A Brush With Death.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Drawn - The Painted Tower.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Empress of the Deep - The Darkest Secret.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Enlightenus II - The Timeless Tower.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Enlightenus.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Fallen - The Flowers of Evil.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/gamelist-generator.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/MatchMaker - Curse of Deserted Bride.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/The Keepers 2 - The Order's Last Secret CE.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/Pirate Mysteries - A Tale of Monkeys, Masks, and Hidden Objects.wsquashfs", skipping.
+2026-05-20 19:46:19	[9612]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/bigfish/9 - The Dark Side of Notre Dame.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/8bit Killer.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Abbaye Des Morts.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Blokanoid.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Curse of Issyos.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Darkula.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Death came from Verminest.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/EFMB.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Game Jam.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Gaurodan.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Gort Ultimatum.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Hydorah.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Linfocross.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Maldita Castilla.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Maniac Aracs.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Mutants from the Deep.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Red Spheres.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Solar Gladiators.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Super Hydorah.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/They came from Verminest.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Toxic Tomb.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/gamelist-generator.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Maldita Castilla EX.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Maldita Castilla EX.wsquashfs", skipping.
+2026-05-20 19:46:19	[29736]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/locomalito/Maldita Castilla.wsquashfs", skipping.
+2026-05-20 19:46:19	[25780]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/magazine/Ação Games", skipping.
+2026-05-20 19:46:19	[25780]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/magazine/Old! Gamer", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Bard's Tale.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Beast Boxing Turbo.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/BombSquad/Lib/idlelib/idle.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Broken Age.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/DubWars.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Duck Game.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Elliot Quest.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Final Fantasy III.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Freedom Fall.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Joe Danger.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Knightmare Tower.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Magnetic By Nature.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Neon Shadow.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Reaper Tale of a Pale Swordsman.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Sine Mora.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Sonic the Hedgehog 4 - Episode II.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Super Indie Karts.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/The Cave.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Tower Fall Ascension.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Vector.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Maldita Castilla.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/BombSquad.wsquashfs", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Joe Danger/Bin/JoeDanger.exe", skipping.
+2026-05-20 19:46:19	[28444]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/ouya/Knightmare Tower.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Alchemy Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Amazing Adventures Around The World.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Amazing Adventures The Lost Tomb.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Atomica Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Bejeweled 2 Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Bejeweled Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Bejeweled Twist.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Big Money Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Bonnie's Bookstore Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Bookworm Adventures Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Bookworm Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Chuzzle Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Cosmic Bugs/animations/i.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Cosmic Bugs.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Dynomite Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Escape Rosecliff Island.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Feeding Frenzy Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Hammer Heads Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Iggle Pop Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Insaniquarium Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Mahjong Escape Ancient China.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Mahjong Escape Ancient Japan.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Mummy Maze Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Mystery PI - The Lottery Ticket.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Mystery PI - The New York Fortune.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Mystery PI - The Vegas Heist.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/NingPo MahJong Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Noah's Ark Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Peggle Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Peggle Nights Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Peggle World of Warcraft Edition.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Pixelus Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Pizza Frenzy.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Plants vs Zombies.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Rocket Mania Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Seven Seas Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Super Collapse 3.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Talismania Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/The Wizard's Pen.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/TipTop Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Venice Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Water Bugs/wanims/i.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Water Bugs.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Word Harmony Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/AstroPop Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Feeding Frenzy 2 Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Zuma Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[2772]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/popcap/Zuma Deluxe.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/10 Mountain of Faith.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/10.5 Scarlet Weather Rhapsody.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/11 Subterranean Animism.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/12 Undefined Fantastic Object.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/12.3 Hisoutensoku.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/12.5 Double Spoiler.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/12.8 Great Fairy Wars.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/13 Ten Desires.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/13.5 Hopeless Masquerade.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/14 Double Dealing Character.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/14.3 Impossible Spell Card.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/14.5 Urban Legend in Limbo.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/15 Legacy of Lunatic Kingdom.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/15.5 Antinomy of Common Flowers.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/16 Hidden Star in Four Seasons.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/17 Wily Beast and Weakest Creature.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/18 Unconnected Marketeers.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/19 Unfinished Dream of All Living Ghost.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/20 Fossilized Wonders.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/6 Embodiment of Scarlet Devil.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/7 Perfect Cherry Blossom.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/7.5 Immaterial and Missing Power.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/8 Imperishable Night.wsquashfs", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/9 Phantasmagoria of Flower View.wsquashfs", skipping.
+2026-05-20 19:46:19	[20256]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/wiiu-sky/Skylanders Giants (US) (v0).wua", skipping.
+2026-05-20 19:46:19	[12616]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/touhou/9.5 Shoot the Bullet.wsquashfs", skipping.
+2026-05-20 19:46:19	[20256]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/wiiu-sky/Skylanders Imaginators (USA) (v16).wua", skipping.
+2026-05-20 19:46:19	[20256]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/wiiu-sky/Skylanders Spyro's Adventure (JP) (v0).wua", skipping.
+2026-05-20 19:46:19	[20256]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/wiiu-sky/Skylanders SuperChargers (USA) (v96).wua", skipping.
+2026-05-20 19:46:19	[20256]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/wiiu-sky/Skylanders SWAP Force (USA) (v16).wua", skipping.
+2026-05-20 19:46:19	[20256]	ERROR	Error finding/creating FileData for "C:/tmp/RIESCADE_SYSTEM/roms/wiiu-sky/Skylanders Trap Team (US) (v16).wua", skipping.
+2026-05-20 19:46:21	[552]	ERROR	HttpReq::onError (3) : Couldn't connect to server
+2026-05-20 19:48:25	[2920]	ERROR	GL error: glDeleteTextures(1, &_texture) failed with error code: 1282
