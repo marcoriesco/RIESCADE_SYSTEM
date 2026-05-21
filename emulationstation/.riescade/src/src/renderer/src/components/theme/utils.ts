@@ -17,17 +17,33 @@ export const resolvePath = (path: string | undefined, data?: any): string => {
 
   // If it's already a file:// or http URL, return it
   if (resolved.startsWith('file://') || resolved.startsWith('http')) {
-    return resolved
+    let url = resolved
+    const mediaRev = data?.['global:mediaRevision']
+    if (mediaRev !== undefined && mediaRev !== null) {
+      if (url.startsWith('file://') && !url.includes('themeRev=') && !url.includes('rev=')) {
+        url = url.includes('?') ? `${url}&rev=${mediaRev}` : `${url}?rev=${mediaRev}`
+      }
+    }
+    return url
   }
 
   // Ensure it's a file:/// URL for Electron if it's an absolute path
+  let url = resolved
   if (resolved.match(/^[a-zA-Z]:[/\\]/) || resolved.startsWith('/') || resolved.startsWith('\\')) {
     const normalized = resolved.replace(/\\/g, '/')
     if (normalized.match(/^[a-zA-Z]:/)) {
-      return `file:///${normalized}`
+      url = `file:///${normalized}`
+    } else {
+      url = `file://${normalized}`
     }
-    return `file://${normalized}`
   }
 
-  return resolved
+  const mediaRev = data?.['global:mediaRevision']
+  if (mediaRev !== undefined && mediaRev !== null) {
+    if (url.startsWith('file://') && !url.includes('themeRev=') && !url.includes('rev=')) {
+      url = url.includes('?') ? `${url}&rev=${mediaRev}` : `${url}?rev=${mediaRev}`
+    }
+  }
+
+  return url
 }

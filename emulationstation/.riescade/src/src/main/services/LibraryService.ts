@@ -8,6 +8,16 @@ import { System, Game } from '../../shared/types'
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+function normalizePathForComparison(p: string): string {
+  if (!p) return ''
+  return p
+    .replace(/\\/g, '/')          // Normalize slashes
+    .replace(/^\.\//, '')         // Remove leading ./
+    .replace(/^\//, '')           // Remove leading /
+    .trim()
+    .toLowerCase()
+}
+
 export class LibraryService {
   private systemsParser: SystemsParser
   private gamelistParser: GamelistParser
@@ -28,7 +38,7 @@ export class LibraryService {
     } catch (e) {}
   }
 
-  public async preloadAll(): Promise<void> {
+  public async preloadAll(forcePhysicalScan = false): Promise<void> {
     if (LibraryService.isPreloaded) return
 
     const { BrowserWindow } = require('electron')
@@ -63,7 +73,7 @@ export class LibraryService {
     let loadedCount = 0
     for (const sys of physicalSystems) {
       try {
-        const games = this.getGamesRaw(sys.name)
+        const games = this.getGamesRaw(sys.name, forcePhysicalScan)
         LibraryService.cachedGames.set(sys.name.toLowerCase(), games)
       } catch (err) {
         console.error(`Failed to preload games for ${sys.name}:`, err)
@@ -97,7 +107,7 @@ export class LibraryService {
     sendProgress(100)
   }
 
-  public preloadAllSync(): void {
+  public preloadAllSync(forcePhysicalScan = false): void {
     if (LibraryService.isPreloaded) return
 
     const displayed = this.getDisplayedSystems()
@@ -115,7 +125,7 @@ export class LibraryService {
 
     for (const sys of physicalSystems) {
       try {
-        const games = this.getGamesRaw(sys.name)
+        const games = this.getGamesRaw(sys.name, forcePhysicalScan)
         LibraryService.cachedGames.set(sys.name.toLowerCase(), games)
       } catch (err) {}
     }
@@ -313,7 +323,7 @@ export class LibraryService {
     return this.getGamesRaw(systemName)
   }
 
-  public getGamesRaw(systemName: string): Game[] {
+  public getGamesRaw(systemName: string, forcePhysicalScan = false): Game[] {
     const systems = this.systemsParser.parse()
     const system = systems.find(s => s.name.toLowerCase() === systemName.toLowerCase())
 
@@ -331,29 +341,77 @@ export class LibraryService {
       gamelistPath = '' // Physical arcade should only load roms/arcade/gamelist.xml
     }
     
-    let games: Game[] = []
+    let xmlGames: Game[] = []
     let source = 'none'
 
-    if (gamelistPath && existsSync(gamelistPath)) {
-      games = this.gamelistParser.parse(gamelistPath, systemName)
-      if (games.length > 0) source = 'gamelistPath'
+    if (romsGamelistPath && existsSync(romsGamelistPath)) {
+      xmlGames = this.gamelistParser.parse(romsGamelistPath, systemName)
+      if (xmlGames.length > 0) source = 'romsGamelistPath'
     }
     
-    if (games.length === 0 && romsGamelistPath && existsSync(romsGamelistPath)) {
-      games = this.gamelistParser.parse(romsGamelistPath, systemName)
-      if (games.length > 0) source = 'romsGamelistPath'
+    if (xmlGames.length === 0 && gamelistPath && existsSync(gamelistPath)) {
+      xmlGames = this.gamelistParser.parse(gamelistPath, systemName)
+      if (xmlGames.length > 0) source = 'gamelistPath'
     }
     
-    if (games.length === 0 && systemGamelistPath && existsSync(systemGamelistPath)) {
-      games = this.gamelistParser.parse(systemGamelistPath, systemName)
-      if (games.length > 0) source = 'systemGamelistPath'
+    if (xmlGames.length === 0 && systemGamelistPath && existsSync(systemGamelistPath)) {
+      xmlGames = this.gamelistParser.parse(systemGamelistPath, systemName)
+      if (xmlGames.length > 0) source = 'systemGamelistPath'
     }
 
-    // Fallback: scan physical directory if gamelist did not yield any games
-    if (games.length === 0 && system && existsSync(system.path)) {
-      const extensions = (system.extension || '').split(/\s+/).filter(e => e.trim().length > 0)
-      games = this.scanPhysicalGames(system.path, extensions, systemName)
-      if (games.length > 0) source = 'physicalScan'
+    let games: Game[] = []
+
+    if (system && existsSync(system.path)) {
+      const settings = new SettingsParser()
+      const parseGamelistOnly = settings.getSetting('ParseGamelistOnly', 'bool') === true
+
+      if (parseGamelistOnly && xmlGames.length > 0 && !forcePhysicalScan) {
+        games = xmlGames
+        source = `${source}+trustXml`
+      } else {
+        const extensions = (system.extension || '').split(/\s+/).filter(e => e.trim().length > 0)
+        const physicalGames = this.scanPhysicalGames(system.path, extensions, systemName)
+        
+        const xmlGamesMap = new Map<string, Game>()
+        xmlGames.forEach(g => {
+          xmlGamesMap.set(normalizePathForComparison(g.path), g)
+        })
+
+        let hasNewGames = false
+        physicalGames.forEach(pg => {
+          const normPath = normalizePathForComparison(pg.path)
+          const xmlGame = xmlGamesMap.get(normPath)
+          if (xmlGame) {
+            games.push({
+              ...pg,
+              ...xmlGame,
+              system: systemName,
+              path: pg.path,
+              id: xmlGame.id && !xmlGame.id.includes('/') && !xmlGame.id.includes('\\') ? xmlGame.id : pg.id
+            })
+          } else {
+            games.push(pg)
+            hasNewGames = true
+          }
+        })
+
+        if ((hasNewGames || xmlGames.length === 0) && games.length > 0 && romsGamelistPath) {
+          try {
+            const fs = require('fs')
+            const dir = dirname(romsGamelistPath)
+            if (!fs.existsSync(dir)) {
+              fs.mkdirSync(dir, { recursive: true })
+            }
+            this.gamelistParser.save(romsGamelistPath, games)
+          } catch (e) {
+            console.error(`Failed to save complete gamelist to ${romsGamelistPath}:`, e)
+          }
+        }
+
+        source = `${source}+physicalScan`
+      }
+    } else {
+      games = xmlGames
     }
 
     try {
@@ -564,19 +622,41 @@ export class LibraryService {
     const gamelistPath = join(configPath, 'gamelists', targetSystem, 'gamelist.xml')
     const romsGamelistPath = join(getRomsPath(), targetSystem, 'gamelist.xml')
     
-    let targetPath = existsSync(gamelistPath) ? gamelistPath : romsGamelistPath
+    const systems = this.getSystems()
+    const system = systems.find(s => s.name.toLowerCase() === targetSystem.toLowerCase())
+    const systemGamelistPath = system ? join(system.path, 'gamelist.xml') : ''
+
+    const targetPath = romsGamelistPath
     if (!existsSync(targetPath)) {
-      const dir = dirname(gamelistPath)
       const fs = require('fs')
+      const dir = dirname(targetPath)
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true })
       }
-      fs.writeFileSync(gamelistPath, '<?xml version="1.0"?>\n<gameList>\n</gameList>\n', 'utf-8')
-      targetPath = gamelistPath
+      // If there's an existing gamelist elsewhere, copy it to initialize targetPath
+      let initialized = false
+      if (existsSync(gamelistPath)) {
+        try {
+          fs.copyFileSync(gamelistPath, targetPath)
+          initialized = true
+        } catch (e) {
+          console.error(`Failed to copy existing gamelist from ${gamelistPath} to ${targetPath}:`, e)
+        }
+      } else if (systemGamelistPath && existsSync(systemGamelistPath)) {
+        try {
+          fs.copyFileSync(systemGamelistPath, targetPath)
+          initialized = true
+        } catch (e) {
+          console.error(`Failed to copy existing gamelist from ${systemGamelistPath} to ${targetPath}:`, e)
+        }
+      }
+      if (!initialized) {
+        fs.writeFileSync(targetPath, '<?xml version="1.0"?>\n<gameList>\n</gameList>\n', 'utf-8')
+      }
     }
 
     const games = this.gamelistParser.parse(targetPath, targetSystem)
-    const index = games.findIndex(g => g.path === gameData.path)
+    const index = games.findIndex(g => normalizePathForComparison(g.path) === normalizePathForComparison(gameData.path))
     
     if (index !== -1) {
       games[index] = { ...games[index], ...gameData }
@@ -588,7 +668,7 @@ export class LibraryService {
 
     const cached = LibraryService.cachedGames.get(targetSystem.toLowerCase())
     if (cached) {
-      const cIdx = cached.findIndex(g => g.path === gameData.path)
+      const cIdx = cached.findIndex(g => normalizePathForComparison(g.path) === normalizePathForComparison(gameData.path))
       if (cIdx !== -1) {
         cached[cIdx] = { ...cached[cIdx], ...gameData }
       } else {

@@ -54,7 +54,6 @@
   background: var(--theme-color);
 }
 
-/* Cabeçalho do Menu */
 .riescade-menu-header {
   background: none !important;
   padding: 20px;
@@ -70,7 +69,6 @@
   color: var(--theme-color);
 }
 
-/* Área onde a lista React será injetada */
 .riescade-menu-list-container {
   background: none !important;
   max-height: 50vh;
@@ -165,6 +163,10 @@
 .menu-select, .menu-input-preview {
   font-size: 1.25rem !important;
   color: #fff;
+}
+
+.menu-selected-count {
+  font-size: 1.25rem !important;
 }
 
 /* Rodapé do Menu */

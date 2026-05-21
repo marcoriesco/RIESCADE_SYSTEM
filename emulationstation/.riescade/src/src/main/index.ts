@@ -20,7 +20,7 @@ const libraryService = new LibraryService()
 const launcherService = new LauncherService()
 const themeService = new ThemeService()
 const settingsParser = new SettingsParser()
-const systemService = new SystemService()
+const systemService = new SystemService(libraryService)
 const sassService = new SassService()
 const scraperService = new ScraperService(libraryService)
 
@@ -71,8 +71,11 @@ app.whenReady().then(() => {
   createWindow()
 
   // ─── IPC: Library ───
-  ipcMain.handle('preload-library', async () => {
-    await libraryService.preloadAll()
+  ipcMain.handle('preload-library', async (_, forcePhysicalScan?: boolean) => {
+    if (forcePhysicalScan) {
+      LibraryService.clearCache()
+    }
+    await libraryService.preloadAll(forcePhysicalScan)
     return true
   })
 
@@ -458,7 +461,7 @@ app.whenReady().then(() => {
     return true
   })
 
-  ipcMain.handle('search-game-media', async (_, systemName: string, gameName: string, databases: string[]) => {
+  ipcMain.handle('search-game-media', async (_, systemName: string, gameName: string, databases: string[], gamePath?: string) => {
     try {
       const devid = 'retrobat'
       const devpassword = 'JRLmOtnZXwo'
@@ -475,28 +478,67 @@ app.whenReady().then(() => {
       const systemId = SYSTEM_TO_SCREENSCRAPER_PLATFORM[systemName.toLowerCase()] || 
                        (systemInfo ? SYSTEM_TO_SCREENSCRAPER_PLATFORM[systemInfo.platform.toLowerCase()] : 0)
 
-      let url = `https://api.screenscraper.fr/api2/jeuInfos.php?devid=${devid}&devpassword=${devpassword}&softname=${softname}&output=json&recherche=${encodeURIComponent(gameName)}`
-      if (systemId > 0) {
-        url += `&systemeid=${systemId}`
-      }
-      if (ssid) {
-        url += `&ssid=${encodeURIComponent(ssid)}`
-      }
-      if (sspassword) {
-        url += `&sspassword=${encodeURIComponent(sspassword)}`
-      }
-
-      const response = await fetch(url)
-      if (!response.ok) {
-        throw new Error(`ScreenScraper returned status ${response.status}`)
-      }
-
-      const json = await response.json()
       let jeux: any[] = []
-      if (json.response?.jeux) {
-        jeux = Array.isArray(json.response.jeux) ? json.response.jeux : [json.response.jeux]
-      } else if (json.response?.jeu) {
-        jeux = Array.isArray(json.response.jeu) ? json.response.jeu : [json.response.jeu]
+
+      // 1. Try search by romnom (ROM filename) if gamePath is provided, just like bulk scraper
+      if (gamePath) {
+        const romName = basename(gamePath)
+        let url = `https://api.screenscraper.fr/api2/jeuInfos.php?devid=${devid}&devpassword=${devpassword}&softname=${softname}&output=json&romnom=${encodeURIComponent(romName)}`
+        if (systemId > 0) {
+          url += `&systemeid=${systemId}`
+        }
+        if (ssid) {
+          url += `&ssid=${encodeURIComponent(ssid)}`
+        }
+        if (sspassword) {
+          url += `&sspassword=${encodeURIComponent(sspassword)}`
+        }
+
+        try {
+          const response = await fetch(url)
+          if (response.ok) {
+            const json = await response.json()
+            const jeu = json.response?.jeu
+            if (jeu) {
+              jeux = [jeu]
+            }
+          }
+        } catch (err) {
+          console.error('ScreenScraper romnom search failed, falling back to text search:', err)
+        }
+      }
+
+      // 2. If no game found by romnom, search by recherche with cleaned gameName
+      if (jeux.length === 0) {
+        // Clean game name: remove parenthesis, brackets, extensions, hyphens/underscores
+        let cleanedName = gameName.replace(/\.[a-zA-Z0-9]{2,4}$/, '')
+        cleanedName = cleanedName.replace(/\([^)]*\)/g, '').replace(/\[[^\]]*\]/g, '')
+        cleanedName = cleanedName.replace(/[_-]/g, ' ')
+        cleanedName = cleanedName.replace(/\s+/g, ' ').trim()
+        if (!cleanedName) cleanedName = gameName
+
+        let url = `https://api.screenscraper.fr/api2/jeuInfos.php?devid=${devid}&devpassword=${devpassword}&softname=${softname}&output=json&recherche=${encodeURIComponent(cleanedName)}`
+        if (systemId > 0) {
+          url += `&systemeid=${systemId}`
+        }
+        if (ssid) {
+          url += `&ssid=${encodeURIComponent(ssid)}`
+        }
+        if (sspassword) {
+          url += `&sspassword=${encodeURIComponent(sspassword)}`
+        }
+
+        const response = await fetch(url)
+        if (response.ok) {
+          const json = await response.json()
+          if (json.response?.jeux) {
+            jeux = Array.isArray(json.response.jeux) ? json.response.jeux : [json.response.jeux]
+          } else if (json.response?.jeu) {
+            jeux = Array.isArray(json.response.jeu) ? json.response.jeu : [json.response.jeu]
+          }
+        } else {
+          throw new Error(`ScreenScraper returned status ${response.status}`)
+        }
       }
 
       const findMediaUrl = (medias: any[], typeList: string[]): string | undefined => {
@@ -612,40 +654,27 @@ app.whenReady().then(() => {
 
       const updatedFields: Partial<Game> = {}
 
-      const getExt = (url: string, defaultExt: string) => {
-        try {
-          const parsed = new URL(url)
-          const ext = extname(parsed.pathname)
-          if (ext && ext.length > 1) return ext.substring(1)
-        } catch (e) {}
-        return defaultExt
-      }
-
       if (matchData.media?.image) {
-        const ext = getExt(matchData.media.image, 'png')
-        const destFile = join(mediaFolder, 'fanart', `${romNameNoExt}.${ext}`)
-        await downloadFile(matchData.media.image, destFile)
+        const destPathWithoutExt = join(mediaFolder, 'fanart', romNameNoExt)
+        const ext = await downloadFile(matchData.media.image, destPathWithoutExt, 'png')
         updatedFields.image = `./media/fanart/${romNameNoExt}.${ext}`
       }
 
       if (matchData.media?.thumbnail) {
-        const ext = getExt(matchData.media.thumbnail, 'png')
-        const destFile = join(mediaFolder, 'cover', `${romNameNoExt}.${ext}`)
-        await downloadFile(matchData.media.thumbnail, destFile)
+        const destPathWithoutExt = join(mediaFolder, 'cover', romNameNoExt)
+        const ext = await downloadFile(matchData.media.thumbnail, destPathWithoutExt, 'png')
         updatedFields.thumbnail = `./media/cover/${romNameNoExt}.${ext}`
       }
 
       if (matchData.media?.marquee) {
-        const ext = getExt(matchData.media.marquee, 'png')
-        const destFile = join(mediaFolder, 'logo', `${romNameNoExt}.${ext}`)
-        await downloadFile(matchData.media.marquee, destFile)
+        const destPathWithoutExt = join(mediaFolder, 'logo', romNameNoExt)
+        const ext = await downloadFile(matchData.media.marquee, destPathWithoutExt, 'png')
         updatedFields.marquee = `./media/logo/${romNameNoExt}.${ext}`
       }
 
       if (matchData.media?.video) {
-        const ext = getExt(matchData.media.video, 'mp4')
-        const destFile = join(mediaFolder, 'video', `${romNameNoExt}.${ext}`)
-        await downloadFile(matchData.media.video, destFile)
+        const destPathWithoutExt = join(mediaFolder, 'video', romNameNoExt)
+        const ext = await downloadFile(matchData.media.video, destPathWithoutExt, 'mp4')
         updatedFields.video = `./media/video/${romNameNoExt}.${ext}`
       }
 
@@ -667,6 +696,32 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('download-temp-media', async (_, url: string) => {
+    try {
+      if (!url || typeof url !== 'string') return ''
+      const crypto = require('crypto')
+      const hash = crypto.createHash('md5').update(url).digest('hex')
+      const tempDir = join(app.getPath('temp'), 'riescade-scraper')
+      const destPathWithoutExt = join(tempDir, hash)
+      
+      const fs = require('fs')
+      const extensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mkv', 'webm']
+      for (const ext of extensions) {
+        const checkPath = `${destPathWithoutExt}.${ext}`
+        if (fs.existsSync(checkPath)) {
+          return checkPath
+        }
+      }
+
+      const defaultExt = url.includes('.mp4') || url.includes('video') ? 'mp4' : 'png'
+      const ext = await downloadFile(url, destPathWithoutExt, defaultExt)
+      return `${destPathWithoutExt}.${ext}`
+    } catch (e) {
+      console.error('download-temp-media error:', e)
+      return ''
+    }
+  })
+
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
@@ -679,15 +734,55 @@ app.on('window-all-closed', () => {
   }
 })
 
-async function downloadFile(url: string, destPath: string): Promise<void> {
-  const dir = dirname(destPath)
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true })
-  }
+async function downloadFile(url: string, destPathWithoutExt: string, defaultExt: string): Promise<string> {
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`Failed to download ${url}: ${response.statusText}`)
   }
+
+  let ext = defaultExt
+  const contentType = response.headers.get('content-type')
+  if (contentType) {
+    const mime = contentType.toLowerCase().split(';')[0].trim()
+    if (mime === 'image/png') ext = 'png'
+    else if (mime === 'image/jpeg' || mime === 'image/jpg') ext = 'jpg'
+    else if (mime === 'image/gif') ext = 'gif'
+    else if (mime === 'image/webp') ext = 'webp'
+    else if (mime === 'video/mp4') ext = 'mp4'
+    else if (mime === 'video/mkv') ext = 'mkv'
+    else if (mime === 'video/webm') ext = 'webm'
+    else {
+      const parts = mime.split('/')
+      if (parts.length === 2 && (parts[0] === 'image' || parts[0] === 'video')) {
+        const temp = parts[1]
+        if (temp && temp.length > 0 && temp !== 'octet-stream') {
+          ext = temp
+        }
+      }
+    }
+  } else {
+    try {
+      const parsed = new URL(url)
+      const pathExt = extname(parsed.pathname)
+      if (pathExt && pathExt.length > 1) {
+        const temp = pathExt.substring(1).toLowerCase()
+        if (temp !== 'php') {
+          ext = temp
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!ext || ext.length > 5 || ext === 'php') {
+    ext = defaultExt
+  }
+
+  const destPath = `${destPathWithoutExt}.${ext}`
+  const dir = dirname(destPath)
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true })
+  }
   const buffer = Buffer.from(await response.arrayBuffer())
   writeFileSync(destPath, buffer)
+  return ext
 }

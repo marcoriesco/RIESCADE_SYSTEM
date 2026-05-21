@@ -155,6 +155,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
   const [customCollections, setCustomCollections] = useState<string[]>([])
   const [needsReload, setNeedsReload] = useState(false)
+  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
   const [hostname, setHostname] = useState('localhost')
   const bluetoothScanTimeoutRef = useRef<any>(null)
 
@@ -175,6 +176,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (val === undefined || val === null || val === '') {
       if (name.endsWith('.emulator')) {
         return 'auto'
+      }
+      if (name === 'ScraperSystems' && selectedSystem) {
+        return selectedSystem.name
       }
     }
     return val ?? fallback
@@ -328,9 +332,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     setThemeSettings(prev => {
       const updated = { ...prev, [name]: stringVal }
       
-      // Theme settings usually require a reload of the frontend to apply.
-      // Set reload required but do not reload immediately!
-      setNeedsReload(true)
       setTimeout(async () => {
         if (theme?.name) {
           await window.api.saveThemeSetting(theme.name, name, stringVal)
@@ -369,9 +370,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       setNeedsReload(false)
       window.api.getSettings().then(s => {
         setSettings(s)
-        setPendingSettings({
-          ScraperSystems: selectedSystem ? selectedSystem.name : ''
-        })
+        setPendingSettings({})
       })
       window.api.getThemes().then(setThemes)
       window.api.getVersion?.().then(setVersions)
@@ -502,27 +501,35 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const handleBackAction = useCallback(() => {
     if (activeMenuStack.length > 1) {
       handleSaveQuietly(pendingSettings)
-      if (activeMenuStack.length === 2 && needsReload) {
-        setTimeout(() => {
-          window.api.executeCommand('reload-frontend')
-        }, 100)
-      } else {
-        setActiveMenuStack(prev => prev.slice(0, -1))
-        const parentItems = activeMenuStack[activeMenuStack.length - 2]?.items || []
-        setSelectedIndex(findFirstSelectableIndex(parentItems))
-      }
+      setActiveMenuStack(prev => prev.slice(0, -1))
+      const parentItems = activeMenuStack[activeMenuStack.length - 2]?.items || []
+      setSelectedIndex(findFirstSelectableIndex(parentItems))
     } else {
-      const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).some(k => themeSettings[k] !== themeData[`options:${k}`])
+      const hasChanges = Object.keys(pendingSettings).some(k => {
+        const pendingVal = pendingSettings[k]
+        const originalVal = settings[k]?.value
+        const normPending = pendingVal === undefined || pendingVal === null ? '' : String(pendingVal)
+        const normOriginal = originalVal === undefined || originalVal === null ? '' : String(originalVal)
+        return normPending !== normOriginal
+      }) || Object.keys(themeSettings).some(k => {
+        const themeVal = themeSettings[k]
+        const originalThemeVal = themeData?.[`options:${k}`]
+        const normTheme = themeVal === undefined || themeVal === null ? '' : String(themeVal)
+        const normOriginalTheme = originalThemeVal === undefined || originalThemeVal === null ? '' : String(originalThemeVal)
+        return normTheme !== normOriginalTheme
+      })
       if (hasChanges || needsReload) {
         handleSaveQuietly(pendingSettings).then(() => {
           onClose()
-          window.api.executeCommand('reload-frontend')
+          if (needsReload) {
+            window.api.executeCommand('reload-frontend')
+          }
         })
       } else {
         onClose()
       }
     }
-  }, [activeMenuStack, pendingSettings, themeSettings, themeData, needsReload, onClose])
+  }, [activeMenuStack, pendingSettings, themeSettings, themeData, settings, needsReload, onClose])
 
   const getBottomButtons = useCallback((): { id: string; label: string; onClick: () => void }[] => {
     // No buttons on the main menu
@@ -739,7 +746,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     const items: MenuItem[] = [
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
-          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => window.api.executeCommand('reload-frontend') },
+          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => window.api.executeCommand('update-gamelists') },
           { id: 'group_accounts', label: t('CONTAS'), type: 'group' },
           { id: 'retroachievements_submenu', label: t('CONQUISTAS RETRÔ'), submenu: [
             { id: 'cheevos_enable', label: t('CONQUISTAS RETRÔ'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },
@@ -1770,14 +1777,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 })) as MenuItem[]
             })()
           },
-          { id: 'group_scrape_actions', label: t('AÇÕES'), type: 'group', tab: 0 },
-          { id: 'scrape_now', label: t('SCRAPE NOW'), type: 'action', tab: 0, onClick: () => {
-            handleSaveQuietly(pendingSettings).then(() => {
-              onClose()
-              window.api.startScrape()
-            })
-          }},
-
           // === TAB 1: OPTIONS ===
           { id: 'group_scrape_settings', label: t('SETTINGS'), type: 'group', tab: 1 },
           { id: 'scrape_image_src', label: t('IMAGE SOURCE'), type: 'select', settingName: 'ScrapperImageSrc', tab: 1, options: [
@@ -2428,7 +2427,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           <div
             key={item.id}
             className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
-            onMouseEnter={() => setSelectedIndex(index)}
+            onMouseMove={(e) => {
+              if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
+                setLastMousePos({ x: e.clientX, y: e.clientY })
+                if (selectedIndex !== index) setSelectedIndex(index)
+              }
+            }}
             onClick={() => handleItemClick(item, index)}
           >
             {isMainMenu ? (
@@ -2506,7 +2510,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                   <button
                     key={btn.id}
                     className={`riescade-menu-bottom-button ${isSelected ? 'selected' : ''}`}
-                    onMouseEnter={() => setSelectedIndex(currentMenu.length + btnIdx)}
+                    onMouseMove={(e) => {
+                      if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
+                        setLastMousePos({ x: e.clientX, y: e.clientY })
+                        const targetIdx = currentMenu.length + btnIdx
+                        if (selectedIndex !== targetIdx) setSelectedIndex(targetIdx)
+                      }
+                    }}
                     onClick={(e) => {
                       e.stopPropagation()
                       btn.onClick()

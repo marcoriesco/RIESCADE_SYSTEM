@@ -147,6 +147,7 @@ export class ScraperService {
 
   public async scrape(): Promise<void> {
     this.isCancelled = false
+    LibraryService.clearCache()
     const win = BrowserWindow.getAllWindows()[0]
     const sendUpdate = (channel: string, data: any) => {
       try {

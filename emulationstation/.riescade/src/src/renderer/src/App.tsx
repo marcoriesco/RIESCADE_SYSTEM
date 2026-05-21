@@ -71,9 +71,10 @@ function App() {
 		null,
 	);
 	const [notifications, setNotifications] = useState<
-		{ id: string; message: string; type: 'info' | 'success' | 'warning' }[]
+		{ id: string; message: string; type: 'info' | 'success' | 'warning'; category?: 'controller' | 'scraper' | 'general' }[]
 	>([]);
 	const [themeRevision, setThemeRevision] = useState(0);
+	const [mediaRevision, setMediaRevision] = useState(0);
 	const [settings, setSettings] = useState<any>({});
 	const [hasRestoredLastSystem, setHasRestoredLastSystem] = useState(false);
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
@@ -495,7 +496,8 @@ function App() {
 				const gpName = event.gamepad.id.split('(')[0].trim();
 				addNotification(
 					`${gpName}\n${isConnected ? 'Conectado' : 'Desconectado'}`,
-					isConnected ? 'success' : 'warning'
+					isConnected ? 'success' : 'warning',
+					'controller'
 				);
 			}
 
@@ -567,6 +569,7 @@ function App() {
 					else if (gp.buttons[1]?.pressed) key = 'Backspace';
 					else if (gp.buttons[8]?.pressed) key = 'Control';
 					else if (gp.buttons[9]?.pressed) key = 'Enter';
+					else if (gp.buttons[11]?.pressed) key = 'Control'; // Select button on many controllers is 11 or 8
 					if (key) {
 						window.dispatchEvent(new KeyboardEvent('keydown', { key }));
 						setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key })), 50);
@@ -590,15 +593,76 @@ function App() {
 	}, []);
 
 	const addNotification = useCallback(
-		(message: string, type: 'info' | 'success' | 'warning' = 'info') => {
+		(message: string, type: 'info' | 'success' | 'warning' = 'info', category: 'controller' | 'scraper' | 'general' = 'general') => {
 			const id = Math.random().toString(36).substring(2, 9);
-			setNotifications((prev) => [...prev, { id, message, type }]);
+			setNotifications((prev) => [...prev, { id, message, type, category }]);
 			setTimeout(() => {
 				setNotifications((prev) => prev.filter((n) => n.id !== id));
 			}, 3000);
 		},
 		[],
 	);
+
+	const handleFastReload = useCallback(() => {
+		setShowGamelistUpdateModal(false);
+		setIsInitializing(true);
+		setSystemsLoadingProgress(0);
+
+		window.api.preloadLibrary(false).then(() => {
+			Promise.all([
+				window.api.getSystems(),
+				window.api.getSettings(),
+				window.api.getMusicFiles(),
+				window.api.getMusicPath()
+			]).then(([s, updatedSettings, files, mPath]: [System[], any, string[], string]) => {
+				setSystems(s);
+				setSettings(updatedSettings);
+				setMusicFiles(files);
+				setMusicPath(mPath);
+
+				if (selectedSystem) {
+					window.api.getGames(selectedSystem.name).then((masterGames: Game[]) => {
+						const groupedSetting = updatedSettings.SystemsGrouped?.value || '';
+						const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
+
+						const childSystems = s.filter(cs => 
+							cs.group && 
+							cs.group.toLowerCase() === selectedSystem.name.toLowerCase() && 
+							groupedList.includes(cs.name)
+						);
+
+						if (childSystems.length > 0) {
+							Promise.all(childSystems.map(cs => window.api.getGames(cs.name))).then((allChildGames) => {
+								const merged = [...masterGames];
+								allChildGames.forEach(childGames => {
+									merged.push(...childGames);
+								});
+								merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+								setGames(merged);
+								setIsInitializing(false);
+								addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
+							});
+						} else {
+							setGames(masterGames);
+							setIsInitializing(false);
+							addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
+						}
+					});
+				} else {
+					setIsInitializing(false);
+					addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
+				}
+			}).catch(err => {
+				console.error('Failed to load libraries during fast reload:', err);
+				setIsInitializing(false);
+				addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
+			});
+		}).catch(err => {
+			console.error('Failed to preload during fast reload:', err);
+			setIsInitializing(false);
+			addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
+		});
+	}, [selectedSystem, addNotification]);
 
 	// Load games when system selected
 	useEffect(() => {
@@ -874,6 +938,7 @@ function App() {
 			'system.isCollections': isCollectionsVal,
 			'system:isCollections': isCollectionsVal,
 			'global:themeRevision': themeRevision,
+			'global:mediaRevision': mediaRevision,
 			'system.fullName': sysFullName,
 			'system.name': sys?.name || 'all',
 			'system.theme': sys?.theme || sys?.name || 'auto-allgames',
@@ -979,30 +1044,60 @@ function App() {
 		isGameOptionsOpen,
 		theme,
 		selectedCollection,
+		themeRevision,
+		mediaRevision,
 	]);
 
 	const handleUpdateGame = (updatedGame: Game) => {
 		if (!selectedSystem) return;
 		const wasFavorite = currentGame?.favorite;
 		window.api.updateGame(selectedSystem.name, updatedGame).then(() => {
-			// Refresh local games list
-			setGames((prev) => {
-				const isFavoritesCol = selectedSystem.name.toLowerCase() === 'favorites';
-				let nextGames = prev;
-				if (isFavoritesCol && !updatedGame.favorite) {
-					nextGames = prev.filter((g) => g.path !== updatedGame.path);
+			// Increment media revision to bust browser cache
+			setMediaRevision((prev) => prev + 1);
+
+			// Refresh/Reload the gamelist from the API silently
+			const getGamesPromise = (selectedSystem.name === 'collections' && selectedCollection)
+				? window.api.getCollectionGames(selectedCollection)
+				: window.api.getGames(selectedSystem.name);
+
+			getGamesPromise.then((masterGames: Game[]) => {
+				const groupedSetting = settings.SystemsGrouped?.value || '';
+				const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
+
+				// Find child systems that belong to this group AND are enabled for grouping
+				const childSystems = systems.filter((s) => 
+					s.group && 
+					s.group.toLowerCase() === selectedSystem.name.toLowerCase() && 
+					groupedList.includes(s.name)
+				);
+
+				const updateGamesState = (newGames: Game[]) => {
+					setGames(newGames);
+					// Adjust selected index to keep the updated game selected
+					const newIdx = newGames.findIndex((g) => g.path === updatedGame.path);
+					if (newIdx !== -1) {
+						setSelectedGameIndex(newIdx);
+					} else {
+						setSelectedGameIndex((prevIdx) => {
+							if (newGames.length === 0) return 0;
+							if (prevIdx >= newGames.length) return newGames.length - 1;
+							return prevIdx;
+						});
+					}
+				};
+
+				if (childSystems.length > 0) {
+					Promise.all(childSystems.map((s) => window.api.getGames(s.name))).then((allChildGames) => {
+						const merged = [...masterGames];
+						allChildGames.forEach((childGames) => {
+							merged.push(...childGames);
+						});
+						merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+						updateGamesState(merged);
+					});
 				} else {
-					nextGames = prev.map((g) => (g.path === updatedGame.path ? updatedGame : g));
+					updateGamesState(masterGames);
 				}
-
-				// Adjust index if needed
-				setSelectedGameIndex((prevIdx) => {
-					if (nextGames.length === 0) return 0;
-					if (prevIdx >= nextGames.length) return nextGames.length - 1;
-					return prevIdx;
-				});
-
-				return nextGames;
 			});
 
 			// Notify on favorite change
@@ -1012,6 +1107,7 @@ function App() {
 						? `${updatedGame.name} ADDED TO FAVORITES`
 						: `${updatedGame.name} REMOVED FROM FAVORITES`,
 					updatedGame.favorite ? 'success' : 'info',
+					'general',
 				);
 			}
 		});
@@ -1025,7 +1121,7 @@ function App() {
 					setReloadModalSelectedIndex((prev) => (prev === 0 ? 1 : 0));
 				} else if (e.key === 'Enter' || e.key === ' ') {
 					if (reloadModalSelectedIndex === 0) {
-						window.api.executeCommand('reload-frontend');
+						handleFastReload();
 					} else {
 						setShowGamelistUpdateModal(false);
 					}
@@ -1033,6 +1129,14 @@ function App() {
 					setShowGamelistUpdateModal(false);
 				}
 				return;
+			}
+
+			if (e.key === 'Control') {
+				setIsMenuOpen(false);
+				setIsGameOptionsOpen(false);
+				setIsHardwareSelectOpen(false);
+				setIsLaunching(false);
+				// Let it bubble or handle below
 			}
 
 			if (e.key === 'Enter' && !isGameOptionsOpen) {
@@ -1211,20 +1315,44 @@ function App() {
 		settings,
 		showGamelistUpdateModal,
 		reloadModalSelectedIndex,
+		handleFastReload,
 	]);
+
+	// ─── Start screen: render once, update progress via DOM refs to avoid flickering ───
+	const startScreenRef = useRef<HTMLDivElement>(null);
+	const startHtmlOnce = useMemo(() => {
+		if (!theme?.views?.start) return null;
+		const normalizedPath = theme.path.replace(/\\/g, '/');
+		return theme.views.start
+			.replace(/src="\.\/"/g, `src="file:///${normalizedPath}/"`)
+			.replace(/src="\.\//g, `src="file:///${normalizedPath}/`)
+			.replace(/href="\.\//g, `href="file:///${normalizedPath}/`)
+			.replace(/{systems-loading}/g, '0');
+	}, [theme?.views?.start, theme?.path]);
+
+	useEffect(() => {
+		const el = startScreenRef.current;
+		if (!el) return;
+		// Update progress bar width
+		const bar = el.querySelector('.progress-bar') as HTMLElement;
+		if (bar) bar.style.width = `${systemsLoadingProgress}%`;
+		// Update percentage text
+		const pct = el.querySelector('.percentage');
+		if (pct) pct.textContent = `${systemsLoadingProgress}%`;
+		// Show/hide loading overlay and progress container based on progress
+		const overlay = el.querySelector('.loading-overlay') as HTMLElement;
+		const progressContainer = el.querySelector('.progress-container') as HTMLElement;
+		if (overlay) overlay.style.opacity = systemsLoadingProgress > 0 ? '1' : '0';
+		if (progressContainer) progressContainer.style.opacity = systemsLoadingProgress > 0 ? '1' : '0';
+	}, [systemsLoadingProgress]);
 
 	// ─── Rendering ───
 	if (!theme) return null;
 
-	if (isInitializing && theme.views?.start) {
-		const normalizedPath = theme.path.replace(/\\/g, '/');
-		const processedHtml = theme.views.start
-			.replace(/src="\.\//g, `src="file:///${normalizedPath}/`)
-			.replace(/href="\.\//g, `href="file:///${normalizedPath}/`)
-			.replace(/{systems-loading}/g, String(systemsLoadingProgress));
-
+	if (isInitializing && startHtmlOnce) {
 		return (
 			<div 
+				ref={startScreenRef}
 				style={{
 					width: '100vw',
 					height: '100vh',
@@ -1232,7 +1360,7 @@ function App() {
 					overflow: 'hidden',
 					['--theme-color' as any]: themeData['options:colors'] || themeData['colors'] || '#3b82f6',
 				}} 
-				dangerouslySetInnerHTML={{ __html: processedHtml }} 
+				dangerouslySetInnerHTML={{ __html: startHtmlOnce }} 
 			/>
 		);
 	}
@@ -1266,6 +1394,9 @@ function App() {
 					window.api.getMusicFiles().then((files: string[]) => {
 						setMusicFiles(files);
 					});
+					if (theme && theme.name) {
+						window.api.loadTheme(theme.name).then(setTheme);
+					}
 				}}
 				theme={theme}
 				themeData={themeData}
@@ -1304,14 +1435,28 @@ function App() {
 				/>
 			)}
 
-			{/* Notifications Layer */}
+			{/* Notifications Layer (General and Controller - Center Top) */}
 			<div className="riescade-notifications-container">
-				{notifications.map((n) => (
-					<div key={n.id} className={`riescade-notification ${n.type}`}>
-						<div className="riescade-notification-status" />
-						<span className="riescade-notification-message">{n.message}</span>
-					</div>
-				))}
+				{notifications
+					.filter((n) => n.category !== 'scraper')
+					.map((n) => (
+						<div key={n.id} className={`riescade-notification ${n.type}`}>
+							<div className="riescade-notification-status" />
+							<span className="riescade-notification-message">{n.message}</span>
+						</div>
+					))}
+			</div>
+
+			{/* Notifications Layer (Scraper - Right Top) */}
+			<div className="riescade-notifications-container scraper-notifications">
+				{notifications
+					.filter((n) => n.category === 'scraper')
+					.map((n) => (
+						<div key={n.id} className={`riescade-notification ${n.type}`}>
+							<div className="riescade-notification-status" />
+							<span className="riescade-notification-message">{n.message}</span>
+						</div>
+					))}
 			</div>
 
 			{/* Song Title Notification Overlay */}
@@ -1352,9 +1497,7 @@ function App() {
 						<div className="scraper-completion-buttons">
 							<button 
 								className={`scraper-completion-btn primary ${reloadModalSelectedIndex === 0 ? 'selected' : ''}`}
-								onClick={() => {
-									window.api.executeCommand('reload-frontend');
-								}}
+								onClick={handleFastReload}
 							>
 								SIM
 							</button>

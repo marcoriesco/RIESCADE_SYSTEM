@@ -14,7 +14,7 @@ interface GameOptionsProps {
   theme?: any
   themeData?: any
   onUpdate: (updatedGame: Game) => void
-  addNotification?: (message: string, type: 'info' | 'success' | 'warning') => void
+  addNotification?: (message: string, type: 'info' | 'success' | 'warning', category?: 'controller' | 'scraper' | 'general') => void
 }
 
 export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({ 
@@ -27,8 +27,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [gameCollections, setGameCollections] = useState<string[]>([])
   const [activeMenuStack, setActiveMenuStack] = useState<{ items: any[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string }[]>([])
   const [settings, setSettings] = useState<Record<string, any>>({})
-  const [rawBiosData, setRawBiosData] = useState<any[]>([])
-  const [installedSystems, setInstalledSystems] = useState<any[]>([])
 
   // Single game scraper states
   const [scraperStage, setScraperStage] = useState<0 | 1 | 2>(0) // 0: closed, 1: database checklist, 2: matches
@@ -42,11 +40,73 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [scraperIsSearching, setScraperIsSearching] = useState(false)
   const [scraperMatches, setScraperMatches] = useState<any[]>([])
   const [scraperMatchSelectedIndex, setScraperMatchSelectedIndex] = useState(0)
+  const [tempMediaUrls, setTempMediaUrls] = useState<Record<string, string>>({})
+  const [tempMediaLoading, setTempMediaLoading] = useState(false)
 
-  // Bios check states
-  const [biosCheckOpen, setBiosCheckOpen] = useState(false)
-  const [biosActiveTab, setBiosActiveTab] = useState(0) // 0: Sistemas instalados, 1: Todos
-  const [biosSelectedIndex, setBiosSelectedIndex] = useState(0)
+  useEffect(() => {
+    if (scraperStage !== 2 || scraperMatches.length === 0) return
+
+    const selectedMatch = scraperMatches[scraperMatchSelectedIndex]
+    if (!selectedMatch) return
+
+    const matchId = selectedMatch.id
+    
+    // Check if we already have the temp media url for this match
+    if (tempMediaUrls[matchId]) return
+
+    // Priority order for preview: BOX/thumbnail → IMAGE → LOGO/marquee → VIDEO
+    const boxUrl = selectedMatch.media?.thumbnail || selectedMatch.thumbnail
+    const imageUrl = selectedMatch.media?.image || selectedMatch.image
+    const logoUrl = selectedMatch.media?.marquee
+    const videoUrl = selectedMatch.media?.video || selectedMatch.video
+
+    // Pick the single highest-priority source
+    const bestImageUrl = boxUrl || imageUrl || logoUrl
+    const bestUrl = bestImageUrl || videoUrl
+
+    if (!bestUrl) {
+      setTempMediaUrls(prev => ({
+        ...prev,
+        [matchId]: '{}'
+      }))
+      return
+    }
+
+    const downloadTemp = async () => {
+      setTempMediaLoading(true)
+      const updates: Record<string, string> = {}
+      try {
+        if (bestImageUrl && bestImageUrl.startsWith('http')) {
+          const localPath = await window.api.downloadTempMedia(bestImageUrl)
+          if (localPath) {
+            updates.image = `file:///${localPath.replace(/\\/g, '/')}`
+          }
+        } else if (videoUrl && videoUrl.startsWith('http')) {
+          // Only download video if no image-type source is available
+          const localPath = await window.api.downloadTempMedia(videoUrl)
+          if (localPath) {
+            updates.video = `file:///${localPath.replace(/\\/g, '/')}`
+          }
+        }
+      } catch (err) {
+        console.error('Error downloading temp media:', err)
+      } finally {
+        setTempMediaUrls(prev => ({
+          ...prev,
+          [matchId]: JSON.stringify(updates)
+        }))
+        setTempMediaLoading(false)
+      }
+    }
+
+    downloadTemp()
+  }, [scraperMatchSelectedIndex, scraperMatches, scraperStage])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTempMediaUrls({})
+    }
+  }, [isOpen])
 
   const getFirstSelectableIndex = (items: any[]): number => {
     const idx = items.findIndex(item => item.type !== 'group')
@@ -119,12 +179,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       type: 'action',
       actionType: 'scrape'
     })
-    items.push({
-      id: 'missing_bios_check',
-      label: 'VERIFICAR AUSÊNCIA DE BIOS',
-      type: 'action',
-      actionType: 'missing_bios'
-    })
+
 
     const getGameSettingValue = (settingName: string, fallback: any) => {
       const key = getGameSettingKey(settingName)
@@ -216,9 +271,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       setDraftGame(game)
       setScraperStage(0)
       
-      window.api.getBiosInformation().then(setRawBiosData).catch(console.error)
-      window.api.getSystems().then(setInstalledSystems).catch(console.error)
-      
       window.api.getSettings().then(s => {
         setSettings(s)
         window.api.getCustomCollections().then(customCols => {
@@ -237,66 +289,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       setVisible(false)
     }
   }, [isOpen, game])
-
-  const getBiosSystemsForTab = (tab: number) => {
-    if (tab === 0) {
-      const installedNames = new Set(installedSystems.map(s => s.name.toLowerCase()))
-      return rawBiosData.filter(sys => installedNames.has(sys.name.toLowerCase()))
-    }
-    return rawBiosData
-  }
-
-  const getRenderItems = (activeBiosSystems: any[]) => {
-    const items: any[] = []
-    let flatIndex = 0
-    
-    activeBiosSystems.forEach(sys => {
-      const matched = installedSystems.find(s => s.name.toLowerCase() === sys.name.toLowerCase())
-      const systemFullName = (matched?.fullName || sys.name || 'UNKNOWN')
-      
-      if (sys.bios && sys.bios.length > 0) {
-        items.push({
-          type: 'group',
-          id: `render_group_${sys.name}`,
-          label: systemFullName.toUpperCase()
-        })
-        
-        sys.bios.forEach(b => {
-          items.push({
-            type: 'bios',
-            id: `render_bios_${sys.name}_${b.path}`,
-            path: b.path,
-            description: `${b.status} - MD5: ${b.md5}`,
-            systemName: sys.name,
-            flatIndex: flatIndex++
-          })
-        })
-      }
-    })
-    
-    return items
-  }
-
-  const refreshBiosData = async () => {
-    if (addNotification) addNotification('ATUALIZANDO INFORMAÇÕES DE BIOS...', 'info')
-    try {
-      const bios = await window.api.getBiosInformation()
-      setRawBiosData(bios || [])
-      if (addNotification) addNotification('INFORMAÇÕES DE BIOS ATUALIZADAS!', 'success')
-    } catch (err) {
-      console.error(err)
-      if (addNotification) addNotification('ERRO AO ATUALIZAR INFORMAÇÕES DE BIOS', 'warning')
-    }
-  }
-
-  useEffect(() => {
-    if (biosCheckOpen) {
-      const selectedEl = document.querySelector('.bios-item.selected')
-      if (selectedEl) {
-        selectedEl.scrollIntoView({ block: 'nearest' })
-      }
-    }
-  }, [biosSelectedIndex, biosCheckOpen, biosActiveTab])
 
   const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
   const currentMenu = currentStackItem ? (currentStackItem.tabs && currentStackItem.activeTab !== undefined ? currentStackItem.items.filter(item => item.tab === currentStackItem.activeTab) : currentStackItem.items) : []
@@ -341,10 +333,17 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           ...prev,
           [key]: { value: nextVal, type: 'string' }
         }))
-      } else if (item.id === 'emulator') {
+      } else if (item.id === 'game_emulator') {
+        const key = getGameSettingKey('emulator')
+        window.api.saveSetting(key, nextVal, 'string')
+        setSettings(prev => ({
+          ...prev,
+          [key]: { value: nextVal, type: 'string' }
+        }))
         const updated = { ...draftGame, emulator: nextVal, core: undefined }
         setDraftGame(updated)
-        onUpdate(updated)
+        // We don't call onUpdate here because it's an emulator override, 
+        // usually handled by the launcher via settings, but we can notify if needed.
       }
 
       setActiveMenuStack(prev => {
@@ -359,93 +358,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   }
 
   const getBottomButtons = () => {
-    const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
-    if (currentStackItem?.parentItemId === 'missing_bios_submenu') {
-      return [
-        {
-          id: 'bios_refresh_btn',
-          label: 'ATUALIZAR',
-          onClick: async () => {
-            const bios = await window.api.getBiosInformation()
-            setRawBiosData(bios || [])
-            
-            setActiveMenuStack(prev => {
-              const next = [...prev]
-              const idx = next.length - 1
-              if (idx >= 0 && next[idx].parentItemId === 'missing_bios_submenu') {
-                const generateTabItems = (systemsList: any[], tabIndex: number): any[] => {
-                  const tabItems: any[] = []
-                  for (const sys of systemsList) {
-                    const matched = installedSystems.find(s => s.name.toLowerCase() === sys.name.toLowerCase())
-                    const systemFullName = (matched?.fullName || sys.name || 'UNKNOWN')
-
-                    if (sys.bios && sys.bios.length > 0) {
-                      tabItems.push({
-                        id: `bios_group_${sys.name}_tab${tabIndex}`,
-                        label: systemFullName.toUpperCase(),
-                        type: 'group',
-                        tab: tabIndex
-                      })
-
-                      for (const b of sys.bios) {
-                        tabItems.push({
-                          id: `bios_file_${sys.name}_${b.path}_tab${tabIndex}`,
-                          label: b.path,
-                          description: `${b.status} - MD5: ${b.md5}`,
-                          type: 'info',
-                          value: '',
-                          tab: tabIndex
-                        })
-                      }
-                    }
-                  }
-
-                  const hasAnyBios = systemsList.some(sys => sys.bios && sys.bios.length > 0)
-                  if (!hasAnyBios) {
-                    tabItems.push({
-                      id: `bios_empty_tab${tabIndex}`,
-                      label: 'NENHUM ARQUIVO DE BIOS AUSENTE',
-                      type: 'info',
-                      value: '',
-                      tab: tabIndex
-                    })
-                  }
-
-                  return tabItems
-                }
-
-                const installedNames = new Set(installedSystems.map(s => s.name.toLowerCase()))
-                const installedBiosSystems = bios.filter((sys: any) => installedNames.has(sys.name.toLowerCase()))
-
-                const tab0Items = generateTabItems(installedBiosSystems, 0)
-                const tab1Items = generateTabItems(bios, 1)
-
-                next[idx] = {
-                  ...next[idx],
-                  items: [...tab0Items, ...tab1Items]
-                }
-              }
-              return next
-            })
-
-            const nextStackItem = activeMenuStack[activeMenuStack.length - 1]
-            if (nextStackItem) {
-              const currentTab = nextStackItem.activeTab ?? 0
-              const tabItems = nextStackItem.items.filter(item => item.tab === currentTab)
-              setSelectedIndex(getFirstSelectableIndex(tabItems))
-            }
-          }
-        },
-        {
-          id: 'bios_back_btn',
-          label: 'VOLTAR',
-          onClick: () => {
-            setActiveMenuStack(prev => prev.slice(0, -1))
-            setSelectedIndex(0)
-          }
-        }
-      ]
-    }
     return []
   }
 
@@ -454,13 +366,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       setScraperStage(1)
       setScraperDbs({ ScreenScraper: true, TheGamesDB: true, HfsDB: true, IGDB: true })
       setScraperDbSelectedIndex(0)
-      return
-    }
-
-    if (item.actionType === 'missing_bios') {
-      setBiosCheckOpen(true)
-      setBiosActiveTab(0)
-      setBiosSelectedIndex(0)
       return
     }
 
@@ -481,7 +386,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             action === 'add'
               ? `${game.name.toUpperCase()} ADICIONADO À COLEÇÃO ${col.toUpperCase()}`
               : `${game.name.toUpperCase()} REMOVIDO DA COLEÇÃO ${col.toUpperCase()}`,
-            action === 'add' ? 'success' : 'info'
+            action === 'add' ? 'success' : 'info',
+            'general'
           )
         }
 
@@ -499,13 +405,15 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
   }
 
+  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
+
   const triggerScraperSearch = async () => {
     const selectedDbs = Object.entries(scraperDbs)
       .filter(([_, active]) => active)
       .map(([name]) => name)
 
     if (selectedDbs.length === 0) {
-      if (addNotification) addNotification('SELECIONE AO MENOS UMA BASE DE DADOS', 'warning')
+      if (addNotification) addNotification('SELECIONE AO MENOS UMA BASE DE DADOS', 'warning', 'scraper')
       return
     }
 
@@ -515,11 +423,11 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     setScraperMatchSelectedIndex(0)
 
     try {
-      const results = await window.api.searchGameMedia(system.name, game.name, selectedDbs)
+      const results = await window.api.searchGameMedia(system.name, game.name, selectedDbs, game.path)
       setScraperMatches(results || [])
     } catch (err) {
       console.error(err)
-      if (addNotification) addNotification('ERRO AO BUSCAR MÍDIAS', 'warning')
+      if (addNotification) addNotification('ERRO AO BUSCAR MÍDIAS', 'warning', 'scraper')
     } finally {
       setScraperIsSearching(false)
     }
@@ -529,7 +437,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     const selectedMatch = scraperMatches[scraperMatchSelectedIndex]
     if (!selectedMatch) return
 
-    if (addNotification) addNotification(`BAIXANDO MÍDIAS PARA ${game.name.toUpperCase()}...`, 'info')
+    if (addNotification) addNotification(`BAIXANDO MÍDIAS PARA ${game.name.toUpperCase()}...`, 'info', 'scraper')
     setScraperStage(0)
     onClose()
 
@@ -537,34 +445,50 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       const updated = await window.api.downloadGameMedia(system.name, game.path, selectedMatch)
       if (updated) {
         onUpdate(updated)
-        if (addNotification) addNotification(`MÍDIAS DE ${game.name.toUpperCase()} BAIXADAS COM SUCESSO!`, 'success')
+        if (addNotification) addNotification(`MÍDIAS DE ${game.name.toUpperCase()} BAIXADAS COM SUCESSO!`, 'success', 'scraper')
       } else {
-        if (addNotification) addNotification(`ERRO AO BAIXAR MÍDIAS`, 'warning')
+        if (addNotification) addNotification(`ERRO AO BAIXAR MÍDIAS`, 'warning', 'scraper')
       }
     } catch (err) {
       console.error(err)
-      if (addNotification) addNotification(`ERRO AO BAIXAR MÍDIAS`, 'warning')
+      if (addNotification) addNotification(`ERRO AO BAIXAR MÍDIAS`, 'warning', 'scraper')
     }
   }
 
   const handleScraperKeyDown = (e: KeyboardEvent) => {
     if (scraperStage === 1) {
-      if (e.key === 'ArrowDown') {
-        setScraperDbSelectedIndex(prev => (prev + 1) % 6)
-      } else if (e.key === 'ArrowUp') {
-        setScraperDbSelectedIndex(prev => (prev - 1 + 6) % 6)
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        if (scraperDbSelectedIndex < 4) {
+      if (scraperDbSelectedIndex >= 4) {
+        // Button zone: horizontal navigation between BUSCAR (4) and CANCELAR (5)
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          setScraperDbSelectedIndex(prev => prev === 4 ? 5 : 4)
+        } else if (e.key === 'ArrowUp') {
+          // Go back up to last DB checkbox
+          setScraperDbSelectedIndex(3)
+        } else if (e.key === 'ArrowDown') {
+          // Wrap to first DB checkbox
+          setScraperDbSelectedIndex(0)
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          if (scraperDbSelectedIndex === 4) {
+            triggerScraperSearch()
+          } else if (scraperDbSelectedIndex === 5) {
+            setScraperStage(0)
+          }
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          setScraperStage(0)
+        }
+      } else {
+        // DB checkbox zone: vertical navigation
+        if (e.key === 'ArrowDown') {
+          setScraperDbSelectedIndex(prev => prev + 1 < 4 ? prev + 1 : 4)
+        } else if (e.key === 'ArrowUp') {
+          setScraperDbSelectedIndex(prev => prev - 1 >= 0 ? prev - 1 : 0)
+        } else if (e.key === 'Enter' || e.key === ' ') {
           const keys = Object.keys(scraperDbs)
           const targetKey = keys[scraperDbSelectedIndex]
           setScraperDbs(prev => ({ ...prev, [targetKey]: !prev[targetKey] }))
-        } else if (scraperDbSelectedIndex === 4) {
-          triggerScraperSearch()
-        } else if (scraperDbSelectedIndex === 5) {
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
           setScraperStage(0)
         }
-      } else if (e.key === 'Escape' || e.key === 'Backspace') {
-        setScraperStage(0)
       }
     } else if (scraperStage === 2) {
       if (scraperIsSearching) return
@@ -578,7 +502,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         setScraperMatchSelectedIndex(prev => (prev + 1) % scraperMatches.length)
       } else if (e.key === 'ArrowUp') {
         setScraperMatchSelectedIndex(prev => (prev - 1 + scraperMatches.length) % scraperMatches.length)
-      } else if (e.key === 'Enter') {
+      } else if (e.key === 'Enter' || e.key === ' ') {
         triggerScraperDownload()
       } else if (e.key === 'Escape' || e.key === 'Backspace') {
         setScraperStage(1)
@@ -590,56 +514,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     (e: KeyboardEvent) => {
       if (!isOpen) return
 
-      if (biosCheckOpen) {
-        e.preventDefault()
-        e.stopPropagation()
-        
-        const activeBiosSystems = (() => {
-          if (biosActiveTab === 0) {
-            const installedNames = new Set(installedSystems.map(s => s.name.toLowerCase()))
-            return rawBiosData.filter(sys => installedNames.has(sys.name.toLowerCase()))
-          }
-          return rawBiosData
-        })()
-        
-        const activeBiosFiles = activeBiosSystems.flatMap(sys => 
-          (sys.bios || []).map(b => ({ ...b, systemName: sys.name }))
-        )
-        const totalSelectable = activeBiosFiles.length + 2 // bios files + 2 buttons
 
-        if (e.key === 'ArrowDown') {
-          setBiosSelectedIndex(prev => (prev + 1) % totalSelectable)
-        } else if (e.key === 'ArrowUp') {
-          setBiosSelectedIndex(prev => (prev - 1 + totalSelectable) % totalSelectable)
-        } else if (e.key === 'ArrowRight') {
-          if (biosSelectedIndex < activeBiosFiles.length) {
-            setBiosActiveTab(prev => (prev === 0 ? 1 : 0))
-            setBiosSelectedIndex(0)
-          } else {
-            const currentBtn = biosSelectedIndex - activeBiosFiles.length
-            const nextBtn = (currentBtn + 1) % 2
-            setBiosSelectedIndex(activeBiosFiles.length + nextBtn)
-          }
-        } else if (e.key === 'ArrowLeft') {
-          if (biosSelectedIndex < activeBiosFiles.length) {
-            setBiosActiveTab(prev => (prev === 0 ? 1 : 0))
-            setBiosSelectedIndex(0)
-          } else {
-            const currentBtn = biosSelectedIndex - activeBiosFiles.length
-            const nextBtn = (currentBtn - 1 + 2) % 2
-            setBiosSelectedIndex(activeBiosFiles.length + nextBtn)
-          }
-        } else if (e.key === 'Enter' || e.key === ' ') {
-          if (biosSelectedIndex === activeBiosFiles.length) {
-            refreshBiosData()
-          } else if (biosSelectedIndex === activeBiosFiles.length + 1) {
-            setBiosCheckOpen(false)
-          }
-        } else if (e.key === 'Escape' || e.key === 'Backspace') {
-          setBiosCheckOpen(false)
-        }
-        return
-      }
 
       if (scraperStage !== 0) {
         e.preventDefault()
@@ -764,13 +639,15 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
       }
     },
-    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings, rawBiosData, installedSystems, biosCheckOpen, biosActiveTab, biosSelectedIndex]
+    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings]
   )
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
+
+  const bottomButtons = getBottomButtons()
 
   const menuItemsNode = (
     <div className="riescade-menu-list">
@@ -786,8 +663,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           <div
             key={item.id}
             className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
-            onMouseEnter={() => {
-              if (scraperStage === 0) setSelectedIndex(index)
+            onMouseMove={(e) => {
+              if (scraperStage === 0) {
+                if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
+                  setLastMousePos({ x: e.clientX, y: e.clientY })
+                  if (selectedIndex !== index) setSelectedIndex(index)
+                }
+              }
             }}
             onClick={() => {
               if (scraperStage !== 0) return
@@ -923,218 +805,237 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
 
     const selectedMatch = scraperMatches[scraperMatchSelectedIndex]
+    // Priority: BOX/thumbnail → IMAGE → LOGO/marquee → VIDEO
+    let previewImage = selectedMatch?.media?.thumbnail || selectedMatch?.thumbnail || selectedMatch?.media?.image || selectedMatch?.image || selectedMatch?.media?.marquee
+    let previewVideo = selectedMatch?.media?.video || selectedMatch?.video
+
+    if (selectedMatch) {
+      const cachedString = tempMediaUrls[selectedMatch.id]
+      if (cachedString) {
+        try {
+          const cached = JSON.parse(cachedString)
+          if (cached.image) previewImage = cached.image
+          if (cached.video) previewVideo = cached.video
+        } catch (e) {}
+      }
+    }
+
+    const isLocalUrl = (url?: string) => {
+      if (!url) return false
+      return url.startsWith('file:///') || url.startsWith('data:') || !url.startsWith('http')
+    }
+
+    // Image takes priority over video in preview display
+    const showImage = previewImage && isLocalUrl(previewImage)
+    const showVideo = !showImage && previewVideo && isLocalUrl(previewVideo)
+
+    const hasMediaToDownload = !!(
+      selectedMatch?.media?.image ||
+      selectedMatch?.media?.thumbnail ||
+      selectedMatch?.image ||
+      selectedMatch?.thumbnail ||
+      selectedMatch?.media?.video ||
+      selectedMatch?.video
+    )
+    const isCached = selectedMatch ? !!tempMediaUrls[selectedMatch.id] : false
+    const isLoadingMedia = tempMediaLoading || (hasMediaToDownload && !isCached)
+
+    // Group matches by database source
+    const matchesByDb: Record<string, { match: any; globalIndex: number }[]> = {}
+    scraperMatches.forEach((match, idx) => {
+      const dbName = match.db || 'DESCONHECIDO'
+      if (!matchesByDb[dbName]) {
+        matchesByDb[dbName] = []
+      }
+      matchesByDb[dbName].push({ match, globalIndex: idx })
+    })
+
+    const formatReleaseDate = (dateStr?: string) => {
+      if (!dateStr) return 'N/A'
+      try {
+        if (dateStr.length >= 8 && !dateStr.includes('-')) {
+          const y = dateStr.substring(0, 4)
+          const m = dateStr.substring(4, 6)
+          const d = dateStr.substring(6, 8)
+          return `${d}/${m}/${y}`
+        }
+        const date = new Date(dateStr)
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleDateString('pt-BR')
+        }
+      } catch (e) {}
+      return dateStr
+    }
+
+    const renderStars = (rating?: number) => {
+      const filledCount = rating !== undefined ? Math.round(rating * 5) : 0
+      const stars = []
+      for (let i = 0; i < 5; i++) {
+        stars.push(
+          <span 
+            key={i} 
+            style={{ 
+              color: i < filledCount ? '#fff' : '#444', 
+              fontSize: '1.1rem',
+              marginRight: '2px'
+            }}
+          >
+            ★
+          </span>
+        )
+      }
+      return stars
+    }
 
     return (
       <div className="scraper-modal-overlay stage2-overlay">
-        <div className="scraper-stage2-container">
-          <div className="scraper-stage2-header">
-            <h2>RESULTADOS DA BUSCA: {game.name.toUpperCase()}</h2>
-          </div>
-          
-          <div className="scraper-stage2-content">
-            {/* Column 1: Matches List */}
-            <div className="scraper-column matches-column">
-              <div className="column-title">RESULTADOS</div>
-              <div className="matches-list">
-                {scraperMatches.map((match, idx) => {
-                  const isSelected = scraperMatchSelectedIndex === idx
-                  const hasImg = !!(match.image || match.thumbnail)
-                  const hasVid = !!match.video
-                  const hasLog = !!(match.logo || match.marquee)
-                  
-                  return (
-                    <div 
-                      key={idx}
-                      className={`match-item ${isSelected ? 'selected' : ''}`}
-                      onClick={() => setScraperMatchSelectedIndex(idx)}
-                    >
-                      <span className="match-title">{match.name}</span>
-                      <div className="match-badges">
-                        {hasImg && <span className="m-badge img">IMG</span>}
-                        {hasVid && <span className="m-badge vid">VID</span>}
-                        {hasLog && <span className="m-badge log">LOG</span>}
+        <div className="scraper-header">
+          <div className="rom-filename">{getRomFileName(game.path).toUpperCase()}</div>
+          <div className="system-fullname">{(system.fullname || system.name).toUpperCase()}</div>
+        </div>
+
+        <div className="scraper-stage2-main-content">
+          {/* Left Column: Matches List grouped by DB */}
+          <div className="scraper-matches-section">
+            {Object.entries(matchesByDb).map(([dbName, items]) => (
+              <div key={dbName} className="scraper-db-group">
+                <div className="scraper-db-group-title">{dbName.toUpperCase()}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  {items.map(({ match, globalIndex }) => {
+                    const isSelected = scraperMatchSelectedIndex === globalIndex
+                    const hasBox = !!(match.media?.thumbnail || match.thumbnail)
+                    const hasImage = !!(match.media?.image || match.image)
+                    const hasLogo = !!(match.media?.marquee)
+                    const hasVid = !!(match.video || match.media?.video)
+                    const hasTxt = !!(match.desc || match.synopsis)
+
+                    return (
+                      <div
+                        key={globalIndex}
+                        className={`scraper-match-item ${isSelected ? 'selected' : ''}`}
+                        onClick={() => setScraperMatchSelectedIndex(globalIndex)}
+                      >
+                        <span className="match-name">{match.name || 'Sem nome'}</span>
+                        <div className="match-icons">
+                          {hasBox && (
+                            <span className="icon-badge img" title="Box / Cover">
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h12v16zM9 13.5h6v1H9z"/>
+                              </svg>
+                            </span>
+                          )}
+                          {hasImage && (
+                            <span className="icon-badge img" title="Imagem">
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
+                              </svg>
+                            </span>
+                          )}
+                          {hasLogo && (
+                            <span className="icon-badge img" title="Logo">
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/>
+                              </svg>
+                            </span>
+                          )}
+                          {hasVid && (
+                            <span className="icon-badge vid" title="Vídeo">
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                              </svg>
+                            </span>
+                          )}
+                          {hasTxt && (
+                            <span className="icon-badge txt" title="Texto" style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', fontSize: '15px' }}>
+                              A
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            ))}
+          </div>
 
-            {/* Column 2: Video & Logo Preview */}
-            <div className="scraper-column preview-column">
-              <div className="column-title">PRÉVIA DE MÍDIAS</div>
-              <div className="preview-card-container">
-                {selectedMatch?.video ? (
-                  <video 
-                    key={selectedMatch.video} 
-                    src={selectedMatch.video} 
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline 
-                    className="preview-video-player"
-                  />
-                ) : selectedMatch?.image || selectedMatch?.thumbnail ? (
-                  <img 
-                    src={selectedMatch.image || selectedMatch.thumbnail} 
-                    className="preview-image-fallback" 
+          {/* Right Column: Media Preview & Metadata Grid */}
+          <div className="scraper-details-section">
+            <div className="scraper-details-top">
+              {/* Media Preview Box */}
+              <div className="scraper-details-image-container" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px' }}>
+                {isLoadingMedia && (
+                  <div className="scraper-spinner" style={{ position: 'absolute', zIndex: 2 }}></div>
+                )}
+                {showImage ? (
+                  <img
+                    src={previewImage}
                     alt="Preview"
+                    style={{ maxWidth: '100%', maxHeight: '250px', objectFit: 'contain', opacity: isLoadingMedia ? 0.3 : 1 }}
                   />
-                ) : (
-                  <div className="no-preview-placeholder">SEM PRÉVIA DISPONÍVEL</div>
-                )}
-                
-                {/* Overlay Logo/Marquee */}
-                {(selectedMatch?.logo || selectedMatch?.marquee) && (
-                  <img 
-                    src={selectedMatch.logo || selectedMatch.marquee} 
-                    className="preview-marquee-overlay" 
-                    alt="Logo"
+                ) : showVideo ? (
+                  <video
+                    key={previewVideo}
+                    src={previewVideo}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{ maxWidth: '100%', maxHeight: '250px', objectFit: 'contain', opacity: isLoadingMedia ? 0.3 : 1 }}
                   />
+                ) : isLoadingMedia ? null : (
+                  <div style={{ color: '#555', fontWeight: 'bold', fontSize: '0.9rem' }}>SEM PRÉVIA DISPONÍVEL</div>
                 )}
               </div>
-            </div>
 
-            {/* Column 3: Metadata Box */}
-            <div className="scraper-column metadata-column">
-              <div className="column-title">METADADOS</div>
-              <div className="metadata-box-details">
-                <div className="metadata-row">
-                  <span className="meta-label">DESENVOLVEDOR:</span>
-                  <span className="meta-value">{selectedMatch?.developer || 'N/A'}</span>
+              {/* Metadata Attributes */}
+              <div className="scraper-details-metadata">
+                <div className="metadata-grid-row">
+                  <span className="metadata-grid-label">PUBLICADORA:</span>
+                  <span className="metadata-grid-value">{selectedMatch?.publisher || 'N/A'}</span>
                 </div>
-                <div className="metadata-row">
-                  <span className="meta-label">DISTRIBUIDORA:</span>
-                  <span className="meta-value">{selectedMatch?.publisher || 'N/A'}</span>
+                <div className="metadata-grid-row">
+                  <span className="metadata-grid-label">DESENVOLVEDORA:</span>
+                  <span className="metadata-grid-value">{selectedMatch?.developer || 'N/A'}</span>
                 </div>
-                <div className="metadata-row">
-                  <span className="meta-label">DATA DE LANÇAMENTO:</span>
-                  <span className="meta-value">
-                    {selectedMatch?.releasedate ? new Date(selectedMatch.releasedate).toLocaleDateString('pt-BR') : 'N/A'}
+                <div className="metadata-grid-row">
+                  <span className="metadata-grid-label">GÊNERO:</span>
+                  <span className="metadata-grid-value">{selectedMatch?.genre || 'N/A'}</span>
+                </div>
+                <div className="metadata-grid-row">
+                  <span className="metadata-grid-label">JOGADORES:</span>
+                  <span className="metadata-grid-value">{selectedMatch?.players || 'N/A'}</span>
+                </div>
+                <div className="metadata-grid-row">
+                  <span className="metadata-grid-label">LANÇAMENTO:</span>
+                  <span className="metadata-grid-value">{formatReleaseDate(selectedMatch?.releasedate)}</span>
+                </div>
+                <div className="metadata-grid-row" style={{ alignItems: 'center' }}>
+                  <span className="metadata-grid-label">CLASSIFICAÇÃO:</span>
+                  <span className="metadata-grid-value" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    {renderStars(selectedMatch?.rating)}
                   </span>
                 </div>
-                <div className="metadata-row">
-                  <span className="meta-label">JOGADORES:</span>
-                  <span className="meta-value">{selectedMatch?.players || 'N/A'}</span>
-                </div>
-                <div className="metadata-row">
-                  <span className="meta-label">NOTA (RATING):</span>
-                  <span className="meta-value">{selectedMatch?.rating ? `${Math.round(parseFloat(selectedMatch.rating) * 100)}%` : 'N/A'}</span>
-                </div>
-                <div className="metadata-row">
-                  <span className="meta-label">GÊNERO:</span>
-                  <span className="meta-value">{selectedMatch?.genre || 'N/A'}</span>
-                </div>
               </div>
             </div>
-          </div>
 
-          {/* Footer: Synopsis & Actions */}
-          <div className="scraper-stage2-footer">
-            <div className="synopsis-box">
-              <span className="synopsis-label">SINOPSE:</span>
-              <p className="synopsis-text">{selectedMatch?.desc || selectedMatch?.synopsis || 'Nenhuma descrição disponível para este jogo.'}</p>
-            </div>
-            <div className="scraper-footer-actions">
-              <div className="footer-action-btn">
-                <span className="keycap">ENTRADA</span>
-                <span className="action-text">SELECIONAR</span>
-              </div>
-              <div className="footer-action-btn">
-                <span className="keycap">BACK / ESC</span>
-                <span className="action-text">CANCELAR</span>
-              </div>
+            {/* Synopsis Description Text */}
+            <div className="scraper-details-description">
+              {selectedMatch?.desc || selectedMatch?.synopsis || 'Nenhuma descrição disponível para este jogo.'}
             </div>
           </div>
+        </div>
+
+        {/* Footer actions center bottom */}
+        <div className="scraper-footer-buttons">
+          <button className="scraper-footer-btn" onClick={triggerScraperDownload}>ENTRADA</button>
+          <button className="scraper-footer-btn" onClick={() => setScraperStage(0)}>CANCELAR</button>
         </div>
       </div>
     )
   }
 
-  const renderBiosCheckModal = () => {
-    const activeBiosSystems = getBiosSystemsForTab(biosActiveTab)
-    const hasBiosFiles = activeBiosSystems.some(sys => sys.bios && sys.bios.length > 0)
-    const activeBiosFiles = activeBiosSystems.flatMap(sys => 
-      (sys.bios || []).map(b => ({ ...b, systemName: sys.name }))
-    )
-    const renderItems = getRenderItems(activeBiosSystems)
-    
-    return (
-      <div className="bios-modal-overlay">
-        <div className="bios-modal-container">
-          <div className="bios-modal-header">
-            <h3 className="bios-modal-title">VERIFICAR AUSÊNCIA DE BIOS</h3>
-            <div className="bios-modal-tabs">
-              {['Sistemas instalados', 'Todos'].map((tab, idx) => (
-                <div
-                  key={tab}
-                  className={`bios-modal-tab ${idx === biosActiveTab ? 'active' : ''}`}
-                  onClick={() => {
-                    setBiosActiveTab(idx)
-                    setBiosSelectedIndex(0)
-                  }}
-                >
-                  {tab}
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="bios-list-container">
-            {!hasBiosFiles ? (
-              <div className="bios-empty-message">NENHUM ARQUIVO DE BIOS AUSENTE</div>
-            ) : (
-              renderItems.map(item => {
-                if (item.type === 'group') {
-                  return (
-                    <div key={item.id} className="bios-group-header">
-                      {item.label}
-                    </div>
-                  )
-                }
-                
-                const isSelected = biosSelectedIndex === item.flatIndex
-                
-                return (
-                  <div
-                    key={item.id}
-                    className={`bios-item ${isSelected ? 'selected' : ''}`}
-                    onMouseEnter={() => setBiosSelectedIndex(item.flatIndex)}
-                  >
-                    <svg className="bios-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px', flexShrink: 0 }}>
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
-                    <div className="bios-item-details">
-                      <span className="bios-item-path">{item.path}</span>
-                      <span className="bios-item-desc">{item.description}</span>
-                    </div>
-                  </div>
-                )
-              })
-            )}
-          </div>
-          
-          <div className="bios-modal-buttons">
-            <button
-              className={`bios-modal-btn ${biosSelectedIndex === activeBiosFiles.length ? 'selected' : ''}`}
-              onClick={refreshBiosData}
-              onMouseEnter={() => setBiosSelectedIndex(activeBiosFiles.length)}
-            >
-              ATUALIZAR
-            </button>
-            <button
-              className={`bios-modal-btn ${biosSelectedIndex === activeBiosFiles.length + 1 ? 'selected' : ''}`}
-              onClick={() => setBiosCheckOpen(false)}
-              onMouseEnter={() => setBiosSelectedIndex(activeBiosFiles.length + 1)}
-            >
-              VOLTAR
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
+
 
   return (
     <>
@@ -1215,7 +1116,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
       {scraperStage === 1 && renderStageStage1()}
       {scraperStage === 2 && renderStageStage2()}
-      {biosCheckOpen && renderBiosCheckModal()}
 
       <style dangerouslySetInnerHTML={{ __html: `
         .riescade-menu-overlay.game-options { 
@@ -1530,236 +1430,202 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           background: rgba(255, 255, 255, 0.15);
         }
 
-        /* Stage 2 Fullscreen Modal */
+        /* Stage 2 Fullscreen Redesigned Modal */
         .stage2-overlay {
-          padding: 40px;
-        }
-        .scraper-stage2-container {
-          width: 90vw;
-          height: 85vh;
-          background: rgba(15, 15, 15, 0.92);
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.85);
           backdrop-filter: blur(20px);
-          border: 2px solid rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
+          z-index: 10000000 !important;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
-          animation: scraper-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          overflow: hidden;
-        }
-        .scraper-stage2-header {
-          padding: 20px 30px;
-          background: rgba(255, 255, 255, 0.02);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .scraper-stage2-header h2 {
-          margin: 0;
-          font-size: 1.3rem;
-          font-weight: 900;
-          letter-spacing: 2px;
-          color: var(--theme-color, #f042b0);
-        }
-        .scraper-stage2-content {
-          flex: 1;
-          display: flex;
-          overflow: hidden;
-          padding: 20px;
-          gap: 20px;
-        }
-        .scraper-column {
-          display: flex;
-          flex-direction: column;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          border-radius: 12px;
-          padding: 15px;
-          overflow: hidden;
-        }
-        .column-title {
-          font-size: 0.8rem;
-          font-weight: 800;
-          color: #888;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          margin-bottom: 15px;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-          padding-bottom: 8px;
-        }
-        .matches-column {
-          width: 32%;
-        }
-        .preview-column {
-          width: 40%;
           align-items: stretch;
+          justify-content: space-between;
+          padding: 40px 60px;
+          font-family: 'Inter', sans-serif;
+          color: #fff;
+          box-sizing: border-box;
+          animation: scraper-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .metadata-column {
-          width: 28%;
+        .scraper-header {
+          text-align: center;
+          margin-bottom: 30px;
+          flex-shrink: 0;
         }
-        .matches-list {
+        .scraper-header .rom-filename {
+          font-size: 1.6rem;
+          font-weight: 900;
+          color: #fff;
+          letter-spacing: 1px;
+          margin-bottom: 5px;
+        }
+        .scraper-header .system-fullname {
+          font-size: 1.0rem;
+          font-weight: 800;
+          color: #ff007f;
+          letter-spacing: 2px;
+        }
+        .scraper-stage2-main-content {
           flex: 1;
-          overflow-y: auto;
+          display: flex;
+          gap: 50px;
+          overflow: hidden;
+          margin-bottom: 30px;
+        }
+        .scraper-matches-section {
+          width: 38%;
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          overflow-y: auto;
+          padding-right: 15px;
+          border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .match-item {
+        .scraper-db-group {
+          margin-bottom: 25px;
+        }
+        .scraper-db-group-title {
+          font-size: 0.85rem;
+          font-weight: 900;
+          color: #ff007f;
+          letter-spacing: 2px;
+          margin-bottom: 12px;
+          text-transform: uppercase;
+        }
+        .scraper-match-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 12px 16px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.04);
-          border-radius: 8px;
+          padding: 10px 15px;
+          border-radius: 4px;
           cursor: pointer;
-          transition: all 0.15s ease;
+          transition: background 0.12s ease;
+          background: rgba(255, 255, 255, 0.01);
         }
-        .match-item:hover {
+        .scraper-match-item:hover {
           background: rgba(255, 255, 255, 0.05);
         }
-        .match-item.selected {
-          background: var(--theme-color, #f042b0);
-          border-color: var(--theme-color, #f042b0);
-          box-shadow: 0 4px 12px rgba(240, 66, 176, 0.25);
+        .scraper-match-item.selected {
+          background: #a3004f;
         }
-        .match-title {
+        .scraper-match-item .match-name {
           font-weight: 700;
-          font-size: 0.9rem;
+          font-size: 0.95rem;
+          color: #eee;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           max-width: 70%;
         }
-        .match-badges {
-          display: flex;
-          gap: 5px;
-        }
-        .m-badge {
-          font-size: 0.65rem;
-          font-weight: 900;
-          padding: 2px 6px;
-          border-radius: 4px;
+        .scraper-match-item.selected .match-name {
           color: #fff;
-          letter-spacing: 0.5px;
+          font-weight: 800;
         }
-        .m-badge.img { background: #3b82f6; }
-        .m-badge.vid { background: #f042b0; }
-        .m-badge.log { background: #eab308; }
-
-        .preview-card-container {
-          flex: 1;
-          background: rgba(0, 0, 0, 0.4);
-          border-radius: 8px;
-          overflow: hidden;
-          position: relative;
+        .scraper-match-item .match-icons {
           display: flex;
+          gap: 8px;
+          align-items: center;
+          color: rgba(255, 255, 255, 0.8);
+        }
+        .scraper-match-item.selected .match-icons {
+          color: #fff;
+        }
+        .icon-badge {
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(255,255,255,0.05);
         }
-        .preview-video-player {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-        .preview-image-fallback {
-          max-width: 100%;
-          max-height: 100%;
-          object-fit: contain;
-        }
-        .no-preview-placeholder {
-          font-weight: 700;
-          color: #555;
-          font-size: 0.9rem;
-          letter-spacing: 1px;
-        }
-        .preview-marquee-overlay {
-          position: absolute;
-          top: 15px;
-          right: 15px;
-          max-width: 35%;
-          max-height: 25%;
-          object-fit: contain;
-          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-          pointer-events: none;
-        }
-        .metadata-box-details {
+        .scraper-details-section {
+          width: 62%;
           display: flex;
           flex-direction: column;
-          gap: 15px;
-        }
-        .metadata-row {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        .meta-label {
-          font-size: 0.7rem;
-          font-weight: 800;
-          color: #666;
-          letter-spacing: 1px;
-        }
-        .meta-value {
-          font-size: 0.9rem;
-          font-weight: 700;
-          color: #ddd;
-        }
-        
-        .scraper-stage2-footer {
-          padding: 20px 30px;
-          background: rgba(255, 255, 255, 0.02);
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 45px;
-        }
-        .synopsis-box {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          max-height: 70px;
-          overflow: hidden;
-        }
-        .synopsis-label {
-          font-size: 0.7rem;
-          font-weight: 800;
-          color: #666;
-          letter-spacing: 1px;
-        }
-        .synopsis-text {
-          margin: 0;
-          font-size: 0.85rem;
-          color: #aaa;
-          line-height: 1.4;
           overflow-y: auto;
+          padding-right: 10px;
         }
-        .scraper-footer-actions {
+        .scraper-details-top {
           display: flex;
-          gap: 25px;
+          gap: 40px;
+          align-items: flex-start;
           flex-shrink: 0;
         }
-        .footer-action-btn {
+        .scraper-details-image-container {
+          width: 45%;
           display: flex;
+          justify-content: center;
           align-items: center;
-          gap: 10px;
+          background: rgba(0, 0, 0, 0.4);
+          border-radius: 12px;
+          padding: 15px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          min-height: 200px;
         }
-        .keycap {
-          background: #333;
-          border: 1px solid #555;
-          border-bottom-width: 3px;
-          color: #fff;
+        .scraper-details-image-container img,
+        .scraper-details-image-container video {
+          max-width: 100%;
+          max-height: 250px;
+          object-fit: contain;
+          border-radius: 4px;
+        }
+        .scraper-details-metadata {
+          width: 55%;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .metadata-grid-row {
+          display: flex;
+          font-size: 0.95rem;
+          line-height: 1.4;
+        }
+        .metadata-grid-label {
+          width: 160px;
           font-weight: 800;
-          font-size: 0.75rem;
-          padding: 4px 10px;
-          border-radius: 6px;
-          letter-spacing: 0.5px;
+          color: #ff007f;
+          letter-spacing: 1px;
         }
-        .action-text {
-          font-size: 0.8rem;
+        .metadata-grid-value {
+          font-weight: 500;
+          color: #ddd;
+        }
+        .scraper-details-description {
+          margin-top: 30px;
+          font-size: 0.9rem;
+          color: #aaa;
+          line-height: 1.6;
+          max-height: 180px;
+          overflow-y: auto;
+          padding-right: 10px;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          padding-top: 20px;
+        }
+        .scraper-footer-buttons {
+          display: flex;
+          gap: 20px;
+          justify-content: center;
+          width: 100%;
+          flex-shrink: 0;
+        }
+        .scraper-footer-btn {
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          border-radius: 4px;
+          padding: 10px 30px;
+          color: #fff;
+          font-size: 1.0rem;
           font-weight: 700;
-          color: #888;
+          cursor: pointer;
           text-transform: uppercase;
+          transition: all 0.15s ease;
+          min-width: 140px;
+          letter-spacing: 1px;
+        }
+        .scraper-footer-btn:hover {
+          background: #ff007f;
+          border-color: #ff007f;
+          box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
         }
         .searching-modal {
           align-items: center;
@@ -1832,168 +1698,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         .riescade-menu-overlay.game-options .riescade-menu-description { font-size: 0.75rem; color: #777; font-weight: 400; text-transform: none; line-height: 1.3; margin-top: 2px; }
         .riescade-menu-overlay.game-options .riescade-menu-item.selected .riescade-menu-description { color: rgba(255, 255, 255, 0.8); }
 
-        /* BIOS Modal Styles */
-        .bios-modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.75);
-          backdrop-filter: blur(15px);
-          z-index: 10000000 !important;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Inter', sans-serif;
-          color: #fff;
-        }
-        .bios-modal-container {
-          background: rgba(20, 20, 20, 0.85);
-          backdrop-filter: blur(10px);
-          border: 2px solid rgba(240, 66, 176, 0.2);
-          border-radius: 16px;
-          padding: 35px;
-          width: 70vw;
-          height: 70vh;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-          animation: scraper-fade-in 0.25s ease-out;
-        }
-        .bios-modal-header {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 20px;
-        }
-        .bios-modal-title {
-          margin: 0 0 15px 0;
-          font-size: 1.4rem;
-          font-weight: 900;
-          text-align: center;
-          color: #f042b0;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-        }
-        .bios-modal-tabs {
-          display: flex;
-          align-self: flex-start;
-          gap: 25px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          width: 100%;
-          padding-bottom: 5px;
-        }
-        .bios-modal-tab {
-          font-size: 1.1rem;
-          font-weight: 700;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          cursor: pointer;
-          color: #888;
-          border-bottom: 3px solid transparent;
-          transition: all 0.2s ease;
-          padding: 5px 10px;
-          user-select: none;
-        }
-        .bios-modal-tab.active {
-          color: #f042b0;
-          border-bottom-color: #f042b0;
-        }
-        .bios-list-container {
-          flex: 1;
-          overflow-y: auto;
-          margin-bottom: 25px;
-          padding-right: 10px;
-        }
-        .bios-group-header {
-          color: #f042b0;
-          font-size: 0.75rem;
-          font-weight: 800;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          margin: 20px 0 10px 0;
-          text-align: left;
-        }
-        .bios-group-header:first-of-type {
-          margin-top: 5px;
-        }
-        .bios-item {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          padding: 12px 20px;
-          border-radius: 8px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.04);
-          cursor: pointer;
-          transition: all 0.15s ease;
-          margin-bottom: 8px;
-        }
-        .bios-item:hover {
-          background: rgba(255, 255, 255, 0.05);
-        }
-        .bios-item.selected {
-          background: #f042b0;
-          border-color: #f042b0;
-          box-shadow: 0 4px 12px rgba(240, 66, 176, 0.25);
-        }
-        .bios-item.selected .bios-item-desc {
-          color: rgba(255, 255, 255, 0.8);
-        }
-        .bios-item-icon {
-          width: 20px;
-          height: 20px;
-          flex-shrink: 0;
-          color: #fff;
-          opacity: 0.8;
-        }
-        .bios-item-details {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-        }
-        .bios-item-path {
-          font-weight: 700;
-          font-size: 0.95rem;
-        }
-        .bios-item-desc {
-          font-size: 0.75rem;
-          color: #aaa;
-          margin-top: 2px;
-        }
-        .bios-empty-message {
-          text-align: center;
-          color: #aaa;
-          margin: 40px 0;
-          font-size: 1rem;
-        }
-        .bios-modal-buttons {
-          display: flex;
-          justify-content: center;
-          gap: 20px;
-        }
-        .bios-modal-btn {
-          background: transparent;
-          color: #999;
-          border: 2px solid #999;
-          border-radius: 4px;
-          padding: 8px 24px;
-          font-size: 0.9rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          text-transform: uppercase;
-          outline: none;
-        }
-        .bios-modal-btn:hover,
-        .bios-modal-btn.selected {
-          border-color: #f042b0;
-          color: #f042b0;
-          transform: scale(1.05);
-        }
+
       ` }} />
     </>
   )

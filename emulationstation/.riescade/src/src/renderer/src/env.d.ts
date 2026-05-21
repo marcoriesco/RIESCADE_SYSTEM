@@ -5,7 +5,7 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: {
-      preloadLibrary: () => Promise<any>
+      preloadLibrary: (forcePhysicalScan?: boolean) => Promise<any>
       getSystems: () => Promise<any>
       getGames: (systemName: string) => Promise<any>
       updateGame: (systemName: string, gameData: any) => Promise<void>
@@ -37,8 +37,9 @@ declare global {
       getMusicPath: () => Promise<string>
       startScrape: () => Promise<boolean>
       cancelScrape: () => Promise<boolean>
-      searchGameMedia: (systemName: string, gameName: string, databases: string[]) => Promise<any[]>
+      searchGameMedia: (systemName: string, gameName: string, databases: string[], gamePath?: string) => Promise<any[]>
       downloadGameMedia: (systemName: string, gamePath: string, matchData: any) => Promise<any>
+      downloadTempMedia: (url: string) => Promise<string>
       on: (channel: string, callback: (...args: any[]) => void) => () => void
     }
   }

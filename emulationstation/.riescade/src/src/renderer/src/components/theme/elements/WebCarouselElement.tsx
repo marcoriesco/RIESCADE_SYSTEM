@@ -81,7 +81,7 @@ export const WebCarouselElement: React.FC<Props> = ({
 
   const getAssetPath = (itemData: any, isGameItem: boolean): string => {
     if (isGameItem) {
-      return resolvePath(itemData?.marquee || itemData?.image, itemData)
+      return resolvePath(itemData?.marquee || itemData?.image, { ...data, ...itemData })
     }
 
     const sysTheme = itemData.theme || itemData.name
@@ -185,7 +185,7 @@ const CarouselItemNode = ({
   
   const artPath = itemBackground 
     ? (item.isGame 
-        ? resolvePath(itemData.image || itemData.marquee, itemData)
+        ? resolvePath(itemData.image || itemData.marquee, { ...data, ...itemData })
         : (itemBackgroundSource 
             ? resolvePath(`${themePath}/${itemBackgroundSource.replace('./', '')}/${sysName}.jpg`)
             : resolvePath(`${themePath}/assets/arts/${sysName}.jpg`)))

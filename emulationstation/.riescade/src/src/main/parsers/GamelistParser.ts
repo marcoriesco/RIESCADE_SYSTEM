@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import { readFileSync, existsSync } from 'fs';
-import { join, dirname, resolve, isAbsolute } from 'path';
+import { join, dirname, resolve, isAbsolute, relative } from 'path';
 import { Game } from '../../shared/types';
 
 export class GamelistParser {
@@ -86,6 +86,29 @@ export class GamelistParser {
 				indentBy: '  ',
 			});
 
+			const baseDir = dirname(filePath);
+
+			const makeRelative = (p?: any) => {
+				if (!p || typeof p !== 'string') return p;
+				if (p.startsWith('http')) return p;
+				
+				if (isAbsolute(p) || p.match(/^[a-zA-Z]:/)) {
+					const rel = relative(baseDir, p);
+					// Standardize to forward slashes and ensure it starts with ./
+					const normalized = rel.replace(/\\/g, '/');
+					return normalized.startsWith('.') ? normalized : './' + normalized;
+				}
+				return p;
+			};
+
+			const isValidDbId = (val: any) => {
+				if (val === null || val === undefined) return false;
+				const str = String(val).trim();
+				if (!str) return false;
+				if (str.includes('/') || str.includes('\\') || str.match(/\.[a-zA-Z0-9]{2,4}$/)) return false;
+				return true;
+			};
+
 			const xmlGames = games.map((g) => {
 				const { id, system, ...xmlGame } = g as any;
 				
@@ -94,11 +117,15 @@ export class GamelistParser {
 				if (xmlGame.hidden !== undefined) xmlGame.hidden = xmlGame.hidden ? 'true' : 'false';
 				if (xmlGame.kidgame !== undefined) xmlGame.kidgame = xmlGame.kidgame ? 'true' : 'false';
 				
-				if (id && id !== xmlGame.path) xmlGame['@_id'] = id;
+				if (id && id !== xmlGame.path && isValidDbId(id)) {
+					xmlGame['@_id'] = id;
+				}
 
-				// NOTE: We are saving the paths as they were in the object.
-				// If they were resolved to absolute paths, they will be saved as absolute.
-				// This might be an issue for portability, but it's consistent with current behavior.
+				// Convert absolute paths of media fields back to relative for portability
+				const mediaFields = ['image', 'video', 'marquee', 'thumbnail', 'fanart', 'titleshot', 'wheel', 'mix'];
+				mediaFields.forEach(field => {
+					if (xmlGame[field]) xmlGame[field] = makeRelative(xmlGame[field]);
+				});
 				
 				return xmlGame;
 			});

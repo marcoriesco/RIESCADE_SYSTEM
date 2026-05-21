@@ -3,6 +3,12 @@ import { app, BrowserWindow } from 'electron'
 import { LibraryService } from './LibraryService'
 
 export class SystemService {
+  private libraryService: LibraryService
+
+  constructor(libraryService: LibraryService) {
+    this.libraryService = libraryService
+  }
+
   public executeCommand(command: string): void {
     console.log(`Executing system command: ${command}`)
     
@@ -33,7 +39,18 @@ export class SystemService {
         app.quit()
         break
       case 'update-gamelists':
-        console.log('Update gamelists triggered')
+        try {
+          LibraryService.clearCache()
+          this.libraryService.preloadAll(true).then(() => {
+            BrowserWindow.getAllWindows().forEach(w => w.reload())
+          }).catch(err => {
+            console.error('Failed to update gamelists:', err)
+            BrowserWindow.getAllWindows().forEach(w => w.reload())
+          })
+        } catch (e) {
+          console.error(e)
+          BrowserWindow.getAllWindows().forEach(w => w.reload())
+        }
         break
       case 'configure-input':
         console.log('Open input configuration UI')
