@@ -78,6 +78,297 @@ function App() {
 	const [hasRestoredLastSystem, setHasRestoredLastSystem] = useState(false);
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
 
+	// ─── Audio System State & Refs ───
+	const [musicFiles, setMusicFiles] = useState<string[]>([]);
+	const [musicPath, setMusicPath] = useState<string>('');
+	const [currentTrackName, setCurrentTrackName] = useState<string>('');
+	const [showMusicTitle, setShowMusicTitle] = useState(false);
+
+	// Scraper progress state
+	const [bulkScrapeStatus, setBulkScrapeStatus] = useState<{
+		active: boolean;
+		current: number;
+		total: number;
+		systemCode: string;
+		systemName: string;
+		gameName: string;
+	} | null>(null);
+	const [showGamelistUpdateModal, setShowGamelistUpdateModal] = useState(false);
+	const [reloadModalSelectedIndex, setReloadModalSelectedIndex] = useState(0);
+
+	const bgMusicRef = useRef<HTMLAudioElement | null>(null);
+	const navSoundRef = useRef<HTMLAudioElement | null>(null);
+	const musicTitleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const currentPlaylistRef = useRef<string[]>([]);
+	const currentTrackIndexRef = useRef<number>(-1);
+	const activeSystemRef = useRef<string>('');
+
+	const currentGame = games[selectedGameIndex];
+
+	const shuffleArray = <T,>(array: T[]): T[] => {
+		const arr = [...array];
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[j]] = [arr[j], arr[i]];
+		}
+		return arr;
+	};
+
+	const playTrack = useCallback((fileOrUrl: string, isAbsolute = false) => {
+		if (!bgMusicRef.current) return;
+		
+		let srcUrl = fileOrUrl;
+		if (!isAbsolute && musicPath) {
+			const cleanPath = musicPath.replace(/\\/g, '/');
+			srcUrl = `file:///${cleanPath}/${fileOrUrl}`;
+		}
+		
+		bgMusicRef.current.src = srcUrl;
+		bgMusicRef.current.load();
+		bgMusicRef.current.play().catch(e => {
+			console.warn('Playback blocked or failed:', e);
+		});
+
+		// Animate title display if setting enabled
+		const displayTitles = settings['audio.display_titles']?.value !== 'false' && settings['audio.display_titles']?.value !== false;
+		if (displayTitles) {
+			const cleanName = fileOrUrl.split('/').pop() || fileOrUrl;
+			const nameWithoutExt = cleanName.substring(0, cleanName.lastIndexOf('.')) || cleanName;
+			setCurrentTrackName(nameWithoutExt.toUpperCase());
+			setShowMusicTitle(true);
+			
+			if (musicTitleTimeoutRef.current) {
+				clearTimeout(musicTitleTimeoutRef.current);
+			}
+			
+			const displayTime = (settings['audio.display_titles_time']?.value !== undefined 
+				? parseInt(settings['audio.display_titles_time'].value, 10) 
+				: 6) * 1000;
+				
+			musicTitleTimeoutRef.current = setTimeout(() => {
+				setShowMusicTitle(false);
+			}, displayTime);
+		} else {
+			setShowMusicTitle(false);
+			setCurrentTrackName('');
+		}
+	}, [musicPath, settings['audio.display_titles'], settings['audio.display_titles_time']]);
+
+	const playNextTrack = useCallback(() => {
+		const playlist = currentPlaylistRef.current;
+		if (!playlist || playlist.length === 0) return;
+		
+		let nextIndex = currentTrackIndexRef.current + 1;
+		if (nextIndex >= playlist.length) {
+			const shuffled = shuffleArray(playlist);
+			currentPlaylistRef.current = shuffled;
+			nextIndex = 0;
+		}
+		
+		currentTrackIndexRef.current = nextIndex;
+		const file = playlist[nextIndex];
+		const isAbsolute = file.startsWith('file:///');
+		if (file) {
+			playTrack(file, isAbsolute);
+		}
+	}, [playTrack]);
+
+	// Initialize Audio Elements
+	useEffect(() => {
+		bgMusicRef.current = new Audio();
+		navSoundRef.current = new Audio();
+		
+		bgMusicRef.current.loop = false;
+		bgMusicRef.current.autoplay = false;
+		
+		bgMusicRef.current.onended = () => {
+			playNextTrack();
+		};
+		
+		return () => {
+			if (bgMusicRef.current) {
+				bgMusicRef.current.pause();
+				bgMusicRef.current.src = '';
+				bgMusicRef.current = null;
+			}
+			if (navSoundRef.current) {
+				navSoundRef.current.pause();
+				navSoundRef.current.src = '';
+				navSoundRef.current = null;
+			}
+			if (musicTitleTimeoutRef.current) {
+				clearTimeout(musicTitleTimeoutRef.current);
+			}
+		};
+	}, [playNextTrack]);
+
+	// Navigation sound playback
+	useEffect(() => {
+		const playClick = () => {
+			if (!navSoundRef.current || !theme) return;
+			const isSoundsEnabled = settings.EnableSounds?.value === 'true' || settings.EnableSounds?.value === true;
+			if (!isSoundsEnabled) return;
+
+			const themePathClean = theme.path ? theme.path.replace(/\\/g, '/') : '';
+			const clickSoundUrl = `file:///${themePathClean}/assets/sounds/click.ogg`;
+			
+			navSoundRef.current.src = clickSoundUrl;
+			navSoundRef.current.currentTime = 0;
+			navSoundRef.current.play().catch(() => {});
+		};
+
+		const handleKeyDown = (e: KeyboardEvent) => {
+			const navKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Enter', ' ', 'Backspace', 'Escape', 'Control'];
+			if (navKeys.includes(e.key)) {
+				playClick();
+			}
+		};
+
+		const handleCustomNavSound = () => {
+			playClick();
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		window.addEventListener('riescade-play-nav-sound', handleCustomNavSound);
+		
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+			window.removeEventListener('riescade-play-nav-sound', handleCustomNavSound);
+		};
+	}, [theme, settings.EnableSounds]);
+
+	// Background Music Player Loop Controller
+	useEffect(() => {
+		if (!bgMusicRef.current || isInitializing) return;
+
+		const isBgMusicEnabled = settings['audio.bgmusic']?.value !== 'false' && settings['audio.bgmusic']?.value !== false;
+		
+		if (!isBgMusicEnabled) {
+			bgMusicRef.current.pause();
+			return;
+		}
+
+		const baseVol = (settings.MusicVolume?.value !== undefined ? parseInt(settings.MusicVolume.value, 10) : 80) / 100;
+		const shouldDuck = selectedSystem && 
+			currentGame && 
+			currentGame.video && 
+			(settings.VideoLowersMusic?.value === 'true' || settings.VideoLowersMusic?.value === true) && 
+			(settings.VideoAudio?.value === 'true' || settings.VideoAudio?.value === true);
+		
+		bgMusicRef.current.volume = shouldDuck ? baseVol * 0.15 : baseVol;
+
+		const sysName = selectedSystem?.name || 'system_view';
+		const useThemeMusic = settings['audio.thememusics']?.value === 'true' || settings['audio.thememusics']?.value === true;
+		const usePerSystem = settings['audio.persystem']?.value === 'true' || settings['audio.persystem']?.value === true;
+		const useFavorite = settings['audio.useFavoriteMusic']?.value === 'true' || settings['audio.useFavoriteMusic']?.value === true;
+
+		const loadAndPlayPlaylist = async () => {
+			// 1. Try theme system-specific music
+			if (useThemeMusic && selectedSystem && theme?.path) {
+				const themePathClean = theme.path.replace(/\\/g, '/');
+				const themeOgg = `file:///${themePathClean}/assets/sounds/${selectedSystem.name}.ogg`;
+				const themeMp3 = `file:///${themePathClean}/assets/sounds/${selectedSystem.name}.mp3`;
+				
+				const testThemeMusic = async (url: string) => {
+					try {
+						const res = await fetch(url, { method: 'HEAD' });
+						return res.ok;
+					} catch {
+						return false;
+					}
+				};
+				
+				let themeMusicSrc = '';
+				if (await testThemeMusic(themeOgg)) {
+					themeMusicSrc = themeOgg;
+				} else if (await testThemeMusic(themeMp3)) {
+					themeMusicSrc = themeMp3;
+				}
+				
+				if (themeMusicSrc) {
+					activeSystemRef.current = `theme_${sysName}`;
+					currentPlaylistRef.current = [themeMusicSrc];
+					currentTrackIndexRef.current = 0;
+					playTrack(themeMusicSrc, true);
+					return;
+				}
+			}
+
+			// 2. Try per-system music folders
+			if (usePerSystem && selectedSystem) {
+				const systemMusic = await window.api.getMusicFiles(selectedSystem.name);
+				if (systemMusic && systemMusic.length > 0) {
+					activeSystemRef.current = `persystem_${sysName}`;
+					const shuffled = shuffleArray(systemMusic);
+					currentPlaylistRef.current = shuffled;
+					currentTrackIndexRef.current = 0;
+					playTrack(shuffled[0]);
+					return;
+				}
+			}
+
+			// 3. Fall back to standard playlist (general or favorites)
+			const favString = settings['audio.favoriteSongs']?.value || '';
+			const favList = favString.split(';').map(s => s.trim()).filter(Boolean);
+			
+			let baseTracks = musicFiles;
+			if (useFavorite) {
+				baseTracks = musicFiles.filter(file => favList.includes(file));
+			}
+
+			if (baseTracks.length === 0 && useFavorite) {
+				baseTracks = musicFiles;
+			}
+
+			if (baseTracks.length > 0) {
+				const activeKey = useFavorite ? 'favorites' : 'all';
+				if (activeSystemRef.current === activeKey && bgMusicRef.current && !bgMusicRef.current.paused) {
+					return;
+				}
+				
+				activeSystemRef.current = activeKey;
+				const shuffled = shuffleArray(baseTracks);
+				currentPlaylistRef.current = shuffled;
+				currentTrackIndexRef.current = 0;
+				playTrack(shuffled[0]);
+			} else {
+				bgMusicRef.current.pause();
+				bgMusicRef.current.src = '';
+				setCurrentTrackName('');
+			}
+		};
+
+		loadAndPlayPlaylist();
+	}, [
+		selectedSystem, 
+		musicFiles, 
+		musicPath, 
+		settings['audio.bgmusic'], 
+		settings['audio.thememusics'], 
+		settings['audio.persystem'], 
+		settings['audio.useFavoriteMusic'], 
+		settings['audio.favoriteSongs'],
+		theme,
+		isInitializing,
+		playTrack
+	]);
+
+	// Video ducking volume controller
+	useEffect(() => {
+		if (!bgMusicRef.current) return;
+		
+		const baseVol = (settings.MusicVolume?.value !== undefined ? parseInt(settings.MusicVolume.value, 10) : 80) / 100;
+		const shouldDuck = selectedSystem && 
+			currentGame && 
+			currentGame.video && 
+			(settings.VideoLowersMusic?.value === 'true' || settings.VideoLowersMusic?.value === true) && 
+			(settings.VideoAudio?.value === 'true' || settings.VideoAudio?.value === true);
+			
+		const targetVol = shouldDuck ? baseVol * 0.15 : baseVol;
+		bgMusicRef.current.volume = targetVol;
+	}, [selectedSystem, currentGame, settings.MusicVolume, settings.VideoLowersMusic, settings.VideoAudio]);
+
+
 	// Listen for systems loading progress from the main process
 	useEffect(() => {
 		const removeProgress = window.api.on(
@@ -87,6 +378,31 @@ function App() {
 			},
 		);
 		return () => removeProgress();
+	}, []);
+
+	// Listen for scraper progress and finish events
+	useEffect(() => {
+		const removeScrapeProgress = window.api.on('scrape-progress', (_: any, data: any) => {
+			setBulkScrapeStatus({
+				active: true,
+				current: data.current,
+				total: data.total,
+				systemCode: data.systemCode || '',
+				systemName: data.systemName || '',
+				gameName: data.gameName || ''
+			});
+		});
+
+		const removeScrapeFinished = window.api.on('scrape-finished', (_: any, data: any) => {
+			setBulkScrapeStatus(null);
+			setShowGamelistUpdateModal(true);
+			setReloadModalSelectedIndex(0); // Default to YES
+		});
+
+		return () => {
+			removeScrapeProgress();
+			removeScrapeFinished();
+		};
 	}, []);
 
 	// ─── Initial Load ───
@@ -103,10 +419,14 @@ function App() {
 							window.api.preloadLibrary().then(() => {
 								Promise.all([
 									window.api.getSystems(),
-									window.api.getSettings()
-								]).then(([s, initialSettings]: [System[], any]) => {
+									window.api.getSettings(),
+									window.api.getMusicFiles(),
+									window.api.getMusicPath()
+								]).then(([s, initialSettings, files, mPath]: [System[], any, string[], string]) => {
 									setSystems(s);
 									setSettings(initialSettings);
+									setMusicFiles(files);
+									setMusicPath(mPath);
 								});
 							});
 						}, 100);
@@ -243,10 +563,10 @@ function App() {
 						key = 'ArrowRight';
 					else if (gp.buttons[4]?.pressed) key = 'PageDown';
 					else if (gp.buttons[5]?.pressed) key = 'PageUp';
-					else if (gp.buttons[0]?.pressed) key = 'Enter';
+					else if (gp.buttons[0]?.pressed) key = ' ';
 					else if (gp.buttons[1]?.pressed) key = 'Backspace';
 					else if (gp.buttons[8]?.pressed) key = 'Control';
-					else if (gp.buttons[9]?.pressed) key = ' ';
+					else if (gp.buttons[9]?.pressed) key = 'Enter';
 					if (key) {
 						window.dispatchEvent(new KeyboardEvent('keydown', { key }));
 						setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key })), 50);
@@ -507,7 +827,6 @@ function App() {
 	};
 
 	const currentSystem = filteredSystems[systemIndex];
-	const currentGame = games[selectedGameIndex];
 
 	// ─── Theme Data ───
 	useEffect(() => {
@@ -701,7 +1020,22 @@ function App() {
 	// ─── Keyboard Navigation ───
 	useEffect(() => {
 		const handleKey = (e: KeyboardEvent) => {
-			if (e.key === ' ' && !isGameOptionsOpen) {
+			if (showGamelistUpdateModal) {
+				if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+					setReloadModalSelectedIndex((prev) => (prev === 0 ? 1 : 0));
+				} else if (e.key === 'Enter' || e.key === ' ') {
+					if (reloadModalSelectedIndex === 0) {
+						window.api.executeCommand('reload-frontend');
+					} else {
+						setShowGamelistUpdateModal(false);
+					}
+				} else if (e.key === 'Escape' || e.key === 'Backspace') {
+					setShowGamelistUpdateModal(false);
+				}
+				return;
+			}
+
+			if (e.key === 'Enter' && !isGameOptionsOpen) {
 				setIsMenuOpen((prev) => !prev);
 				return;
 			}
@@ -754,7 +1088,7 @@ function App() {
 					}
 				}
 
-				if (e.key === 'Enter') setSelectedSystem(filteredSystems[systemIndex]);
+				if (e.key === ' ') setSelectedSystem(filteredSystems[systemIndex]);
 
 				if (e.key === 'Control') {
 					setIsHardwareSelectOpen(true);
@@ -832,7 +1166,7 @@ function App() {
 				}
 				if (isGameOptionsOpen) return;
 
-				if (e.key === 'Enter' && currentGame && !isLaunching) {
+				if (e.key === ' ' && currentGame && !isLaunching) {
 					if (currentGame.isCollectionFolder) {
 						setSelectedCollection(currentGame.path);
 					} else {
@@ -875,6 +1209,8 @@ function App() {
 		isLaunching,
 		enterPressTimer,
 		settings,
+		showGamelistUpdateModal,
+		reloadModalSelectedIndex,
 	]);
 
 	// ─── Rendering ───
@@ -889,7 +1225,13 @@ function App() {
 
 		return (
 			<div 
-				style={{ width: '100vw', height: '100vh', background: '#000', overflow: 'hidden' }} 
+				style={{
+					width: '100vw',
+					height: '100vh',
+					background: '#000',
+					overflow: 'hidden',
+					['--theme-color' as any]: themeData['options:colors'] || themeData['colors'] || '#3b82f6',
+				}} 
 				dangerouslySetInnerHTML={{ __html: processedHtml }} 
 			/>
 		);
@@ -914,11 +1256,15 @@ function App() {
 			/>
 			<Menu
 				isOpen={isMenuOpen}
+				selectedSystem={selectedSystem}
 				onClose={() => {
 					setIsMenuOpen(false);
 					// Refresh settings when menu closes to reflect changes like DrawFramerate
 					window.api.getSettings().then((latestSettings: any) => {
 						setSettings(latestSettings);
+					});
+					window.api.getMusicFiles().then((files: string[]) => {
+						setMusicFiles(files);
 					});
 				}}
 				theme={theme}
@@ -967,6 +1313,61 @@ function App() {
 					</div>
 				))}
 			</div>
+
+			{/* Song Title Notification Overlay */}
+			<div className={`riescade-music-title-overlay ${showMusicTitle && currentTrackName ? 'visible' : ''}`}>
+				<div className="music-title-container">
+					<div className="music-icon-glow" />
+					<div className="music-title-text-wrap">
+						<span className="music-title-label">REPRODUZINDO AGORA</span>
+						<span className="music-title-value">{currentTrackName}</span>
+					</div>
+				</div>
+			</div>
+
+			{/* Floating Background Scraper Progress Card */}
+			{bulkScrapeStatus && bulkScrapeStatus.active && (
+				<div className="scraper-progress-card">
+					<div className="scraper-spinner" />
+					<div className="scraper-info-wrap">
+						<span className="scraper-progress-title">
+							PROCURANDO MÍDIAS {bulkScrapeStatus.current}/{bulkScrapeStatus.total}
+						</span>
+						<span className="scraper-progress-sub">
+							<span className="scraper-system-tag">{bulkScrapeStatus.systemCode}</span>: {bulkScrapeStatus.gameName}
+						</span>
+					</div>
+				</div>
+			)}
+
+			{/* Glassmorphic Gamelist Completion/Reload Modal */}
+			{showGamelistUpdateModal && (
+				<div className="scraper-completion-overlay">
+					<div className="scraper-completion-modal">
+						<div className="scraper-completion-icon">⚡</div>
+						<div className="scraper-completion-title">SCRAPE CONCLUÍDO</div>
+						<div className="scraper-completion-text">
+							Deseja atualizar a lista de jogos agora para aplicar as novas mídias baixadas?
+						</div>
+						<div className="scraper-completion-buttons">
+							<button 
+								className={`scraper-completion-btn primary ${reloadModalSelectedIndex === 0 ? 'selected' : ''}`}
+								onClick={() => {
+									window.api.executeCommand('reload-frontend');
+								}}
+							>
+								SIM
+							</button>
+							<button 
+								className={`scraper-completion-btn secondary ${reloadModalSelectedIndex === 1 ? 'selected' : ''}`}
+								onClick={() => setShowGamelistUpdateModal(false)}
+							>
+								NÃO
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 
 			{/* FPS Counter Layer */}
 			<FPSCounter visible={settings.DrawFramerate?.value === true || settings.DrawFramerate?.value === 'true'} />

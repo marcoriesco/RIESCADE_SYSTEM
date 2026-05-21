@@ -564,26 +564,39 @@ export class LibraryService {
     const gamelistPath = join(configPath, 'gamelists', targetSystem, 'gamelist.xml')
     const romsGamelistPath = join(getRomsPath(), targetSystem, 'gamelist.xml')
     
-    const targetPath = existsSync(gamelistPath) ? gamelistPath : romsGamelistPath
-    if (!existsSync(targetPath)) return
+    let targetPath = existsSync(gamelistPath) ? gamelistPath : romsGamelistPath
+    if (!existsSync(targetPath)) {
+      const dir = dirname(gamelistPath)
+      const fs = require('fs')
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
+      fs.writeFileSync(gamelistPath, '<?xml version="1.0"?>\n<gameList>\n</gameList>\n', 'utf-8')
+      targetPath = gamelistPath
+    }
 
     const games = this.gamelistParser.parse(targetPath, targetSystem)
     const index = games.findIndex(g => g.path === gameData.path)
     
     if (index !== -1) {
       games[index] = { ...games[index], ...gameData }
-      this.gamelistParser.save(targetPath, games)
-
-      const cached = LibraryService.cachedGames.get(targetSystem.toLowerCase())
-      if (cached) {
-        const cIdx = cached.findIndex(g => g.path === gameData.path)
-        if (cIdx !== -1) {
-          cached[cIdx] = { ...cached[cIdx], ...gameData }
-        }
-      }
-
-      this.rebuildAutoCollections()
+    } else {
+      games.push(gameData)
     }
+
+    this.gamelistParser.save(targetPath, games)
+
+    const cached = LibraryService.cachedGames.get(targetSystem.toLowerCase())
+    if (cached) {
+      const cIdx = cached.findIndex(g => g.path === gameData.path)
+      if (cIdx !== -1) {
+        cached[cIdx] = { ...cached[cIdx], ...gameData }
+      } else {
+        cached.push(gameData)
+      }
+    }
+
+    this.rebuildAutoCollections()
   }
 
   private rebuildAutoCollections(): void {

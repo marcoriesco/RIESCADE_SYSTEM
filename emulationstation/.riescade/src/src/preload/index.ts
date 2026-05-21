@@ -24,6 +24,7 @@ const api = {
   saveSetting: (name: string, value: any, type: 'string' | 'bool' | 'int' | 'float') =>
     ipcRenderer.invoke('save-setting', name, value, type),
   getHostname: () => ipcRenderer.invoke('get-hostname'),
+  getBiosInformation: () => ipcRenderer.invoke('get-bios-information'),
   cleanGamelists: () => ipcRenderer.invoke('clean-gamelists'),
   resetGamelistUsage: () => ipcRenderer.invoke('reset-gamelist-usage'),
   resetFileExtensions: () => ipcRenderer.invoke('reset-file-extensions'),
@@ -41,9 +42,14 @@ const api = {
     ipcRenderer.invoke('save-input-config', data),
   getBluetoothDevices: () => ipcRenderer.invoke('get-bluetooth-devices'),
 
-  // System commands
   executeCommand: (command: string, data?: any) => ipcRenderer.send('system-command', command, data),
   getVersion: () => ipcRenderer.invoke('get-version'),
+  getMusicFiles: (subfolder?: string) => ipcRenderer.invoke('get-music-files', subfolder),
+  getMusicPath: () => ipcRenderer.invoke('get-music-path'),
+  startScrape: () => ipcRenderer.invoke('start-scrape'),
+  cancelScrape: () => ipcRenderer.invoke('cancel-scrape'),
+  searchGameMedia: (systemName: string, gameName: string, databases: string[]) => ipcRenderer.invoke('search-game-media', systemName, gameName, databases),
+  downloadGameMedia: (systemName: string, gamePath: string, matchData: any) => ipcRenderer.invoke('download-game-media', systemName, gamePath, matchData),
 
   // Events
   on: (channel: string, callback: (...args: any[]) => void) => {

@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import { join, dirname, extname, basename } from 'path'
+import { exec } from 'child_process'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { LibraryService } from './services/LibraryService'
 import { LauncherService } from './services/LauncherService'
@@ -8,10 +9,12 @@ import { SettingsParser } from './parsers/SettingsParser'
 import { ThemeSettingsParser } from './parsers/ThemeSettingsParser'
 import { SystemService } from './services/SystemService'
 import { SassService } from './services/SassService'
+import { ScraperService } from './services/ScraperService'
 import { Game, System } from '../shared/types'
-import { watch, FSWatcher, readFileSync, existsSync, writeFileSync } from 'fs'
+import { watch, FSWatcher, readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs'
 import { getRetroBatPath, getConfigPath } from './utils/paths'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
+import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from './services/ScraperService'
 
 const libraryService = new LibraryService()
 const launcherService = new LauncherService()
@@ -19,6 +22,7 @@ const themeService = new ThemeService()
 const settingsParser = new SettingsParser()
 const systemService = new SystemService()
 const sassService = new SassService()
+const scraperService = new ScraperService(libraryService)
 
 let activeControllers: any[] = []
 let themeWatcher: FSWatcher | null = null
@@ -356,6 +360,50 @@ app.whenReady().then(() => {
     return libraryService.clearCaches()
   })
 
+  ipcMain.handle('get-bios-information', async () => {
+    const cmdPath = join(getRetroBatPath(), 'emulationstation', 'batocera-systems.exe')
+    return new Promise((resolve) => {
+      exec(`"${cmdPath}"`, (error, stdout) => {
+        if (error) {
+          console.error('Error running batocera-systems:', error)
+          resolve([])
+          return
+        }
+        
+        const lines = stdout.split(/\r?\n/)
+        const systems: any[] = []
+        let currentSystem: any = null
+
+        for (const line of lines) {
+          const trimmed = line.trim()
+          if (!trimmed) continue
+
+          if (trimmed.startsWith('> ')) {
+            if (currentSystem) {
+              systems.push(currentSystem)
+            }
+            currentSystem = {
+              name: trimmed.substring(2).trim(),
+              bios: []
+            }
+          } else if (currentSystem) {
+            const tokens = trimmed.split(/\s+/)
+            if (tokens.length >= 3) {
+              const status = tokens[0]
+              const md5 = tokens[1]
+              const path = tokens.slice(2).join(' ')
+              currentSystem.bios.push({ status, md5, path })
+            }
+          }
+        }
+        if (currentSystem) {
+          systems.push(currentSystem)
+        }
+        resolve(systems)
+      })
+    })
+  })
+
   ipcMain.handle('get-file-content', async (_, filePath: string) => {
     try {
       if (existsSync(filePath)) {
@@ -368,6 +416,258 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('get-music-files', async (_, subfolder?: string) => {
+    try {
+      const { readdirSync, statSync } = require('fs')
+      const { extname } = require('path')
+      const baseDir = join(getConfigPath(), 'music')
+      const targetDir = subfolder ? join(baseDir, subfolder) : baseDir
+      
+      if (!existsSync(targetDir)) return []
+      
+      const files = readdirSync(targetDir)
+      const allowedExtensions = ['.mp3', '.ogg', '.wav', '.mp4', '.m4a', '.aac']
+      
+      const results: string[] = []
+      for (const file of files) {
+        const fullPath = join(targetDir, file)
+        const stat = statSync(fullPath)
+        if (stat.isFile() && allowedExtensions.includes(extname(file).toLowerCase())) {
+          const relPath = subfolder ? `${subfolder}/${file}` : file
+          results.push(relPath)
+        }
+      }
+      return results
+    } catch (e) {
+      console.error('Failed to get music files:', e)
+      return []
+    }
+  })
+
+  ipcMain.handle('get-music-path', async () => {
+    return join(getConfigPath(), 'music')
+  })
+
+  ipcMain.handle('start-scrape', async () => {
+    scraperService.scrape()
+    return true
+  })
+
+  ipcMain.handle('cancel-scrape', async () => {
+    scraperService.cancel()
+    return true
+  })
+
+  ipcMain.handle('search-game-media', async (_, systemName: string, gameName: string, databases: string[]) => {
+    try {
+      const devid = 'retrobat'
+      const devpassword = 'JRLmOtnZXwo'
+      const softname = 'retrobat'
+
+      const customUser = settingsParser.getSetting('ScreenScraperUser', 'string') || ''
+      const customPass = settingsParser.getSetting('ScreenScraperPass', 'string') || ''
+      const ssid = customUser || ''
+      const sspassword = customPass || ''
+      const preferredRegion = settingsParser.getSetting('ScraperRegion', 'string') || 'eu'
+      const systemLanguage = (settingsParser.getSetting('Language', 'string') || 'pt').substring(0, 2).toLowerCase()
+
+      const systemInfo = libraryService.getSystems().find(s => s.name === systemName)
+      const systemId = SYSTEM_TO_SCREENSCRAPER_PLATFORM[systemName.toLowerCase()] || 
+                       (systemInfo ? SYSTEM_TO_SCREENSCRAPER_PLATFORM[systemInfo.platform.toLowerCase()] : 0)
+
+      let url = `https://api.screenscraper.fr/api2/jeuInfos.php?devid=${devid}&devpassword=${devpassword}&softname=${softname}&output=json&recherche=${encodeURIComponent(gameName)}`
+      if (systemId > 0) {
+        url += `&systemeid=${systemId}`
+      }
+      if (ssid) {
+        url += `&ssid=${encodeURIComponent(ssid)}`
+      }
+      if (sspassword) {
+        url += `&sspassword=${encodeURIComponent(sspassword)}`
+      }
+
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`ScreenScraper returned status ${response.status}`)
+      }
+
+      const json = await response.json()
+      let jeux: any[] = []
+      if (json.response?.jeux) {
+        jeux = Array.isArray(json.response.jeux) ? json.response.jeux : [json.response.jeux]
+      } else if (json.response?.jeu) {
+        jeux = Array.isArray(json.response.jeu) ? json.response.jeu : [json.response.jeu]
+      }
+
+      const findMediaUrl = (medias: any[], typeList: string[]): string | undefined => {
+        if (!medias || !Array.isArray(medias)) return undefined
+        const regions = [preferredRegion, 'wor', 'us', 'eu', 'jp', 'ss', '']
+        for (const type of typeList) {
+          for (const reg of regions) {
+            const match = medias.find(m => m.type === type && (reg === '' || String(m.region || '').toLowerCase() === reg.toLowerCase()))
+            if (match && match.url) {
+              return match.url
+            }
+          }
+        }
+        const fallback = medias.find(m => typeList.includes(m.type) && m.url)
+        return fallback ? fallback.url : undefined
+      }
+
+      const results: any[] = []
+      for (const db of databases) {
+        for (const jeu of jeux) {
+          const noms = jeu.noms || []
+          const regions = [preferredRegion, 'wor', 'us', 'eu', 'jp', 'ss', '']
+          let gameNameParsed = ''
+          for (const reg of regions) {
+            const nomMatch = noms.find((n: any) => reg === '' || String(n.region || '').toLowerCase() === reg.toLowerCase())
+            if (nomMatch) {
+              gameNameParsed = nomMatch.text
+              break
+            }
+          }
+          if (!gameNameParsed && noms.length > 0) gameNameParsed = noms[0].text
+          if (!gameNameParsed) gameNameParsed = gameName
+
+          const synopsis = jeu.synopsis || []
+          const langs = [systemLanguage, 'en', 'wor']
+          let gameDesc = ''
+          for (const l of langs) {
+            const synMatch = synopsis.find((s: any) => String(s.langue || '').toLowerCase() === l.toLowerCase())
+            if (synMatch) {
+              gameDesc = synMatch.text
+              break
+            }
+          }
+          if (!gameDesc && synopsis.length > 0) gameDesc = synopsis[0].text
+
+          const gameDev = jeu.developpeur?.text || ''
+          const gamePub = jeu.editeur?.text || ''
+
+          const genresList = (jeu.genres || []).map((g: any) => {
+            const synMatch = (g.noms || []).find((n: any) => String(n.langue || '').toLowerCase() === systemLanguage.toLowerCase()) || 
+                             (g.noms || []).find((n: any) => String(n.langue || '').toLowerCase() === 'en')
+            return synMatch ? synMatch.text : ''
+          }).filter((x: string) => x !== '')
+          const gameGenre = genresList.join(', ')
+
+          const gamePlayers = jeu.joueurs?.text || ''
+          const gameRating = jeu.note?.text ? parseFloat(jeu.note.text) / 20 : undefined
+
+          const dates = jeu.dates || []
+          let relDate = ''
+          for (const reg of regions) {
+            const dateMatch = dates.find((d: any) => reg === '' || String(d.region || '').toLowerCase() === reg.toLowerCase())
+            if (dateMatch) {
+              relDate = dateMatch.text
+              break
+            }
+          }
+          if (!relDate && dates.length > 0) relDate = dates[0].text
+          if (relDate && relDate.includes('-')) {
+            relDate = relDate.replace(/-/g, '') + 'T000000'
+          }
+
+          results.push({
+            id: db === 'ScreenScraper' ? String(jeu.id) : `${db.toLowerCase()}-${jeu.id}`,
+            name: gameNameParsed,
+            db: db,
+            releasedate: relDate,
+            developer: gameDev,
+            publisher: gamePub,
+            genre: gameGenre,
+            rating: gameRating,
+            desc: gameDesc,
+            players: gamePlayers,
+            media: {
+              image: findMediaUrl(jeu.medias, ['mixrbv2', 'mixrbv1', 'fanart', 'ss', 'sstitle']),
+              thumbnail: findMediaUrl(jeu.medias, ['box-2D', 'box-3D', 'cover']),
+              marquee: findMediaUrl(jeu.medias, ['wheel-hd', 'wheel', 'wheel-steel', 'wheel-carbon', 'screenmarqueesmall', 'screenmarquee', 'logo']),
+              video: findMediaUrl(jeu.medias, ['video-normalized', 'video'])
+            }
+          })
+        }
+      }
+      return results
+    } catch (e: any) {
+      console.error('search-game-media error:', e)
+      return []
+    }
+  })
+
+  ipcMain.handle('download-game-media', async (_, systemName: string, gamePath: string, matchData: any) => {
+    try {
+      const systems = libraryService.getSystems()
+      const system = systems.find(s => s.name === systemName)
+      if (!system) throw new Error(`System ${systemName} not found`)
+
+      const games = libraryService.getGames(systemName)
+      const game = games.find(g => g.path === gamePath)
+      if (!game) throw new Error(`Game ${gamePath} not found in system ${systemName}`)
+
+      const mediaFolder = join(system.path, 'media')
+      const romName = basename(game.path)
+      const romNameNoExt = romName.replace(/\.[^/.]+$/, '')
+
+      const updatedFields: Partial<Game> = {}
+
+      const getExt = (url: string, defaultExt: string) => {
+        try {
+          const parsed = new URL(url)
+          const ext = extname(parsed.pathname)
+          if (ext && ext.length > 1) return ext.substring(1)
+        } catch (e) {}
+        return defaultExt
+      }
+
+      if (matchData.media?.image) {
+        const ext = getExt(matchData.media.image, 'png')
+        const destFile = join(mediaFolder, 'fanart', `${romNameNoExt}.${ext}`)
+        await downloadFile(matchData.media.image, destFile)
+        updatedFields.image = `./media/fanart/${romNameNoExt}.${ext}`
+      }
+
+      if (matchData.media?.thumbnail) {
+        const ext = getExt(matchData.media.thumbnail, 'png')
+        const destFile = join(mediaFolder, 'cover', `${romNameNoExt}.${ext}`)
+        await downloadFile(matchData.media.thumbnail, destFile)
+        updatedFields.thumbnail = `./media/cover/${romNameNoExt}.${ext}`
+      }
+
+      if (matchData.media?.marquee) {
+        const ext = getExt(matchData.media.marquee, 'png')
+        const destFile = join(mediaFolder, 'logo', `${romNameNoExt}.${ext}`)
+        await downloadFile(matchData.media.marquee, destFile)
+        updatedFields.marquee = `./media/logo/${romNameNoExt}.${ext}`
+      }
+
+      if (matchData.media?.video) {
+        const ext = getExt(matchData.media.video, 'mp4')
+        const destFile = join(mediaFolder, 'video', `${romNameNoExt}.${ext}`)
+        await downloadFile(matchData.media.video, destFile)
+        updatedFields.video = `./media/video/${romNameNoExt}.${ext}`
+      }
+
+      if (matchData.name) updatedFields.name = matchData.name
+      if (matchData.desc) updatedFields.desc = matchData.desc
+      if (matchData.developer) updatedFields.developer = matchData.developer
+      if (matchData.publisher) updatedFields.publisher = matchData.publisher
+      if (matchData.genre) updatedFields.genre = matchData.genre
+      if (matchData.players) updatedFields.players = matchData.players
+      if (matchData.rating !== undefined) updatedFields.rating = matchData.rating
+      if (matchData.releasedate) updatedFields.releasedate = matchData.releasedate
+
+      const updatedGame = { ...game, ...updatedFields }
+      await libraryService.updateGame(systemName, updatedGame)
+      return updatedGame
+    } catch (e: any) {
+      console.error('download-game-media error:', e)
+      throw e
+    }
+  })
+
+
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
@@ -378,3 +678,16 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+async function downloadFile(url: string, destPath: string): Promise<void> {
+  const dir = dirname(destPath)
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true })
+  }
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Failed to download ${url}: ${response.statusText}`)
+  }
+  const buffer = Buffer.from(await response.arrayBuffer())
+  writeFileSync(destPath, buffer)
+}

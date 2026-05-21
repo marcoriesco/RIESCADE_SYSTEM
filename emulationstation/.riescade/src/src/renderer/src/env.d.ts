@@ -28,10 +28,17 @@ declare global {
       toggleGameInCollection: (collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove') => Promise<boolean>
       getFileContent: (path: string) => Promise<string | null>
       getHostname: () => Promise<string>
+      getBiosInformation: () => Promise<any[]>
       cleanGamelists: () => Promise<any>
       resetGamelistUsage: () => Promise<any>
       resetFileExtensions: () => Promise<any>
       clearCaches: () => Promise<any>
+      getMusicFiles: (subfolder?: string) => Promise<string[]>
+      getMusicPath: () => Promise<string>
+      startScrape: () => Promise<boolean>
+      cancelScrape: () => Promise<boolean>
+      searchGameMedia: (systemName: string, gameName: string, databases: string[]) => Promise<any[]>
+      downloadGameMedia: (systemName: string, gamePath: string, matchData: any) => Promise<any>
       on: (channel: string, callback: (...args: any[]) => void) => () => void
     }
   }

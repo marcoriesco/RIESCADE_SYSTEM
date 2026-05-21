@@ -32,15 +32,18 @@
 .riescade-menu-overlay,
 .riescade-modal-overlay {
   background: rgba(0, 0, 0, 0.7) !important;
+  display: flex;
+  align-items: flex-start !important;
+  padding-top: 15vh;
   backdrop-filter: blur(3px);
 }
 
 .riescade-menu-container,
 .riescade-modal-container {
+  background: rgba(0, 0, 0, 0.65) !important;
   font-family: "Roboto Condensed", sans-serif !important;
   font-weight: 400;
   width: 50vw !important;
-  background: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid #0e0e0e;
   box-shadow: 2px 2px 40px rgb(0, 0, 0);
   border-radius: 4px;
@@ -70,11 +73,11 @@
 /* Área onde a lista React será injetada */
 .riescade-menu-list-container {
   background: none !important;
-  max-height: 70vh;
+  max-height: 50vh;
 }
 
 .riescade-menu-list {
-  max-height: 70vh;
+  max-height: 50vh;
 }
 
 .riescade-menu-group {
@@ -87,6 +90,7 @@
 .riescade-menu-item {
   color: #999 !important;
   padding: 0 15px !important;
+  transition: none !important;
 }
 .riescade-menu-item .riescade-menu-icon#game_settings {
   background-image: url(../icons/games.png);

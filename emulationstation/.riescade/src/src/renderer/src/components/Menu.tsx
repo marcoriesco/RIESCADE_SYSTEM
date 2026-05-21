@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { WebThemeRenderer } from './theme/WebThemeRenderer'
 import { InputConfigOverlay } from './InputConfigOverlay'
+import { ScraperProgressModal } from './ScraperProgressModal'
 
 const localeModules = import.meta.glob('../locales/*.json', { eager: true })
 const locales: Record<string, any> = {}
@@ -25,6 +26,9 @@ const languageFriendlyNames: Record<string, string> = {
 
 const isOptionMatch = (optVal: any, settingVal: any) => {
   if (optVal === settingVal) return true
+  if (optVal !== null && optVal !== undefined && settingVal !== null && settingVal !== undefined) {
+    if (String(optVal) === String(settingVal)) return true
+  }
   const isOptNull = optVal === null || optVal === undefined || optVal === '' || optVal === 'null'
   const isSetNull = settingVal === null || settingVal === undefined || settingVal === '' || settingVal === 'null'
   return isOptNull && isSetNull
@@ -41,6 +45,33 @@ const findMenuItemBySettingName = (items: MenuItem[], settingName: string): Menu
     }
   }
   return undefined
+}
+
+const findMenuItemById = (items: MenuItem[], id: string): MenuItem | undefined => {
+  for (const item of items) {
+    if (item.id === id) return item
+    if (item.submenu) {
+      const found = findMenuItemById(item.submenu, id)
+      if (found) return found
+    }
+  }
+  return undefined
+}
+
+interface BiosFile {
+  status: string
+  md5: string
+  path: string
+}
+
+interface BiosSystem {
+  name: string
+  bios: BiosFile[]
+}
+
+interface System {
+  name: string
+  fullName: string
 }
 
 interface MenuItem {
@@ -71,6 +102,7 @@ interface MenuProps {
   theme?: any
   themeData?: any
   allSystems?: any[]
+  selectedSystem?: any
 }
 
 const getGamepadGuid = (pad: Gamepad): string => {
@@ -90,7 +122,7 @@ const getGamepadGuid = (pad: Gamepad): string => {
   return id
 }
 
-export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [] }) => {
+export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem }) => {
   const [settings, setSettings] = useState<Record<string, any>>({})
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
@@ -99,13 +131,25 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [configuredControllers, setConfiguredControllers] = useState<any[]>([])
   const [bluetoothDevices, setBluetoothDevices] = useState<{ name: string; id: string }[]>([])
   const [isBluetoothScanning, setIsBluetoothScanning] = useState(false)
-  const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string; tabs?: string[]; activeTab?: number }[]>([])
+  const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string }[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
+
+  // Helper: find the first selectable (non-group) item index in a menu items array
+  const findFirstSelectableIndex = (items: MenuItem[]): number => {
+    const idx = items.findIndex(item => item.type !== 'group')
+    return idx !== -1 ? idx : 0
+  }
   const [visible, setVisible] = useState(false)
   const [showInputConfig, setShowInputConfig] = useState(false)
+  // NEW STATES FOR MUSIC & BIOS INTEGRATION
+  const [favoriteSongsList, setFavoriteSongsList] = useState<string[]>([])
+  const [rawBiosData, setRawBiosData] = useState<BiosSystem[]>([])
+  const [installedSystems, setInstalledSystems] = useState<System[]>([])
+  const [biosViewMode, setBiosViewMode] = useState<'installed' | 'all'>('installed')
+  const [showScraperProgress, setShowScraperProgress] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [modalSelectedIndex, setModalSelectedIndex] = useState(0)
-  const [versions, setVersions] = useState({ app: '2.0.0', es: '' })
+  const [versions, setVersions] = useState({ app: '2.0.1', es: '' })
   const [showInputModal, setShowInputModal] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
@@ -114,8 +158,20 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [hostname, setHostname] = useState('localhost')
   const bluetoothScanTimeoutRef = useRef<any>(null)
 
+  const pendingSettingsRef = useRef(pendingSettings)
+  pendingSettingsRef.current = pendingSettings
+
+  const settingsRef = useRef(settings)
+  settingsRef.current = settings
+
+  const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
+  const currentMenu = currentStackItem ? (currentStackItem.tabs && currentStackItem.activeTab !== undefined ? currentStackItem.items.filter(item => item.tab === currentStackItem.activeTab) : currentStackItem.items) : []
+
   const getSetting = (name: string, fallback: any = ''): any => {
-    let val = (pendingSettings[name] !== undefined ? pendingSettings[name] : settings[name]?.value)
+    if (name === 'bios_view_mode_temp') {
+      return biosViewMode
+    }
+    let val = (pendingSettingsRef.current[name] !== undefined ? pendingSettingsRef.current[name] : settingsRef.current[name]?.value)
     if (val === undefined || val === null || val === '') {
       if (name.endsWith('.emulator')) {
         return 'auto'
@@ -192,6 +248,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   }
 
   const updateSetting = (name: string, value: any) => {
+    if (name === 'bios_view_mode_temp') {
+      setBiosViewMode(value as 'installed' | 'all')
+      return
+    }
     const stringVal = String(value)
 
     if (name.startsWith('INPUT P') && name.endsWith('NAME')) {
@@ -230,7 +290,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       }
     }
 
-    if (String(getSetting(name)) === stringVal) {
+    const dbValue = settingsRef.current[name]?.value ?? ''
+    if (String(dbValue) === stringVal) {
       setPendingSettings(prev => {
         const next = { ...prev }
         delete next[name]
@@ -308,7 +369,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       setNeedsReload(false)
       window.api.getSettings().then(s => {
         setSettings(s)
-        setPendingSettings({})
+        setPendingSettings({
+          ScraperSystems: selectedSystem ? selectedSystem.name : ''
+        })
       })
       window.api.getThemes().then(setThemes)
       window.api.getVersion?.().then(setVersions)
@@ -316,6 +379,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       window.api.getHostname?.().then(setHostname).catch(() => {})
       window.api.getConfiguredControllers?.().then(setConfiguredControllers).catch(console.error)
       window.api.getBluetoothDevices?.().then(setBluetoothDevices).catch(console.error)
+      window.api.getMusicFiles().then(setFavoriteSongsList).catch(console.error)
+      window.api.getBiosInformation().then(setRawBiosData).catch(console.error)
+      window.api.getSystems().then(setInstalledSystems).catch(console.error)
 
       const updateGamepads = () => {
         const pads = navigator.getGamepads().filter((p): p is Gamepad => p !== null)
@@ -330,7 +396,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       }
 
       setActiveMenuStack([{ items: getMainMenuItems(), title: t('MAIN MENU') }])
-      setSelectedIndex(0)
+      setSelectedIndex(findFirstSelectableIndex(getMainMenuItems()))
       // Animate in
       requestAnimationFrame(() => setVisible(true))
 
@@ -344,16 +410,221 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     }
   }, [isOpen, theme?.name])
 
+  const regenerateStack = useCallback((prevStack: { items: MenuItem[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string }[]) => {
+    if (prevStack.length === 0) return []
+    const mainItems = getMainMenuItems()
+    const nextStack = [{ ...prevStack[0], items: mainItems }]
+    
+    for (let i = 1; i < prevStack.length; i++) {
+      const prevItem = prevStack[i]
+      if (prevItem.parentItemId) {
+        const parentItem = findMenuItemById(mainItems, prevItem.parentItemId)
+        if (parentItem && parentItem.submenu) {
+          nextStack.push({
+            ...prevItem,
+            items: parentItem.submenu
+          })
+          continue
+        }
+      }
+      nextStack.push(prevItem)
+    }
+    return nextStack
+  }, [favoriteSongsList, rawBiosData, installedSystems, biosViewMode])
+
   // Update menu when settings/themes change
   useEffect(() => {
     if (isOpen && activeMenuStack.length > 0) {
-      setActiveMenuStack(prev => {
-        const updated = [...prev]
-        updated[0] = { ...updated[0], items: getMainMenuItems() }
-        return updated
+      setActiveMenuStack(prev => regenerateStack(prev))
+    }
+  }, [
+    settings,
+    themes,
+    customCollections,
+    connectedGamepads,
+    configuredControllers,
+    bluetoothDevices,
+    favoriteSongsList,
+    rawBiosData,
+    installedSystems,
+    biosViewMode
+  ])
+
+  // Helpers for checklist selection
+  const handleSelectAll = useCallback(() => {
+    const checklistItems = currentMenu.filter(item => item.type === 'toggle' && item.value !== undefined)
+    if (checklistItems.length === 0) return
+
+    const settingName = checklistItems[0].settingName!
+    if (settingName === 'audio.favoriteSongs') {
+      const allValues = checklistItems.map(item => item.value)
+      updateSetting(settingName, allValues.join(';'))
+      return
+    }
+
+    if (settingName === 'DisabledManualScrapers') {
+      updateSetting(settingName, '')
+      return
+    }
+
+    if (settingName === 'VisibleSystems' || settingName === 'ScraperSystems') {
+      updateSetting(settingName, '')
+      return
+    }
+
+    const allValues = checklistItems.map(item => item.value)
+    updateSetting(settingName, allValues.join(','))
+  }, [currentMenu, allSystems, updateSetting])
+
+  const handleSelectNone = useCallback(() => {
+    const checklistItems = currentMenu.filter(item => item.type === 'toggle' && item.value !== undefined)
+    if (checklistItems.length === 0) return
+
+    const settingName = checklistItems[0].settingName!
+    if (settingName === 'audio.favoriteSongs') {
+      updateSetting(settingName, '')
+      return
+    }
+
+    if (settingName === 'DisabledManualScrapers') {
+      const allValues = checklistItems.map(item => item.value)
+      updateSetting(settingName, allValues.join(';'))
+      return
+    }
+
+    if (settingName === 'VisibleSystems' || settingName === 'ScraperSystems') {
+      updateSetting(settingName, 'none')
+      return
+    }
+    updateSetting(settingName, '')
+  }, [currentMenu, updateSetting])
+
+  const handleBackAction = useCallback(() => {
+    if (activeMenuStack.length > 1) {
+      handleSaveQuietly(pendingSettings)
+      if (activeMenuStack.length === 2 && needsReload) {
+        setTimeout(() => {
+          window.api.executeCommand('reload-frontend')
+        }, 100)
+      } else {
+        setActiveMenuStack(prev => prev.slice(0, -1))
+        const parentItems = activeMenuStack[activeMenuStack.length - 2]?.items || []
+        setSelectedIndex(findFirstSelectableIndex(parentItems))
+      }
+    } else {
+      const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).some(k => themeSettings[k] !== themeData[`options:${k}`])
+      if (hasChanges || needsReload) {
+        handleSaveQuietly(pendingSettings).then(() => {
+          onClose()
+          window.api.executeCommand('reload-frontend')
+        })
+      } else {
+        onClose()
+      }
+    }
+  }, [activeMenuStack, pendingSettings, themeSettings, themeData, needsReload, onClose])
+
+  const getBottomButtons = useCallback((): { id: string; label: string; onClick: () => void }[] => {
+    // No buttons on the main menu
+    if (activeMenuStack.length <= 1) return []
+
+    const buttons: { id: string; label: string; onClick: () => void }[] = []
+    
+    const checklistItems = currentMenu.filter(item => item.type === 'toggle' && item.value !== undefined)
+    const isChecklist = checklistItems.length > 0
+
+    if (isChecklist) {
+      buttons.push({
+        id: 'select_all',
+        label: t('SELECIONAR TUDO'),
+        onClick: handleSelectAll
+      })
+      buttons.push({
+        id: 'select_none',
+        label: t('SELECIONAR NENHUM'),
+        onClick: handleSelectNone
       })
     }
-  }, [settings, themes, customCollections, connectedGamepads, configuredControllers, bluetoothDevices])
+
+    if (currentStackItem?.parentItemId === 'scraper' && currentStackItem?.activeTab === 0) {
+      buttons.push({
+        id: 'scrape_now_btn',
+        label: t('BAIXAR AGORA'),
+        onClick: () => {
+          handleSaveQuietly(pendingSettings).then(() => {
+            onClose()
+            window.api.startScrape()
+          })
+        }
+      })
+    }
+
+    if (currentStackItem?.parentItemId === 'missing_bios_submenu') {
+      buttons.push({
+        id: 'bios_refresh_btn',
+        label: t('ATUALIZAR'),
+        onClick: async () => {
+          const [bios, systems] = await Promise.all([
+            window.api.getBiosInformation(),
+            window.api.getSystems()
+          ])
+          setRawBiosData(bios || [])
+          setInstalledSystems(systems || [])
+        }
+      })
+    }
+
+    buttons.push({
+      id: 'back_btn',
+      label: t('VOLTAR'),
+      onClick: handleBackAction
+    })
+
+    return buttons
+  }, [activeMenuStack.length, currentMenu, currentStackItem, handleSelectAll, handleSelectNone, handleBackAction, t, setRawBiosData, setInstalledSystems])
+
+  const handleItemClick = (item: MenuItem, index: number) => {
+    setSelectedIndex(index)
+    
+    if (item.submenu) {
+      const submenuItems = item.submenu!
+      const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
+      setActiveMenuStack(prev => [...prev, { 
+        items: submenuItems, 
+        title: item.label, 
+        tabs: item.tabs, 
+        activeTab: item.tabs ? 0 : undefined,
+        parentItemId: item.id
+      }])
+      setSelectedIndex(findFirstSelectableIndex(filteredItems))
+    } else if (item.type === 'select' && item.options) {
+      const currentSettingVal = item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)
+      const activeIndex = item.options.findIndex(opt => isOptionMatch(opt.value, currentSettingVal))
+
+      const optionsSubmenu: MenuItem[] = item.options.map(opt => ({
+        id: `opt_${opt.value}`,
+        label: opt.label.toUpperCase(),
+        type: 'action',
+        description: opt.description,
+        onClick: () => {
+          if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName!, opt.value)
+          else updateSetting(item.settingName!, opt.value)
+          setActiveMenuStack(prev => prev.slice(0, -1))
+          setSelectedIndex(index)
+        }
+      }))
+      setActiveMenuStack(prev => [...prev, { items: optionsSubmenu, title: item.label, parentItemId: item.id }])
+      setSelectedIndex(activeIndex !== -1 ? activeIndex : 0)
+    } else if (item.type === 'toggle') {
+      handleToggle(item)
+    } else if (item.type === 'input') {
+      setActiveInputItem(item)
+      setInputValue(String(getSetting(item.settingName!, '')))
+      setShowInputModal(true)
+    } else if (item.onClick) {
+      item.onClick()
+    }
+  }
 
   // Auto-scroll to selected item
   useEffect(() => {
@@ -372,17 +643,24 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ? getThemeSetting(item.settingName, fallback)
         : getSetting(item.settingName, fallback)
       
-      // Special logic for DisabledManualScrapers (semicolon separated list of disabled scrapers)
-      if (item.settingName === 'DisabledManualScrapers' && item.value !== undefined) {
+      // Special logic for DisabledManualScrapers & audio.favoriteSongs (semicolon separated list of options)
+      if ((item.settingName === 'DisabledManualScrapers' || item.settingName === 'audio.favoriteSongs') && item.value !== undefined) {
         const values = String(current || '').split(';').filter(v => v.trim() !== '')
-        const isExcluded = values.includes(item.value)
+        const isSelected = values.includes(item.value)
         let newValues: string[]
-        if (isExcluded) {
+        if (isSelected) {
           newValues = values.filter(v => v !== item.value)
         } else {
           newValues = [...values, item.value]
         }
-        updateSetting(item.settingName, newValues.join(';'))
+        
+        // Save to settings
+        if (item.settingName === 'audio.favoriteSongs') {
+          updateSetting(item.settingName, newValues.join(';'))
+          window.dispatchEvent(new CustomEvent('riescade-play-nav-sound'))
+        } else {
+          updateSetting(item.settingName, newValues.join(';'))
+        }
         return
       }
 
@@ -390,8 +668,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       if (item.type === 'toggle' && item.value !== undefined && !item.settingType) {
         const values = String(current || '').split(',').filter(v => v.trim() !== '')
         
+        // Filter out 'none' to get the actual selected system names
+        let currentValues = values.filter(v => v !== 'none')
+        
         // Special logic for VisibleSystems/ScraperSystems: if empty, it means ALL are selected
-        let currentValues = values
         if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && values.length === 0) {
           currentValues = allSystems.map((s: any) => s.name)
         }
@@ -405,9 +685,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           newValues = [...currentValues, item.value]
         }
         
-        // If all systems are selected, we can save an empty string to keep config clean
+        // If all systems are selected, we can save an empty string to keep config clean.
+        // If no systems are selected, we save 'none'.
         if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && newValues.length === allSystems.length) {
           updateSetting(item.settingName, '')
+        } else if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && newValues.length === 0) {
+          updateSetting(item.settingName, 'none')
         } else {
           updateSetting(item.settingName, newValues.join(','))
         }
@@ -469,9 +752,61 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'netplay_port', label: t('PORT'), type: 'input', settingName: 'global.netplay.port', settingType: 'string' }
           ]},
           { id: 'group_bios', label: t('BIOS SETTINGS'), type: 'group' },
-          { id: 'missing_bios_submenu', label: t('MISSING BIOS CHECK'), submenu: [
-            { id: 'no_missing_bios', label: t('NO MISSING BIOS FILES'), type: 'info', value: '' }
-          ]},
+          {
+            id: 'missing_bios_submenu',
+            label: t('MISSING BIOS CHECK'),
+            tabs: [t('Sistemas instalados'), t('Todos')],
+            submenu: (() => {
+              const generateTabItems = (systems: BiosSystem[], tabIndex: number): MenuItem[] => {
+                const tabItems: MenuItem[] = []
+                for (const sys of systems) {
+                  const matched = installedSystems.find(s => s.name.toLowerCase() === sys.name.toLowerCase())
+                  const systemFullName = (matched?.fullName || sys.name || 'UNKNOWN')
+
+                  if (sys.bios && sys.bios.length > 0) {
+                    tabItems.push({
+                      id: `bios_group_${sys.name}_tab${tabIndex}`,
+                      label: systemFullName.toUpperCase(),
+                      type: 'group',
+                      tab: tabIndex
+                    })
+
+                    for (const b of sys.bios) {
+                      tabItems.push({
+                        id: `bios_file_${sys.name}_${b.path}_tab${tabIndex}`,
+                        label: b.path,
+                        description: `${b.status} - MD5: ${b.md5}`,
+                        type: 'info',
+                        value: '',
+                        tab: tabIndex
+                      })
+                    }
+                  }
+                }
+
+                const hasAnyBios = systems.some(sys => sys.bios && sys.bios.length > 0)
+                if (!hasAnyBios) {
+                  tabItems.push({
+                    id: `bios_empty_tab${tabIndex}`,
+                    label: t('NENHUM ARQUIVO DE BIOS AUSENTE'),
+                    type: 'info',
+                    value: '',
+                    tab: tabIndex
+                  })
+                }
+
+                return tabItems
+              }
+
+              const installedNames = new Set(installedSystems.map(s => s.name.toLowerCase()))
+              const installedBiosSystems = rawBiosData.filter(sys => installedNames.has(sys.name.toLowerCase()))
+
+              const tab0Items = generateTabItems(installedBiosSystems, 0)
+              const tab1Items = generateTabItems(rawBiosData, 1)
+
+              return [...tab0Items, ...tab1Items]
+            })()
+          },
           { id: 'check_bios_launch', label: t('CHECK BIOS FILES BEFORE RUNNING A GAME'), type: 'toggle', settingName: 'CheckBiosesAtLaunch', settingType: 'bool' },
           { id: 'group_autosave', label: t('ESTADOS DE SALVAMENTO'), type: 'group' },
           { id: 'autosave', label: t('SALVAR/CARREGAR AUTOMÁTICO'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool', description: t('Carrega o estado de salvamento mais recente ao iniciar o jogo e salva o estado ao sair do jogo.') },
@@ -1047,7 +1382,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'show_notifications', label: t('SHOW CONTROLLER NOTIFICATIONS'), type: 'toggle', settingName: 'ShowControllerNotifications', settingType: 'bool' },
           { id: 'show_activity', label: t('SHOW CONTROLLER ACTIVITY'), type: 'toggle', settingName: 'ShowControllerActivity', settingType: 'bool' },
           ...((getSetting('ShowControllerActivity') === 'true' || getSetting('ShowControllerActivity') === true || getSetting('ShowControllerActivity') === '1' || getSetting('ShowControllerActivity') === 1) ? [
-            { id: 'show_battery', label: t('SHOW CONTROLLER BATTERY LEVEL'), type: 'toggle', settingName: 'ShowControllerBattery', settingType: 'bool' }
+            { id: 'show_battery', label: t('SHOW CONTROLLER BATTERY LEVEL'), type: 'toggle' as const, settingName: 'ShowControllerBattery', settingType: 'bool' as const } as MenuItem
           ] : []),
           { id: 'show_gun_notifications', label: t('SHOW GUN NOTIFICATIONS'), type: 'toggle', settingName: 'ShowGunNotifications', settingType: 'bool' },
           { id: 'draw_gun_crosshair', label: t('DRAW GUN CROSSHAIR'), type: 'toggle', settingName: 'DrawGunCrosshair', settingType: 'bool' },
@@ -1106,7 +1441,24 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'thememusics', label: t('PLAY SYSTEM-SPECIFIC MUSIC'), type: 'toggle', settingName: 'audio.thememusics', settingType: 'bool' },
           { id: 'video_lowers_music', label: t('LOWER MUSIC WHEN PLAYING VIDEO'), type: 'toggle', settingName: 'VideoLowersMusic', settingType: 'bool' },
           { id: 'use_favorite_music', label: t('PLAY ONLY SONGS FROM YOUR FAVORITES PLAYLIST'), type: 'toggle', settingName: 'audio.useFavoriteMusic', settingType: 'bool' },
-          { id: 'selection_favorite_songs', label: t('SELECTION OF FAVORITE SONGS'), type: 'action', onClick: () => { alert(t('SELECTION OF FAVORITE SONGS')) } },
+          {
+            id: 'selection_favorite_songs',
+            label: t('SELECTION OF FAVORITE SONGS'),
+            showCount: true,
+            submenu: favoriteSongsList.map(song => {
+              const cleanName = song.split('/').pop() || song
+              const nameWithoutExt = cleanName.substring(0, cleanName.lastIndexOf('.')) || cleanName
+              const label = nameWithoutExt.toUpperCase()
+              
+              return {
+                id: `song_${song}`,
+                label,
+                type: 'toggle' as const,
+                settingName: 'audio.favoriteSongs',
+                value: song
+              }
+            })
+          },
           
           { id: 'group_sounds', label: t('SOUNDS'), type: 'group' },
           { id: 'enable_sounds', label: t('ENABLE NAVIGATION SOUNDS'), type: 'toggle', settingName: 'EnableSounds', settingType: 'bool' },
@@ -1420,7 +1772,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           },
           { id: 'group_scrape_actions', label: t('AÇÕES'), type: 'group', tab: 0 },
           { id: 'scrape_now', label: t('SCRAPE NOW'), type: 'action', tab: 0, onClick: () => {
-            alert(t('SCRAPE NOW'))
+            handleSaveQuietly(pendingSettings).then(() => {
+              onClose()
+              window.api.startScrape()
+            })
           }},
 
           // === TAB 1: OPTIONS ===
@@ -1752,13 +2107,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     return items
   }
 
-  const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
-  const currentMenu = currentStackItem ? (currentStackItem.tabs && currentStackItem.activeTab !== undefined ? currentStackItem.items.filter(item => item.tab === currentStackItem.activeTab) : currentStackItem.items) : []
   const menuTitle = currentStackItem?.title || 'MAIN MENU'
+  const bottomButtons = getBottomButtons()
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isOpen || showInputConfig) return
+      if (!isOpen || showInputConfig || showScraperProgress) return
 
       if (showSaveModal) {
         const modalButtons = [
@@ -1771,7 +2125,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           setModalSelectedIndex(prev => (prev + 1) % modalButtons.length)
         } else if (e.key === 'ArrowUp') {
           setModalSelectedIndex(prev => (prev - 1 + modalButtons.length) % modalButtons.length)
-        } else if (e.key === 'Enter') {
+        } else if (e.key === 'Enter' || e.key === ' ') {
           modalButtons[modalSelectedIndex].action()
         } else if (e.key === 'Backspace' || e.key === 'Escape') {
           setShowSaveModal(false)
@@ -1787,7 +2141,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             next[next.length - 1] = { ...next[next.length - 1], activeTab: newTab }
             return next
           })
-          setSelectedIndex(0)
+          setSelectedIndex(findFirstSelectableIndex(currentStackItem.items.filter(item => item.tab === newTab)))
           e.preventDefault()
           return
         } else if (e.key === 'PageDown' || e.key === 'e' || e.key === 'E') {
@@ -1797,7 +2151,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             next[next.length - 1] = { ...next[next.length - 1], activeTab: newTab }
             return next
           })
-          setSelectedIndex(0)
+          setSelectedIndex(findFirstSelectableIndex(currentStackItem.items.filter(item => item.tab === newTab)))
           e.preventDefault()
           return
         }
@@ -1805,88 +2159,114 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
       if (currentMenu.length === 0) return
 
-      if (e.key === 'ArrowDown') {
-        setSelectedIndex(prev => {
-          let next = (prev + 1) % currentMenu.length
-          while (currentMenu[next]?.type === 'group' && next !== prev) next = (next + 1) % currentMenu.length
-          return next
-        })
-      } else if (e.key === 'ArrowUp') {
-        setSelectedIndex(prev => {
-          let next = (prev - 1 + currentMenu.length) % currentMenu.length
-          while (currentMenu[next]?.type === 'group' && next !== prev) next = (next - 1 + currentMenu.length) % currentMenu.length
-          return next
-        })
-      } else if (e.key === 'Enter') {
-        const item = currentMenu[selectedIndex]
-        if (item.submenu) {
-          setActiveMenuStack(prev => [...prev, { items: item.submenu!, title: item.label, tabs: item.tabs, activeTab: item.tabs ? 0 : undefined }])
-          setSelectedIndex(0)
-        } else if (item.type === 'select' && item.options) {
-          const currentSettingVal = item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)
-          const activeIndex = item.options.findIndex(opt => isOptionMatch(opt.value, currentSettingVal))
-
-          // Convert options to a temporary submenu
-          const optionsSubmenu: MenuItem[] = item.options.map(opt => ({
-            id: `opt_${opt.value}`,
-            label: opt.label.toUpperCase(),
-            type: 'action',
-            description: opt.description,
-            onClick: () => {
-              if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName!, opt.value)
-              else updateSetting(item.settingName!, opt.value)
-              setActiveMenuStack(prev => prev.slice(0, -1))
-              setSelectedIndex(selectedIndex)
-            }
-          }))
-          setActiveMenuStack(prev => [...prev, { items: optionsSubmenu, title: item.label }])
-          setSelectedIndex(activeIndex !== -1 ? activeIndex : 0)
-        } else if (item.type === 'toggle') {
-          handleToggle(item)
-        } else if (item.type === 'input') {
-          setActiveInputItem(item)
-          setInputValue(String(getSetting(item.settingName!, '')))
-          setShowInputModal(true)
-        } else if (item.onClick) {
-          item.onClick()
+      const bottomButtons = getBottomButtons()
+      const lastSelectableMenuIndex = (() => {
+        for (let i = currentMenu.length - 1; i >= 0; i--) {
+          if (currentMenu[i]?.type !== 'group') return i
         }
-      } else if (e.key === 'ArrowRight') {
-        const item = currentMenu[selectedIndex]
-        if (item.type === 'select') handleSelect(item, 1)
-        else if (item.type === 'slider') handleSlider(item, 1)
+        return -1
+      })()
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        if (selectedIndex >= currentMenu.length) {
+          setSelectedIndex(findFirstSelectableIndex(currentMenu))
+        } else if (selectedIndex === lastSelectableMenuIndex && bottomButtons.length > 0) {
+          setSelectedIndex(currentMenu.length)
+        } else {
+          setSelectedIndex(prev => {
+            let next = (prev + 1) % currentMenu.length
+            while (currentMenu[next]?.type === 'group' && next !== prev) next = (next + 1) % currentMenu.length
+            return next
+          })
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        if (selectedIndex >= currentMenu.length) {
+          setSelectedIndex(lastSelectableMenuIndex !== -1 ? lastSelectableMenuIndex : 0)
+        } else if (selectedIndex === findFirstSelectableIndex(currentMenu) && bottomButtons.length > 0) {
+          setSelectedIndex(currentMenu.length + bottomButtons.length - 1)
+        } else {
+          setSelectedIndex(prev => {
+            let next = (prev - 1 + currentMenu.length) % currentMenu.length
+            while (currentMenu[next]?.type === 'group' && next !== prev) next = (next - 1 + currentMenu.length) % currentMenu.length
+            return next
+          })
+        }
       } else if (e.key === 'ArrowLeft') {
+        if (selectedIndex >= currentMenu.length) {
+          e.preventDefault()
+          const currentBtnIdx = selectedIndex - currentMenu.length
+          const nextBtnIdx = (currentBtnIdx - 1 + bottomButtons.length) % bottomButtons.length
+          setSelectedIndex(currentMenu.length + nextBtnIdx)
+          return
+        }
         const item = currentMenu[selectedIndex]
         if (item.type === 'select') handleSelect(item, -1)
         else if (item.type === 'slider') handleSlider(item, -1)
-      } else if (e.key === 'Backspace' || e.key === 'Escape') {
-        if (activeMenuStack.length > 1) {
-          // Going back from a submenu: save quietly!
-          handleSaveQuietly(pendingSettings)
-          if (activeMenuStack.length === 2 && needsReload) {
-            // Returning to the Main Menu (activeMenuStack.length becomes 1)
-            // Save and reload frontend!
-            setTimeout(() => {
-              window.api.executeCommand('reload-frontend')
-            }, 100)
-          } else {
-            setActiveMenuStack(prev => prev.slice(0, -1))
-            setSelectedIndex(0)
-          }
+      } else if (e.key === 'ArrowRight') {
+        if (selectedIndex >= currentMenu.length) {
+          e.preventDefault()
+          const currentBtnIdx = selectedIndex - currentMenu.length
+          const nextBtnIdx = (currentBtnIdx + 1) % bottomButtons.length
+          setSelectedIndex(currentMenu.length + nextBtnIdx)
+          return
+        }
+        const item = currentMenu[selectedIndex]
+        if (item.type === 'select') handleSelect(item, 1)
+        else if (item.type === 'slider') handleSlider(item, 1)
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        if (selectedIndex >= currentMenu.length) {
+          const btnIdx = selectedIndex - currentMenu.length
+          bottomButtons[btnIdx]?.onClick()
         } else {
-          // Exiting the main menu entirely
-          const hasChanges = Object.keys(pendingSettings).length > 0 || Object.keys(themeSettings).some(k => themeSettings[k] !== themeData[`options:${k}`])
-          if (hasChanges || needsReload) {
-            handleSaveQuietly(pendingSettings).then(() => {
-              onClose()
-              window.api.executeCommand('reload-frontend')
-            })
-          } else {
-            onClose()
+          const item = currentMenu[selectedIndex]
+          if (item.submenu) {
+            const submenuItems = item.submenu!
+            const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
+            setActiveMenuStack(prev => [...prev, { 
+              items: submenuItems, 
+              title: item.label, 
+              tabs: item.tabs, 
+              activeTab: item.tabs ? 0 : undefined,
+              parentItemId: item.id
+            }])
+            setSelectedIndex(findFirstSelectableIndex(filteredItems))
+          } else if (item.type === 'select' && item.options) {
+            const currentSettingVal = item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)
+            const activeIndex = item.options.findIndex(opt => isOptionMatch(opt.value, currentSettingVal))
+
+            const optionsSubmenu: MenuItem[] = item.options.map(opt => ({
+              id: `opt_${opt.value}`,
+              label: opt.label.toUpperCase(),
+              type: 'action',
+              description: opt.description,
+              onClick: () => {
+                if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName!, opt.value)
+                else updateSetting(item.settingName!, opt.value)
+                setActiveMenuStack(prev => prev.slice(0, -1))
+                setSelectedIndex(selectedIndex)
+              }
+            }))
+            setActiveMenuStack(prev => [...prev, { items: optionsSubmenu, title: item.label, parentItemId: item.id }])
+            setSelectedIndex(activeIndex !== -1 ? activeIndex : 0)
+          } else if (item.type === 'toggle') {
+            handleToggle(item)
+          } else if (item.type === 'input') {
+            setActiveInputItem(item)
+            setInputValue(String(getSetting(item.settingName!, '')))
+            setShowInputModal(true)
+          } else if (item.onClick) {
+            item.onClick()
           }
         }
+      } else if (e.key === 'Backspace' || e.key === 'Escape') {
+        e.preventDefault()
+        handleBackAction()
       }
     },
-    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData, needsReload]
+    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData, needsReload, showInputConfig, showScraperProgress, getBottomButtons, handleBackAction]
   )
 
   useEffect(() => {
@@ -1906,9 +2286,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       
       const isMultiCheck = item.value !== undefined && !item.settingType
       if (isMultiCheck) {
-        if (item.settingName === 'DisabledManualScrapers') {
+        if (item.settingName === 'DisabledManualScrapers' || item.settingName === 'audio.favoriteSongs') {
           const values = String(currentSettingVal || '').split(';').filter(v => v.trim() !== '')
-          isOn = !values.includes(item.value)
+          isOn = item.settingName === 'audio.favoriteSongs' ? values.includes(item.value) : !values.includes(item.value)
         } else {
           const values = String(currentSettingVal || '').split(',').filter(v => v.trim() !== '')
           
@@ -1937,14 +2317,53 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       const label = item.options?.find(o => isOptionMatch(o.value, currentVal))?.label || currentVal
       return (
         <div className="menu-select">
-          <span className="arrow">◁</span>
+          <span 
+            className="arrow-clickable" 
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSelect(item, -1)
+            }}
+          >
+            ◁
+          </span>
           <span className="value">{label}</span>
-          <span className="arrow">▷</span>
+          <span 
+            className="arrow-clickable" 
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSelect(item, 1)
+            }}
+          >
+            ▷
+          </span>
         </div>
       )
     }
     if (item.type === 'slider') {
-      return <div className="menu-slider">{getSetting(item.settingName!, item.min ?? 0)}{item.suffix || '%'}</div>
+      const currentVal = getSetting(item.settingName!, item.min ?? 0)
+      return (
+        <div className="menu-slider">
+          <span 
+            className="arrow-clickable" 
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSlider(item, -1)
+            }}
+          >
+            ◁
+          </span>
+          <span className="value">{currentVal}{item.suffix || '%'}</span>
+          <span 
+            className="arrow-clickable" 
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSlider(item, 1)
+            }}
+          >
+            ▷
+          </span>
+        </div>
+      )
     }
     if (item.type === 'input') {
       const displayVal = item.isPassword ? '••••••••' : (currentSettingVal || '')
@@ -1962,11 +2381,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             const subVal = sub.id.startsWith('theme_opt_') ? getThemeSetting(sub.settingName) : getSetting(sub.settingName)
             let isSubOn = subVal === 'true' || subVal === true || subVal === '1' || subVal === 1
             if (sub.value !== undefined && !sub.settingType) {
-              const values = String(subVal || '').split(',').filter(v => v.trim() !== '')
-              if ((sub.settingName === 'VisibleSystems' || sub.settingName === 'ScraperSystems') && values.length === 0) {
-                isSubOn = true
-              } else {
+              if (sub.settingName === 'audio.favoriteSongs') {
+                const values = String(subVal || '').split(';').filter(v => v.trim() !== '')
                 isSubOn = values.includes(sub.value)
+              } else {
+                const values = String(subVal || '').split(',').filter(v => v.trim() !== '')
+                if ((sub.settingName === 'VisibleSystems' || sub.settingName === 'ScraperSystems') && values.length === 0) {
+                  isSubOn = true
+                } else {
+                  isSubOn = values.includes(sub.value)
+                }
               }
             }
             if (sub.invert) isSubOn = !isSubOn
@@ -2004,6 +2428,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           <div
             key={item.id}
             className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
+            onMouseEnter={() => setSelectedIndex(index)}
+            onClick={() => handleItemClick(item, index)}
           >
             {isMainMenu ? (
               <div className="riescade-menu-label-container">
@@ -2058,7 +2484,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                         next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
                         return next
                       })
-                      setSelectedIndex(0)
+                      setSelectedIndex(findFirstSelectableIndex(currentStackItem.items.filter(item => item.tab === idx)))
                     }}
                   >
                     {t(tab)}
@@ -2072,17 +2498,40 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             {menuItemsNode}
           </div>
 
-          <div className="riescade-menu-footer">
-            <div className="riescade-menu-footer-actions">
-              <div className="riescade-menu-footer-action">
-                <span className="riescade-menu-footer-button">A</span>
-                <span className="riescade-menu-footer-text">{t('CHOOSE')}</span>
-              </div>
-              <div className="riescade-menu-footer-action">
-                <span className="riescade-menu-footer-button">B</span>
-                <span className="riescade-menu-footer-text">{t('BACK')}</span>
-              </div>
+          {bottomButtons.length > 0 && (
+            <div className="riescade-menu-bottom-bar">
+              {bottomButtons.map((btn, btnIdx) => {
+                const isSelected = selectedIndex === currentMenu.length + btnIdx
+                return (
+                  <button
+                    key={btn.id}
+                    className={`riescade-menu-bottom-button ${isSelected ? 'selected' : ''}`}
+                    onMouseEnter={() => setSelectedIndex(currentMenu.length + btnIdx)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      btn.onClick()
+                    }}
+                  >
+                    {btn.label}
+                  </button>
+                )
+              })}
             </div>
+          )}
+
+          <div className="riescade-menu-footer">
+            {bottomButtons.length === 0 && (
+              <div className="riescade-menu-footer-actions">
+                <div className="riescade-menu-footer-action">
+                  <span className="riescade-menu-footer-button">A</span>
+                  <span className="riescade-menu-footer-text">{t('CHOOSE')}</span>
+                </div>
+                <div className="riescade-menu-footer-action">
+                  <span className="riescade-menu-footer-button">B</span>
+                  <span className="riescade-menu-footer-text">{t('BACK')}</span>
+                </div>
+              </div>
+            )}
             <div className="riescade-menu-version">
               RIESCADE {versions.app} | ES {versions.es}
             </div>
@@ -2183,8 +2632,58 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
+        
+        .arrow-clickable {
+          padding: 0 8px;
+          cursor: pointer;
+          user-select: none;
+          opacity: 0.5;
+          transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .arrow-clickable:hover {
+          opacity: 1;
+          transform: scale(1.2);
+        }
+        .riescade-menu-item.selected .arrow-clickable {
+          opacity: 0.8;
+        }
+        .riescade-menu-item.selected .arrow-clickable:hover {
+          opacity: 1;
+          color: #fff;
+        }
+        
+        .riescade-menu-bottom-bar {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 20px;
+          padding: 20px;
+        }
+        
+        .riescade-menu-bottom-button {
+          background: transparent;
+          color: #999;
+          border: 2px solid #999;
+          border-radius: 4px;
+          padding: 8px 24px;
+          font-size: 0.9rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-transform: uppercase;
+          outline: none;
+        }
+        
+        .riescade-menu-bottom-button:hover,
+        .riescade-menu-bottom-button.selected {
+          border-color: var(--theme-color);
+          color: var(--theme-color);
+          transform: scale(1.05);
+        }
       ` }} />
       {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />}
+
+      {showScraperProgress && <ScraperProgressModal isOpen={showScraperProgress} onClose={() => setShowScraperProgress(false)} t={t} />}
       
       {isBluetoothScanning && (
         <div className="riescade-modal-overlay" style={{ zIndex: 10000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
