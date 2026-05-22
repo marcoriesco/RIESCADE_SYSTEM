@@ -282,20 +282,7 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       }
       const reactTagName = svgTagMap[tagName] || tagName
 
-      // Surgical Strike: Block fanart/media if we are launching a game (and not in loading view)
-      if (data['game:launching'] === true && !isLaunchingView) {
-        const src = el.getAttribute('src') || ''
-        const style = el.getAttribute('style') || ''
-        const fanart = data['game:fanart'] || ''
-        const image = data['game:image'] || ''
-        
-        if (
-          (tagName === 'img' && (src.includes(fanart) || src.includes(image))) ||
-          (style.includes('background') && (style.includes(fanart) || style.includes(image)))
-        ) {
-          return null
-        }
-      }
+      // Surgical Strike block removed: we keep the gamelist intact and visible with its fanart/images until the loading screen overlay fades in.
 
       let key = index
       const keyAttr = el.getAttribute('data-riescade-key')
