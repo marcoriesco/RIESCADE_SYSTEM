@@ -96,6 +96,7 @@ function App() {
 	} | null>(null);
 	const [showGamelistUpdateModal, setShowGamelistUpdateModal] = useState(false);
 	const [reloadModalSelectedIndex, setReloadModalSelectedIndex] = useState(0);
+	const [isUpdatingGamelist, setIsUpdatingGamelist] = useState(false);
 
 	const bgMusicRef = useRef<HTMLAudioElement | null>(null);
 	const navSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -603,12 +604,13 @@ function App() {
 		[],
 	);
 
-	const handleFastReload = useCallback(() => {
+	const performInPlaceGamelistReload = useCallback((forcePhysical = true, systemName?: string) => {
+		setIsUpdatingGamelist(true);
+		setIsMenuOpen(false);
+		setIsGameOptionsOpen(false);
 		setShowGamelistUpdateModal(false);
-		setIsInitializing(true);
-		setSystemsLoadingProgress(0);
 
-		window.api.preloadLibrary(false).then(() => {
+		window.api.preloadLibrary(forcePhysical, systemName).then(() => {
 			Promise.all([
 				window.api.getSystems(),
 				window.api.getSettings(),
@@ -639,30 +641,51 @@ function App() {
 								});
 								merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 								setGames(merged);
-								setIsInitializing(false);
+								setIsUpdatingGamelist(false);
 								addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
 							});
 						} else {
 							setGames(masterGames);
-							setIsInitializing(false);
+							setIsUpdatingGamelist(false);
 							addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
 						}
 					});
 				} else {
-					setIsInitializing(false);
+					setIsUpdatingGamelist(false);
 					addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
 				}
 			}).catch(err => {
-				console.error('Failed to load libraries during fast reload:', err);
-				setIsInitializing(false);
+				console.error('Failed to load libraries during in-place reload:', err);
+				setIsUpdatingGamelist(false);
 				addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
 			});
 		}).catch(err => {
-			console.error('Failed to preload during fast reload:', err);
-			setIsInitializing(false);
+			console.error('Failed to preload during in-place reload:', err);
+			setIsUpdatingGamelist(false);
 			addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
 		});
 	}, [selectedSystem, addNotification]);
+
+	const handleFastReload = useCallback(() => {
+		performInPlaceGamelistReload(false);
+	}, [performInPlaceGamelistReload]);
+
+	const handleUpdateGamelists = useCallback((forcePhysicalOrSystem?: boolean | string, systemName?: string) => {
+		let force = true;
+		let sys: string | undefined = undefined;
+
+		if (typeof forcePhysicalOrSystem === 'string') {
+			sys = forcePhysicalOrSystem;
+			force = true;
+		} else {
+			if (forcePhysicalOrSystem !== undefined) {
+				force = forcePhysicalOrSystem;
+			}
+			sys = systemName;
+		}
+
+		performInPlaceGamelistReload(force, sys);
+	}, [performInPlaceGamelistReload]);
 
 	// Load games when system selected
 	useEffect(() => {
@@ -1054,9 +1077,9 @@ function App() {
 	]);
 
 	const handleUpdateGame = (updatedGame: Game) => {
-		if (!selectedSystem) return;
+		if (!selectedSystem) return Promise.resolve();
 		const wasFavorite = currentGame?.favorite;
-		window.api.updateGame(selectedSystem.name, updatedGame).then(() => {
+		return window.api.updateGame(selectedSystem.name, updatedGame).then(() => {
 			// Increment media revision to bust browser cache
 			setMediaRevision((prev) => prev + 1);
 
@@ -1065,7 +1088,7 @@ function App() {
 				? window.api.getCollectionGames(selectedCollection)
 				: window.api.getGames(selectedSystem.name);
 
-			getGamesPromise.then((masterGames: Game[]) => {
+			const gamesUpdatePromise = getGamesPromise.then((masterGames: Game[]) => {
 				const groupedSetting = settings.SystemsGrouped?.value || '';
 				const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
 
@@ -1092,7 +1115,7 @@ function App() {
 				};
 
 				if (childSystems.length > 0) {
-					Promise.all(childSystems.map((s) => window.api.getGames(s.name))).then((allChildGames) => {
+					return Promise.all(childSystems.map((s) => window.api.getGames(s.name))).then((allChildGames) => {
 						const merged = [...masterGames];
 						allChildGames.forEach((childGames) => {
 							merged.push(...childGames);
@@ -1115,6 +1138,8 @@ function App() {
 					'general',
 				);
 			}
+
+			return gamesUpdatePromise;
 		});
 	};
 
@@ -1390,6 +1415,7 @@ function App() {
 			<Menu
 				isOpen={isMenuOpen}
 				selectedSystem={selectedSystem}
+				onUpdateGamelists={handleUpdateGamelists}
 				onClose={() => {
 					setIsMenuOpen(false);
 					// Refresh settings when menu closes to reflect changes like DrawFramerate
@@ -1428,6 +1454,7 @@ function App() {
 					themeData={themeData}
 					onUpdate={handleUpdateGame}
 					addNotification={addNotification}
+					onUpdateGamelists={handleUpdateGamelists}
 				/>
 			)}
 
@@ -1513,6 +1540,72 @@ function App() {
 								NÃO
 							</button>
 						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Graphical Gamelist Update Overlay */}
+			{isUpdatingGamelist && (
+				<div 
+					className="scraper-modal-overlay"
+					style={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						background: 'rgba(0, 0, 0, 0.85)',
+						backdropFilter: 'blur(15px)',
+						WebkitBackdropFilter: 'blur(15px)',
+						zIndex: 10000000,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontFamily: "'Outfit', 'Inter', sans-serif",
+						color: '#fff'
+					}}
+				>
+					<div 
+						className="scraper-modal-container searching-modal"
+						style={{
+							background: 'rgba(20, 20, 20, 0.85)',
+							backdropFilter: 'blur(10px)',
+							WebkitBackdropFilter: 'blur(10px)',
+							border: '2px solid rgba(240, 66, 176, 0.2)',
+							borderRadius: '16px',
+							padding: '40px 30px',
+							width: '420px',
+							boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+							display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'center',
+							textAlign: 'center'
+						}}
+					>
+						<div 
+							className="scraper-spinner" 
+							style={{ 
+								width: '50px', 
+								height: '50px', 
+								border: '5px solid rgba(255, 255, 255, 0.1)', 
+								borderTopColor: 'var(--theme-color, #f042b0)', 
+								borderRadius: '50%',
+								animation: 'scraper-spin 1s linear infinite'
+							}} 
+						/>
+						<p 
+							className="searching-text"
+							style={{ 
+								fontSize: '1.25rem', 
+								fontWeight: 900, 
+								color: 'var(--theme-color, #f042b0)', 
+								margin: '25px 0 8px 0',
+								letterSpacing: '2px',
+								textTransform: 'uppercase'
+							}}
+						>
+							ATUALIZANDO GAMELISTS
+						</p>
 					</div>
 				</div>
 			)}

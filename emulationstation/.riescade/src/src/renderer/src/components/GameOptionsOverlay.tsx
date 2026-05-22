@@ -13,12 +13,13 @@ interface GameOptionsProps {
   system: System
   theme?: any
   themeData?: any
-  onUpdate: (updatedGame: Game) => void
+  onUpdate: (updatedGame: Game) => void | Promise<any>
   addNotification?: (message: string, type: 'info' | 'success' | 'warning', category?: 'controller' | 'scraper' | 'general') => void
+  onUpdateGamelists?: (systemName?: string) => void
 }
 
 export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({ 
-  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification 
+  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -32,6 +33,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [scraperStage, setScraperStage] = useState<0 | 1 | 2>(0) // 0: closed, 1: database checklist, 2: matches
   const [scraperDbs, setScraperDbs] = useState<Record<string, boolean>>({
     ScreenScraper: true,
+    ArcadeDB: true,
     TheGamesDB: true,
     HfsDB: true,
     IGDB: true
@@ -357,7 +359,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const handleAction = async (item: any) => {
     if (item.actionType === 'scrape') {
       setScraperStage(1)
-      setScraperDbs({ ScreenScraper: true, TheGamesDB: true, HfsDB: true, IGDB: true })
+      setScraperDbs({ ScreenScraper: true, ArcadeDB: true, TheGamesDB: true, HfsDB: true, IGDB: true })
       setScraperDbSelectedIndex(0)
       return
     }
@@ -414,13 +416,17 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     setScraperStage(2)
     setScraperMatches([])
     setScraperMatchSelectedIndex(0)
+    setTempMediaUrls({}) // Clear cached temporary media from previous searches
 
     try {
       const results = await window.api.searchGameMedia(system.name, game.name, selectedDbs, game.path)
       setScraperMatches(results || [])
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      if (addNotification) addNotification('ERRO AO BUSCAR MÍDIAS', 'warning', 'scraper')
+      const msg = err && typeof err === 'object' && 'message' in err
+        ? (err.message as string).replace(/Error invoking remote method.*?: /i, '')
+        : 'ERRO AO BUSCAR MÍDIAS'
+      if (addNotification) addNotification(msg.toUpperCase(), 'warning', 'scraper')
     } finally {
       setScraperIsSearching(false)
     }
@@ -437,8 +443,21 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     try {
       const updated = await window.api.downloadGameMedia(system.name, game.path, selectedMatch)
       if (updated) {
-        onUpdate(updated)
+        const updateResult = onUpdate(updated)
         if (addNotification) addNotification(`MÍDIAS DE ${game.name.toUpperCase()} BAIXADAS COM SUCESSO!`, 'success', 'scraper')
+        
+        if (onUpdateGamelists) {
+          if (updateResult instanceof Promise) {
+            updateResult.then(() => {
+              onUpdateGamelists(system.name)
+            }).catch((err) => {
+              console.error('Failed to save metadata before reload:', err)
+              onUpdateGamelists(system.name)
+            })
+          } else {
+            onUpdateGamelists(system.name)
+          }
+        }
       } else {
         if (addNotification) addNotification(`ERRO AO BAIXAR MÍDIAS`, 'warning', 'scraper')
       }
@@ -449,21 +468,26 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   }
 
   const handleScraperKeyDown = (e: KeyboardEvent) => {
+    const dbKeys = ['ScreenScraper', 'ArcadeDB', 'TheGamesDB', 'HfsDB', 'IGDB']
+    const totalDbs = dbKeys.length
+    const buscarIndex = totalDbs
+    const cancelarIndex = totalDbs + 1
+
     if (scraperStage === 1) {
-      if (scraperDbSelectedIndex >= 4) {
-        // Button zone: horizontal navigation between BUSCAR (4) and CANCELAR (5)
+      if (scraperDbSelectedIndex >= totalDbs) {
+        // Button zone: horizontal navigation between BUSCAR and CANCELAR
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-          setScraperDbSelectedIndex(prev => prev === 4 ? 5 : 4)
+          setScraperDbSelectedIndex(prev => prev === buscarIndex ? cancelarIndex : buscarIndex)
         } else if (e.key === 'ArrowUp') {
           // Go back up to last DB checkbox
-          setScraperDbSelectedIndex(3)
+          setScraperDbSelectedIndex(totalDbs - 1)
         } else if (e.key === 'ArrowDown') {
           // Wrap to first DB checkbox
           setScraperDbSelectedIndex(0)
         } else if (e.key === 'Enter' || e.key === ' ') {
-          if (scraperDbSelectedIndex === 4) {
+          if (scraperDbSelectedIndex === buscarIndex) {
             triggerScraperSearch()
-          } else if (scraperDbSelectedIndex === 5) {
+          } else if (scraperDbSelectedIndex === cancelarIndex) {
             setScraperStage(0)
           }
         } else if (e.key === 'Escape' || e.key === 'Backspace') {
@@ -472,12 +496,11 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       } else {
         // DB checkbox zone: vertical navigation
         if (e.key === 'ArrowDown') {
-          setScraperDbSelectedIndex(prev => prev + 1 < 4 ? prev + 1 : 4)
+          setScraperDbSelectedIndex(prev => prev + 1 < totalDbs ? prev + 1 : buscarIndex)
         } else if (e.key === 'ArrowUp') {
-          setScraperDbSelectedIndex(prev => prev - 1 >= 0 ? prev - 1 : 0)
+          setScraperDbSelectedIndex(prev => prev - 1 >= 0 ? prev - 1 : cancelarIndex)
         } else if (e.key === 'Enter' || e.key === ' ') {
-          const keys = Object.keys(scraperDbs)
-          const targetKey = keys[scraperDbSelectedIndex]
+          const targetKey = dbKeys[scraperDbSelectedIndex]
           setScraperDbs(prev => ({ ...prev, [targetKey]: !prev[targetKey] }))
         } else if (e.key === 'Escape' || e.key === 'Backspace') {
           setScraperStage(0)
@@ -724,7 +747,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const marqueeUrl = getMarqueeUrl()
 
   const renderStageStage1 = () => {
-    const dbKeys = ['ScreenScraper', 'TheGamesDB', 'HfsDB', 'IGDB']
+    const dbKeys = ['ScreenScraper', 'ArcadeDB', 'TheGamesDB', 'HfsDB', 'IGDB']
     return (
       <div className="scraper-modal-overlay">
         <div className="scraper-modal-container db-select-modal">
@@ -752,13 +775,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           </div>
           <div className="scraper-modal-buttons">
             <button 
-              className={`scraper-modal-btn ${scraperDbSelectedIndex === 4 ? 'selected' : ''}`}
+              className={`scraper-modal-btn ${scraperDbSelectedIndex === dbKeys.length ? 'selected' : ''}`}
               onClick={triggerScraperSearch}
             >
               BUSCAR
             </button>
             <button 
-              className={`scraper-modal-btn secondary ${scraperDbSelectedIndex === 5 ? 'selected' : ''}`}
+              className={`scraper-modal-btn secondary ${scraperDbSelectedIndex === dbKeys.length + 1 ? 'selected' : ''}`}
               onClick={() => setScraperStage(0)}
             >
               CANCELAR
@@ -939,8 +962,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                             </span>
                           )}
                           {hasTxt && (
-                            <span className="icon-badge txt" title="Texto" style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', fontSize: '15px' }}>
-                              A
+                            <span className="icon-badge txt" title="Texto">
+                              TXT
                             </span>
                           )}
                         </div>
@@ -962,6 +985,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 )}
                 {showImage ? (
                   <img
+                    key={previewImage}
                     src={previewImage}
                     alt="Preview"
                     style={{ maxWidth: '100%', maxHeight: '250px', objectFit: 'contain', opacity: isLoadingMedia ? 0.3 : 1 }}
@@ -1529,6 +1553,30 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          padding: 3px 8px;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          font-weight: 800;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          transition: all 0.2s ease;
+          border: 1px solid transparent;
+        }
+        .icon-badge.img {
+          background: rgba(6, 182, 212, 0.15); /* cyan */
+          border-color: rgba(6, 182, 212, 0.3);
+          color: #22d3ee;
+        }
+        .icon-badge.vid {
+          background: rgba(236, 72, 153, 0.15); /* pink */
+          border-color: rgba(236, 72, 153, 0.3);
+          color: #f472b6;
+        }
+        .icon-badge.txt {
+          background: rgba(16, 185, 129, 0.15); /* emerald */
+          border-color: rgba(16, 185, 129, 0.3);
+          color: #34d399;
+          font-size: 0.7rem !important;
         }
         .scraper-details-section {
           width: 62%;

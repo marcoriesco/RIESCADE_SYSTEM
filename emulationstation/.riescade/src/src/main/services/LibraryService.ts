@@ -107,6 +107,54 @@ export class LibraryService {
     sendProgress(100)
   }
 
+  public async preloadSystem(systemName: string, forcePhysicalScan = false): Promise<void> {
+    const nameLower = systemName.toLowerCase()
+    
+    // Clear only this system's cache
+    LibraryService.cachedGames.delete(nameLower)
+    
+    // Preload games for only this specific system
+    try {
+      const games = this.getGamesRaw(systemName, forcePhysicalScan)
+      LibraryService.cachedGames.set(nameLower, games)
+    } catch (err) {
+      console.error(`Failed to preload games for ${systemName}:`, err)
+    }
+    
+    // Re-resolve and update all auto-collections based on the new cached games
+    const autoCollections = [
+      'all', 'favorites', 'recent', 'neverplayed',
+      'retroachievements', '2players', '4players',
+      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
+    ]
+    const displayed = this.getDisplayedSystems()
+    const physicalSystems = displayed.filter(s => 
+      !s.path.startsWith('virtual://') && 
+      s.name !== 'collections' && 
+      !autoCollections.includes(s.name.toLowerCase())
+    )
+    
+    for (const col of autoCollections) {
+      try {
+        const colGames = this.resolveAutoCollectionGames(col)
+        const isDuplicate = physicalSystems.some(s => s.name.toLowerCase() === col.toLowerCase())
+        const cacheKey = isDuplicate ? `auto-${col}` : col
+        LibraryService.cachedGames.set(cacheKey.toLowerCase(), colGames)
+      } catch (err) {
+        console.error(`Failed to preload auto collection ${col} after system update:`, err)
+      }
+    }
+
+    // Send final progress update
+    try {
+      const { BrowserWindow } = require('electron')
+      const win = BrowserWindow.getAllWindows()[0]
+      if (win) {
+        win.webContents.send('systems-loading-progress', 100)
+      }
+    } catch (err) {}
+  }
+
   public preloadAllSync(forcePhysicalScan = false): void {
     if (LibraryService.isPreloaded) return
 

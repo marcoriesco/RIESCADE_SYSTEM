@@ -103,6 +103,7 @@ interface MenuProps {
   themeData?: any
   allSystems?: any[]
   selectedSystem?: any
+  onUpdateGamelists?: (systemName?: string) => void
 }
 
 const getGamepadGuid = (pad: Gamepad): string => {
@@ -122,7 +123,7 @@ const getGamepadGuid = (pad: Gamepad): string => {
   return id
 }
 
-export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem }) => {
+export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists }) => {
   const [settings, setSettings] = useState<Record<string, any>>({})
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
@@ -750,7 +751,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
           { id: 'group_reload_app', label: t('FERRAMENTAS'), type: 'group' },
-          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => window.api.executeCommand('update-gamelists') },
+          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => {
+            if (onUpdateGamelists) {
+              onUpdateGamelists()
+            } else {
+              window.api.executeCommand('update-gamelists')
+            }
+          } },
           { id: 'group_accounts', label: t('CONTAS'), type: 'group' },
           { id: 'retroachievements_submenu', label: t('CONQUISTAS RETRÔ'), submenu: [
             { id: 'cheevos_enable', label: t('CONQUISTAS RETRÔ'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },

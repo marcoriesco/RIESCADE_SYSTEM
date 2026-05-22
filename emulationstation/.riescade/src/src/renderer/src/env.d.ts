@@ -5,7 +5,7 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: {
-      preloadLibrary: (forcePhysicalScan?: boolean) => Promise<any>
+      preloadLibrary: (forcePhysicalScan?: boolean, systemName?: string) => Promise<any>
       getSystems: () => Promise<any>
       getGames: (systemName: string) => Promise<any>
       updateGame: (systemName: string, gameData: any) => Promise<void>
