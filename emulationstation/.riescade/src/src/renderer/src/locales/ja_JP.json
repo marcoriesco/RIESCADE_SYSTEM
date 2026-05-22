@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "イメージ動画"
+  "video": "イメージ動画",
+  "BY MANUFACTURER": "メーカー別",
+  "BY HARDWARE TYPE THEN YEAR": "ハードウェア種類別、製造年順",
+  "BY RELEASE YEAR": "リリース年別",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "メーカーとゲーム機別",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "ハードウェア種類別、アルファベット順",
+  "ALWAYS": "常に",
+  "RESTORE LAST SELECTED": "最終選択を復元"
 }

@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "video"
+  "video": "video",
+  "BY MANUFACTURER": "BY MANUFACTURER",
+  "BY HARDWARE TYPE THEN YEAR": "BY HARDWARE TYPE THEN YEAR",
+  "BY RELEASE YEAR": "BY RELEASE YEAR",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "BY MANUFACTURER AND TYPE",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "BY HARDWARE TYPE THEN ALPHABETICALLY",
+  "ALWAYS": "ALWAYS",
+  "RESTORE LAST SELECTED": "RESTORE LAST SELECTED"
 }

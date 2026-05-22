@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "videó"
+  "video": "videó",
+  "BY MANUFACTURER": "GYÁRTÓ SZERINT",
+  "BY HARDWARE TYPE THEN YEAR": "HARDVERTÍPUS SZERINT, AZTÁN ÉV",
+  "BY RELEASE YEAR": "MEGJELENÉSI ÉV SZERINT",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "GYÁRTÓ ÉS TÍPUS SZERINT",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "HARDVERTÍPUS SZERINT, MAJD ÁBCÉ SZERINT",
+  "ALWAYS": "MINDIG",
+  "RESTORE LAST SELECTED": "UTOLSÓ VÁLASZTOTT VISSZAÁLLÍTÁSA"
 }

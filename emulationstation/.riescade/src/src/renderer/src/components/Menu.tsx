@@ -159,7 +159,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [configuredControllers, setConfiguredControllers] = useState<any[]>([])
   const [bluetoothDevices, setBluetoothDevices] = useState<{ name: string; id: string }[]>([])
   const [isBluetoothScanning, setIsBluetoothScanning] = useState(false)
-  const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string }[]>([])
+  const [activeMenuStack, setActiveMenuStack] = useState<{ items: MenuItem[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string; savedSelectedIndex?: number }[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   // Helper: find the first selectable (non-group) item index in a menu items array
@@ -533,8 +533,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (activeMenuStack.length > 1) {
       handleSaveQuietly(pendingSettings)
       setActiveMenuStack(prev => prev.slice(0, -1))
-      const parentItems = activeMenuStack[activeMenuStack.length - 2]?.items || []
-      setSelectedIndex(findFirstSelectableIndex(parentItems))
+      const parentItem = activeMenuStack[activeMenuStack.length - 2]
+      const parentItems = parentItem?.items || []
+      const savedIdx = parentItem?.savedSelectedIndex
+      setSelectedIndex(savedIdx !== undefined ? savedIdx : findFirstSelectableIndex(parentItems))
     } else {
       const hasChanges = Object.keys(pendingSettings).some(k => {
         const pendingVal = pendingSettings[k]
@@ -627,13 +629,19 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (item.submenu) {
       const submenuItems = item.submenu!
       const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
-      setActiveMenuStack(prev => [...prev, { 
-        items: submenuItems, 
-        title: item.label, 
-        tabs: item.tabs, 
-        activeTab: item.tabs ? 0 : undefined,
-        parentItemId: item.id
-      }])
+      setActiveMenuStack(prev => {
+        const updated = [...prev]
+        if (updated.length > 0) {
+          updated[updated.length - 1] = { ...updated[updated.length - 1], savedSelectedIndex: index }
+        }
+        return [...updated, { 
+          items: submenuItems, 
+          title: item.label, 
+          tabs: item.tabs, 
+          activeTab: item.tabs ? 0 : undefined,
+          parentItemId: item.id
+        }]
+      })
       setSelectedIndex(findFirstSelectableIndex(filteredItems))
     } else if (item.type === 'select' && item.options) {
       const currentSettingVal = item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)
@@ -651,7 +659,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           setSelectedIndex(index)
         }
       }))
-      setActiveMenuStack(prev => [...prev, { items: optionsSubmenu, title: item.label, parentItemId: item.id }])
+      setActiveMenuStack(prev => {
+        const updated = [...prev]
+        if (updated.length > 0) {
+          updated[updated.length - 1] = { ...updated[updated.length - 1], savedSelectedIndex: index }
+        }
+        return [...updated, { items: optionsSubmenu, title: item.label, parentItemId: item.id }]
+      })
       setSelectedIndex(activeIndex !== -1 ? activeIndex : 0)
     } else if (item.type === 'toggle') {
       handleToggle(item)
@@ -2279,13 +2293,19 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           if (item.submenu) {
             const submenuItems = item.submenu!
             const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
-            setActiveMenuStack(prev => [...prev, { 
-              items: submenuItems, 
-              title: item.label, 
-              tabs: item.tabs, 
-              activeTab: item.tabs ? 0 : undefined,
-              parentItemId: item.id
-            }])
+            setActiveMenuStack(prev => {
+              const updated = [...prev]
+              if (updated.length > 0) {
+                updated[updated.length - 1] = { ...updated[updated.length - 1], savedSelectedIndex: selectedIndex }
+              }
+              return [...updated, { 
+                items: submenuItems, 
+                title: item.label, 
+                tabs: item.tabs, 
+                activeTab: item.tabs ? 0 : undefined,
+                parentItemId: item.id
+              }]
+            })
             setSelectedIndex(findFirstSelectableIndex(filteredItems))
           } else if (item.type === 'select' && item.options) {
             const currentSettingVal = item.id.startsWith('theme_opt_') ? getThemeSetting(item.settingName!) : getSetting(item.settingName!)
@@ -2303,7 +2323,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 setSelectedIndex(selectedIndex)
               }
             }))
-            setActiveMenuStack(prev => [...prev, { items: optionsSubmenu, title: item.label, parentItemId: item.id }])
+            setActiveMenuStack(prev => {
+              const updated = [...prev]
+              if (updated.length > 0) {
+                updated[updated.length - 1] = { ...updated[updated.length - 1], savedSelectedIndex: selectedIndex }
+              }
+              return [...updated, { items: optionsSubmenu, title: item.label, parentItemId: item.id }]
+            })
             setSelectedIndex(activeIndex !== -1 ? activeIndex : 0)
           } else if (item.type === 'toggle') {
             handleToggle(item)

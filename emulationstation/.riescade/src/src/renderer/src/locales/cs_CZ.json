@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "video"
+  "video": "video",
+  "BY MANUFACTURER": "PODLE VÝROBCE",
+  "BY HARDWARE TYPE THEN YEAR": "BY HARDWARE TYPE THEN YEAR",
+  "BY RELEASE YEAR": "PODLE ROKU VYDÁNÍ",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "PODLE VÝROBCE A TYPU",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "BY HARDWARE TYPE THEN ALPHABETICALLY",
+  "ALWAYS": "VŽDY",
+  "RESTORE LAST SELECTED": "OBNOVIT POSLEDNÍ VYBRANÉ"
 }

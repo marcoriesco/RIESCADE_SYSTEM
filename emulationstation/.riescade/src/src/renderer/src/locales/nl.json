@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "video"
+  "video": "video",
+  "BY MANUFACTURER": "OP FABRIKANT",
+  "BY HARDWARE TYPE THEN YEAR": "OP HARDWARETYPE EN DAN JAAR",
+  "BY RELEASE YEAR": "OP UITGAVEJAAR",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "PER FABRIKANT EN TYPE",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "OP HARDWARETYPE EN DAN ALFABETISCH",
+  "ALWAYS": "ALTIJD",
+  "RESTORE LAST SELECTED": "HERSTEL LAATST GESELECTEERDE"
 }

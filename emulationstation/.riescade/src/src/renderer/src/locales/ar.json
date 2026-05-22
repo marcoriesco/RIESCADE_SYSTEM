@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "الفيديو"
+  "video": "الفيديو",
+  "BY MANUFACTURER": "حسب المطور",
+  "BY HARDWARE TYPE THEN YEAR": "BY HARDWARE TYPE THEN YEAR",
+  "BY RELEASE YEAR": "حسب سنة الصدور",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "حسب المطور والنوع",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "BY HARDWARE TYPE THEN ALPHABETICALLY",
+  "ALWAYS": "دائماً",
+  "RESTORE LAST SELECTED": "آخر نظام تم تحديده"
 }

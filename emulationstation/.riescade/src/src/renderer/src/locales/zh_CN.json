@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "游戏视频"
+  "video": "游戏视频",
+  "BY MANUFACTURER": "按制造商",
+  "BY HARDWARE TYPE THEN YEAR": "按硬件类型再按年份",
+  "BY RELEASE YEAR": "按发布年份",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "按制造商和类型",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "按硬件类型排序，然后按字母顺序排序",
+  "ALWAYS": "总是",
+  "RESTORE LAST SELECTED": "恢复上次的选择"
 }

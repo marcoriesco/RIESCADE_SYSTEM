@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "video"
+  "video": "video",
+  "BY MANUFACTURER": "DUPĂ PRODUCĂTOR",
+  "BY HARDWARE TYPE THEN YEAR": "DUPĂ TIPUL HARDWARE APOI AN",
+  "BY RELEASE YEAR": "DUPĂ ANUL LANSĂRII",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "DUPĂ PRODUCĂTOR ȘI TIP",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "DUPĂ TIPUL HARDWARE APOI ALFABETIC",
+  "ALWAYS": "MEREU",
+  "RESTORE LAST SELECTED": "ULTIMUL SELECTAT"
 }

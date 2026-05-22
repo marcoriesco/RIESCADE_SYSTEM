@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "video"
+  "video": "video",
+  "BY MANUFACTURER": "AV TILLVERKAREN",
+  "BY HARDWARE TYPE THEN YEAR": "PER HÅRDVARUTYP OCH ÅR",
+  "BY RELEASE YEAR": "PER UTGIVNINGSÅR",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "PER TILLVERKARE OCH TYP",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "EFTER HÅRDVARUTYP OCH SEDAN I ALFABETISK ORDNING",
+  "ALWAYS": "ALLTID",
+  "RESTORE LAST SELECTED": "ÅTERSTÄLLA SENAST VALDA"
 }

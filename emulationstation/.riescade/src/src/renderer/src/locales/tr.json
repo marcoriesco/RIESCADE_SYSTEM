@@ -652,5 +652,13 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "VİDEO"
+  "video": "VİDEO",
+  "BY MANUFACTURER": "ÜRETİCİYE GÖRE",
+  "BY HARDWARE TYPE THEN YEAR": "ÖNCE DONANIM TÜRÜNE, SONRA YILA GÖRE",
+  "BY RELEASE YEAR": "ÇIKIŞ YILINA GÖRE",
+  "BY ALPHABETICAL ORDER": "BY ALPHABETICAL ORDER",
+  "BY MANUFACTURER AND TYPE": "ÜRETİCİYE VE TÜRE GÖRE",
+  "BY HARDWARE TYPE THEN ALPHABETICALLY": "ÖNCE DONANIM TÜRÜNE, SONRA ALFABETİK OLARAK",
+  "ALWAYS": "HER ZAMAN",
+  "RESTORE LAST SELECTED": "SON SEÇİLENİ GERİ YÜKLE"
 }
