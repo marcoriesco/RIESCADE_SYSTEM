@@ -11,17 +11,44 @@ Object.entries(localeModules).forEach(([path, module]: [string, any]) => {
 })
 
 const languageFriendlyNames: Record<string, string> = {
+  ar: 'العربية (Arabic)',
+  ca: 'Català (Catalan)',
+  cs_CZ: 'Čeština (Czech)',
+  cy_GB: 'Cymraeg (Welsh)',
+  de: 'Deutsch (German)',
+  el: 'Ελληνικά (Greek)',
+  en_GB: 'English (UK)',
   en_US: 'English (US)',
-  pt_BR: 'Português (Brasil)',
-  fr_FR: 'Français (France)',
+  es: 'Español (Latinoamérica)',
   es_ES: 'Español (España)',
-  de_DE: 'Deutsch (Deutschland)',
-  it_IT: 'Italiano (Italia)',
-  zh_CN: '简体中文 (中国)',
-  zh_TW: '繁體中文 (台灣)',
-  ja_JP: '日本語 (日本)',
-  ko_KR: '한국어 (대한민국)',
-  ru_RU: 'Русский (Россия)'
+  es_MX: 'Español (México)',
+  eu_ES: 'Euskara (Basque)',
+  fi_FI: 'Suomi (Finnish)',
+  fr: 'Français (French)',
+  fr_FR: 'Français (France)',
+  gl_ES: 'Galego (Galician)',
+  he: 'עברית (Hebrew)',
+  hu: 'Magyar (Hungarian)',
+  id_ID: 'Bahasa Indonesia (Indonesian)',
+  it: 'Italiano (Italian)',
+  ja_JP: '日本語 (Japanese)',
+  ko: '한국어 (Korean)',
+  nb_NO: 'Norsk Bokmål (Norwegian Bokmål)',
+  nl: 'Nederlands (Dutch)',
+  nn_NO: 'Norsk Nynorsk (Norwegian Nynorsk)',
+  oc_FR: 'Occitan (Occitan)',
+  pl: 'Polski (Polish)',
+  pt_BR: 'Português (Brasil)',
+  pt_PT: 'Português (Portugal)',
+  ro_RO: 'Română (Romanian)',
+  ru_RU: 'Русский (Russian)',
+  sk_SK: 'Slovenčina (Slovak)',
+  sv_SE: 'Svenska (Swedish)',
+  tr: 'Türkçe (Turkish)',
+  uk_UA: 'Українська (Ukrainian)',
+  vi_VN: 'Tiếng Việt (Vietnamese)',
+  zh_CN: '简体中文 (Simplified Chinese)',
+  zh_TW: '繁體中文 (Traditional Chinese)'
 }
 
 const isOptionMatch = (optVal: any, settingVal: any) => {
@@ -241,11 +268,11 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const getFriendlySystemName = (sys: any) => {
     if (!sys) return ''
     const name = sys.name
-    if (name === 'all') return t('TODOS OS JOGOS')
-    if (name === 'favorites') return t('FAVORITOS')
-    if (name === 'collections') return t('COLEÇÕES')
-    if (name === 'recent') return t('ÚLTIMOS JOGADOS')
-    if (name === 'neverplayed') return t('NUNCA JOGADOS')
+    if (name === 'all') return t('ALL GAMES')
+    if (name === 'favorites') return t('FAVORITES')
+    if (name === 'collections') return t('COLLECTIONS')
+    if (name === 'recent') return t('LAST PLAYED')
+    if (name === 'neverplayed') return t('NEVER PLAYED')
     if (name === 'retroachievements') return 'RETROACHIEVEMENTS'
     if (name === 'arcade') return 'ARCADE'
     return sys.fullname || sys.name.toUpperCase()
@@ -587,7 +614,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
     buttons.push({
       id: 'back_btn',
-      label: t('VOLTAR'),
+      label: t('BACK'),
       onClick: handleBackAction
     })
 
@@ -756,7 +783,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     const items: MenuItem[] = [
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
-          { id: 'group_reload_app', label: t('FERRAMENTAS'), type: 'group' },
+          { id: 'group_reload_app', label: t('TOOLS'), type: 'group' },
           { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => {
             if (onUpdateGamelists) {
               onUpdateGamelists()
@@ -775,10 +802,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               }
             }
           }] : []),
-          { id: 'group_accounts', label: t('CONTAS'), type: 'group' },
-          { id: 'retroachievements_submenu', label: t('CONQUISTAS RETRÔ'), submenu: [
-            { id: 'cheevos_enable', label: t('CONQUISTAS RETRÔ'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },
-            { id: 'cheevos_user', label: t('USUÁRIO'), type: 'input', settingName: 'global.cheevos.username', settingType: 'string' },
+          { id: 'group_accounts', label: t('ACCOUNTS'), type: 'group' },
+          { id: 'retroachievements_submenu', label: t('RETROACHIEVEMENTS'), submenu: [
+            { id: 'cheevos_enable', label: t('RETROACHIEVEMENTS'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },
+            { id: 'cheevos_user', label: t('USERNAME'), type: 'input', settingName: 'global.cheevos.username', settingType: 'string' },
             { id: 'cheevos_pass', label: t('SENHA'), type: 'input', settingName: 'global.cheevos.password', settingType: 'string', isPassword: true },
           ]},
           { id: 'netplay_submenu', label: t('NETPLAY SETTINGS'), submenu: [
@@ -790,7 +817,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           {
             id: 'missing_bios_submenu',
             label: t('MISSING BIOS CHECK'),
-            tabs: [t('Sistemas instalados'), t('Todos')],
+            tabs: [t('Installed systems'), t('All')],
             submenu: (() => {
               const generateTabItems = (systems: BiosSystem[], tabIndex: number): MenuItem[] => {
                 const tabItems: MenuItem[] = []
@@ -843,30 +870,30 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             })()
           },
           { id: 'check_bios_launch', label: t('CHECK BIOS FILES BEFORE RUNNING A GAME'), type: 'toggle', settingName: 'CheckBiosesAtLaunch', settingType: 'bool' },
-          { id: 'group_autosave', label: t('ESTADOS DE SALVAMENTO'), type: 'group' },
-          { id: 'autosave', label: t('SALVAR/CARREGAR AUTOMÁTICO'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool', description: t('Carrega o estado de salvamento mais recente ao iniciar o jogo e salva o estado ao sair do jogo.') },
+          { id: 'group_autosave', label: t('SAVE STATES'), type: 'group' },
+          { id: 'autosave', label: t('AUTO SAVE/LOAD'), type: 'toggle', settingName: 'global.autosave', settingType: 'bool', description: t('Loads the most recent save state when starting the game and saves the state when exiting.') },
           { 
             id: 'autosave_increment', 
-            label: t('TIPO DE INCREMENTO'), 
+            label: t('INCREMENT TYPE'), 
             type: 'select', 
             settingName: 'global.incrementalsavestates', 
             settingType: 'int',
             options: [
-              { label: t('POR ESTADO DE SALVAMENTO'), value: null, description: t('Nunca sobrescreve estados de salvamento antigos, sempre crie novos.') },
-              { label: t('POR ESPAÇO DE SALVAMENTO'), value: '0', description: t('Incrementa novo espaço em um novo jogo.') },
-              { label: t('NÃO INCREMENTAR'), value: '2', description: t('Usa o espaço atual em um novo jogo.') }
+              { label: t('BY SAVE STATE'), value: null, description: t('Never overwrite old save states, always create new ones.') },
+              { label: t('BY SAVE SLOT'), value: '0', description: t('Increments a new slot on a new game start.') },
+              { label: t('DO NOT INCREMENT'), value: '2', description: t('Uses the current slot on a new game start.') }
             ]
           },
           { 
             id: 'autosave_manager', 
-            label: t('EXIBIR GERENCIADOR'), 
+            label: t('SHOW MANAGER'), 
             type: 'select', 
             settingName: 'global.savestates', 
-            description: t('Exibe o gerenciador de estado de salvamento antes de iniciar um jogo.'),
+            description: t('Displays the save state manager before starting a game.'),
             options: [
-              { label: t('NÃO'), value: '0' },
-              { label: t('SEMPRE'), value: '1' },
-              { label: t('SE DISPONÍVEL'), value: '2' }
+              { label: t('NO'), value: '0' },
+              { label: t('ALWAYS'), value: '1' },
+              { label: t('IF AVAILABLE'), value: '2' }
             ]
           },
           { id: 'group_display', label: t('DISPLAY CONFIGURATION'), type: 'group' },
@@ -903,15 +930,15 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { label: t('NONE'), value: 'none' }, { label: t('AUTO'), value: 'auto' }
           ]},
           { id: 'tattoo_submenu', label: t('TATTOO'), submenu: [
-            { id: 'global_tattoo', label: t('MOSTRAR IMAGEM SOBREPOSTA À MOLDURA'), type: 'toggle', settingName: 'global.tattoo', settingType: 'bool', description: t('Show a control image overlaid on top of the bezel.') },
-            { id: 'global_tattoo_corner', label: t('POSIÇÃO DA SOBREPOSIÇÃO'), type: 'select', settingName: 'global.tattoo_corner', description: t('Select corner of the screen where the tattoo will appear.'), options: [
+            { id: 'global_tattoo', label: t('SHOW TATTOO OVER BEZEL'), type: 'toggle', settingName: 'global.tattoo', settingType: 'bool', description: t('Show a control image overlaid on top of the bezel.') },
+            { id: 'global_tattoo_corner', label: t('TATTOO CORNER'), type: 'select', settingName: 'global.tattoo_corner', description: t('Select corner of the screen where the tattoo will appear.'), options: [
               { label: t('AUTO'), value: 'auto' },
               { label: t('TOP LEFT'), value: 'NW' },
               { label: t('TOP RIGHT'), value: 'NE' },
               { label: t('BOTTOM RIGHT'), value: 'SE' },
               { label: t('BOTTOM LEFT'), value: 'SW' }
             ]},
-            { id: 'global_resize_tattoo', label: t('REDIMENSIONAR SOBREPOSIÇÃO'), type: 'toggle', settingName: 'global.resize_tattoo', settingType: 'bool', description: t('Reduz/expande a sobreposição para caber na borda da moldura.') }
+            { id: 'global_resize_tattoo', label: t('RESIZE TATTOO'), type: 'toggle', settingName: 'global.resize_tattoo', settingType: 'bool', description: t('Reduces/expands the overlay to fit inside the bezel.') }
           ]},
           {
             id: 'global_videomode',
@@ -932,14 +959,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'forcefullscreen', label: t('FORCE FULLSCREEN'), type: 'toggle', settingName: 'global.forcefullscreen', settingType: 'bool', description: t('Force emulator in fullscreen even if RetroBat is windowed') },
           { id: 'exclusivefs', label: t('PREFER EXCLUSIVE FULLSCREEN'), type: 'toggle', settingName: 'global.exclusivefs', settingType: 'bool', description: t('When available, prefer exclusive fullscreen for emulators.') },
           { id: 'nopauseonlostfocus', label: t('NEVER PAUSE EMULATION ON LOST FOCUS'), type: 'toggle', settingName: 'global.nopauseonlostfocus', settingType: 'bool', description: t('This setting will prevent pause in emulation when losing focus.') },
-          { id: 'integerscale', label: t('ESCALA INTEIRA (PIXEL PERFEITO)'), type: 'toggle', settingName: 'global.integerscale', settingType: 'bool' },
-          { id: 'smooth_games', label: t('JOGOS SUAVES (FILTRO BILINEAR)'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
+          { id: 'integerscale', label: t('INTEGER SCALING (PIXEL PERFECT)'), type: 'toggle', settingName: 'global.integerscale', settingType: 'bool' },
+          { id: 'smooth_games', label: t('SMOOTH GAMES (BILINEAR FILTERING)'), type: 'toggle', settingName: 'global.smooth', settingType: 'bool' },
           { id: 'discord_rich_presence', label: t('DISCORD RICH PRESENCE'), type: 'toggle', settingName: 'global.discord', settingType: 'bool', description: t('Enable Discord Rich Presence service, this will update Discord status to show the games being played.') },
-          { id: 'disableautocontrollers', label: t('CONFIGURAR CONTROLES AUTOMATICAMENTE'), type: 'toggle', settingName: 'global.disableautocontrollers', settingType: 'bool' },
+          { id: 'disableautocontrollers', label: t('AUTOCONFIGURE CONTROLLERS'), type: 'toggle', settingName: 'global.disableautocontrollers', settingType: 'bool' },
           {
             id: 'switch_submenu',
             label: t('SWITCH'),
-            description: t('SAVES IN RETROBAT SAVES FOLDER') + ' : ' + (getSetting('yuzu_mutualize', 'false') === 'true' ? t('LIGADO') : t('DESLIGADO')),
+            description: t('SAVES IN RETROBAT SAVES FOLDER') + ' : ' + (getSetting('yuzu_mutualize', 'false') === 'true' ? t('ON') : t('OFF')),
             submenu: [
               { id: 'yuzu_mutualize', label: t('SAVES IN RETROBAT SAVES FOLDER'), type: 'toggle', settingName: 'yuzu_mutualize', settingType: 'bool', description: t('Switch on to use RetroBat saves folder for Citron and Eden saves (instead of emulator folder).') }
             ]
@@ -964,7 +991,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'group_compression', label: t('COMPRESSION'), type: 'group' },
           { id: 'decompressedfolders', label: t('DECOMPRESSION'), type: 'select', settingName: 'decompressedfolders', description: t('Keep or delete games files once extracted (squashfs, 7z)'), options: [
-            { label: t('AUTOMÁTICO'), value: 'ask' },
+            { label: t('AUTOMATIC'), value: 'ask' },
             { label: t('KEEP'), value: 'keep' },
             { label: t('DELETE'), value: 'delete' }
           ]},
@@ -1013,16 +1040,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           {
             id: 'screen_sync_submenu',
             label: t('SCREEN SYNC'),
-            description: t('G-SYNC/FREESYNC COMPATIBILITY') + ' : ' + (getSetting('vrr_runloop_enable', 'false') === 'true' ? t('LIGADO') : t('DESLIGADO')),
+            description: t('G-SYNC/FREESYNC COMPATIBILITY') + ' : ' + (getSetting('vrr_runloop_enable', 'false') === 'true' ? t('ON') : t('OFF')),
             submenu: [
               { id: 'vrr_runloop_enable', label: t('G-SYNC/FREESYNC COMPATIBILITY'), type: 'toggle', settingName: 'vrr_runloop_enable', settingType: 'bool', description: t('Sync to exact content framerate. Only for G-Sync/FreeSync/HDMI-2.1-VRR compatible monitors.') },
               { id: 'video_vsync', label: t('VERTICAL SYNC'), type: 'select', settingName: 'video_vsync', options: [
-                { label: t('NÃO'), value: 'false' },
-                { label: t('SIM'), value: 'true' },
+                { label: t('NO'), value: 'false' },
+                { label: t('YES'), value: 'true' },
                 { label: t('ADAPTATIVE'), value: 'adaptative' }
               ]},
               { id: 'video_hard_sync', label: t('HARD SYNC'), type: 'select', settingName: 'video_hard_sync', description: t('Only compatible with OpenGL, hard-sync GPU and CPU. Reduce latency at the cost of inscreased performance requirements.'), options: [
-                { label: t('NÃO'), value: 'false' },
+                { label: t('NO'), value: 'false' },
                 { label: '0 frame', value: '0' },
                 { label: '1 frame', value: '1' },
                 { label: '2 frames', value: '2' },
@@ -1271,7 +1298,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                     type: 'select',
                     settingName: `${sys.name}.emulator`,
                     options: [
-                      { label: t('AUTOMÁTICO'), value: 'auto' },
+                      { label: t('AUTOMATIC'), value: 'auto' },
                       ...(sys.emulators?.map((e: any) => ({
                         label: e.name.toUpperCase(),
                         value: e.name
@@ -1339,7 +1366,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                   },
                   {
                     id: `sys_adv_${sys.name}_smooth`,
-                    label: t('JOGOS SUAVES (FILTRO BILINEAR)'),
+                    label: t('SMOOTH GAMES (BILINEAR FILTERING)'),
                     type: 'toggle',
                     settingName: `${sys.name}.smooth`,
                     settingType: 'bool'
@@ -1429,7 +1456,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             const savedName = getSetting(nameSetting)
 
             const options = [
-              { label: t('AUTOMÁTICO'), value: 'DEFAULT' }
+              { label: t('AUTOMATIC'), value: 'DEFAULT' }
             ]
 
             connectedGamepads.forEach(pad => {
@@ -1502,10 +1529,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       },
       {
         id: 'game_collections', label: t('GAME COLLECTION SETTINGS'), submenu: [
-          { id: 'group_collections_display', label: t('COLEÇÕES A SEREM EXIBIDAS'), type: 'group' },
+          { id: 'group_collections_display', label: t('COLLECTIONS TO DISPLAY'), type: 'group' },
           { 
             id: 'systems_displayed', 
-            label: t('SISTEMAS EXIBIDOS'), 
+            label: t('SYSTEMS DISPLAYED'), 
             showCount: true,
             submenu: (() => {
               const systemsSource = allSystems || []
@@ -1519,14 +1546,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               
               const groups: Record<string, any[]> = {}
               realSystems.forEach((s: any) => {
-                const hw = s.hardware || t('OUTROS')
+                const hw = s.hardware || t('OTHERS')
                 if (!groups[hw]) groups[hw] = []
                 groups[hw].push(s)
               })
 
               const sortedGroups = Object.keys(groups).sort((a, b) => {
-                if (a === t('OUTROS')) return 1
-                if (b === t('OUTROS')) return -1
+                if (a === t('OTHERS')) return 1
+                if (b === t('OTHERS')) return -1
                 return a.localeCompare(b)
               })
 
@@ -1553,15 +1580,15 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               return finalItems
             })()
           },
-          { id: 'auto_collections', label: t('COLEÇÕES DE JOGOS AUTOMÁTICOS'), showCount: true, submenu: [
-            { id: 'group_std_cols', label: t('PADRÃO'), type: 'group' },
-            { id: 'col_all', label: t('TODOS OS JOGOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'all' },
-            { id: 'col_recent', label: t('ÚLTIMOS JOGADOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'recent' },
-            { id: 'col_favorites', label: t('FAVORITOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'favorites' },
-            { id: 'col_never', label: t('NUNCA JOGADOS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'neverplayed' },
+          { id: 'auto_collections', label: t('AUTOMATIC GAME COLLECTIONS'), showCount: true, submenu: [
+            { id: 'group_std_cols', label: t('DEFAULT'), type: 'group' },
+            { id: 'col_all', label: t('ALL GAMES'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'all' },
+            { id: 'col_recent', label: t('LAST PLAYED'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'recent' },
+            { id: 'col_favorites', label: t('FAVORITES'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'favorites' },
+            { id: 'col_never', label: t('NEVER PLAYED'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'neverplayed' },
             { id: 'col_retro', label: t('RETROACHIEVEMENTS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'retroachievements' },
             
-            { id: 'group_players_cols', label: t('JOGADORES'), type: 'group' },
+            { id: 'group_players_cols', label: t('PLAYERS'), type: 'group' },
             { id: 'col_2p', label: t('2 JOGADORES'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '2players' },
             { id: 'col_4p', label: t('4 JOGADORES'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '4players' },
 
@@ -1586,7 +1613,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col_zirem', label: t('IREM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zirem' },
             { id: 'col_zsnk', label: t('SNK'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsnk' },
 
-            { id: 'group_genres_cols', label: t('GÊNEROS'), type: 'group' },
+            { id: 'group_genres_cols', label: t('GENRES'), type: 'group' },
             { id: 'col__action', label: t('ACTION'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_action' },
             { id: 'col__adult', label: t('ADULT'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_adult' },
             { id: 'col__adventure', label: t('ADVENTURE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_adventure' },
@@ -1649,12 +1676,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { 
             id: 'custom_collections_submenu', 
-            label: t('COLEÇÕES DE JOGO PERSONALIZADOS'), 
+            label: t('CUSTOM GAME COLLECTIONS'), 
             showCount: true,
             submenu: (() => {
               const collectionsSource = customCollections || []
               if (collectionsSource.length === 0) {
-                return [{ id: 'no_collections_found', label: t('NENHUMA COLEÇÃO ENCONTRADA'), type: 'info', value: '' }]
+                return [{ id: 'no_collections_found', label: t('NO COLLECTIONS FOUND'), type: 'info', value: '' }]
               }
 
               return collectionsSource.map(colName => ({
@@ -1668,7 +1695,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           },
           { 
             id: 'grouped_systems', 
-            label: t('SISTEMAS AGRUPADOS'), 
+            label: t('GROUPED SYSTEMS'), 
             showCount: true,
             submenu: (() => {
               const systemsSource = allSystems || []
@@ -1682,7 +1709,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               })
               
               if (realSystems.length === 0) {
-                return [{ id: 'no_groupable_systems', label: t('NENHUM SISTEMA AGRUPÁVEL ENCONTRADO'), type: 'info', value: '' }]
+                return [{ id: 'no_groupable_systems', label: t('NO GROUPABLE SYSTEMS FOUND'), type: 'info', value: '' }]
               }
 
               const groups: Record<string, any[]> = {}
@@ -1720,26 +1747,26 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               return finalItems
             })()
           },
-          { id: 'group_collection_options', label: t('OPÇÕES'), type: 'group' },
-          { id: 'sort_systems', label: t('ORDENAÇÃO DOS SISTEMAS'), type: 'select', settingName: 'SortSystems', options: [
-            { label: 'NÃO', value: '' },
-            { label: 'POR ORDEM ALFABÉTICA', value: 'alpha' },
-            { label: 'POR FABRICANTE', value: 'manufacturer' },
-            { label: 'POR TIPO DE HARDWARE ENTÃO ALFABETICAMENTE', value: 'hardware' },
-            { label: 'POR TIPO DE HARDWARE ENTÃO ANO', value: 'hardware-year' },
-            { label: 'POR FABRICANTE E TIPO', value: 'subgroup' },
-            { label: 'POR ANO DE LANÇAMENTO', value: 'releaseDate' }
+          { id: 'group_collection_options', label: t('OPTIONS'), type: 'group' },
+          { id: 'sort_systems', label: t('SYSTEM SORTING'), type: 'select', settingName: 'SortSystems', options: [
+            { label: t('NO'), value: '' },
+            { label: t('BY ALPHABETICAL ORDER'), value: 'alpha' },
+            { label: t('BY MANUFACTURER'), value: 'manufacturer' },
+            { label: t('BY HARDWARE TYPE THEN ALPHABETICALLY'), value: 'hardware' },
+            { label: t('BY HARDWARE TYPE THEN YEAR'), value: 'hardware-year' },
+            { label: t('BY MANUFACTURER AND TYPE'), value: 'subgroup' },
+            { label: t('BY RELEASE YEAR'), value: 'releaseDate' }
           ]},
-          { id: 'start_on_system', label: t('INICIAR NO SISTEMA'), type: 'select', settingName: 'StartupSystem', options: [
-            { label: 'RESTAURAR O ÚLTIMO SELECIONADO', value: 'last' },
+          { id: 'start_on_system', label: t('START ON SYSTEM'), type: 'select', settingName: 'StartupSystem', options: [
+            { label: t('RESTORE LAST SELECTED'), value: 'last' },
             ...visibleSystems.map(sys => ({
               label: getFriendlySystemName(sys).toUpperCase(),
               value: sys.name
             }))
           ]},
-          { id: 'start_gamelist', label: t('INICIAR NA LISTA DE JOGOS'), type: 'toggle', settingName: 'StartOnGamelist', settingType: 'bool' },
-          { id: 'show_hidden_games_collections', label: t('EXIBIR JOGOS DE SISTEMAS OCULTOS NAS COLEÇÕES'), type: 'toggle', settingName: 'CollectionShowHidden', settingType: 'bool' },
-          { id: 'show_empty_systems', label: t('EXIBIR SISTEMAS VAZIOS'), type: 'toggle', settingName: 'LoadEmptySystems', settingType: 'bool' },
+          { id: 'start_gamelist', label: t('START ON GAMELIST'), type: 'toggle', settingName: 'StartOnGamelist', settingType: 'bool' },
+          { id: 'show_hidden_games_collections', label: t('SHOW GAMES FROM HIDDEN SYSTEMS IN COLLECTIONS'), type: 'toggle', settingName: 'CollectionShowHidden', settingType: 'bool' },
+          { id: 'show_empty_systems', label: t('SHOW EMPTY SYSTEMS'), type: 'toggle', settingName: 'LoadEmptySystems', settingType: 'bool' },
         ]
       },
       {
@@ -1755,9 +1782,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'group_scrape_filters', label: t('FILTERS'), type: 'group', tab: 0 },
           { id: 'scrape_filter', label: t('GAMES TO SCRAPE FOR'), type: 'select', settingName: 'ScrapperFilter', tab: 0, options: [
-            { label: t('TODOS OS JOGOS'), value: 'all' },
-            { label: t('FALTANDO QUALQUER MÍDIA'), value: 'missing' },
-            { label: t('FALTANDO TODAS AS MÍDIAS'), value: 'missing_all' }
+            { label: t('ALL GAMES'), value: 'all' },
+            { label: t('GAMES MISSING ANY MEDIA'), value: 'missing' },
+            { label: t('GAMES MISSING ALL MEDIA'), value: 'missing_all' }
           ]},
           { 
             id: 'scrape_ignore_recent', 
@@ -1766,7 +1793,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             settingName: 'ScrapperIgnoreRecent', 
             tab: 0,
             options: [
-              { label: t('NÃO'), value: '0' },
+              { label: t('NO'), value: '0' },
               { label: t('LAST DAY'), value: '1' },
               { label: t('LAST WEEK'), value: '7' },
               { label: t('LAST 15 DAYS'), value: '15' },
@@ -1829,7 +1856,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { label: t('MARQUEE'), value: 'marquee' }
           ]},
           { id: 'scrape_region', label: t('PREFERED REGION'), type: 'select', settingName: 'ScraperRegion', tab: 1, options: [
-            { label: t('AUTOMÁTICO'), value: '' },
+            { label: t('AUTOMATIC'), value: '' },
             { label: t('EUROPE'), value: 'eu' },
             { label: t('USA'), value: 'us' },
             { label: t('JAPAN'), value: 'jp' },
@@ -1877,12 +1904,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'group_software_updates', label: t('SOFTWARE UPDATES'), type: 'group' },
           { id: 'updates_enabled', label: t('CHECK FOR UPDATES'), type: 'toggle', settingName: 'updates.enabled', settingType: 'bool' },
           { id: 'updates_type', label: t('UPDATE TYPE'), type: 'select', settingName: 'updates.type', options: [
-            { label: t('ESTÁVEL'), value: 'stable' },
+            { label: t('STABLE'), value: 'stable' },
             { label: t('BETA'), value: 'beta' },
             { label: t('BETA (BUTTERFLY)'), value: 'butterfly' },
-            { label: t('INSTÁVEL'), value: 'unstable' }
+            { label: t('UNSTABLE'), value: 'unstable' }
           ]},
-          { id: 'group_updates_actions', label: t('AÇÕES'), type: 'group' },
+          { id: 'group_updates_actions', label: t('ACTIONS'), type: 'group' },
           { id: 'start_update', label: t('START UPDATE'), type: 'action', onClick: () => {
             alert(t('START UPDATE'))
           }}
@@ -2428,7 +2455,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         if (selectedCount > 0) {
           return (
             <div className="menu-submenu-preview">
-              <span className="menu-selected-count">{selectedCount} {t('SELECIONADOS')}</span>
+              <span className="menu-selected-count">{selectedCount} {t('SELECTED')}</span>
               <span className="menu-submenu-arrow">›</span>
             </div>
           )

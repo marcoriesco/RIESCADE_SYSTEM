@@ -86,7 +86,7 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
         <div style={styles.glowBorder}></div>
 
         <h2 style={styles.title}>
-          {finished ? t('SCRAPING COMPLETED') : t('BUSCANDO MÍDIAS')}
+          {finished ? t('SCRAPING COMPLETED') : t('SEARCHING FOR MEDIA')}
         </h2>
 
         {!finished ? (
