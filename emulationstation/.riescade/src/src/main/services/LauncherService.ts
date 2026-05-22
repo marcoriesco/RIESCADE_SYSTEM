@@ -16,7 +16,7 @@ interface ControllerInfo {
 }
 
 export class LauncherService {
-  public launch(game: Game, system: System, activeControllers: ControllerInfo[] = []): Promise<void> {
+  public launch(game: Game, system: System, activeControllers: ControllerInfo[] = [], saveStateSlot?: number): Promise<void> {
     return new Promise((resolvePromise, reject) => {
       const retroBatPath = getRetroBatPath()
       const launcherPath = join(retroBatPath, 'emulationstation', 'emulatorLauncher.exe')
@@ -170,12 +170,29 @@ export class LauncherService {
         })
       }
 
+      let saveStateArgs: string[] = []
+      if (saveStateSlot !== undefined) {
+        if (saveStateSlot === -2) {
+          saveStateArgs.push('-autosave', '0')
+        } else if (saveStateSlot === -1) {
+          saveStateArgs.push('-autosave', '1')
+        } else if (saveStateSlot >= 0) {
+          saveStateArgs.push('-state_slot', saveStateSlot.toString(), '-autosave', '1')
+        }
+      } else {
+        const globalAutosave = settingsParser.getSetting('global.autosave', 'bool')
+        if (globalAutosave === 'true' || globalAutosave === true || globalAutosave === '1') {
+          saveStateArgs.push('-autosave', '1')
+        }
+      }
+
       const args = [
         '-gameinfo', `"${gameXmlPath}"`,
         ...controllerArgs,
         '-system', system.name,
         '-emulator', emulator,
         '-core', core,
+        ...saveStateArgs,
         '-rom', `"${romPath}"`
       ]
 

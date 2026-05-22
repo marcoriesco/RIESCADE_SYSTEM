@@ -45,6 +45,10 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [tempMediaUrls, setTempMediaUrls] = useState<Record<string, string>>({})
   const [tempMediaLoading, setTempMediaLoading] = useState(false)
 
+  // REMOVER JOGO states
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
+  const [deleteModalSelectedIndex, setDeleteModalSelectedIndex] = useState(1) // Default to "NÃO" for safety
+
   useEffect(() => {
     if (scraperStage !== 2 || scraperMatches.length === 0) return
 
@@ -137,7 +141,16 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const getRootItems = (currentGame: Game, gameCols: string[], sys: System, allCols: string[], currentSettings: Record<string, any>) => {
     const items: any[] = []
 
-    // 1. Group: COLEÇÕES
+    // 1. Group: OPÇÕES
+    items.push({ id: 'group_games', label: 'GAMES', type: 'group' })
+    items.push({
+      id: 'delete_game',
+      label: 'REMOVER JOGO',
+      type: 'action',
+      actionType: 'delete'
+    })
+
+    // 2. Group: COLEÇÕES
     items.push({ id: 'group_collections', label: 'COLEÇÕES', type: 'group' })
     items.push({ 
       id: 'favorite', 
@@ -356,11 +369,46 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     return []
   }
 
+  const confirmDelete = useCallback(
+    async (deletePhysical: boolean) => {
+      setShowDeleteConfirmModal(false)
+      if (addNotification) addNotification(`REMOVENDO JOGO ${game.name.toUpperCase()}...`, 'info', 'general')
+
+      try {
+        await window.api.deleteGame(game.system || system.name, game.path, deletePhysical)
+
+        if (addNotification) {
+          addNotification(
+            `JOGO ${game.name.toUpperCase()} REMOVIDO COM SUCESSO!`,
+            'success',
+            'general'
+          )
+        }
+
+        onClose()
+
+        if (onUpdateGamelists) {
+          onUpdateGamelists(system.name)
+        }
+      } catch (err) {
+        console.error(err)
+        if (addNotification) addNotification('ERRO AO REMOVER O JOGO', 'warning', 'general')
+      }
+    },
+    [game, system, addNotification, onClose, onUpdateGamelists]
+  )
+
   const handleAction = async (item: any) => {
     if (item.actionType === 'scrape') {
       setScraperStage(1)
       setScraperDbs({ ScreenScraper: true, ArcadeDB: true, TheGamesDB: true, HfsDB: true, IGDB: true })
       setScraperDbSelectedIndex(0)
+      return
+    }
+
+    if (item.actionType === 'delete') {
+      setDeleteModalSelectedIndex(1) // default to 'NÃO' for safety
+      setShowDeleteConfirmModal(true)
       return
     }
 
@@ -530,7 +578,18 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     (e: KeyboardEvent) => {
       if (!isOpen) return
 
-
+      if (showDeleteConfirmModal) {
+        e.preventDefault()
+        e.stopPropagation()
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          setDeleteModalSelectedIndex(prev => prev === 0 ? 1 : 0)
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          confirmDelete(deleteModalSelectedIndex === 0)
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          setShowDeleteConfirmModal(false)
+        }
+        return
+      }
 
       if (scraperStage !== 0) {
         e.preventDefault()
@@ -655,7 +714,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
       }
     },
-    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings]
+    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings, showDeleteConfirmModal, deleteModalSelectedIndex, confirmDelete]
   )
 
   useEffect(() => {
@@ -1133,8 +1192,36 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
       {scraperStage === 1 && renderStageStage1()}
       {scraperStage === 2 && renderStageStage2()}
+      {showDeleteConfirmModal && (
+        <div className="scraper-completion-overlay" onClick={() => setShowDeleteConfirmModal(false)}>
+          <div className="scraper-completion-modal" onClick={e => e.stopPropagation()}>
+            <h3 className="scraper-completion-title">REMOVER JOGO</h3>
+            <p className="scraper-completion-text">
+              Você tem certeza que deseja remover o jogo <strong>{game.name.toUpperCase()}</strong>?<br/>
+              Apagar os arquivos físicos também?
+            </p>
+            <div className="scraper-completion-buttons">
+              <button 
+                className={`scraper-completion-btn primary ${deleteModalSelectedIndex === 0 ? 'selected' : ''}`}
+                onClick={() => confirmDelete(true)}
+              >
+                SIM (APAGAR ROM)
+              </button>
+              <button 
+                className={`scraper-completion-btn secondary ${deleteModalSelectedIndex === 1 ? 'selected' : ''}`}
+                onClick={() => confirmDelete(false)}
+              >
+                NÃO (APENAS DA LISTA)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
+        .scraper-completion-overlay {
+          z-index: 10000000 !important;
+        }
         .riescade-menu-overlay.game-options { 
           position: fixed; 
           top: 0; 
@@ -1480,12 +1567,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           margin-bottom: 5px;
         }
         .scraper-header .system-fullname {
-          font-size: 1.0rem;
+          font-size: 1rem;
           font-weight: 800;
           color: #ff007f;
           letter-spacing: 2px;
         }
         .scraper-stage2-main-content {
+          width: 100%;
           flex: 1;
           display: flex;
           gap: 50px;
@@ -1493,7 +1581,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           margin-bottom: 30px;
         }
         .scraper-matches-section {
-          width: 38%;
+          width: 40%;
           display: flex;
           flex-direction: column;
           overflow-y: auto;
@@ -1529,7 +1617,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
         .scraper-match-item .match-name {
           font-weight: 700;
-          font-size: 0.95rem;
+          font-size: 1.2em;
           color: #eee;
           white-space: nowrap;
           overflow: hidden;
@@ -1553,33 +1641,29 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 3px 8px;
-          border-radius: 6px;
+          padding: 2px 4px;
+          border-radius: 4px;
           font-size: 0.7rem;
           font-weight: 800;
           letter-spacing: 0.5px;
           text-transform: uppercase;
           transition: all 0.2s ease;
-          border: 1px solid transparent;
         }
         .icon-badge.img {
           background: rgba(6, 182, 212, 0.15); /* cyan */
-          border-color: rgba(6, 182, 212, 0.3);
           color: #22d3ee;
         }
         .icon-badge.vid {
           background: rgba(236, 72, 153, 0.15); /* pink */
-          border-color: rgba(236, 72, 153, 0.3);
           color: #f472b6;
         }
         .icon-badge.txt {
           background: rgba(16, 185, 129, 0.15); /* emerald */
-          border-color: rgba(16, 185, 129, 0.3);
           color: #34d399;
           font-size: 0.7rem !important;
         }
         .scraper-details-section {
-          width: 62%;
+          width: 60%;
           display: flex;
           flex-direction: column;
           overflow-y: auto;

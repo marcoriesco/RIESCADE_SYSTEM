@@ -475,7 +475,20 @@ export class LibraryService {
       } catch (err) {}
     }
 
-    return games.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+    const processedGames = games.map(g => {
+      const sysLower = String(g.system || systemName).toLowerCase()
+      if (!g.image || String(g.image).trim() === '') {
+        const ext = (g.path.includes('.') ? g.path.substring(g.path.lastIndexOf('.')) : '').toLowerCase()
+        if (ext === '.png' || (sysLower === 'pico8' && ext === '.p8')) {
+          if (system && system.path) {
+            g.image = resolve(system.path, g.path).replace(/\\/g, '/')
+          }
+        }
+      }
+      return g
+    })
+
+    return processedGames.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
   }
 
   private resolveAutoCollectionGames(colKey: string): Game[] {
@@ -525,6 +538,18 @@ export class LibraryService {
     const games: Game[] = []
     const extSet = new Set(extensions.map(e => e.toLowerCase().trim()))
 
+    // Common MAME / NeoGeo BIOS and support device zip files to exclude from the playable list (isArcadeAsset)
+    const ARCADE_ASSETS = new Set([
+      'neogeo', 'awbios', 'cpis', 'decocass', 'pgm', 'skns', 'konamih', 'segaboot',
+      'naomi', 'naomiboot', 'naomi2', 'hikaru', 'chihiro', 'triforce', 'sys246', 'sys256',
+      'playchoice', 'nss', 'megaplay', 'megatech', 'cvs', 'stvbios', 'targ', 'titan',
+      'zn1', 'zn2', 'namcoc74', 'namcoc75', 'namcoc76', 'qsound', 'qsound_cia', 'ym2608',
+      'ym2610', 'midssio', 'midyunit', 'midxunit', 'midtunit', 'sega_c2', 'cchip'
+    ])
+
+    const japanDefaults = ['pc88', 'pc98', 'pcenginecd', 'pcfx', 'satellaview', 'sg1000', 'sufami', 'wswan', 'wswanc', 'x68000']
+    const sysLower = systemName.toLowerCase()
+
     // Limit scanning recursion to depth 2 to prevent freezing on huge/system directories
     const scanDir = (dir: string, depth: number) => {
       if (depth > 2) return
@@ -542,11 +567,12 @@ export class LibraryService {
             continue; // Skip inaccessible or broken links/files
           }
 
+          const ext = (file.includes('.') ? file.substring(file.lastIndexOf('.')) : '').toLowerCase()
+          const stem = (file.includes('.') ? file.substring(0, file.lastIndexOf('.')) : file).toLowerCase()
+
           if (stat.isDirectory()) {
-            scanDir(fullPath, depth + 1)
-          } else {
-            const ext = (file.includes('.') ? file.substring(file.lastIndexOf('.')) : '').toLowerCase()
             if (extSet.has(ext)) {
+              // Folder matches a valid system extension (e.g. .teknoparrot). Treat folder as a game and block internal scan.
               const relPath = './' + relative(systemPath, fullPath).replace(/\\/g, '/')
               const displayName = file.substring(0, file.length - ext.length)
 
@@ -558,6 +584,62 @@ export class LibraryService {
                 favorite: false,
                 hidden: false,
                 playcount: 0
+              } as any
+
+              games.push(game)
+            } else {
+              // wiiu ignore optimization: ignore "content" and "meta" directories
+              if (sysLower === 'wiiu' && (file.toLowerCase() === 'content' || file.toLowerCase() === 'meta')) {
+                continue
+              }
+              // vpinball ignore optimization: ignore "roms" directory
+              if (sysLower === 'vpinball' && file.toLowerCase() === 'roms') {
+                continue
+              }
+
+              scanDir(fullPath, depth + 1)
+            }
+          } else {
+            // It's a file
+            if (extSet.has(ext)) {
+              // Arcade / NeoGeo BIOS/Device filter
+              if ((sysLower === 'arcade' || sysLower === 'neogeo') && ARCADE_ASSETS.has(stem)) {
+                continue
+              }
+
+              const relPath = './' + relative(systemPath, fullPath).replace(/\\/g, '/')
+              const displayName = file.substring(0, file.length - ext.length)
+
+              // Default region and language parsing (LangInfo::parse)
+              let defaultRegion = ''
+              let defaultLang = 'en'
+
+              if (japanDefaults.includes(sysLower)) {
+                defaultRegion = 'jp'
+                defaultLang = 'jp'
+              } else if (sysLower === 'thomson') {
+                defaultRegion = 'eu'
+                defaultLang = 'fr'
+              } else if (sysLower === 'arcade' || sysLower === 'neogeo') {
+                if (file.toLowerCase().includes('j.zip')) {
+                  defaultRegion = 'jp'
+                  defaultLang = 'jp'
+                } else {
+                  defaultRegion = 'us'
+                  defaultLang = 'en'
+                }
+              }
+
+              const game: Game = {
+                id: fullPath.replace(/\\/g, '/'),
+                name: displayName,
+                path: relPath,
+                system: systemName,
+                favorite: false,
+                hidden: false,
+                playcount: 0,
+                region: defaultRegion,
+                lang: defaultLang
               } as any
 
               // If it's the screenshots system, set the image property to the absolute path of the file itself!
@@ -724,6 +806,76 @@ export class LibraryService {
       }
     }
 
+    this.rebuildAutoCollections()
+  }
+
+  public deleteGame(systemName: string, gamePath: string, deletePhysical: boolean): void {
+    const fs = require('fs')
+    const configPath = getConfigPath()
+    const targetSystem = systemName
+
+    // 1. Identify all possible gamelist.xml paths for this system
+    const systems = this.getSystems()
+    const system = systems.find(s => s.name.toLowerCase() === targetSystem.toLowerCase())
+    const systemGamelistPath = system ? join(system.path, 'gamelist.xml') : ''
+
+    const gamelistPaths = [
+      join(configPath, 'gamelists', targetSystem, 'gamelist.xml'),
+      join(getRomsPath(), targetSystem, 'gamelist.xml'),
+      systemGamelistPath
+    ].filter(p => p && existsSync(p))
+
+    // 2. Remove game from all existing gamelists
+    for (const gp of gamelistPaths) {
+      try {
+        const games = this.gamelistParser.parse(gp, targetSystem)
+        const filteredGames = games.filter(
+          g => normalizePathForComparison(g.path) !== normalizePathForComparison(gamePath)
+        )
+        this.gamelistParser.save(gp, filteredGames)
+      } catch (e) {
+        console.error(`Failed to delete game from gamelist ${gp}:`, e)
+      }
+    }
+
+    // 3. Remove game from custom collections
+    try {
+      const collections = this.getCollectionsForGame(targetSystem, gamePath)
+      for (const col of collections) {
+        this.toggleGameInCollection(col, targetSystem, gamePath, 'remove')
+      }
+    } catch (e) {
+      console.error(`Failed to remove game from custom collections:`, e)
+    }
+
+    // 4. Update in-memory cache
+    const cached = LibraryService.cachedGames.get(targetSystem.toLowerCase())
+    if (cached) {
+      const filtered = cached.filter(
+        g => normalizePathForComparison(g.path) !== normalizePathForComparison(gamePath)
+      )
+      LibraryService.cachedGames.set(targetSystem.toLowerCase(), filtered)
+    }
+
+    // 5. If requested, delete the physical file/folder
+    if (deletePhysical && system && system.path) {
+      try {
+        const absRomPath = resolve(system.path, gamePath)
+        if (existsSync(absRomPath)) {
+          const stat = statSync(absRomPath)
+          if (stat.isDirectory()) {
+            fs.rmSync(absRomPath, { recursive: true, force: true })
+          } else {
+            fs.rmSync(absRomPath, { force: true })
+          }
+          console.log(`Physically deleted ROM: ${absRomPath}`)
+        }
+      } catch (e) {
+        console.error(`Failed to physically delete game file at ${gamePath}:`, e)
+      }
+    }
+
+    // 6. Rebuild all auto-collections
     this.rebuildAutoCollections()
   }
 
@@ -919,5 +1071,106 @@ export class LibraryService {
 
     deleteDirFiles(join(configPath, 'tmp'))
     deleteDirFiles(join(os.tmpdir(), 'riescade'))
+  }
+
+  public getGameSaveStates(systemName: string, gamePath: string): any[] {
+    const fs = require('fs')
+    const path = require('path')
+    
+    const savesDir = path.join(getRetroBatPath(), 'saves', systemName)
+    if (!fs.existsSync(savesDir)) {
+      return []
+    }
+
+    const romFilename = path.basename(gamePath)
+    const ext = path.extname(romFilename)
+    const romName = romFilename.substring(0, romFilename.length - ext.length)
+
+    try {
+      // Helper to recursively scan for files inside a directory up to a given depth limit
+      const getAllFiles = (dir: string, depth = 0): string[] => {
+        if (depth > 3) return []
+        let results: string[] = []
+        try {
+          if (!fs.existsSync(dir)) return []
+          const list = fs.readdirSync(dir)
+          for (const file of list) {
+            const fullPath = path.join(dir, file)
+            const stat = fs.statSync(fullPath)
+            if (stat.isDirectory()) {
+              results = results.concat(getAllFiles(fullPath, depth + 1))
+            } else if (stat.isFile()) {
+              results.push(fullPath)
+            }
+          }
+        } catch (e) {
+          // Ignore read errors
+        }
+        return results
+      }
+
+      const allFiles = getAllFiles(savesDir)
+      const saveStates: any[] = []
+
+      // Helper to escape regex
+      const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const escapedRomName = escapeRegExp(romName)
+
+      // Regexes:
+      // Autosave: romName.state.auto
+      const autoRegex = new RegExp(`^${escapedRomName}\\.state\\.auto$`, 'i')
+      // Standard: romName.state OR romName.state<digits>
+      const slotRegex = new RegExp(`^${escapedRomName}\\.state(\\d*)$`, 'i')
+
+      for (const fullPath of allFiles) {
+        const file = path.basename(fullPath)
+        try {
+          const stat = fs.statSync(fullPath)
+
+          let isMatch = false
+          let slot = -2
+
+          if (autoRegex.test(file)) {
+            isMatch = true
+            slot = -1
+          } else {
+            const match = file.match(slotRegex)
+            if (match) {
+              isMatch = true
+              slot = match[1] === '' ? 0 : parseInt(match[1], 10)
+            }
+          }
+
+          if (isMatch) {
+            const screenshotPath = fullPath + '.png'
+            const hasScreenshot = fs.existsSync(screenshotPath)
+            const screenshotUrl = hasScreenshot 
+              ? `file:///${screenshotPath.replace(/\\/g, '/')}`
+              : undefined
+
+            saveStates.push({
+              slot,
+              path: fullPath,
+              date: stat.mtimeMs,
+              screenshotUrl
+            })
+          }
+        } catch (e) {
+          console.error(`Error reading stats for save file ${file}:`, e)
+        }
+      }
+
+      // Sort: Autosave (-1) first, then other slots in descending order of last modified date
+      saveStates.sort((a, b) => {
+        if (a.slot === -1) return -1
+        if (b.slot === -1) return 1
+        return b.date - a.date
+      })
+
+      return saveStates
+    } catch (e) {
+      console.error(`Error scanning save states in ${savesDir}:`, e)
+      return []
+    }
   }
 }

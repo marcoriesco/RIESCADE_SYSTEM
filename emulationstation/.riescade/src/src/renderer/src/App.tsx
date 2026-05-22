@@ -4,6 +4,7 @@ import { Menu } from './components/Menu';
 import { GameOptionsOverlay } from './components/GameOptionsOverlay';
 import { LaunchScreen } from './components/LaunchScreen';
 import { HardwareSelectOverlay } from './components/HardwareSelectOverlay';
+import { SaveStateManagerOverlay } from './components/SaveStateManagerOverlay';
 
 // Simple types inline - no need for separate store
 interface System {
@@ -76,6 +77,9 @@ function App() {
 	const [themeRevision, setThemeRevision] = useState(0);
 	const [mediaRevision, setMediaRevision] = useState(0);
 	const [settings, setSettings] = useState<any>({});
+	const [isSaveStateManagerOpen, setIsSaveStateManagerOpen] = useState(false);
+	const [saveManagerGame, setSaveManagerGame] = useState<Game | null>(null);
+	const [saveManagerSystem, setSaveManagerSystem] = useState<System | null>(null);
 	const [hasRestoredLastSystem, setHasRestoredLastSystem] = useState(false);
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
 
@@ -665,6 +669,18 @@ function App() {
 			addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
 		});
 	}, [selectedSystem, addNotification]);
+
+	// Listen for systems updated event (e.g. from windows_installers)
+	useEffect(() => {
+		const removeListener = window.api.on(
+			'systems-updated',
+			() => {
+				console.log('Library updated on backend, performing silent reload...');
+				performInPlaceGamelistReload(false);
+			},
+		);
+		return () => removeListener();
+	}, [performInPlaceGamelistReload]);
 
 	const handleFastReload = useCallback(() => {
 		performInPlaceGamelistReload(false);
@@ -1298,22 +1314,46 @@ function App() {
 					setIsGameOptionsOpen((prev) => !prev);
 					return;
 				}
-				if (isGameOptionsOpen) return;
+				if (isGameOptionsOpen || isSaveStateManagerOpen) return;
 
 				if (e.key === ' ' && currentGame && !isLaunching) {
 					if (currentGame.isCollectionFolder) {
 						setSelectedCollection(currentGame.path);
 					} else {
-						setIsLaunching(true);
-						window.api
-							.launchGame(currentGame, selectedSystem)
-							.then(() => {
-								setTimeout(() => setIsLaunching(false), 5000);
-							})
-							.catch((err) => {
-								console.error('Launch game failed or exited with code:', err);
-								setTimeout(() => setIsLaunching(false), 5000);
-							});
+						const saveStatesSetting = settings['global.savestates']?.value ?? '0';
+
+						const executeDirectLaunch = () => {
+							setIsLaunching(true);
+							window.api
+								.launchGame(currentGame, selectedSystem)
+								.then(() => {
+									setTimeout(() => setIsLaunching(false), 5000);
+								})
+								.catch((err) => {
+									console.error('Launch game failed or exited with code:', err);
+									setTimeout(() => setIsLaunching(false), 5000);
+								});
+						};
+
+						if (saveStatesSetting === '0') {
+							executeDirectLaunch();
+						} else {
+							window.api
+								.scanSaveStates(selectedSystem!.name, currentGame.path)
+								.then((states) => {
+									if (saveStatesSetting === '2' && (!states || states.length === 0)) {
+										executeDirectLaunch();
+									} else {
+										setSaveManagerGame(currentGame);
+										setSaveManagerSystem(selectedSystem);
+										setIsSaveStateManagerOpen(true);
+									}
+								})
+								.catch((err) => {
+									console.error('Failed to scan save states before launch:', err);
+									executeDirectLaunch();
+								});
+						}
 					}
 				}
 			}
@@ -1346,6 +1386,7 @@ function App() {
 		showGamelistUpdateModal,
 		reloadModalSelectedIndex,
 		handleFastReload,
+		isSaveStateManagerOpen,
 	]);
 
 	// ─── Start screen: render once, update progress via DOM refs to avoid flickering ───
@@ -1608,6 +1649,35 @@ function App() {
 						</p>
 					</div>
 				</div>
+			)}
+
+			{/* Save State Manager Overlay */}
+			{isSaveStateManagerOpen && saveManagerGame && saveManagerSystem && (
+				<SaveStateManagerOverlay
+					isOpen={isSaveStateManagerOpen}
+					game={saveManagerGame}
+					system={saveManagerSystem}
+					onClose={() => {
+						setIsSaveStateManagerOpen(false);
+						setSaveManagerGame(null);
+						setSaveManagerSystem(null);
+					}}
+					onLaunch={(slot) => {
+						setIsSaveStateManagerOpen(false);
+						setIsLaunching(true);
+						window.api
+							.launchGame(saveManagerGame, saveManagerSystem, slot)
+							.then(() => {
+								setTimeout(() => setIsLaunching(false), 5000);
+							})
+							.catch((err) => {
+								console.error('Launch game failed or exited with code:', err);
+								setTimeout(() => setIsLaunching(false), 5000);
+							});
+						setSaveManagerGame(null);
+						setSaveManagerSystem(null);
+					}}
+				/>
 			)}
 
 			{/* FPS Counter Layer */}

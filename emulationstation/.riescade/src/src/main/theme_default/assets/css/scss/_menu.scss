@@ -32,10 +32,6 @@
     width: 20vw !important;
 }
 
-.riescade-menu-list-container::-webkit-scrollbar-thumb { 
-    background: var(--theme-color); 
-}
-
 .riescade-menu-header {
     background: none !important;
     padding: 20px;
@@ -239,6 +235,13 @@
 
 
 // SCRAPER
+.scraper-matches-section::-webkit-scrollbar {
+    width: 6px;
+}
+.scraper-matches-section::-webkit-scrollbar-thumb {
+    background: var(--theme-color) !important;
+    border-radius: 0 !important;
+}
 
 .scraper-db-item {
     background: none !important;
@@ -247,6 +250,7 @@
 }
 
 .stage2-overlay {
+    font-family: "Roboto Condensed", sans-serif !important;
     padding-top: 40px !important;
 }
 
@@ -269,6 +273,14 @@
 }
 .scraper-match-item.selected {
     background: var(--theme-color) !important;
+
+    .icon-badge.img,
+    .icon-badge.txt,
+    .icon-badge.vid {
+        background: none !important;
+        border-color: #fff;
+        color: #fff;
+    }
 }
 .metadata-grid-label {
     width: 180px !important;

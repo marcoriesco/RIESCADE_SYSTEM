@@ -9,7 +9,9 @@ declare global {
       getSystems: () => Promise<any>
       getGames: (systemName: string) => Promise<any>
       updateGame: (systemName: string, gameData: any) => Promise<void>
-      launchGame: (game: any, system: any) => Promise<any>
+      deleteGame: (systemName: string, gamePath: string, deletePhysical: boolean) => Promise<void>
+      launchGame: (game: any, system: any, saveStateSlot?: number) => Promise<any>
+      scanSaveStates: (systemName: string, gamePath: string) => Promise<any[]>
       getCustomCollections: () => Promise<string[]>
       getCollectionGames: (collectionName: string) => Promise<any[]>
       getThemes: () => Promise<any>

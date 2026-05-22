@@ -416,24 +416,17 @@ header h1 {
 }
 
 .scraper-completion-modal {
-  background: rgba(20, 24, 38, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #111;
+  border-radius: 4px;
   padding: 30px;
   width: 480px;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  font-family: 'Outfit', 'Inter', sans-serif;
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.scraper-completion-icon {
-  font-size: 3rem;
-  color: var(--theme-color, #f042b0);
-  margin-bottom: 15px;
 }
 
 .scraper-completion-title {
@@ -460,7 +453,7 @@ header h1 {
 .scraper-completion-btn {
   flex: 1;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -468,28 +461,31 @@ header h1 {
   border: 1px solid transparent;
   outline: none;
 }
-
+.scraper-completion-btn {
+  background: none;
+  border-color: #bdbdbd;
+}
 .scraper-completion-btn.primary {
-  background: var(--theme-color, #f042b0);
   color: #fff;
 }
 
-.scraper-completion-btn.primary.selected {
-  background: #ff60c3;
-  box-shadow: 0 0 15px rgba(240, 66, 176, 0.5);
-  transform: scale(1.02);
+.scraper-completion-btn.primary.selected,
+.scraper-completion-btn.secondary.selected,
+.scraper-completion-btn.primary:hover,
+.scraper-completion-btn.secondary:hover {
+  background: var(--theme-color, #f042b0);
+  border-color: transparent;
 }
-
+.scraper-completion-btn.primary:hover ~ .scraper-completion-btn.secondary,
+.scraper-completion-btn.secondary:hover ~ .scraper-completion-btn.primary{
+  background: none;
+  border-color: #bdbdbd;
+}
 .scraper-completion-btn.secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #a0a0a0;
+  color: #bdbdbd;
 }
 
 .scraper-completion-btn.secondary.selected {
-  background: rgba(255, 255, 255, 0.15);
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: scale(1.02);
 }
 

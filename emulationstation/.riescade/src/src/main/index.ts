@@ -90,7 +90,7 @@ app.whenReady().then(() => {
     return libraryService.getGames(systemName)
   })
 
-  ipcMain.handle('launch-game', async (_, game: Game, system: System) => {
+  ipcMain.handle('launch-game', async (_, game: Game, system: System, saveStateSlot?: number) => {
     let targetSystem = system
     if (system.name === 'collections') {
       const realSystem = libraryService.getSystems().find(s => s.name.toLowerCase() === game.system.toLowerCase())
@@ -98,11 +98,34 @@ app.whenReady().then(() => {
         targetSystem = realSystem
       }
     }
-    return launcherService.launch(game, targetSystem, activeControllers)
+    const result = await launcherService.launch(game, targetSystem, activeControllers, saveStateSlot)
+    
+    if (targetSystem.name.toLowerCase() === 'windows_installers') {
+      console.log('windows_installers launched and exited, reloading library and notifying frontend...')
+      LibraryService.clearCache()
+      await libraryService.preloadAll(true)
+      BrowserWindow.getAllWindows().forEach(win => {
+        try {
+          win.webContents.send('systems-updated')
+        } catch (e) {
+          console.error('Failed to send systems-updated to window', e)
+        }
+      })
+    }
+    
+    return result
+  })
+
+  ipcMain.handle('scan-save-states', async (_, systemName: string, gamePath: string) => {
+    return libraryService.getGameSaveStates(systemName, gamePath)
   })
 
   ipcMain.handle('update-game', async (_, systemName: string, gameData: Game) => {
     return libraryService.updateGame(systemName, gameData)
+  })
+
+  ipcMain.handle('delete-game', async (_, systemName: string, gamePath: string, deletePhysical: boolean) => {
+    return libraryService.deleteGame(systemName, gamePath, deletePhysical)
   })
 
   ipcMain.handle('get-custom-collections', async () => {

@@ -747,6 +747,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   }
 
   const getMainMenuItems = (): MenuItem[] => {
+    const isPhysicalSystem = selectedSystem && !(
+      selectedSystem.name === 'collections' ||
+      selectedSystem.path?.startsWith('virtual://') ||
+      ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players', 'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'].includes(selectedSystem.name.toLowerCase())
+    )
+
     const items: MenuItem[] = [
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
@@ -758,6 +764,17 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               window.api.executeCommand('update-gamelists')
             }
           } },
+          ...(isPhysicalSystem ? [{
+            id: 'reload_system',
+            label: t('UPDATE GAMELIST'),
+            description: getFriendlySystemName(selectedSystem).toUpperCase(),
+            type: 'action' as const,
+            onClick: () => {
+              if (onUpdateGamelists) {
+                onUpdateGamelists(selectedSystem.name)
+              }
+            }
+          }] : []),
           { id: 'group_accounts', label: t('CONTAS'), type: 'group' },
           { id: 'retroachievements_submenu', label: t('CONQUISTAS RETRÔ'), submenu: [
             { id: 'cheevos_enable', label: t('CONQUISTAS RETRÔ'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },
