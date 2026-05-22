@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Game, System } from '../../shared/types'
+import { Game, System } from '../../../shared/types'
 
 const getRomFileName = (path: string): string => {
   const parts = path.replace(/\\/g, '/').split('/')
@@ -193,7 +193,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         label: 'EMULATOR',
         type: 'select',
         settingName: 'emulator',
-        value: getGameSettingValue('emulator', 'auto'),
+        value: currentGame.emulator || 'auto',
         items: [
           { label: 'AUTO', value: 'auto' },
           ...(sys.emulators?.map(e => ({ label: e.name.toUpperCase(), value: e.name })) || [])
@@ -326,24 +326,17 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       const nextIdx = (currentIdx + direction + item.items.length) % item.items.length
       const nextVal = item.items[nextIdx].value
 
-      if (item.settingName) {
+      if (item.id === 'game_emulator') {
+        const updated = { ...draftGame, emulator: nextVal, core: undefined }
+        setDraftGame(updated)
+        onUpdate(updated)
+      } else if (item.settingName) {
         const key = getGameSettingKey(item.settingName)
         window.api.saveSetting(key, nextVal, 'string')
         setSettings(prev => ({
           ...prev,
           [key]: { value: nextVal, type: 'string' }
         }))
-      } else if (item.id === 'game_emulator') {
-        const key = getGameSettingKey('emulator')
-        window.api.saveSetting(key, nextVal, 'string')
-        setSettings(prev => ({
-          ...prev,
-          [key]: { value: nextVal, type: 'string' }
-        }))
-        const updated = { ...draftGame, emulator: nextVal, core: undefined }
-        setDraftGame(updated)
-        // We don't call onUpdate here because it's an emulator override, 
-        // usually handled by the launcher via settings, but we can notify if needed.
       }
 
       setActiveMenuStack(prev => {

@@ -1,5 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react'
 
+import buttonsSouthIcon from '../resources/buttons_south.svg'
+import buttonsEastIcon from '../resources/buttons_east.svg'
+import buttonsNorthIcon from '../resources/buttons_north.svg'
+import buttonsWestIcon from '../resources/buttons_west.svg'
+import buttonStartIcon from '../resources/button_start.svg'
+import buttonSelectIcon from '../resources/button_select.svg'
+import dpadUpIcon from '../resources/dpad_up.svg'
+import dpadDownIcon from '../resources/dpad_down.svg'
+import dpadLeftIcon from '../resources/dpad_left.svg'
+import dpadRightIcon from '../resources/dpad_right.svg'
+import buttonLIcon from '../resources/button_l.svg'
+import buttonRIcon from '../resources/button_r.svg'
+import buttonLtIcon from '../resources/button_lt.svg'
+import buttonRtIcon from '../resources/button_rt.svg'
+import analogUpIcon from '../resources/analog_up.svg'
+import analogLeftIcon from '../resources/analog_left.svg'
+import analogThumbIcon from '../resources/analog_thumb.svg'
+import buttonHotkeyIcon from '../resources/button_hotkey.svg'
+
 const MAPPING_ORDER = [
   { id: 'a', label: 'SOUTH', icon: 'south' },
   { id: 'b', label: 'EAST', icon: 'east' },
@@ -544,150 +563,54 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
 
   // Inline SVG icons mapper
   const renderIcon = (type: string, active: boolean) => {
-    const color = active ? '#fff' : '#888'
-    const highlightColor = active ? '#fff' : '#bf0052'
+    let src = ''
     switch (type) {
-      case 'south':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="6" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="6" cy="12" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="18" cy="12" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="12" cy="18" r="2.5" fill={highlightColor} stroke={highlightColor} strokeWidth="1.5" />
-          </svg>
-        )
-      case 'east':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="6" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="6" cy="12" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="12" cy="18" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="18" cy="12" r="2.5" fill={highlightColor} stroke={highlightColor} strokeWidth="1.5" />
-          </svg>
-        )
-      case 'north':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="6" r="2.5" fill={highlightColor} stroke={highlightColor} strokeWidth="1.5" />
-            <circle cx="6" cy="12" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="18" cy="12" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="12" cy="18" r="2.5" stroke={color} strokeWidth="1.5" />
-          </svg>
-        )
-      case 'west':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="6" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="6" cy="12" r="2.5" fill={highlightColor} stroke={highlightColor} strokeWidth="1.5" />
-            <circle cx="18" cy="12" r="2.5" stroke={color} strokeWidth="1.5" />
-            <circle cx="12" cy="18" r="2.5" stroke={color} strokeWidth="1.5" />
-          </svg>
-        )
-      case 'start':
-      case 'select':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="9" width="18" height="6" rx="3" stroke={color} strokeWidth="1.5" />
-            <rect x="7" y="11" width="10" height="2" rx="1" fill={highlightColor} />
-          </svg>
-        )
-      case 'dpad-up':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 4 L12 20 M4 12 L20 12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M12 3 L9 7 H15 Z" fill={highlightColor} stroke={highlightColor} />
-          </svg>
-        )
-      case 'dpad-down':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 4 L12 20 M4 12 L20 12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M12 21 L9 17 H15 Z" fill={highlightColor} stroke={highlightColor} />
-          </svg>
-        )
-      case 'dpad-left':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 4 L12 20 M4 12 L20 12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M3 12 L7 9 V15 Z" fill={highlightColor} stroke={highlightColor} />
-          </svg>
-        )
-      case 'dpad-right':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 4 L12 20 M4 12 L20 12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M21 12 L17 9 V15 Z" fill={highlightColor} stroke={highlightColor} />
-          </svg>
-        )
-      case 'shoulder-left':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M3 14 C3 8, 8 7, 12 7 L12 11 C8 11, 5 12, 5 14 Z" fill={highlightColor} stroke={color} strokeWidth="1" />
-          </svg>
-        )
-      case 'shoulder-right':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M21 14 C21 8, 16 7, 12 7 L12 11 C16 11, 19 12, 19 14 Z" fill={highlightColor} stroke={color} strokeWidth="1" />
-          </svg>
-        )
-      case 'trigger-left':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M4 6 H10 V16 C10 19, 4 19, 4 16 Z" fill={highlightColor} stroke={color} strokeWidth="1.5" />
-            <text x="5.5" y="12" fill="#fff" fontSize="6.5" fontWeight="bold">LT</text>
-          </svg>
-        )
-      case 'trigger-right':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M20 6 H14 V16 C14 19, 20 19, 20 16 Z" fill={highlightColor} stroke={color} strokeWidth="1.5" />
-            <text x="14.5" y="12" fill="#fff" fontSize="6.5" fontWeight="bold">RT</text>
-          </svg>
-        )
+      case 'south': src = buttonsSouthIcon; break
+      case 'east': src = buttonsEastIcon; break
+      case 'north': src = buttonsNorthIcon; break
+      case 'west': src = buttonsWestIcon; break
+      case 'start': src = buttonStartIcon; break
+      case 'select': src = buttonSelectIcon; break
+      case 'dpad-up': src = dpadUpIcon; break
+      case 'dpad-down': src = dpadDownIcon; break
+      case 'dpad-left': src = dpadLeftIcon; break
+      case 'dpad-right': src = dpadRightIcon; break
+      case 'shoulder-left': src = buttonLIcon; break
+      case 'shoulder-right': src = buttonRIcon; break
+      case 'trigger-left': src = buttonLtIcon; break
+      case 'trigger-right': src = buttonRtIcon; break
       case 'analog-l-up':
+      case 'analog-r-up': src = analogUpIcon; break
       case 'analog-l-left':
-      case 'analog-r-up':
-      case 'analog-r-left':
-        const isRight = type.includes('analog-r')
-        const isUp = type.includes('up')
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="8" stroke={color} strokeWidth="1.5" />
-            <circle cx={12 + (isUp ? 0 : -3.5)} cy={12 + (isUp ? -3.5 : 0)} r="3" fill={highlightColor} />
-            <text x="10.5" y="14" fill="#fff" fontSize="6" fontWeight="bold">{isRight ? 'R' : 'L'}</text>
-          </svg>
-        )
+      case 'analog-r-left': src = analogLeftIcon; break
       case 'stick-press-l':
-      case 'stick-press-r':
-        const isPressR = type.includes('-r')
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="8" stroke={color} strokeWidth="1.5" />
-            <circle cx="12" cy="12" r="4.5" fill={highlightColor} />
-            <text x="9" y="14.5" fill="#fff" fontSize="6" fontWeight="bold">{isPressR ? 'R3' : 'L3'}</text>
-          </svg>
-        )
-      case 'hotkey':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="4" y="6" width="16" height="12" rx="2" stroke={color} strokeWidth="1.5" fill={highlightColor} />
-            <text x="6.5" y="14.5" fill="#fff" fontSize="7.5" fontWeight="bold">HK</text>
-          </svg>
-        )
-      default:
-        return null
+      case 'stick-press-r': src = analogThumbIcon; break
+      case 'hotkey': src = buttonHotkeyIcon; break
+      default: return null
     }
+
+    return (
+      <img
+        src={src}
+        alt={type}
+        style={{
+          width: '46px',
+          height: '46px',
+          opacity: active ? 1 : 0.4,
+          transition: 'opacity 0.2s ease',
+          display: 'block'
+        }}
+      />
+    )
   }
 
   return (
     <div style={{
+      fontFamily: '"Roboto Condensed", sans-serif',
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.92)', zIndex: 9999,
-      display: 'flex', flexDirection: 'column',
+      zIndex: 9999, display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      color: '#fff', fontFamily: '"Outfit", "Inter", "Segoe UI", sans-serif',
-      userSelect: 'none'
+      color: '#fff', userSelect: 'none'
     }}>
       
       {/* PHASE 1: WARNING DIALOG REPLICA (Screenshot 1) */}
@@ -738,8 +661,8 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
           }}>
             <div style={{
               padding: '8px 24px',
-              backgroundColor: warningSelection === 'ok' ? '#bf0052' : 'transparent',
-              border: warningSelection === 'ok' ? '2.5px solid #bf0052' : '2.5px solid rgba(255,255,255,0.4)',
+              backgroundColor: warningSelection === 'ok' ? 'var(--theme-color)' : 'transparent',
+              border: warningSelection === 'ok' ? '2.5px solid var(--theme-color)' : '2.5px solid rgba(255,255,255,0.4)',
               cursor: 'pointer',
               fontWeight: 'bold',
               letterSpacing: '1px',
@@ -751,8 +674,8 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
             </div>
             <div style={{
               padding: '8px 24px',
-              backgroundColor: warningSelection === 'cancel' ? '#bf0052' : 'transparent',
-              border: warningSelection === 'cancel' ? '2.5px solid #bf0052' : '2.5px solid rgba(255,255,255,0.4)',
+              backgroundColor: warningSelection === 'cancel' ? 'var(--theme-color)' : 'transparent',
+              border: warningSelection === 'cancel' ? '2.5px solid var(--theme-color)' : '2.5px solid rgba(255,255,255,0.4)',
               cursor: 'pointer',
               fontWeight: 'bold',
               letterSpacing: '1px',
@@ -780,7 +703,7 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
           {/* Header titles */}
           <h1 style={{
             fontSize: '32px',
-            color: '#bf0052',
+            color: 'var(--theme-color)',
             letterSpacing: '2px',
             margin: '0 0 10px 0',
             fontWeight: 700
@@ -789,7 +712,7 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
           </h1>
           <h2 style={{
             fontSize: '18px',
-            color: '#bf0052',
+            color: 'var(--theme-color)',
             letterSpacing: '1px',
             margin: '0 0 50px 0',
             fontWeight: 600
@@ -827,17 +750,19 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
       {/* PHASE 3 & 4: CONFIGURE/LIST SCREEN (Screenshots 4 & 5) */}
       {(phase === 'map' || phase === 'done') && device && (
         <div style={{
-          width: '800px',
+          width: '50vw',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: '20px 0'
+          padding: '20px 0',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid #111'
         }}>
           
           {/* Top Title Headers */}
           <h1 style={{
             fontSize: '24px',
-            color: '#bf0052',
+            color: 'var(--theme-color)',
             letterSpacing: '2px',
             margin: '0 0 5px 0',
             fontWeight: 700,
@@ -847,7 +772,7 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
           </h1>
           <h2 style={{
             fontSize: '18px',
-            color: '#bf0052',
+            color: 'var(--theme-color)',
             letterSpacing: '1px',
             margin: '0 0 5px 0',
             fontWeight: 600,
@@ -857,7 +782,7 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
           </h2>
           <h3 style={{
             fontSize: '14px',
-            color: '#ff3366',
+            color: 'var(--theme-color)',
             letterSpacing: '1px',
             margin: '0 0 25px 0',
             fontWeight: 600,
@@ -880,7 +805,7 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
               <div style={{
                 width: `${skipProgress}%`,
                 height: '100%',
-                backgroundColor: '#ff3366',
+                backgroundColor: 'var(--theme-color)',
                 transition: 'width 0.05s linear'
               }} />
             </div>
@@ -891,10 +816,8 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
             ref={listContainerRef}
             style={{
               width: '100%',
-              height: '440px',
+              height: '50vh',
               overflowY: 'auto',
-              border: '1.5px solid rgba(255, 255, 255, 0.1)',
-              backgroundColor: 'rgba(10, 10, 10, 0.95)',
               display: 'flex',
               flexDirection: 'column',
               boxSizing: 'border-box'
@@ -915,8 +838,8 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     height: '40px',
-                    padding: '0 25px',
-                    backgroundColor: isActive ? '#bf0052' : (idx % 2 === 0 ? 'rgba(255,255,255,0.015)' : 'transparent'),
+                    padding: '5px 25px',
+                    backgroundColor: isActive ? 'var(--theme-color)' : 'transparent',
                     color: isActive ? '#fff' : 'rgba(255, 255, 255, 0.85)',
                     fontSize: '15px',
                     fontWeight: isActive ? 'bold' : 500,
@@ -927,12 +850,12 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
                   {/* Left Label & SVG Icon */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     {renderIcon(item.icon, isActive)}
-                    <span style={{ fontSize: '15px' }}>{item.label}</span>
+                    <span style={{ fontSize: '1.6em' }}>{item.label}</span>
                   </div>
 
                   {/* Right Status / Mapped key */}
                   <div style={{
-                    fontSize: '15px',
+                    fontSize: '1.6em',
                     fontWeight: 'bold',
                     letterSpacing: '0.5px'
                   }}>
@@ -958,19 +881,19 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
             display: 'flex',
             justifyContent: 'center',
             gap: '20px',
-            marginTop: '30px',
+            marginTop: '20px',
             width: '100%',
             opacity: phase === 'done' ? 1 : 0.4,
             pointerEvents: phase === 'done' ? 'auto' : 'none'
           }}>
             <div style={{
               padding: '8px 24px',
-              backgroundColor: doneSelection === 'ok' && phase === 'done' ? '#bf0052' : 'transparent',
-              border: doneSelection === 'ok' && phase === 'done' ? '2.5px solid #bf0052' : '2.5px solid rgba(255,255,255,0.4)',
+              backgroundColor: doneSelection === 'ok' && phase === 'done' ? 'var(--theme-color)' : 'transparent',
+              border: doneSelection === 'ok' && phase === 'done' ? '1.5px solid var(--theme-color)' : '1.5px solid rgba(255,255,255,0.4)',
               cursor: 'pointer',
               fontWeight: 'bold',
               letterSpacing: '1px',
-              fontSize: '15px',
+              fontSize: '1.2em',
               textAlign: 'center',
               minWidth: '90px'
             }} onClick={saveAndExit}>
@@ -978,12 +901,12 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
             </div>
             <div style={{
               padding: '8px 24px',
-              backgroundColor: doneSelection === 'cancel' && phase === 'done' ? '#bf0052' : 'transparent',
-              border: doneSelection === 'cancel' && phase === 'done' ? '2.5px solid #bf0052' : '2.5px solid rgba(255,255,255,0.4)',
+              backgroundColor: doneSelection === 'cancel' && phase === 'done' ? 'var(--theme-color)' : 'transparent',
+              border: doneSelection === 'cancel' && phase === 'done' ? '1.5px solid var(--theme-color)' : '1.5px solid rgba(255,255,255,0.4)',
               cursor: 'pointer',
               fontWeight: 'bold',
               letterSpacing: '1px',
-              fontSize: '15px',
+              fontSize: '1.2em',
               textAlign: 'center',
               minWidth: '90px'
             }} onClick={onClose}>
@@ -1008,8 +931,7 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
           background: rgba(0,0,0,0.1);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255,255,255,0.15);
-          border-radius: 2px;
+          background: var(--theme-color);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(255,255,255,0.3);

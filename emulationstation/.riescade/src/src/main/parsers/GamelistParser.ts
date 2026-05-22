@@ -126,6 +126,13 @@ export class GamelistParser {
 				mediaFields.forEach(field => {
 					if (xmlGame[field]) xmlGame[field] = makeRelative(xmlGame[field]);
 				});
+
+				if (xmlGame.emulator === 'auto' || !xmlGame.emulator) {
+					delete xmlGame.emulator;
+				}
+				if (xmlGame.core === 'auto' || !xmlGame.core) {
+					delete xmlGame.core;
+				}
 				
 				return xmlGame;
 			});

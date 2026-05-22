@@ -4,6 +4,7 @@ import { writeFileSync, existsSync, mkdirSync } from 'fs'
 import { tmpdir } from 'os'
 import { Game, System } from '../../shared/types'
 import { getRetroBatPath } from '../utils/paths'
+import { SettingsParser } from '../parsers/SettingsParser'
 
 interface ControllerInfo {
   name: string
@@ -75,18 +76,46 @@ export class LauncherService {
       writeFileSync(gameXmlPath, gameXmlContent)
 
       // Setup arguments
-      let emulator = game.emulator || system.emulators?.[0]?.name || 'libretro'
+      const settingsParser = new SettingsParser()
+      let emulator = 'libretro'
       let core = ''
 
-      // If we are using the game-specific emulator, find its core
-      const selectedEmulator = system.emulators?.find(e => e.name === emulator)
-      if (game.core) {
-        core = game.core
-      } else if (selectedEmulator) {
-        core = selectedEmulator.cores?.[0] || ''
-      } else if (system.emulators?.[0]) {
-        core = system.emulators[0].cores?.[0] || ''
+      // 1. Resolve Emulator
+      if (game.emulator && game.emulator !== 'auto') {
+        emulator = game.emulator
+      } else {
+        const systemWideEmulator = settingsParser.getSetting(`${system.name}.emulator`, 'string')
+        if (systemWideEmulator && systemWideEmulator !== 'auto') {
+          emulator = systemWideEmulator
+        } else if (system.emulators?.[0]?.name) {
+          emulator = system.emulators[0].name
+        }
       }
+
+      // 2. Resolve Core
+      if (game.core && game.core !== 'auto') {
+        core = game.core
+      } else {
+        const hasGameEmulatorOverride = game.emulator && game.emulator !== 'auto'
+        const systemWideCore = settingsParser.getSetting(`${system.name}.core`, 'string')
+
+        if (hasGameEmulatorOverride) {
+          const selectedEmulator = system.emulators?.find(e => e.name === emulator)
+          core = selectedEmulator?.cores?.[0] || ''
+        } else {
+          if (systemWideCore && systemWideCore !== 'auto') {
+            core = systemWideCore
+          } else {
+            const selectedEmulator = system.emulators?.find(e => e.name === emulator)
+            if (selectedEmulator) {
+              core = selectedEmulator.cores?.[0] || ''
+            } else if (system.emulators?.[0]) {
+              core = system.emulators[0].cores?.[0] || ''
+            }
+          }
+        }
+      }
+
 
       let controllerArgs: string[] = []
       

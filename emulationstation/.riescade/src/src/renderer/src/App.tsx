@@ -971,8 +971,12 @@ function App() {
 		if (selectedSystem && currentGame) {
 			const resolveMedia = (p?: string) => {
 				if (!p) return '';
-				if (p.startsWith('http')) return p;
-				return p.replace(/\\/g, '/');
+				if (p.startsWith('http') || p.startsWith('file://')) return p;
+				const normalized = p.replace(/\\/g, '/');
+				if (normalized.match(/^[a-zA-Z]:/) || normalized.startsWith('/')) {
+					return normalized.match(/^[a-zA-Z]:/) ? `file:///${normalized}` : `file://${normalized}`;
+				}
+				return normalized;
 			};
 
 			let gameImage = resolveMedia(currentGame.image);
@@ -1042,6 +1046,7 @@ function App() {
 		currentGame,
 		isMenuOpen,
 		isGameOptionsOpen,
+		isLaunching,
 		theme,
 		selectedCollection,
 		themeRevision,

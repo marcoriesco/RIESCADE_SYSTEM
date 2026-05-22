@@ -174,6 +174,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     }
     let val = (pendingSettingsRef.current[name] !== undefined ? pendingSettingsRef.current[name] : settingsRef.current[name]?.value)
     if (val === undefined || val === null || val === '') {
+      if (name.includes('.') && !name.startsWith('global.') && !name.startsWith('RIESCADE.')) {
+        return 'auto'
+      }
       if (name.endsWith('.emulator')) {
         return 'auto'
       }
@@ -746,6 +749,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     const items: MenuItem[] = [
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
+          { id: 'group_reload_app', label: t('FERRAMENTAS'), type: 'group' },
           { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => window.api.executeCommand('update-gamelists') },
           { id: 'group_accounts', label: t('CONTAS'), type: 'group' },
           { id: 'retroachievements_submenu', label: t('CONQUISTAS RETRÔ'), submenu: [
