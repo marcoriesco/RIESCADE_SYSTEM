@@ -274,7 +274,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (name === 'recent') return t('LAST PLAYED')
     if (name === 'neverplayed') return t('NEVER PLAYED')
     if (name === 'retroachievements') return 'RETROACHIEVEMENTS'
-    if (name === 'arcade') return 'ARCADE'
     return sys.fullname || sys.name.toUpperCase()
   }
 
@@ -1393,7 +1392,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       },
       {
         id: 'ui_settings', label: t('USER INTERFACE SETTINGS'), submenu: [
-          { id: 'theme_set', label: t('THEME'), type: 'select', settingName: 'RIESCADE.ThemeSet',
+          { id: 'group_appearance', label: t('APPEARANCE'), type: 'group' },
+          { id: 'theme_set', label: t('THEME SET'), type: 'select', settingName: 'RIESCADE.ThemeSet',
             options: themes.length ? themes.map(t => ({ label: t.toUpperCase(), value: t })) : [{ label: 'DEFAULT', value: 'default' }]
           },
           { 
@@ -2610,23 +2610,25 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             </div>
           )}
 
-          <div className="riescade-menu-footer">
-            {bottomButtons.length === 0 && (
-              <div className="riescade-menu-footer-actions">
-                <div className="riescade-menu-footer-action">
-                  <span className="riescade-menu-footer-button">A</span>
-                  <span className="riescade-menu-footer-text">{t('CHOOSE')}</span>
+          {activeMenuStack.length === 1 && (
+            <div className="riescade-menu-footer">
+              {bottomButtons.length === 0 && (
+                <div className="riescade-menu-footer-actions">
+                  <div className="riescade-menu-footer-action">
+                    <span className="riescade-menu-footer-button">A</span>
+                    <span className="riescade-menu-footer-text">{t('CHOOSE')}</span>
+                  </div>
+                  <div className="riescade-menu-footer-action">
+                    <span className="riescade-menu-footer-button">B</span>
+                    <span className="riescade-menu-footer-text">{t('BACK')}</span>
+                  </div>
                 </div>
-                <div className="riescade-menu-footer-action">
-                  <span className="riescade-menu-footer-button">B</span>
-                  <span className="riescade-menu-footer-text">{t('BACK')}</span>
-                </div>
+              )}
+              <div className="riescade-menu-version">
+                RIESCADE {versions.app} | ES {versions.es}
               </div>
-            )}
-            <div className="riescade-menu-version">
-              RIESCADE {versions.app} | ES {versions.es}
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -2725,7 +2727,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
         
         .arrow-clickable {
-          padding: 0 8px;
+          padding: 0;
           cursor: pointer;
           user-select: none;
           opacity: 0.5;

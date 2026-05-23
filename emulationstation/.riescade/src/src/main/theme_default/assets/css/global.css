@@ -194,12 +194,14 @@
 }
 
 .menu-select, .menu-input-preview {
-  font-size: 1.25rem !important;
+  font-size: 1.5rem !important;
   color: #fff;
 }
 
 .menu-selected-count {
-  font-size: 1.25rem !important;
+  font-size: 1.5rem !important;
+  background: none !important;
+  padding: 0 !important;
 }
 
 /* Rodapé do Menu */
