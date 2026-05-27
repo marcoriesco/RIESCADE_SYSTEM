@@ -150,7 +150,7 @@ body {
 /* GAMES */
 .ns2-carousel {
   position: absolute;
-  top: 220px;
+  top: 15vw;
   left: 70px;
   width: 100vw;
   height: 400px;
@@ -171,6 +171,16 @@ body {
   justify-content: flex-end !important;
   align-items: center !important;
   padding-bottom: 40px !important;
+  width: calc(22% - 20px) !important;
+  height: 100% !important;
+}
+.ns2-game .riescade-carousel-image-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: flex-end;
+}
+.ns2-game {
   /* Art Background */
 }
 .ns2-game::after {
@@ -188,11 +198,8 @@ body {
   width: auto !important;
   height: auto !important;
   max-width: 70% !important;
-  max-height: 25% !important;
+  max-height: 90% !important;
   object-fit: contain !important;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.4));
-  position: relative;
-  z-index: 2;
 }
 .ns2-game.selected {
   transform: translate(0, -50%) scale(1) !important;
@@ -204,8 +211,8 @@ body {
   background-clip: padding-box, border-box;
   background-size: 105% 105%;
   animation: rotate-gradient 4s linear infinite;
-  width: calc(20% - 0px) !important;
-  height: calc(80% + 24px) !important;
+  width: calc(22% - 0px) !important;
+  height: calc(100% + 24px) !important;
   margin-left: 0 !important;
 }
 .ns2-game.selected::after {

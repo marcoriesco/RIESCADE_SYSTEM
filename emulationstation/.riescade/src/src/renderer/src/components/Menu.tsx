@@ -420,6 +420,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       window.addEventListener('gamepadconnected', updateGamepads)
       window.addEventListener('gamepaddisconnected', updateGamepads)
       
+      const removeThemesListener = window.api.on('themes-updated', () => {
+        window.api.getThemes().then(setThemes)
+      })
+      
       if (theme?.name) {
         window.api.getThemeSettings(theme.name).then(setThemeSettings)
       }
@@ -432,6 +436,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       return () => {
         window.removeEventListener('gamepadconnected', updateGamepads)
         window.removeEventListener('gamepaddisconnected', updateGamepads)
+        removeThemesListener()
       }
     } else {
       setVisible(false)
@@ -1613,15 +1618,11 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col_trackball', label: t('TRACKBALL'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'trackball' },
             { id: 'col_spinner', label: t('SPINNER'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'spinner' },
             { id: 'col_zcapcom', label: t('CAPCOM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcapcom' },
-            { id: 'col_zneogeo', label: t('NEOGEO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zneogeo' },
             { id: 'col_zkonami', label: t('KONAMI'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zkonami' },
             { id: 'col_zsega', label: t('SEGA'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsega' },
             { id: 'col_znintendo', label: t('NINTENDO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znintendo' },
             { id: 'col_ztaito', label: t('TAITO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'ztaito' },
             { id: 'col_znamco', label: t('NAMCO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znamco' },
-            { id: 'col_zcps1', label: t('CPS1'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcps1' },
-            { id: 'col_zcps2', label: t('CPS2'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcps2' },
-            { id: 'col_zcps3', label: t('CPS3'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcps3' },
             { id: 'col_zcave', label: t('CAVE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zcave' },
             { id: 'col_zmidway', label: t('MIDWAY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmidway' },
             { id: 'col_zirem', label: t('IREM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zirem' },
@@ -1657,11 +1658,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col__various', label: t('VARIOUS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: '_various' },
             
             { id: 'group_other_arcades', label: t('MANUFACTURERS'), type: 'group' },
-            { id: 'col_zatomiswave', label: t('ATOMISWAVE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zatomiswave' },
-            { id: 'col_znaomi', label: t('NAOMI'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znaomi' },
-            { id: 'col_zmodel2', label: t('MODEL 2'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmodel2' },
-            { id: 'col_zmodel3', label: t('MODEL 3'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zmodel3' },
-            { id: 'col_zdaphne', label: t('DAPHNE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zdaphne' },
             { id: 'col_zatari', label: t('ATARI ARCADE'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zatari' },
             { id: 'col_zatlus', label: t('ATLUS'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zatlus' },
             { id: 'col_zbanpresto', label: t('BANPRESTO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zbanpresto' },
@@ -1678,7 +1674,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'col_znk', label: t('NMK'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'znk' },
             { id: 'col_zpsikyo', label: t('PSIKYO'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zpsikyo' },
             { id: 'col_zsammy', label: t('SAMMY'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsammy' },
-            { id: 'col_zsegastv', label: t('SEGA ST-V'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsegastv' },
             { id: 'col_zseibukaihatsu', label: t('SEIBU KAIHATSU'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zseibukaihatsu' },
             { id: 'col_zsemicom', label: t('SEMICOM'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zsemicom' },
             { id: 'col_zseta', label: t('SETA'), type: 'toggle', settingName: 'CollectionSystemsAuto', value: 'zseta' },

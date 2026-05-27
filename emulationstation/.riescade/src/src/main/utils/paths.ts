@@ -46,8 +46,7 @@ export function getEmulatorsPath(): string {
  * which points to the project root (emulationstation/.riescade/src/).
  */
 export function getDefaultThemePath(): string {
-  // Always point to the themes/default folder in the .riescade directory
-  return join(getUserThemesPath(), 'default')
+  return join(app.getAppPath(), 'src', 'main', 'theme_default')
 }
 
 /**

@@ -6,6 +6,7 @@ import { getDefaultThemePath, getUserThemesPath } from '../utils/paths'
 
 export interface WebThemeConfig {
   name: string
+  displayName?: string
   path: string
   isWebTheme: true
   isDefault: boolean
@@ -37,8 +38,8 @@ export class ThemeService {
     if (existsSync(userThemesPath)) {
       const dirs = readdirSync(userThemesPath, { withFileTypes: true })
         .filter(d => d.isDirectory() && d.name !== 'default')
-        .filter(d => existsSync(join(userThemesPath, d.name, 'theme.json')))
         .map(d => d.name)
+        .sort((a, b) => a.localeCompare(b))
       themes.push(...dirs)
     }
 
@@ -57,7 +58,7 @@ export class ThemeService {
       return getDefaultThemePath()
     }
     const themePath = join(getUserThemesPath(), themeName)
-    if (!existsSync(themePath) || !existsSync(join(themePath, 'theme.json'))) {
+    if (!existsSync(themePath)) {
       return getDefaultThemePath()
     }
     return themePath
@@ -79,7 +80,7 @@ export class ThemeService {
       themePath = join(getUserThemesPath(), themeName)
       
       // Fallback to default if user theme not found
-      if (!existsSync(themePath) || !existsSync(join(themePath, 'theme.json'))) {
+      if (!existsSync(themePath)) {
         console.warn(`Theme "${themeName}" not found, falling back to default`)
         themePath = getDefaultThemePath()
         isDefault = true
@@ -117,7 +118,8 @@ export class ThemeService {
     }
 
     return {
-      name: metadata.name || themeName,
+      name: themeName,
+      displayName: metadata.name || themeName,
       path: themePath,
       isWebTheme: true,
       isDefault,

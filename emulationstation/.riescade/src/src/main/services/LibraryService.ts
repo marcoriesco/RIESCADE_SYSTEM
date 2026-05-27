@@ -28,14 +28,444 @@ export class LibraryService {
   }
 
   private static cachedGames: Map<string, Game[]> = new Map()
+  private static fullyLoadedSystems: Set<string> = new Set()
+  private static quickAutoCounts: Map<string, number> = new Map()
   private static isPreloaded = false
+
+  /**
+   * GamesDB control type data: maps controlType -> systemName -> Set<gameId>
+   * Used for wheel, trackball, spinner, lightgun auto-collections.
+   */
+  private static gamesDbControlData: Map<string, Map<string, Set<string>>> | null = null
+  /** Vertical arcade game IDs (from gamesdb.xml <vertical/> tags or genre fallback) */
+  private static verticalGameIds: Set<string> | null = null
 
   public static clearCache(): void {
     LibraryService.isPreloaded = false
     LibraryService.cachedGames.clear()
+    LibraryService.fullyLoadedSystems.clear()
+    LibraryService.quickAutoCounts.clear()
+    LibraryService.genreMap = null
+    LibraryService.gamesDbControlData = null
+    LibraryService.verticalGameIds = null
     try {
       SystemsParser.clearCache()
     } catch (e) {}
+  }
+
+  /**
+   * Build a mapping from ES collection key (e.g. 'shootemup', 'beatemup') to
+   * all possible localized genre names that should match, based on genres.xml.
+   * This replicates the ES C++ logic from CollectionSystemManager::getSystemDecls().
+   */
+  private static genreMap: Map<string, Set<string>> | null = null
+
+  private buildGenreMap(): Map<string, Set<string>> {
+    if (LibraryService.genreMap) return LibraryService.genreMap
+
+    const genreMap = new Map<string, Set<string>>()
+    const genresXmlPath = join(getRetroBatPath(), 'emulationstation', 'resources', 'genres.xml')
+    
+    if (!existsSync(genresXmlPath)) {
+      LibraryService.genreMap = genreMap
+      return genreMap
+    }
+
+    try {
+      const { XMLParser } = require('fast-xml-parser')
+      const parser = new XMLParser({ ignoreAttributes: false })
+      const xmlContent = readFileSync(genresXmlPath, 'utf8')
+      const parsed = parser.parse(xmlContent)
+      const genres = parsed.genres?.genre
+      if (!genres) {
+        LibraryService.genreMap = genreMap
+        return genreMap
+      }
+
+      const genreList = Array.isArray(genres) ? genres : [genres]
+      
+      // Build index by id
+      const byId = new Map<number, any>()
+      for (const g of genreList) {
+        if (g.id) byId.set(Number(g.id), g)
+      }
+
+      // ES logic: collection key = toLower(nom_en).replace(/ |'|,|-/g, '').replace(/game/g, '')
+      const toColKey = (name: string): string => {
+        return name.toLowerCase()
+          .replace(/[\s',\-]/g, '')
+          .replace(/game/g, '')
+      }
+
+      // For each top-level genre (parentId == 0 or no parent), create a collection entry
+      for (const g of genreList) {
+        if (g.parent) continue // skip child genres for collection key generation
+        
+        const nomEn = String(g.nom_en || '')
+        if (!nomEn) continue
+        
+        const colKey = toColKey(nomEn)
+        if (!colKey) continue
+
+        // Collect ALL localized names for this genre and its children
+        const names = new Set<string>()
+        const addNames = (genre: any) => {
+          const fields = ['nom_en', 'nom_fr', 'nom_de', 'nom_es', 'nom_pt', 'nom_ja']
+          for (const f of fields) {
+            if (genre[f]) names.add(String(genre[f]).toUpperCase())
+          }
+          // Add alt names
+          if (genre.altname) {
+            const alts = Array.isArray(genre.altname) ? genre.altname : [genre.altname]
+            for (const alt of alts) names.add(String(alt).toUpperCase())
+          }
+        }
+
+        addNames(g)
+        
+        // Find children of this genre
+        for (const child of genreList) {
+          if (Number(child.parent) === Number(g.id)) {
+            addNames(child)
+            // Also add "Parent / Child" format names
+            const parentFields = ['nom_en', 'nom_fr', 'nom_de', 'nom_es', 'nom_pt', 'nom_ja']
+            const childFields = ['nom_en', 'nom_fr', 'nom_de', 'nom_es', 'nom_pt', 'nom_ja']
+            for (const pf of parentFields) {
+              for (const cf of childFields) {
+                if (g[pf] && child[cf]) {
+                  names.add((String(g[pf]) + ' / ' + String(child[cf])).toUpperCase())
+                }
+              }
+            }
+          }
+        }
+
+        genreMap.set(colKey, names)
+      }
+    } catch (e) {
+      console.error('Error parsing genres.xml:', e)
+    }
+
+    LibraryService.genreMap = genreMap
+    return genreMap
+  }
+
+  /**
+   * Parse gamesdb.xml to build control type data (wheel, trackball, spinner, lightgun).
+   * Returns: controlType -> systemId -> Set<gameId>
+   * This replicates the C++ MameNames logic used by isWheelGame(), isTrackballGame(), etc.
+   */
+  private static readonly CONTROL_TYPE_TAGS = ['wheel', 'trackball', 'spinner', 'gun'] as const
+  private static readonly TAG_TO_COLKEY: Record<string, string> = { wheel: 'wheel', trackball: 'trackball', spinner: 'spinner', gun: 'lightgun' }
+
+  private parseGamesDb(): Map<string, Map<string, Set<string>>> {
+    if (LibraryService.gamesDbControlData) return LibraryService.gamesDbControlData
+
+    const controlData = new Map<string, Map<string, Set<string>>>()
+    const gamesDbPath = join(getRetroBatPath(), 'emulationstation', 'resources', 'gamesdb.xml')
+
+    if (!existsSync(gamesDbPath)) {
+      LibraryService.gamesDbControlData = controlData
+      return controlData
+    }
+
+    try {
+      const content = readFileSync(gamesDbPath, 'utf8')
+      // Parse each <system> block
+      const systemRegex = /<system\s+id="([^"]+)">([\s\S]*?)<\/system>/gi
+      let sysMatch: RegExpExecArray | null
+      while ((sysMatch = systemRegex.exec(content)) !== null) {
+        const systemId = sysMatch[1].toLowerCase()
+        const systemBlock = sysMatch[2]
+
+        // Parse each <game> block within this system
+        const gameRegex = /<game\s+id="([^"]+)"[^>]*>([\s\S]*?)<\/game>/gi
+        let gameMatch: RegExpExecArray | null
+        while ((gameMatch = gameRegex.exec(systemBlock)) !== null) {
+          const gameId = gameMatch[1].toLowerCase()
+          const gameBlock = gameMatch[2]
+
+          // Check for control type tags
+          for (const tag of LibraryService.CONTROL_TYPE_TAGS) {
+            if (new RegExp(`<${tag}[\\s/>]`, 'i').test(gameBlock)) {
+              const colKey = LibraryService.TAG_TO_COLKEY[tag]
+              if (!controlData.has(colKey)) controlData.set(colKey, new Map())
+              const systemMap = controlData.get(colKey)!
+              if (!systemMap.has(systemId)) systemMap.set(systemId, new Set())
+              systemMap.get(systemId)!.add(gameId)
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing gamesdb.xml:', e)
+    }
+
+    LibraryService.gamesDbControlData = controlData
+    return controlData
+  }
+
+  private calculateQuickAutoCounts(): void {
+    const displayed = this.getDisplayedSystems()
+    
+    let totalAll = 0
+    let totalFavorites = 0
+    let totalRecent = 0
+    let totalNeverPlayed = 0
+    let totalCheevos = 0
+    let total2P = 0
+    let total4P = 0
+
+    const configPath = getConfigPath()
+    const romsPath = getRomsPath()
+
+    // Discover genre-based and manufacturer-based auto-collections that need counting
+    const specificCols = new Set(['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players', 'arcade'])
+    const settings = new SettingsParser()
+    const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
+    const enabledCols = autoColsString.split(',').map((c: string) => c.trim()).filter((c: string) => c !== '')
+    
+    // Separate genre collections from manufacturer collections
+    const genreColKeys: Map<string, string> = new Map() // cleanKey -> colKey for quickAutoCounts
+    const manufacturerColKeys: Map<string, string> = new Map() // manufacturer name -> colKey
+    // Control type collections that use gamesdb.xml (not genre matching)
+    const controlTypeSet = new Set(['wheel', 'trackball', 'spinner', 'lightgun', 'vertical'])
+    const activeControlTypes = new Set<string>()
+    
+    for (const col of enabledCols) {
+      if (specificCols.has(col)) continue
+      
+      if (col.startsWith('z')) {
+        // Arcade manufacturer: znamco -> namco, zcapcom -> capcom, etc.
+        const mfr = col.substring(1).toLowerCase()
+        manufacturerColKeys.set(mfr, mfr)
+      } else if (controlTypeSet.has(col)) {
+        // Control type collection: wheel, trackball, spinner, lightgun, vertical
+        activeControlTypes.add(col)
+      } else if (col.startsWith('_')) {
+        // Genre collection: _shootemup -> shootemup
+        const cleanKey = col.substring(1).toLowerCase()
+        genreColKeys.set(cleanKey, cleanKey)
+      }
+    }
+    
+    // Build genre map from genres.xml for proper multi-language matching
+    const genreMap = this.buildGenreMap()
+    // Parse gamesdb.xml for control type collections
+    const gamesDbData = this.parseGamesDb()
+    
+    // Initialize counters
+    const genreCounts: Map<string, number> = new Map()
+    for (const [, key] of genreColKeys) genreCounts.set(key, 0)
+    
+    const mfrCounts: Map<string, number> = new Map()
+    for (const [, key] of manufacturerColKeys) mfrCounts.set(key, 0)
+
+    // Control type counters
+    const controlTypeCounts: Map<string, number> = new Map()
+    for (const ct of activeControlTypes) controlTypeCounts.set(ct, 0)
+
+    for (const sys of displayed) {
+      // Skip virtual/auto-collection systems - only scan real system gamelists
+      if (sys.path && sys.path.startsWith('virtual://')) continue
+      
+      const paths = [
+        join(romsPath, sys.name, 'gamelist.xml'),
+        join(configPath, 'gamelists', sys.name, 'gamelist.xml'),
+        sys.path ? join(sys.path, 'gamelist.xml') : ''
+      ].filter(Boolean)
+      
+      let content = ''
+      for (const p of paths) {
+        if (existsSync(p)) {
+          try {
+            content = readFileSync(p, 'utf8')
+          } catch (e) {}
+          break
+        }
+      }
+      
+      if (!content) {
+        try {
+          if (sys.path && existsSync(sys.path)) {
+            const count = readdirSync(sys.path).filter((f: string) => !f.startsWith('.')).length
+            totalAll += count
+            totalNeverPlayed += count
+          }
+        } catch(e) {}
+        continue
+      }
+      
+      const gameMatches = content.match(/<game[\s>]/g)
+      if (!gameMatches) continue
+      
+      totalAll += gameMatches.length
+      
+      const favMatches = content.match(/<favorite>(true|1)<\/favorite>/g)
+      if (favMatches) totalFavorites += favMatches.length
+      
+      const playedMatches = content.match(/<lastplayed>/g)
+      const playedCount = playedMatches ? playedMatches.length : 0
+      totalRecent += playedCount
+      totalNeverPlayed += (gameMatches.length - playedCount)
+      
+      const cheevosMatches = content.match(/<(cheevosId|cheevosHash)>/g)
+      if (cheevosMatches) totalCheevos += cheevosMatches.length / 2
+      
+      const p2Matches = content.match(/<players>\s*(2|.*2.*)\s*<\/players>/g)
+      if (p2Matches) total2P += p2Matches.length
+      
+      const p4Matches = content.match(/<players>\s*(4|.*4.*)\s*<\/players>/g)
+      if (p4Matches) total4P += p4Matches.length
+
+      // Count genre-based collections using genres.xml mapping
+      if (genreColKeys.size > 0) {
+        const genreRegex = /<genre>(.*?)<\/genre>/gi
+        let match: RegExpExecArray | null
+        while ((match = genreRegex.exec(content)) !== null) {
+          const genreValue = match[1].toUpperCase()
+          // Decode XML entities
+          const decoded = genreValue.replace(/&amp;/gi, '&').replace(/&apos;/gi, "'").replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"')
+          
+          for (const [colKey] of genreColKeys) {
+            const matchNames = genreMap.get(colKey)
+            if (matchNames) {
+              // Check if genre value matches any known name (exact) or is a parent/child combination
+              // Also check if any known name is a prefix of the genre (for "Shoot'em Up / Vertical" matching "Shoot'em Up")
+              let found = false
+              for (const name of matchNames) {
+                if (decoded === name || decoded.startsWith(name + ' /') || decoded.startsWith(name + ',')) {
+                  found = true
+                  break
+                }
+              }
+              if (found) {
+                genreCounts.set(colKey, (genreCounts.get(colKey) || 0) + 1)
+              }
+            } else {
+              // Fallback: try simple substring match for collections not in genres.xml
+              if (decoded.toLowerCase().includes(colKey)) {
+                genreCounts.set(colKey, (genreCounts.get(colKey) || 0) + 1)
+              }
+            }
+          }
+        }
+      }
+
+      // Count manufacturer-based collections by scanning <publisher> and <developer>
+      if (manufacturerColKeys.size > 0) {
+        const pubRegex = /<(?:publisher|developer)>(.*?)<\/(?:publisher|developer)>/gi
+        let match: RegExpExecArray | null
+        while ((match = pubRegex.exec(content)) !== null) {
+          const pubValue = match[1].toLowerCase()
+          for (const [mfrKey] of manufacturerColKeys) {
+            if (pubValue.includes(mfrKey)) {
+              mfrCounts.set(mfrKey, (mfrCounts.get(mfrKey) || 0) + 1)
+            }
+          }
+        }
+      }
+
+      // Count control type collections using gamesdb.xml data
+      if (activeControlTypes.size > 0) {
+        const sysName = sys.name.toLowerCase()
+        // Extract game blocks with path and check against gamesdb data
+        const gameBlockRegex = /<game[\s>][\s\S]*?<\/game>/gi
+        let blockMatch: RegExpExecArray | null
+        while ((blockMatch = gameBlockRegex.exec(content)) !== null) {
+          const block = blockMatch[0]
+          // Extract ROM stem from <path> tag
+          const pathMatch = block.match(/<path>(.*?)<\/path>/i)
+          if (!pathMatch) continue
+          const pathVal = pathMatch[1]
+          // Get filename without extension (ROM stem)
+          const fileName = pathVal.replace(/^.*[\/\\]/, '').replace(/\.[^.]+$/, '').toLowerCase()
+
+          for (const ct of activeControlTypes) {
+            if (ct === 'vertical') {
+              // Vertical: check gamesdb for 'vertical' tag OR genre contains "Vertical"
+              const vertSystemMap = gamesDbData.get('vertical')
+              if (vertSystemMap) {
+                const sysGameIds = vertSystemMap.get(sysName)
+                if (sysGameIds && sysGameIds.has(fileName)) {
+                  controlTypeCounts.set(ct, (controlTypeCounts.get(ct) || 0) + 1)
+                  continue
+                }
+              }
+              // Fallback: check genre for "Vertical" (for arcade games with vertical genre tag)
+              const genreMatch = block.match(/<genre>(.*?)<\/genre>/i)
+              if (genreMatch) {
+                const genreUpper = genreMatch[1].toUpperCase().replace(/&amp;/gi, '&').replace(/&apos;/gi, "'")
+                if (genreUpper.includes('VERTICAL')) {
+                  controlTypeCounts.set(ct, (controlTypeCounts.get(ct) || 0) + 1)
+                }
+              }
+            } else {
+              // wheel, trackball, spinner, lightgun: check gamesdb.xml data
+              const systemMap = gamesDbData.get(ct)
+              if (systemMap) {
+                const sysGameIds = systemMap.get(sysName)
+                if (sysGameIds && sysGameIds.has(fileName)) {
+                  controlTypeCounts.set(ct, (controlTypeCounts.get(ct) || 0) + 1)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    LibraryService.quickAutoCounts.set('all', totalAll)
+    LibraryService.quickAutoCounts.set('favorites', totalFavorites)
+    LibraryService.quickAutoCounts.set('recent', totalRecent)
+    LibraryService.quickAutoCounts.set('neverplayed', totalNeverPlayed)
+    LibraryService.quickAutoCounts.set('retroachievements', Math.floor(totalCheevos))
+    LibraryService.quickAutoCounts.set('2players', total2P)
+    LibraryService.quickAutoCounts.set('4players', total4P)
+    
+    // Set genre-based collection counts
+    for (const [, colKey] of genreColKeys) {
+      LibraryService.quickAutoCounts.set(colKey, genreCounts.get(colKey) || 0)
+    }
+    
+    // Set manufacturer-based collection counts
+    for (const [, colKey] of manufacturerColKeys) {
+      LibraryService.quickAutoCounts.set(colKey, mfrCounts.get(colKey) || 0)
+    }
+
+    // Set control type collection counts
+    for (const ct of activeControlTypes) {
+      LibraryService.quickAutoCounts.set(ct, controlTypeCounts.get(ct) || 0)
+    }
+  }
+
+  private getQuickGameCount(systemName: string): number {
+    try {
+      const configPath = getConfigPath()
+      const systems = this.systemsParser.parse()
+      const system = systems.find(s => s.name.toLowerCase() === systemName.toLowerCase())
+      const paths = [
+        join(getRomsPath(), systemName, 'gamelist.xml'),
+        join(configPath, 'gamelists', systemName, 'gamelist.xml'),
+        system ? join(system.path, 'gamelist.xml') : ''
+      ].filter(Boolean)
+
+      for (const p of paths) {
+        if (existsSync(p)) {
+          const content = readFileSync(p, 'utf8')
+          const matches = content.match(/<game[\s>]/g)
+          return matches ? matches.length : 0
+        }
+      }
+
+      if (system && existsSync(system.path)) {
+        const files = readdirSync(system.path)
+        return files.filter(f => !f.startsWith('.')).length
+      }
+    } catch (e) {
+      console.error(`Error in getQuickGameCount for ${systemName}:`, e)
+    }
+    return 0
   }
 
   public async preloadAll(forcePhysicalScan = false): Promise<void> {
@@ -52,56 +482,14 @@ export class LibraryService {
     }
 
     sendProgress(5)
-    await delay(100)
-
-    const displayed = this.getDisplayedSystems()
-    
-    const autoCollections = [
-      'all', 'favorites', 'recent', 'neverplayed',
-      'retroachievements', '2players', '4players',
-      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
-    ]
-    const physicalSystems = displayed.filter(s => 
-      !s.path.startsWith('virtual://') && 
-      s.name !== 'collections' && 
-      !autoCollections.includes(s.name.toLowerCase())
-    )
-
-    sendProgress(20)
     await delay(50)
 
-    let loadedCount = 0
-    for (const sys of physicalSystems) {
-      try {
-        const games = this.getGamesRaw(sys.name, forcePhysicalScan)
-        LibraryService.cachedGames.set(sys.name.toLowerCase(), games)
-      } catch (err) {
-        console.error(`Failed to preload games for ${sys.name}:`, err)
-      }
-      loadedCount++
-      const progress = 20 + Math.round((loadedCount / physicalSystems.length) * 60)
-      sendProgress(progress)
-      await delay(10)
-    }
+    // Trigger systems parsing if not already done
+    this.getDisplayedSystems()
+    this.calculateQuickAutoCounts()
 
-    sendProgress(80)
+    sendProgress(50)
     await delay(50)
-
-    let colCount = 0
-    for (const col of autoCollections) {
-      try {
-        const colGames = this.resolveAutoCollectionGames(col)
-        const isDuplicate = physicalSystems.some(s => s.name.toLowerCase() === col.toLowerCase())
-        const cacheKey = isDuplicate ? `auto-${col}` : col
-        LibraryService.cachedGames.set(cacheKey.toLowerCase(), colGames)
-      } catch (err) {
-        console.error(`Failed to preload auto collection ${col}:`, err)
-      }
-      colCount++
-      const progress = 80 + Math.round((colCount / autoCollections.length) * 20)
-      sendProgress(progress)
-      await delay(10)
-    }
 
     LibraryService.isPreloaded = true
     sendProgress(100)
@@ -122,26 +510,24 @@ export class LibraryService {
     }
     
     // Re-resolve and update all auto-collections based on the new cached games
-    const autoCollections = [
-      'all', 'favorites', 'recent', 'neverplayed',
-      'retroachievements', '2players', '4players',
-      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
-    ]
     const displayed = this.getDisplayedSystems()
-    const physicalSystems = displayed.filter(s => 
-      !s.path.startsWith('virtual://') && 
-      s.name !== 'collections' && 
-      !autoCollections.includes(s.name.toLowerCase())
-    )
+    const autoColSystems = this.systemsParser.parse().filter(s => s.hardware === 'auto collection')
     
-    for (const col of autoCollections) {
-      try {
-        const colGames = this.resolveAutoCollectionGames(col)
-        const isDuplicate = physicalSystems.some(s => s.name.toLowerCase() === col.toLowerCase())
-        const cacheKey = isDuplicate ? `auto-${col}` : col
-        LibraryService.cachedGames.set(cacheKey.toLowerCase(), colGames)
-      } catch (err) {
-        console.error(`Failed to preload auto collection ${col} after system update:`, err)
+    for (const autoSys of autoColSystems) {
+      const nameLow = autoSys.name.toLowerCase()
+      const cleanCol = nameLow.startsWith('auto-') ? nameLow.substring(5) : nameLow
+      let resolveKey = cleanCol
+      if (cleanCol.startsWith('_')) resolveKey = cleanCol.substring(1)
+      else if (cleanCol.startsWith('z')) resolveKey = cleanCol.substring(1)
+      
+      const cacheKey = nameLow
+      if (LibraryService.cachedGames.has(cacheKey)) {
+        try {
+          const colGames = this.resolveAutoCollectionGames(resolveKey)
+          LibraryService.cachedGames.set(cacheKey, colGames)
+        } catch (err) {
+          console.error(`Failed to preload auto collection ${autoSys.name} after system update:`, err)
+        }
       }
     }
 
@@ -157,36 +543,8 @@ export class LibraryService {
 
   public preloadAllSync(forcePhysicalScan = false): void {
     if (LibraryService.isPreloaded) return
-
-    const displayed = this.getDisplayedSystems()
-    
-    const autoCollections = [
-      'all', 'favorites', 'recent', 'neverplayed',
-      'retroachievements', '2players', '4players',
-      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
-    ]
-    const physicalSystems = displayed.filter(s => 
-      !s.path.startsWith('virtual://') && 
-      s.name !== 'collections' && 
-      !autoCollections.includes(s.name.toLowerCase())
-    )
-
-    for (const sys of physicalSystems) {
-      try {
-        const games = this.getGamesRaw(sys.name, forcePhysicalScan)
-        LibraryService.cachedGames.set(sys.name.toLowerCase(), games)
-      } catch (err) {}
-    }
-
-    for (const col of autoCollections) {
-      try {
-        const colGames = this.resolveAutoCollectionGames(col)
-        const isDuplicate = physicalSystems.some(s => s.name.toLowerCase() === col.toLowerCase())
-        const cacheKey = isDuplicate ? `auto-${col}` : col
-        LibraryService.cachedGames.set(cacheKey.toLowerCase(), colGames)
-      } catch (err) {}
-    }
-
+    this.getDisplayedSystems()
+    this.calculateQuickAutoCounts()
     LibraryService.isPreloaded = true
   }
 
@@ -220,7 +578,7 @@ export class LibraryService {
       })
     }
 
-    // Set gamecount from preloaded cache
+    // Set gamecount from preloaded cache or quick count
     systems.forEach(s => {
       if (s.name === 'collections') {
         const customSetting = settings.getSetting('CollectionSystemsCustom', 'string') || ''
@@ -228,11 +586,25 @@ export class LibraryService {
         return
       }
 
-      const cached = LibraryService.cachedGames.get(s.name.toLowerCase())
+      const nameLower = s.name.toLowerCase()
+      const cleanColName = nameLower.startsWith('auto-') ? nameLower.substring(5) : nameLower
+
+      const cached = LibraryService.cachedGames.get(nameLower)
       if (cached) {
         s.gamecount = cached.length
+      } else if (s.hardware === 'auto collection') {
+        // Try direct key first, then strip _ or z prefix for genre/manufacturer collections
+        let countKey = cleanColName
+        if (!LibraryService.quickAutoCounts.has(countKey)) {
+          if (cleanColName.startsWith('_')) {
+            countKey = cleanColName.substring(1)
+          } else if (cleanColName.startsWith('z')) {
+            countKey = cleanColName.substring(1)
+          }
+        }
+        s.gamecount = LibraryService.quickAutoCounts.get(countKey) || 0
       } else {
-        s.gamecount = 0
+        s.gamecount = this.getQuickGameCount(s.name)
       }
     })
 
@@ -313,16 +685,10 @@ export class LibraryService {
       )
     }
 
-    const autoCollections = [
-      'all', 'favorites', 'recent', 'neverplayed',
-      'retroachievements', '2players', '4players',
-      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
-    ]
-
     return baseSystems.filter(s => 
       s.name !== 'collections' && 
       !s.path.startsWith('virtual://') && 
-      !autoCollections.includes(s.name.toLowerCase())
+      s.hardware !== 'auto collection'
     )
   }
 
@@ -335,7 +701,8 @@ export class LibraryService {
       if (cached) {
         allGames.push(...cached)
       } else {
-        const sysGames = this.getGamesRaw(sys.name)
+        const sysGames = this.getGamesRaw(sys.name, false, true)
+        LibraryService.cachedGames.set(sys.name.toLowerCase(), sysGames)
         allGames.push(...sysGames)
       }
     }
@@ -345,10 +712,6 @@ export class LibraryService {
 
   public getGames(systemName: string): Game[] {
     const nameLower = systemName.toLowerCase()
-    
-    if (LibraryService.cachedGames.has(nameLower)) {
-      return LibraryService.cachedGames.get(nameLower)!
-    }
 
     if (nameLower === 'collections') {
       const settings = new SettingsParser()
@@ -368,12 +731,37 @@ export class LibraryService {
       } as any))
     }
 
-    return this.getGamesRaw(systemName)
+    // Check if it is an auto-collection
+    // Check if it is an auto-collection by looking up system hardware
+    const allSystems = this.systemsParser.parse()
+    const matchedSystem = allSystems.find(s => s.name.toLowerCase() === nameLower)
+    if (matchedSystem && matchedSystem.hardware === 'auto collection') {
+      if (LibraryService.cachedGames.has(nameLower)) {
+        return LibraryService.cachedGames.get(nameLower)!
+      }
+      let cleanColName = nameLower.startsWith('auto-') ? nameLower.substring(5) : nameLower
+      if (cleanColName.startsWith('_')) cleanColName = cleanColName.substring(1)
+      else if (cleanColName.startsWith('z')) cleanColName = cleanColName.substring(1)
+      const games = this.resolveAutoCollectionGames(cleanColName)
+      LibraryService.cachedGames.set(nameLower, games)
+      return games
+    }
+
+    // For physical systems, verify if we have completed a full load/scan
+    if (LibraryService.fullyLoadedSystems.has(nameLower)) {
+      return LibraryService.cachedGames.get(nameLower)!
+    }
+
+    const games = this.getGamesRaw(systemName, false, false) // full scan/load
+    LibraryService.cachedGames.set(nameLower, games)
+    LibraryService.fullyLoadedSystems.add(nameLower)
+    return games
   }
 
-  public getGamesRaw(systemName: string, forcePhysicalScan = false): Game[] {
+  public getGamesRaw(systemName: string, forcePhysicalScan = false, xmlOnly = false): Game[] {
     const systems = this.systemsParser.parse()
     const system = systems.find(s => s.name.toLowerCase() === systemName.toLowerCase())
+    const settings = new SettingsParser()
 
     const configPath = getConfigPath()
     let gamelistPath = join(configPath, 'gamelists', systemName, 'gamelist.xml')
@@ -409,7 +797,10 @@ export class LibraryService {
 
     let games: Game[] = []
 
-    if (system && existsSync(system.path)) {
+    if (xmlOnly) {
+      games = xmlGames
+      source = `${source}+xmlOnly`
+    } else if (system && existsSync(system.path)) {
       const settings = new SettingsParser()
       const parseGamelistOnly = settings.getSetting('ParseGamelistOnly', 'bool') === true
 
@@ -488,7 +879,10 @@ export class LibraryService {
       return g
     })
 
-    return processedGames.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+    const showHidden = settings.getSetting('ShowHidden', 'bool') === true
+    const visibleGames = showHidden ? processedGames : processedGames.filter(g => g.hidden !== true && String(g.hidden) !== 'true')
+
+    return visibleGames.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
   }
 
   private resolveAutoCollectionGames(colKey: string): Game[] {
@@ -518,13 +912,62 @@ export class LibraryService {
       })
     } else if (colKey === 'retroachievements') {
       filtered = allDisplayedGames.filter(g => g.cheevosId || g.cheevosHash)
-    } else {
+    } else if (['wheel', 'trackball', 'spinner', 'lightgun', 'vertical'].includes(colKey)) {
+      // Control type collections: use gamesdb.xml data
+      const gamesDbData = this.parseGamesDb()
       filtered = allDisplayedGames.filter(g => {
-        const nameLower = String(g.name || '').toLowerCase()
-        const descLower = String(g.desc || '').toLowerCase()
-        const genreLower = String(g.genre || '').toLowerCase()
-        return nameLower.includes(colKey) || descLower.includes(colKey) || genreLower.includes(colKey)
+        const sysName = String(g.system || '').toLowerCase()
+        // Get ROM stem from path
+        const pathVal = String(g.path || '')
+        const fileName = pathVal.replace(/^.*[\/\\]/, '').replace(/\.[^.]+$/, '').toLowerCase()
+
+        if (colKey === 'vertical') {
+          // Check gamesdb vertical data first
+          const vertMap = gamesDbData.get('vertical')
+          if (vertMap) {
+            const sysIds = vertMap.get(sysName)
+            if (sysIds && sysIds.has(fileName)) return true
+          }
+          // Fallback: check genre for "Vertical"
+          const genreUpper = String(g.genre || '').toUpperCase()
+          return genreUpper.includes('VERTICAL')
+        }
+
+        // wheel, trackball, spinner, lightgun: check gamesdb.xml
+        const systemMap = gamesDbData.get(colKey)
+        if (!systemMap) return false
+        const sysGameIds = systemMap.get(sysName)
+        return !!(sysGameIds && sysGameIds.has(fileName))
       })
+    } else {
+      // Check if this is a genre-based collection
+      const genreMap = this.buildGenreMap()
+      const matchNames = genreMap.get(colKey)
+      
+      if (matchNames && matchNames.size > 0) {
+        // Genre-based collection: match game genre against known localized names
+        filtered = allDisplayedGames.filter(g => {
+          const genreUpper = String(g.genre || '').toUpperCase()
+          if (!genreUpper) return false
+          for (const name of matchNames) {
+            if (genreUpper === name || genreUpper.startsWith(name + ' /') || genreUpper.startsWith(name + ',')) {
+              return true
+            }
+          }
+          return false
+        })
+      } else {
+        // Manufacturer collection or unknown: check publisher/developer AND fallback to genre/name/desc
+        filtered = allDisplayedGames.filter(g => {
+          const pubLower = String((g as any).publisher || '').toLowerCase()
+          const devLower = String((g as any).developer || '').toLowerCase()
+          if (pubLower.includes(colKey) || devLower.includes(colKey)) return true
+          // Also fallback to genre/name for unknown collections
+          const genreLower = String(g.genre || '').toLowerCase()
+          const nameLower = String(g.name || '').toLowerCase()
+          return genreLower.includes(colKey) || nameLower.includes(colKey)
+        })
+      }
     }
 
     if (colKey !== 'recent') {
@@ -880,17 +1323,39 @@ export class LibraryService {
   }
 
   private rebuildAutoCollections(): void {
-    const autoCollections = [
-      'all', 'favorites', 'recent', 'neverplayed',
-      'retroachievements', '2players', '4players',
-      'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'
-    ]
-    for (const col of autoCollections) {
-      try {
-        const colGames = this.resolveAutoCollectionGames(col)
-        LibraryService.cachedGames.set(col.toLowerCase(), colGames)
-      } catch (err) {}
+    const settings = new SettingsParser()
+    const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
+    const enabledCols = autoColsString.split(',').map((c: string) => c.trim()).filter((c: string) => c !== '' && c.toLowerCase() !== 'arcade')
+
+    // Build clean keys for auto-collections
+    const autoCollections: string[] = []
+    for (const col of enabledCols) {
+      let cleanKey = col
+      if (col.startsWith('_')) {
+        cleanKey = col.substring(1)
+      } else if (col.startsWith('z')) {
+        cleanKey = col.substring(1)
+      }
+      autoCollections.push(cleanKey.toLowerCase())
     }
+
+    const displayed = this.getDisplayedSystems()
+    const physicalSystems = displayed.filter(s => 
+      !s.path.startsWith('virtual://') && 
+      s.name !== 'collections' && 
+      !autoCollections.includes(s.name.toLowerCase())
+    )
+    for (const col of autoCollections) {
+      const isDuplicate = physicalSystems.some(s => s.name.toLowerCase() === col.toLowerCase())
+      const cacheKey = (isDuplicate ? `auto-${col}` : col).toLowerCase()
+      if (LibraryService.cachedGames.has(cacheKey)) {
+        try {
+          const colGames = this.resolveAutoCollectionGames(col)
+          LibraryService.cachedGames.set(cacheKey, colGames)
+        } catch (err) {}
+      }
+    }
+    this.calculateQuickAutoCounts()
   }
 
   public getCollectionsForGame(systemName: string, gamePath: string): string[] {

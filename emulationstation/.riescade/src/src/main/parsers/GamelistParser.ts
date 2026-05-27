@@ -29,6 +29,30 @@ export class GamelistParser {
 
 			const list = Array.isArray(gameList) ? gameList : [gameList];
 
+			const normalizePath = (p: string): string => {
+				if (!p) return ''
+				return p
+					.replace(/\\/g, '/')
+					.replace(/^\.\//, '')
+					.replace(/^\//, '')
+					.trim()
+					.toLowerCase()
+			}
+
+			const uniqueList: any[] = []
+			const seenPaths = new Set<string>()
+			list.forEach((g: any) => {
+				if (g && g.path) {
+					const norm = normalizePath(g.path)
+					if (!seenPaths.has(norm)) {
+						seenPaths.add(norm)
+						uniqueList.push(g)
+					}
+				} else {
+					uniqueList.push(g)
+				}
+			})
+
 			const baseDir = dirname(filePath);
 
 			const resolveMedia = (path?: any) => {
@@ -48,7 +72,7 @@ export class GamelistParser {
 				return absolute.replace(/\\/g, '/');
 			};
 
-			return list.map((g: any) => {
+			return uniqueList.map((g: any) => {
 				const game: any = { ...g };
 				game.id = g['@_id'] || g.path;
 				game.system = systemName;

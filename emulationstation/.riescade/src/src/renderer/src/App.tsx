@@ -82,6 +82,7 @@ function App() {
 	const [saveManagerSystem, setSaveManagerSystem] = useState<System | null>(null);
 	const [hasRestoredLastSystem, setHasRestoredLastSystem] = useState(false);
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
+	const [isLoadingGames, setIsLoadingGames] = useState(false);
 
 	// ─── Audio System State & Refs ───
 	const [musicFiles, setMusicFiles] = useState<string[]>([]);
@@ -706,6 +707,7 @@ function App() {
 	// Load games when system selected
 	useEffect(() => {
 		if (selectedSystem) {
+			setIsLoadingGames(true);
 			setGames([]);
 			setSelectedGameIndex(0);
 			setSelectedCollection(null);
@@ -728,20 +730,37 @@ function App() {
 						});
 						merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 						setGames(merged);
+						setIsLoadingGames(false);
+					}).catch(err => {
+						console.error(err);
+						setIsLoadingGames(false);
 					});
 				} else {
 					setGames(masterGames);
+					setIsLoadingGames(false);
 				}
+			}).catch(err => {
+				console.error(err);
+				setIsLoadingGames(false);
 			});
+		} else {
+			setIsLoadingGames(false);
 		}
 	}, [selectedSystem, systems, settings.SystemsGrouped]);
 
 	// Load games when collection selected
 	useEffect(() => {
 		if (selectedSystem && selectedSystem.name === 'collections' && selectedCollection) {
+			setIsLoadingGames(true);
 			setGames([]);
 			setSelectedGameIndex(0);
-			window.api.getCollectionGames(selectedCollection).then((g: Game[]) => setGames(g));
+			window.api.getCollectionGames(selectedCollection).then((g: Game[]) => {
+				setGames(g);
+				setIsLoadingGames(false);
+			}).catch(err => {
+				console.error(err);
+				setIsLoadingGames(false);
+			});
 		}
 	}, [selectedCollection, selectedSystem]);
 
@@ -882,11 +901,6 @@ function App() {
 			'_strategy': 'STRATEGY',
 			'_simulation': 'SIMULATION',
 			'_various': 'VARIOUS',
-			'zatomiswave': 'ATOMISWAVE',
-			'znaomi': 'NAOMI',
-			'zmodel2': 'MODEL 2',
-			'zmodel3': 'MODEL 3',
-			'zdaphne': 'DAPHNE',
 			'zatari': 'ATARI ARCADE',
 			'zatlus': 'ATLUS',
 			'zbanpresto': 'BANPRESTO',
@@ -903,13 +917,11 @@ function App() {
 			'zmidway': 'MIDWAY',
 			'zmitchell': 'MITCHELL',
 			'znamco': 'NAMCO',
-			'zneogeo': 'NEOGEO',
 			'znichibutsu': 'NICHIBUTSU',
 			'znmk': 'NMK',
 			'zpsikyo': 'PSIKYO',
 			'zsammy': 'SAMMY',
 			'zsega': 'SEGA',
-			'zsegastv': 'SEGA ST-V',
 			'zseibukaihatsu': 'SEIBU KAIHATSU',
 			'zsemicom': 'SEMICOM',
 			'zseta': 'SETA',
@@ -920,9 +932,6 @@ function App() {
 			'ztoaplan': 'TOAPLAN',
 			'zuniversal': 'UNIVERSAL',
 			'zvisco': 'VISCO',
-			'zcps1': 'CPS1',
-			'zcps2': 'CPS2',
-			'zcps3': 'CPS3',
 			'zcave': 'CAVE',
 			'zirem': 'IREM'
 		};
@@ -974,6 +983,8 @@ function App() {
 			games: resolvedGames,
 			isCollections: isCollectionsVal,
 			iscollections: isCollectionsVal,
+			'gamelist:loading': isLoadingGames,
+			'gamelist.loading': isLoadingGames,
 			'system.isCollections': isCollectionsVal,
 			'system:isCollections': isCollectionsVal,
 			'global:themeRevision': themeRevision,
@@ -981,11 +992,11 @@ function App() {
 			'system.fullName': sysFullName,
 			'system.name': sys?.name || 'all',
 			'system.theme': sys?.theme || sys?.name || 'auto-allgames',
-			'system.gamecount': sys?.gamecount || 0,
+			'system.gamecount': (selectedSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
 			'system.hardwareType': sys?.hardware || 'console',
 			'system:fullName': sysFullName,
 			'system:name': sys?.name || 'all',
-			'system:gamecount': sys?.gamecount || 0,
+			'system:gamecount': (selectedSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
 			'system:theme': sys?.theme || sys?.name || 'auto-allgames',
 			'system:hardwareType': sys?.hardware || 'console',
 			'global:time': new Date().toLocaleTimeString([], {
@@ -1320,7 +1331,7 @@ function App() {
 					if (currentGame.isCollectionFolder) {
 						setSelectedCollection(currentGame.path);
 					} else {
-						const saveStatesSetting = settings['global.savestates']?.value ?? '0';
+						const saveStatesSetting = String(settings['global.savestates']?.value ?? '0');
 
 						const executeDirectLaunch = () => {
 							setIsLaunching(true);

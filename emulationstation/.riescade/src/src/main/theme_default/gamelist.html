@@ -74,8 +74,36 @@
     </div>
   </div>
 
-  <div class="{system:gamecount == '0' ? 'gamelist-empty' : 'hide'}">
+  <div class="{system:gamecount == '0' ? 'gamelist-empty' : 'hide'}" style="{gamelist:loading ? 'display: none !important;' : ''}">
     <p>Não temos jogos neste sistema.</p>
-  </div>"
-  
+  </div>
+
+  <!-- GAMELIST LOADING OVERLAY -->
+  <div class="gamelist-loading-screen-root" style="{gamelist:loading ? 'display: flex;' : 'display: none;'}">
+    <div class="gamelist-loading-overlay"></div>
+
+    <div class="gamelist-loading-content">
+      <h1 class="gamelist-loading-title" style="font-size: 2.5rem; letter-spacing: 2px;">{system:fullName}</h1>
+    </div>
+
+    <div class="gamelist-loading-text-row">
+      <span class="gamelist-loading-text">Carregando Lista de Jogos</span>
+      <span class="gamelist-loading-dots">...</span>
+    </div>
+
+    <div class="gamelist-loading-spinner-container">
+      <svg class="gamelist-loading-icon" width="128" height="128" viewBox="0 0 256 256" fill="none">
+        <defs>
+          <linearGradient id="grad_gamelist" x1="40" y1="40" x2="216" y2="216" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="var(--theme-color)"/>
+            <stop offset="100%" stop-color="color-mix(in srgb, var(--theme-color) 30%, black)"/>
+          </linearGradient>
+        </defs>
+        <!-- Shadow / depth -->
+        <circle cx="128" cy="128" r="84" stroke="color-mix(in srgb, var(--theme-color) 15%, black)" stroke-width="24" stroke-linecap="round" stroke-dasharray="440 120" transform="rotate(38 128 128)" opacity="0.45"/>
+        <!-- Main circular loader -->
+        <circle cx="128" cy="128" r="84" stroke="url(#grad_gamelist)" stroke-width="24" stroke-linecap="round" stroke-dasharray="440 120" transform="rotate(38 128 128)"/>
+      </svg>
+    </div>
+  </div>
 </div>

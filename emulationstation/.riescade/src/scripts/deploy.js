@@ -80,9 +80,9 @@ if (fs.existsSync(distSource)) {
   process.exit(1)
 }
 
-// 1.2 Copy/Update Default Theme in themes/default
-console.log(`🎨 Deploying default theme to ${themeDest}...`)
-copyTheme(themeSource, themeDest)
+// 1.2 Copy/Update Default Theme in themes/default - Removed as default theme is now loaded internally
+// console.log(`🎨 Deploying default theme to ${themeDest}...`)
+// copyTheme(themeSource, themeDest)
 
 // 1.1 Cleanup accidental Electron runtime files in RetroBat root (keep only the launcher)
 try {

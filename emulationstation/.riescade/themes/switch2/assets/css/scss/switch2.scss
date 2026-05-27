@@ -137,7 +137,7 @@ body {
 /* GAMES */
 .ns2-carousel {
   position: absolute;
-  top: 220px;
+  top: 15vw;
   left: 70px;
   width: 100vw;
   height: 400px;
@@ -158,6 +158,15 @@ body {
   justify-content: flex-end !important;
   align-items: center !important;
   padding-bottom: 40px !important;
+  width: calc(22% - 20px) !important;
+  height: 100% !important;
+
+  .riescade-carousel-image-wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-end;
+  }
   
   /* Art Background */
   &::after {
@@ -176,15 +185,12 @@ body {
     width: auto !important;
     height: auto !important;
     max-width: 70% !important;
-    max-height: 25% !important;
+    max-height: 90% !important;
     object-fit: contain !important;
-    filter: drop-shadow(0 2px 10px rgba(0,0,0,0.4));
-    position: relative;
-    z-index: 2;
   }
 
   &.selected {
-transform: translate(0, -50%) scale(1) !important;
+    transform: translate(0, -50%) scale(1) !important;
     z-index: 100 !important;
     border-radius: 36px !important;
     border: 12px solid transparent;
@@ -193,8 +199,8 @@ transform: translate(0, -50%) scale(1) !important;
     background-clip: padding-box, border-box;
     background-size: 105% 105%;
     animation: rotate-gradient 4s linear infinite;
-    width: calc(20% - 0px) !important;
-    height: calc(80% + 24px) !important;
+    width: calc(22% - 0px) !important;
+    height: calc(100% + 24px) !important;
     margin-left: 0 !important;
     
     &::after {
@@ -322,7 +328,7 @@ transform: translate(0, -50%) scale(1) !important;
   font-weight: 500;
   color: var(--text);
 
-  b {
+    b {
     width: 30px;
     height: 30px;
     display: inline-flex;
@@ -334,4 +340,47 @@ transform: translate(0, -50%) scale(1) !important;
     font-size: 22px;
     margin-right: 8px;
   }
+}
+
+/* GAMELIST LOADING VIEW */
+.gamelist-loading-view {
+  background: var(--bg);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+.gamelist-loading-center {
+  text-align: center;
+}
+.gamelist-loading-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 30px auto;
+  border: 6px solid var(--text);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: sw-spin 1s linear infinite;
+}
+.gamelist-loading-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 5px;
+}
+.gamelist-loading-subtext {
+  margin-top: 20px;
+  opacity: 0.5;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+@keyframes sw-spin {
+  to { transform: rotate(360deg); }
 }

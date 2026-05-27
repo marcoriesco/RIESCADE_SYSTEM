@@ -48,7 +48,8 @@
       "icon": "src/main/theme_default/assets/_parts/riescade.ico"
     },
     "files": [
-      "out/**/*"
+      "out/**/*",
+      "src/main/theme_default/**/*"
     ],
     "extraResources": []
   }

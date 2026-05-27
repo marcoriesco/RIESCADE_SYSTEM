@@ -72,6 +72,18 @@ These are always available regardless of the view.
 These variables are specifically designed for the initial app splash screen layout (`start.html`).
 - `{systems-loading}`: Returns the current progress percentage of system/emulator parsing and cache loading (an integer from `0` to `100`). This is extremely useful for rendering dynamic loading text or custom styled progress bar widths (e.g., `<div style="width: {systems-loading}%;"></div>`).
 
+### ⏳ Gamelist Loading Overlay (`gamelist:loading`)
+To optimize performance, gamelists are loaded dynamically. While the games are loading/scanning, you can show a loading overlay directly inside your `gamelist.html`.
+The following variables are available to control this state:
+- `{gamelist:loading}`: Evaluates to `true` while the list is loading, and `false` once loading completes.
+
+You can toggle visibility of your overlay using inline styles:
+```html
+<div class="gamelist-loading-view" style="{gamelist:loading ? 'display: flex;' : 'display: none;'}">
+  Carregando...
+</div>
+```
+
 ### 🎮 System Variables (`system:`)
 Refers to the currently selected system (e.g., "NES", "Genesis").
 - `{system:fullName}`: The full display name (e.g., `Super Nintendo Entertainment System`).

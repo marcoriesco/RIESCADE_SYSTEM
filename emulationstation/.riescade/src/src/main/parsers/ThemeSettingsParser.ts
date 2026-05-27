@@ -1,14 +1,21 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
-import { getConfigPath } from '../utils/paths'
+import { getConfigPath, getUserThemesPath } from '../utils/paths'
 
 export class ThemeSettingsParser {
-  static getSettingsPath(themePath: string): string {
+  static getSettingsPath(themeName: string, themePath: string): string {
+    if (themeName === 'default') {
+      const parentDir = getUserThemesPath()
+      if (!existsSync(parentDir)) {
+        mkdirSync(parentDir, { recursive: true })
+      }
+      return join(parentDir, 'default_config.json')
+    }
     return join(themePath, 'config.json')
   }
 
   static getThemeSettings(themeName: string, themePath: string): Record<string, string> {
-    const settingsPath = this.getSettingsPath(themePath)
+    const settingsPath = this.getSettingsPath(themeName, themePath)
     const settings: Record<string, string> = {}
 
     // 1. Load defaults from options.json if it exists
@@ -48,7 +55,7 @@ export class ThemeSettingsParser {
   }
 
   static saveThemeSetting(themeName: string, themePath: string, key: string, value: string): void {
-    const settingsPath = this.getSettingsPath(themePath)
+    const settingsPath = this.getSettingsPath(themeName, themePath)
     let userData: Record<string, string> = {}
     
     if (existsSync(settingsPath)) {

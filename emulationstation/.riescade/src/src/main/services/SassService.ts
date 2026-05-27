@@ -1,4 +1,4 @@
-import { writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
+import { writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs'
 import { join, dirname, basename, extname } from 'path'
 
 export class SassService {
@@ -25,7 +25,9 @@ export class SassService {
       if (!sass) return null
 
       console.log(`Compiling SCSS: ${scssFilePath}`)
-      const result = sass.compile(scssFilePath)
+      const result = sass.compile(scssFilePath, {
+        sourceMap: false
+      })
       
       const scssDir = dirname(scssFilePath)
       const cssDir = join(scssDir, '..')
@@ -40,6 +42,17 @@ export class SassService {
       writeFileSync(cssFilePath, result.css)
       console.log(`Successfully compiled to: ${cssFilePath}`)
       
+      // Delete any existing source map file
+      const mapFilePath = cssFilePath + '.map'
+      if (existsSync(mapFilePath)) {
+        try {
+          unlinkSync(mapFilePath)
+          console.log(`Removed existing source map: ${mapFilePath}`)
+        } catch (e) {
+          console.warn(`Failed to remove source map ${mapFilePath}:`, e)
+        }
+      }
+
       return cssFilePath
     } catch (error) {
       console.error(`Sass compilation error in ${scssFilePath}:`, error)

@@ -12,7 +12,7 @@ import { SassService } from './services/SassService'
 import { ScraperService } from './services/ScraperService'
 import { Game, System } from '../shared/types'
 import { watch, FSWatcher, readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs'
-import { getRetroBatPath, getConfigPath } from './utils/paths'
+import { getRetroBatPath, getConfigPath, getDefaultThemePath, getUserThemesPath } from './utils/paths'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from './services/ScraperService'
 
@@ -69,6 +69,19 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+
+  // Watch user themes directory for new themes
+  const userThemesPath = getUserThemesPath()
+  try {
+    if (!existsSync(userThemesPath)) {
+      mkdirSync(userThemesPath, { recursive: true })
+    }
+    watch(userThemesPath, (eventType, filename) => {
+      mainWindow?.webContents.send('themes-updated')
+    })
+  } catch (e) {
+    console.error('Failed to watch themes directory:', e)
+  }
 
   ipcMain.handle('preload-library', async (_, forcePhysicalScan?: boolean, systemName?: string) => {
     if (systemName) {
@@ -161,7 +174,8 @@ app.whenReady().then(() => {
     }
 
     const themePath = themeService.getThemePath(themeName)
-    if (themePath) {
+    const isDev = !app.isPackaged
+    if (themePath && (themePath !== getDefaultThemePath() || isDev)) {
       sassService.compileTheme(themePath)
       try {
         themeWatcher = watch(themePath, { recursive: true }, (eventType, filename) => {
@@ -176,7 +190,11 @@ app.whenReady().then(() => {
             // Auto-compile SCSS
             if (filename.endsWith('.scss')) {
               const fullPath = join(themePath, filename)
-              sassService.compileFile(fullPath)
+              if (basename(filename).startsWith('_')) {
+                sassService.compileTheme(themePath)
+              } else {
+                sassService.compileFile(fullPath)
+              }
               scheduleReload()
               return
             }
