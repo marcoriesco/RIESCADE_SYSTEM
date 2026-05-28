@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Немає ігор у цій системі.",
+  "LOADING_GAMELIST": "Завантаження списку ігор",
+  "LOADING": "Завантаження",
+  "LOADING_PLATFORMS": "Завантаження платформ...",
+  "CONFIGURE_EMULATORS": "Налаштування емуляторів",
+  "COLLECTIONS": "Колекції",
+  "FAVORITES": "Обране",
+  "ACCESS_LIBRARY": "Доступ до бібліотеки",
+  "ACCESS_SCREENSHOTS": "Доступ до скріншотів",
+  "ACCESS_MAGAZINES": "Доступ до журналів",
+  "ALL_GAMES": "Усі ігри",
+  "EMULATORS_COUNT": "емулятори",
+  "COLLECTIONS_COUNT": "колекції",
+  "MEDIA_COUNT": "медіа",
+  "IMAGES_COUNT": "зображення",
+  "MAGAZINES_COUNT": "журнали",
+  "GAMES_COUNT": "ігри"
+}

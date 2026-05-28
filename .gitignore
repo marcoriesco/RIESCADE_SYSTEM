@@ -8,6 +8,20 @@ out/
 modern-frontend/dist/
 modern-frontend/out/
 *.exe
+*.asar
+
+# Electron deployment binaries (.riescade/)
+emulationstation/.riescade/*.dll
+emulationstation/.riescade/*.pak
+emulationstation/.riescade/*.bin
+emulationstation/.riescade/*.dat
+emulationstation/.riescade/*.html
+emulationstation/.riescade/*.json
+emulationstation/.riescade/*.ico
+emulationstation/.riescade/*.txt
+emulationstation/.riescade/locales/*.pak
+emulationstation/.riescade/resources/app.asar
+emulationstation/.riescade/src/debug_*.log
 
 # OS generated files
 .DS_Store

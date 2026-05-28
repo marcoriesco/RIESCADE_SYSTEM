@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Ei pelejä tässä järjestelmässä.",
+  "LOADING_GAMELIST": "Ladataan pelilistaa",
+  "LOADING": "Ladataan",
+  "LOADING_PLATFORMS": "Ladataan alustoja...",
+  "CONFIGURE_EMULATORS": "Määritä emulaattorit",
+  "COLLECTIONS": "Kokoelmat",
+  "FAVORITES": "Suosikit",
+  "ACCESS_LIBRARY": "Avaa kirjasto",
+  "ACCESS_SCREENSHOTS": "Avaa kuvakaappaukset",
+  "ACCESS_MAGAZINES": "Avaa lehdet",
+  "ALL_GAMES": "Kaikki pelit",
+  "EMULATORS_COUNT": "emulaattoria",
+  "COLLECTIONS_COUNT": "kokoelmaa",
+  "MEDIA_COUNT": "mediaa",
+  "IMAGES_COUNT": "kuvaa",
+  "MAGAZINES_COUNT": "lehteä",
+  "GAMES_COUNT": "peliä"
+}

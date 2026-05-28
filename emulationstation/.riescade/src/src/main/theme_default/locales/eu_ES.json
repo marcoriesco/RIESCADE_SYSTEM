@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Ez dago jokorik sistema honetan.",
+  "LOADING_GAMELIST": "Joko zerrenda kargatzen",
+  "LOADING": "Kargatzen",
+  "LOADING_PLATFORMS": "Plataformak kargatzen...",
+  "CONFIGURE_EMULATORS": "Emuladoreak konfiguratu",
+  "COLLECTIONS": "Bildumak",
+  "FAVORITES": "Gogokoak",
+  "ACCESS_LIBRARY": "Liburutegira sartu",
+  "ACCESS_SCREENSHOTS": "Pantaila-argazkietara sartu",
+  "ACCESS_MAGAZINES": "Aldizkarietara sartu",
+  "ALL_GAMES": "Joko guztiak",
+  "EMULATORS_COUNT": "emuladore",
+  "COLLECTIONS_COUNT": "bilduma",
+  "MEDIA_COUNT": "multimedia",
+  "IMAGES_COUNT": "irudi",
+  "MAGAZINES_COUNT": "aldizkari",
+  "GAMES_COUNT": "joko"
+}

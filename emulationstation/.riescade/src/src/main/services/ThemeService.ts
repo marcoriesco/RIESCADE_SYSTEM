@@ -18,6 +18,8 @@ export interface WebThemeConfig {
   }
   options?: any[]
   settings?: Record<string, string>
+  locales?: Record<string, Record<string, string>>
+  defaultLocale?: string
 }
 
 export class ThemeService {
@@ -117,6 +119,25 @@ export class ThemeService {
       }
     }
 
+    // Load locales
+    let locales: Record<string, Record<string, string>> = {}
+    const localesDir = join(themePath, 'locales')
+    if (existsSync(localesDir)) {
+      try {
+        const files = readdirSync(localesDir).filter(f => f.endsWith('.json'))
+        for (const file of files) {
+          const lang = file.replace('.json', '')
+          try {
+            locales[lang] = JSON.parse(readFileSync(join(localesDir, file), 'utf8'))
+          } catch (e) {
+            console.error(`Error loading locale ${lang}:`, e)
+          }
+        }
+      } catch (e) {
+        console.error('Error reading locales directory:', e)
+      }
+    }
+
     return {
       name: themeName,
       displayName: metadata.name || themeName,
@@ -130,7 +151,9 @@ export class ThemeService {
         start: getTemplate('start', 'start.html')
       },
       options,
-      settings: ThemeSettingsParser.getThemeSettings(themeName, themePath)
+      settings: ThemeSettingsParser.getThemeSettings(themeName, themePath),
+      locales,
+      defaultLocale: metadata.defaultLocale
     }
   }
 }

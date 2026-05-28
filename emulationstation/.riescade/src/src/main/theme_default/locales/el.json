@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Δεν υπάρχουν παιχνίδια σε αυτό το σύστημα.",
+  "LOADING_GAMELIST": "Φόρτωση λίστας παιχνιδιών",
+  "LOADING": "Φόρτωση",
+  "LOADING_PLATFORMS": "Φόρτωση πλατφορμών...",
+  "CONFIGURE_EMULATORS": "Ρύθμιση εξομοιωτών",
+  "COLLECTIONS": "Συλλογές",
+  "FAVORITES": "Αγαπημένα",
+  "ACCESS_LIBRARY": "Πρόσβαση στη βιβλιοθήκη",
+  "ACCESS_SCREENSHOTS": "Πρόσβαση σε στιγμιότυπα",
+  "ACCESS_MAGAZINES": "Πρόσβαση σε περιοδικά",
+  "ALL_GAMES": "Όλα τα παιχνίδια",
+  "EMULATORS_COUNT": "εξομοιωτές",
+  "COLLECTIONS_COUNT": "συλλογές",
+  "MEDIA_COUNT": "πολυμέσα",
+  "IMAGES_COUNT": "εικόνες",
+  "MAGAZINES_COUNT": "περιοδικά",
+  "GAMES_COUNT": "παιχνίδια"
+}

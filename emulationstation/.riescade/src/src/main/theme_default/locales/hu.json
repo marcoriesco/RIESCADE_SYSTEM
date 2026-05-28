@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Nincsenek játékok ebben a rendszerben.",
+  "LOADING_GAMELIST": "Játéklista betöltése",
+  "LOADING": "Betöltés",
+  "LOADING_PLATFORMS": "Platformok betöltése...",
+  "CONFIGURE_EMULATORS": "Emulátorok beállítása",
+  "COLLECTIONS": "Gyűjtemények",
+  "FAVORITES": "Kedvencek",
+  "ACCESS_LIBRARY": "Könyvtár elérése",
+  "ACCESS_SCREENSHOTS": "Képernyőképek elérése",
+  "ACCESS_MAGAZINES": "Magazinok elérése",
+  "ALL_GAMES": "Összes játék",
+  "EMULATORS_COUNT": "emulátor",
+  "COLLECTIONS_COUNT": "gyűjtemény",
+  "MEDIA_COUNT": "média",
+  "IMAGES_COUNT": "kép",
+  "MAGAZINES_COUNT": "magazin",
+  "GAMES_COUNT": "játék"
+}

@@ -50,6 +50,7 @@
   object-fit: cover;
   filter: brightness(0.5) blur(10px);
   transform: scale(1.1);
+  z-index: 9;
 }
 
 .loading-overlay {
@@ -61,6 +62,7 @@
   background-image: url("../_parts/overlays/overlay-gamelist-hard.png");
   background-size: 100% 100%;
   opacity: 0.8;
+  z-index: 10;
 }
 
 .loading-content {
@@ -103,6 +105,7 @@
   align-items: center;
   gap: 15px;
   height: auto;
+  z-index: 20;
 }
 
 .loading-text {
@@ -126,6 +129,7 @@
   right: 50px;
   width: 80px;
   height: 80px;
+  z-index: 20;
 
   .loading-icon {
     width: 100%;

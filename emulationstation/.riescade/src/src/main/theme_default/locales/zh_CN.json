@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "此系统中没有游戏。",
+  "LOADING_GAMELIST": "正在加载游戏列表",
+  "LOADING": "正在加载",
+  "LOADING_PLATFORMS": "正在加载平台...",
+  "CONFIGURE_EMULATORS": "配置模拟器",
+  "COLLECTIONS": "收藏集",
+  "FAVORITES": "收藏夹",
+  "ACCESS_LIBRARY": "访问游戏库",
+  "ACCESS_SCREENSHOTS": "访问截图",
+  "ACCESS_MAGAZINES": "访问杂志",
+  "ALL_GAMES": "所有游戏",
+  "EMULATORS_COUNT": "模拟器",
+  "COLLECTIONS_COUNT": "收藏集",
+  "MEDIA_COUNT": "媒体",
+  "IMAGES_COUNT": "图片",
+  "MAGAZINES_COUNT": "杂志",
+  "GAMES_COUNT": "游戏"
+}

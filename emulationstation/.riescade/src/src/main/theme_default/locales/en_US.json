@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "No games in this system.",
+  "LOADING_GAMELIST": "Loading Game List",
+  "LOADING": "Loading",
+  "LOADING_PLATFORMS": "Loading platforms...",
+  "CONFIGURE_EMULATORS": "Configure emulators",
+  "COLLECTIONS": "Collections",
+  "FAVORITES": "Favorites",
+  "ACCESS_LIBRARY": "Access Library",
+  "ACCESS_SCREENSHOTS": "Access Screenshots",
+  "ACCESS_MAGAZINES": "Access Magazines",
+  "ALL_GAMES": "All Games",
+  "EMULATORS_COUNT": "emulators",
+  "COLLECTIONS_COUNT": "collections",
+  "MEDIA_COUNT": "media",
+  "IMAGES_COUNT": "images",
+  "MAGAZINES_COUNT": "magazines",
+  "GAMES_COUNT": "games"
+}

@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Ingen spill i dette systemet.",
+  "LOADING_GAMELIST": "Laster spilliste",
+  "LOADING": "Laster",
+  "LOADING_PLATFORMS": "Laster plattformer...",
+  "CONFIGURE_EMULATORS": "Konfigurer emulatorer",
+  "COLLECTIONS": "Samlinger",
+  "FAVORITES": "Favoritter",
+  "ACCESS_LIBRARY": "Åpne bibliotek",
+  "ACCESS_SCREENSHOTS": "Åpne skjermbilder",
+  "ACCESS_MAGAZINES": "Åpne blader",
+  "ALL_GAMES": "Alle spill",
+  "EMULATORS_COUNT": "emulatorer",
+  "COLLECTIONS_COUNT": "samlinger",
+  "MEDIA_COUNT": "medier",
+  "IMAGES_COUNT": "bilder",
+  "MAGAZINES_COUNT": "blader",
+  "GAMES_COUNT": "spill"
+}

@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Нет игр в этой системе.",
+  "LOADING_GAMELIST": "Загрузка списка игр",
+  "LOADING": "Загрузка",
+  "LOADING_PLATFORMS": "Загрузка платформ...",
+  "CONFIGURE_EMULATORS": "Настройка эмуляторов",
+  "COLLECTIONS": "Коллекции",
+  "FAVORITES": "Избранное",
+  "ACCESS_LIBRARY": "Открыть библиотеку",
+  "ACCESS_SCREENSHOTS": "Открыть скриншоты",
+  "ACCESS_MAGAZINES": "Открыть журналы",
+  "ALL_GAMES": "Все игры",
+  "EMULATORS_COUNT": "эмуляторы",
+  "COLLECTIONS_COUNT": "коллекции",
+  "MEDIA_COUNT": "медиа",
+  "IMAGES_COUNT": "изображения",
+  "MAGAZINES_COUNT": "журналы",
+  "GAMES_COUNT": "игры"
+}

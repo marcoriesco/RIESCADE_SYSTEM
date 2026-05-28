@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Nu există jocuri în acest sistem.",
+  "LOADING_GAMELIST": "Se încarcă lista de jocuri",
+  "LOADING": "Se încarcă",
+  "LOADING_PLATFORMS": "Se încarcă platformele...",
+  "CONFIGURE_EMULATORS": "Configurare emulatoare",
+  "COLLECTIONS": "Colecții",
+  "FAVORITES": "Favorite",
+  "ACCESS_LIBRARY": "Accesare bibliotecă",
+  "ACCESS_SCREENSHOTS": "Accesare capturi de ecran",
+  "ACCESS_MAGAZINES": "Accesare reviste",
+  "ALL_GAMES": "Toate jocurile",
+  "EMULATORS_COUNT": "emulatoare",
+  "COLLECTIONS_COUNT": "colecții",
+  "MEDIA_COUNT": "media",
+  "IMAGES_COUNT": "imagini",
+  "MAGAZINES_COUNT": "reviste",
+  "GAMES_COUNT": "jocuri"
+}

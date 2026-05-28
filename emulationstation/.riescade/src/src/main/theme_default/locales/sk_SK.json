@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "V tomto systéme nie sú žiadne hry.",
+  "LOADING_GAMELIST": "Načítavanie zoznamu hier",
+  "LOADING": "Načítavanie",
+  "LOADING_PLATFORMS": "Načítavanie platforiem...",
+  "CONFIGURE_EMULATORS": "Konfigurovať emulátory",
+  "COLLECTIONS": "Kolekcie",
+  "FAVORITES": "Obľúbené",
+  "ACCESS_LIBRARY": "Prístup ku knižnici",
+  "ACCESS_SCREENSHOTS": "Prístup k snímkam",
+  "ACCESS_MAGAZINES": "Prístup k časopisom",
+  "ALL_GAMES": "Všetky hry",
+  "EMULATORS_COUNT": "emulátory",
+  "COLLECTIONS_COUNT": "kolekcie",
+  "MEDIA_COUNT": "médiá",
+  "IMAGES_COUNT": "obrázky",
+  "MAGAZINES_COUNT": "časopisy",
+  "GAMES_COUNT": "hry"
+}

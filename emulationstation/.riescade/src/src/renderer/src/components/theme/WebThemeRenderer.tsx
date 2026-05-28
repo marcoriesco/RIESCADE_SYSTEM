@@ -192,6 +192,12 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         }
       }
 
+      // Translation key: {t:KEY}
+      if (expr.trim().startsWith('t:')) {
+        const key = expr.trim().substring(2);
+        return data[`t:${key}`] || key;
+      }
+
       // Standard variable resolution with date formatting support
       const parts = expr.split(':');
       const baseKey = parts.length >= 2 ? `${parts[0]}:${parts[1]}` : expr;

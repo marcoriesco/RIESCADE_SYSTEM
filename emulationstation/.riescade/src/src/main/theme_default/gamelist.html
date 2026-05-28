@@ -74,20 +74,27 @@
     </div>
   </div>
 
+  <!-- GAMELIST EMPTY MESSAGE -->
   <div class="{system:gamecount == '0' ? 'gamelist-empty' : 'hide'}" style="{gamelist:loading ? 'display: none !important;' : ''}">
-    <p>Não temos jogos neste sistema.</p>
+    <p>{t:EMPTY_GAMELIST}</p>
   </div>
 
   <!-- GAMELIST LOADING OVERLAY -->
   <div class="gamelist-loading-screen-root" style="{gamelist:loading ? 'display: flex;' : 'display: none;'}">
+
+    <img class="gamelist-loading-bg" src="./assets/arts/{system:theme}.jpg" onerror="this.style.display='none';" />
+
     <div class="gamelist-loading-overlay"></div>
 
     <div class="gamelist-loading-content">
-      <h1 class="gamelist-loading-title" style="font-size: 2.5rem; letter-spacing: 2px;">{system:fullName}</h1>
+      <div class="gamelist-loading-logo-container">
+        <img src="./assets/logos/{system:theme}.png" onerror="this.style.display='none';" />
+      </div>
+      <h1 class="gamelist-loading-title">{system:fullName}</h1>
     </div>
 
     <div class="gamelist-loading-text-row">
-      <span class="gamelist-loading-text">Carregando Lista de Jogos</span>
+      <span class="gamelist-loading-text">{t:LOADING_GAMELIST}</span>
       <span class="gamelist-loading-dots">...</span>
     </div>
 

@@ -8,38 +8,40 @@
   </div>
 
   <!-- HEADER GLOBAL -->
-<div class="riescade-header">
-    <div class="header-left">
-        <div class="system-name system-{system:name}">
-            <span class="custom-title retrobat-title">Configurar emuladores</span>
-            <span class="custom-title collections-title">Coleções</span>
-            <span class="custom-title favorites-title">Favoritos</span>
-            <span class="custom-title library-title">Acessar Biblioteca</span>
-            <span class="custom-title screenshots-title">Acessar Screenshots</span>
-            <span class="custom-title magazine-title">Acessar Revistas</span>
-            <span class="custom-title all-title">Todos os jogos</span>
-            <span class="fallback-title">{system:fullName}</span>
-            
-            <span class="system-gamecount">
-                <span class="custom-count retrobat-count">({system:gamecount} emuladores)</span>
-                <span class="custom-count collections-count">({system:gamecount} coleções)</span>
-                <span class="custom-count library-count">({system:gamecount} mídias)</span>
-                <span class="custom-count screenshots-count">({system:gamecount} imagens)</span>
-                <span class="custom-count magazine-count">({system:gamecount} revistas)</span>
-                <span class="fallback-count">({system:gamecount} jogos)</span>
-            </span>
-        </div>
-    </div>
-    <div class="header-center centered">
-        <riescade-clock format="HH:mm" />
-    </div>
-    <div class="header-right">
-      <div class="user-profile">
-        <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'RIESCADE'}</span>
-        <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/_parts/riescade.png'}" />
+  <div class="riescade-header">
+      <div class="header-left">
+          <div class="system-name system-{system:name}">
+              <span class="custom-title retrobat-title">{t:CONFIGURE_EMULATORS}</span>
+              <span class="custom-title collections-title">{t:COLLECTIONS}</span>
+              <span class="custom-title favorites-title">{t:FAVORITES}</span>
+              <span class="custom-title library-title">{t:ACCESS_LIBRARY}</span>
+              <span class="custom-title screenshots-title">{t:ACCESS_SCREENSHOTS}</span>
+              <span class="custom-title magazine-title">{t:ACCESS_MAGAZINES}</span>
+              <span class="custom-title all-title">{t:ALL_GAMES}</span>
+              <span class="fallback-title">{system:fullName}</span>
+              
+              <span class="system-gamecount">
+                  <span class="custom-count retrobat-count">({system:gamecount} {t:EMULATORS_COUNT})</span>
+                  <span class="custom-count collections-count">({system:gamecount} {t:COLLECTIONS_COUNT})</span>
+                  <span class="custom-count library-count">({system:gamecount} {t:MEDIA_COUNT})</span>
+                  <span class="custom-count screenshots-count">({system:gamecount} {t:IMAGES_COUNT})</span>
+                  <span class="custom-count magazine-count">({system:gamecount} {t:MAGAZINES_COUNT})</span>
+                  <span class="fallback-count">({system:gamecount} {t:GAMES_COUNT})</span>
+              </span>
+          </div>
       </div>
-    </div>
-</div>
+
+      <div class="header-center centered">
+          <riescade-clock format="HH:mm" />
+      </div>
+      
+      <div class="header-right">
+        <div class="user-profile">
+          <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'RIESCADE'}</span>
+          <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/_parts/riescade.png'}" />
+        </div>
+      </div>
+  </div>
 
 
   <!-- Camada Principal: Carousel -->

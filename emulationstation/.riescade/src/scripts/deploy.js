@@ -52,23 +52,6 @@ function copyRecursiveSync(src, dest) {
   }
 }
 
-function copyTheme(src, dest) {
-  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
-  const entries = fs.readdirSync(src, { withFileTypes: true })
-
-  for (let entry of entries) {
-    const srcPath = path.join(src, entry.name)
-    const destPath = path.join(dest, entry.name)
-
-    if (entry.isDirectory()) {
-      if (entry.name === 'scss') continue // Skip scss folder
-      copyTheme(srcPath, destPath)
-    } else {
-      fs.copyFileSync(srcPath, destPath)
-    }
-  }
-}
-
 console.log('🚀 Starting deployment...')
 
 // 1. Copy unpacked build to .riescade root

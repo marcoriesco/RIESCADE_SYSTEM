@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "このシステムにはゲームがありません。",
+  "LOADING_GAMELIST": "ゲームリストを読み込み中",
+  "LOADING": "読み込み中",
+  "LOADING_PLATFORMS": "プラットフォームを読み込み中...",
+  "CONFIGURE_EMULATORS": "エミュレータの設定",
+  "COLLECTIONS": "コレクション",
+  "FAVORITES": "お気に入り",
+  "ACCESS_LIBRARY": "ライブラリにアクセス",
+  "ACCESS_SCREENSHOTS": "スクリーンショットにアクセス",
+  "ACCESS_MAGAZINES": "雑誌にアクセス",
+  "ALL_GAMES": "すべてのゲーム",
+  "EMULATORS_COUNT": "エミュレータ",
+  "COLLECTIONS_COUNT": "コレクション",
+  "MEDIA_COUNT": "メディア",
+  "IMAGES_COUNT": "画像",
+  "MAGAZINES_COUNT": "雑誌",
+  "GAMES_COUNT": "ゲーム"
+}

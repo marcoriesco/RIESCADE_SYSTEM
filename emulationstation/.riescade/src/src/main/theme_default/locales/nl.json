@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Geen games in dit systeem.",
+  "LOADING_GAMELIST": "Gamelist laden",
+  "LOADING": "Laden",
+  "LOADING_PLATFORMS": "Platforms laden...",
+  "CONFIGURE_EMULATORS": "Emulators configureren",
+  "COLLECTIONS": "Collecties",
+  "FAVORITES": "Favorieten",
+  "ACCESS_LIBRARY": "Bibliotheek openen",
+  "ACCESS_SCREENSHOTS": "Screenshots openen",
+  "ACCESS_MAGAZINES": "Tijdschriften openen",
+  "ALL_GAMES": "Alle games",
+  "EMULATORS_COUNT": "emulators",
+  "COLLECTIONS_COUNT": "collecties",
+  "MEDIA_COUNT": "media",
+  "IMAGES_COUNT": "afbeeldingen",
+  "MAGAZINES_COUNT": "tijdschriften",
+  "GAMES_COUNT": "games"
+}

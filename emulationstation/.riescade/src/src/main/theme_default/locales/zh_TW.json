@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "此系統中沒有遊戲。",
+  "LOADING_GAMELIST": "正在載入遊戲列表",
+  "LOADING": "正在載入",
+  "LOADING_PLATFORMS": "正在載入平台...",
+  "CONFIGURE_EMULATORS": "設定模擬器",
+  "COLLECTIONS": "收藏集",
+  "FAVORITES": "收藏夾",
+  "ACCESS_LIBRARY": "存取遊戲庫",
+  "ACCESS_SCREENSHOTS": "存取截圖",
+  "ACCESS_MAGAZINES": "存取雜誌",
+  "ALL_GAMES": "所有遊戲",
+  "EMULATORS_COUNT": "模擬器",
+  "COLLECTIONS_COUNT": "收藏集",
+  "MEDIA_COUNT": "媒體",
+  "IMAGES_COUNT": "圖片",
+  "MAGAZINES_COUNT": "雜誌",
+  "GAMES_COUNT": "遊戲"
+}

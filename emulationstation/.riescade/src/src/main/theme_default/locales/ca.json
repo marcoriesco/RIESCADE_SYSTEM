@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "No hi ha jocs en aquest sistema.",
+  "LOADING_GAMELIST": "Carregant llista de jocs",
+  "LOADING": "Carregant",
+  "LOADING_PLATFORMS": "Carregant plataformes...",
+  "CONFIGURE_EMULATORS": "Configurar emuladors",
+  "COLLECTIONS": "Col·leccions",
+  "FAVORITES": "Preferits",
+  "ACCESS_LIBRARY": "Accedir a la biblioteca",
+  "ACCESS_SCREENSHOTS": "Accedir a captures",
+  "ACCESS_MAGAZINES": "Accedir a revistes",
+  "ALL_GAMES": "Tots els jocs",
+  "EMULATORS_COUNT": "emuladors",
+  "COLLECTIONS_COUNT": "col·leccions",
+  "MEDIA_COUNT": "mitjans",
+  "IMAGES_COUNT": "imatges",
+  "MAGAZINES_COUNT": "revistes",
+  "GAMES_COUNT": "jocs"
+}

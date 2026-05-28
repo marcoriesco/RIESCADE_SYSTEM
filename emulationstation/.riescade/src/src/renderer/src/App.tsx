@@ -1011,6 +1011,16 @@ function App() {
 			...Object.entries(theme?.settings || {}).reduce((acc, [k, v]) => ({ ...acc, [`options:${k}`]: v }), {})
 		};
 
+		// Inject theme translations
+		const lang = settings['Language']?.value || 'en_US';
+		const themeLocales = theme?.locales || {};
+		const defaultLocaleKey = theme?.defaultLocale || 'en_US';
+		const currentLocale = themeLocales[lang] || {};
+		const fallbackLocale = themeLocales[defaultLocaleKey] || themeLocales['en_US'] || {};
+		for (const key of Object.keys({ ...fallbackLocale, ...currentLocale })) {
+			baseData[`t:${key}`] = currentLocale[key] || fallbackLocale[key] || key;
+		}
+
 		// Mapping for common settings (like RetroAchievements)
 		const cheevosUser = baseData['global.cheevos.username'] || baseData['RetroAchievements.Username'];
 		if (cheevosUser) {

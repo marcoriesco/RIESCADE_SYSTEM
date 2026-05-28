@@ -4,6 +4,7 @@
   "author": "Marco Riesco",
   "description": "Exemplo do novo motor de temas baseado em web (HTML/CSS)",
   "type": "web",
+  "defaultLocale": "pt_BR",
   "templates": {
     "system": "system.html",
     "gamelist": "gamelist.html",

@@ -1,0 +1,19 @@
+{
+  "EMPTY_GAMELIST": "Brak gier w tym systemie.",
+  "LOADING_GAMELIST": "Ładowanie listy gier",
+  "LOADING": "Ładowanie",
+  "LOADING_PLATFORMS": "Ładowanie platform...",
+  "CONFIGURE_EMULATORS": "Konfiguruj emulatory",
+  "COLLECTIONS": "Kolekcje",
+  "FAVORITES": "Ulubione",
+  "ACCESS_LIBRARY": "Otwórz bibliotekę",
+  "ACCESS_SCREENSHOTS": "Otwórz zrzuty ekranu",
+  "ACCESS_MAGAZINES": "Otwórz czasopisma",
+  "ALL_GAMES": "Wszystkie gry",
+  "EMULATORS_COUNT": "emulatory",
+  "COLLECTIONS_COUNT": "kolekcje",
+  "MEDIA_COUNT": "media",
+  "IMAGES_COUNT": "obrazy",
+  "MAGAZINES_COUNT": "czasopisma",
+  "GAMES_COUNT": "gry"
+}
