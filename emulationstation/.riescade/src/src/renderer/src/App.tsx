@@ -1415,12 +1415,20 @@ function App() {
 	const startHtmlOnce = useMemo(() => {
 		if (!theme?.views?.start) return null;
 		const normalizedPath = theme.path.replace(/\\/g, '/');
+		// Resolve translations for {t:KEY} tags
+		const lang = settings['Language']?.value || 'en_US';
+		const themeLocales = theme?.locales || {};
+		const defaultLocaleKey = theme?.defaultLocale || 'en_US';
+		const currentLocale = themeLocales[lang] || {};
+		const fallbackLocale = themeLocales[defaultLocaleKey] || themeLocales['en_US'] || {};
+		const merged = { ...fallbackLocale, ...currentLocale };
 		return theme.views.start
 			.replace(/src="\.\/"/g, `src="file:///${normalizedPath}/"`)
 			.replace(/src="\.\//g, `src="file:///${normalizedPath}/`)
 			.replace(/href="\.\//g, `href="file:///${normalizedPath}/`)
-			.replace(/{systems-loading}/g, '0');
-	}, [theme?.views?.start, theme?.path]);
+			.replace(/{systems-loading}/g, '0')
+			.replace(/\{t:(\w+)\}/g, (_match: string, key: string) => merged[key] || fallbackLocale[key] || key);
+	}, [theme?.views?.start, theme?.path, theme?.locales, theme?.defaultLocale, settings['Language']?.value]);
 
 	useEffect(() => {
 		const el = startScreenRef.current;
