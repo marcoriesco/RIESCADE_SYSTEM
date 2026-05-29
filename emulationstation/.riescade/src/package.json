@@ -45,7 +45,7 @@
     "win": {
       "target": "dir",
       "artifactName": "${productName}.${ext}",
-      "icon": "src/main/theme_default/assets/_parts/riescade.ico"
+      "icon": "src/main/theme_default/assets/riescade.ico"
     },
     "files": [
       "out/**/*",
