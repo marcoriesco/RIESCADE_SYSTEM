@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "contenuti",
   "IMAGES_COUNT": "immagini",
   "MAGAZINES_COUNT": "riviste",
-  "GAMES_COUNT": "giochi"
+  "GAMES_COUNT": "giochi",
+  "HELP_SELECT": "Seleziona",
+  "HELP_PLATFORMS": "Piattaforme",
+  "HELP_SEARCH": "Cerca",
+  "HELP_ONLINE": "Online",
+  "HELP_PLAY": "Gioca",
+  "HELP_OPTIONS": "Opzioni (Mantieni)",
+  "HELP_BACK": "Indietro",
+  "HELP_SAVE": "Salvataggio"
 }

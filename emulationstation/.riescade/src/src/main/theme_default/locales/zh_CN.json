@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "媒体",
   "IMAGES_COUNT": "图片",
   "MAGAZINES_COUNT": "杂志",
-  "GAMES_COUNT": "游戏"
+  "GAMES_COUNT": "游戏",
+  "HELP_SELECT": "选择",
+  "HELP_PLATFORMS": "平台",
+  "HELP_SEARCH": "搜索",
+  "HELP_ONLINE": "在线",
+  "HELP_PLAY": "游玩",
+  "HELP_OPTIONS": "选项 (长按)",
+  "HELP_BACK": "返回",
+  "HELP_SAVE": "保存"
 }

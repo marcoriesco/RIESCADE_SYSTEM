@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "媒體",
   "IMAGES_COUNT": "圖片",
   "MAGAZINES_COUNT": "雜誌",
-  "GAMES_COUNT": "遊戲"
+  "GAMES_COUNT": "遊戲",
+  "HELP_SELECT": "選擇",
+  "HELP_PLATFORMS": "平台",
+  "HELP_SEARCH": "搜尋",
+  "HELP_ONLINE": "線上",
+  "HELP_PLAY": "遊玩",
+  "HELP_OPTIONS": "選項 (長按)",
+  "HELP_BACK": "返回",
+  "HELP_SAVE": "儲存"
 }

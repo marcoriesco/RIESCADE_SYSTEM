@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "medya",
   "IMAGES_COUNT": "görsel",
   "MAGAZINES_COUNT": "dergi",
-  "GAMES_COUNT": "oyun"
+  "GAMES_COUNT": "oyun",
+  "HELP_SELECT": "Select",
+  "HELP_PLATFORMS": "Platforms",
+  "HELP_SEARCH": "Search",
+  "HELP_ONLINE": "Online",
+  "HELP_PLAY": "Play",
+  "HELP_OPTIONS": "Options (Hold)",
+  "HELP_BACK": "Back",
+  "HELP_SAVE": "Save"
 }

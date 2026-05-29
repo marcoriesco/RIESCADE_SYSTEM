@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "미디어",
   "IMAGES_COUNT": "이미지",
   "MAGAZINES_COUNT": "잡지",
-  "GAMES_COUNT": "게임"
+  "GAMES_COUNT": "게임",
+  "HELP_SELECT": "Select",
+  "HELP_PLATFORMS": "Platforms",
+  "HELP_SEARCH": "Search",
+  "HELP_ONLINE": "Online",
+  "HELP_PLAY": "Play",
+  "HELP_OPTIONS": "Options (Hold)",
+  "HELP_BACK": "Back",
+  "HELP_SAVE": "Save"
 }

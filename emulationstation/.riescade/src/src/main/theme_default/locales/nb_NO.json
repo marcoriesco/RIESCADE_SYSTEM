@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "medier",
   "IMAGES_COUNT": "bilder",
   "MAGAZINES_COUNT": "blader",
-  "GAMES_COUNT": "spill"
+  "GAMES_COUNT": "spill",
+  "HELP_SELECT": "Select",
+  "HELP_PLATFORMS": "Platforms",
+  "HELP_SEARCH": "Search",
+  "HELP_ONLINE": "Online",
+  "HELP_PLAY": "Play",
+  "HELP_OPTIONS": "Options (Hold)",
+  "HELP_BACK": "Back",
+  "HELP_SAVE": "Save"
 }

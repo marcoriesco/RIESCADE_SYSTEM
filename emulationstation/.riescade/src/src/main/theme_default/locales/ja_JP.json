@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "メディア",
   "IMAGES_COUNT": "画像",
   "MAGAZINES_COUNT": "雑誌",
-  "GAMES_COUNT": "ゲーム"
+  "GAMES_COUNT": "ゲーム",
+  "HELP_SELECT": "選択",
+  "HELP_PLATFORMS": "プラットフォーム",
+  "HELP_SEARCH": "検索",
+  "HELP_ONLINE": "オンライン",
+  "HELP_PLAY": "プレイ",
+  "HELP_OPTIONS": "オプション (長押し)",
+  "HELP_BACK": "戻る",
+  "HELP_SAVE": "セーブ"
 }

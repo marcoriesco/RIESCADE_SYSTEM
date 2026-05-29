@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "медиа",
   "IMAGES_COUNT": "изображения",
   "MAGAZINES_COUNT": "журналы",
-  "GAMES_COUNT": "игры"
+  "GAMES_COUNT": "игры",
+  "HELP_SELECT": "Выбрать",
+  "HELP_PLATFORMS": "Платформы",
+  "HELP_SEARCH": "Поиск",
+  "HELP_ONLINE": "Онлайн",
+  "HELP_PLAY": "Играть",
+  "HELP_OPTIONS": "Опции (Удерживать)",
+  "HELP_BACK": "Назад",
+  "HELP_SAVE": "Сохранение"
 }

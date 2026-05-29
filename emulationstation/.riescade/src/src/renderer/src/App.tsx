@@ -1416,9 +1416,9 @@ function App() {
 		if (!theme?.views?.start) return null;
 		const normalizedPath = theme.path.replace(/\\/g, '/');
 		// Resolve translations for {t:KEY} tags
-		const lang = settings['Language']?.value || 'en_US';
-		const themeLocales = theme?.locales || {};
 		const defaultLocaleKey = theme?.defaultLocale || 'en_US';
+		const lang = settings['Language']?.value || defaultLocaleKey;
+		const themeLocales = theme?.locales || {};
 		const currentLocale = themeLocales[lang] || {};
 		const fallbackLocale = themeLocales[defaultLocaleKey] || themeLocales['en_US'] || {};
 		const merged = { ...fallbackLocale, ...currentLocale };

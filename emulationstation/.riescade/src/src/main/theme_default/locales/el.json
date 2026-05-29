@@ -15,5 +15,13 @@
   "MEDIA_COUNT": "πολυμέσα",
   "IMAGES_COUNT": "εικόνες",
   "MAGAZINES_COUNT": "περιοδικά",
-  "GAMES_COUNT": "παιχνίδια"
+  "GAMES_COUNT": "παιχνίδια",
+  "HELP_SELECT": "Select",
+  "HELP_PLATFORMS": "Platforms",
+  "HELP_SEARCH": "Search",
+  "HELP_ONLINE": "Online",
+  "HELP_PLAY": "Play",
+  "HELP_OPTIONS": "Options (Hold)",
+  "HELP_BACK": "Back",
+  "HELP_SAVE": "Save"
 }
