@@ -105,7 +105,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('launch-game', async (_, game: Game, system: System, saveStateSlot?: number) => {
     let targetSystem = system
-    if (system.name === 'collections') {
+    if (system.name === 'collections' || (game.system && game.system.toLowerCase() !== system.name.toLowerCase())) {
       const realSystem = libraryService.getSystems().find(s => s.name.toLowerCase() === game.system.toLowerCase())
       if (realSystem) {
         targetSystem = realSystem

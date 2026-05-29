@@ -54,6 +54,25 @@ interface Game {
 	mix?: string;
 }
 
+const resolveAbsolutePath = (systemPath: string, gamePath: string) => {
+	const sysPath = systemPath.replace(/\\/g, '/');
+	const gPath = gamePath.replace(/\\/g, '/').replace(/^\.\//, '');
+	if (gPath.startsWith('/') || gPath.match(/^[a-zA-Z]:/)) {
+		return gPath.toLowerCase();
+	}
+	const parts = (sysPath + '/' + gPath).split('/');
+	const resolvedParts: string[] = [];
+	for (const part of parts) {
+		if (part === '.' || part === '') continue;
+		if (part === '..') {
+			resolvedParts.pop();
+		} else {
+			resolvedParts.push(part);
+		}
+	}
+	return resolvedParts.join('/').toLowerCase();
+};
+
 function App() {
 	// ─── State ───
 	const [systems, setSystems] = useState<System[]>([]);
@@ -640,10 +659,22 @@ function App() {
 
 						if (childSystems.length > 0) {
 							Promise.all(childSystems.map(cs => window.api.getGames(cs.name))).then((allChildGames) => {
-								const merged = [...masterGames];
-								allChildGames.forEach(childGames => {
-									merged.push(...childGames);
+								const gameMap = new Map<string, Game>();
+								masterGames.forEach(g => {
+									const sysObj = s.find(sys => sys.name.toLowerCase() === g.system.toLowerCase()) || selectedSystem;
+									if (sysObj) {
+										const absPath = resolveAbsolutePath(sysObj.path, g.path);
+										gameMap.set(absPath, g);
+									}
 								});
+								allChildGames.forEach((childGames, childIdx) => {
+									const childSys = childSystems[childIdx];
+									childGames.forEach(g => {
+										const absPath = resolveAbsolutePath(childSys.path, g.path);
+										gameMap.set(absPath, g);
+									});
+								});
+								const merged = Array.from(gameMap.values());
 								merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 								setGames(merged);
 								setIsUpdatingGamelist(false);
@@ -724,10 +755,22 @@ function App() {
 
 				if (childSystems.length > 0) {
 					Promise.all(childSystems.map(s => window.api.getGames(s.name))).then((allChildGames) => {
-						const merged = [...masterGames];
-						allChildGames.forEach(childGames => {
-							merged.push(...childGames);
+						const gameMap = new Map<string, Game>();
+						masterGames.forEach(g => {
+							const sysObj = systems.find(sys => sys.name.toLowerCase() === g.system.toLowerCase()) || selectedSystem;
+							if (sysObj) {
+								const absPath = resolveAbsolutePath(sysObj.path, g.path);
+								gameMap.set(absPath, g);
+							}
 						});
+						allChildGames.forEach((childGames, childIdx) => {
+							const childSys = childSystems[childIdx];
+							childGames.forEach(g => {
+								const absPath = resolveAbsolutePath(childSys.path, g.path);
+								gameMap.set(absPath, g);
+							});
+						});
+						const merged = Array.from(gameMap.values());
 						merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 						setGames(merged);
 						setIsLoadingGames(false);
@@ -1152,11 +1195,23 @@ function App() {
 				};
 
 				if (childSystems.length > 0) {
-					return Promise.all(childSystems.map((s) => window.api.getGames(s.name))).then((allChildGames) => {
-						const merged = [...masterGames];
-						allChildGames.forEach((childGames) => {
-							merged.push(...childGames);
+					return Promise.all(childSystems.map((cs) => window.api.getGames(cs.name))).then((allChildGames) => {
+						const gameMap = new Map<string, Game>();
+						masterGames.forEach(g => {
+							const sysObj = systems.find(sys => sys.name.toLowerCase() === g.system.toLowerCase()) || selectedSystem;
+							if (sysObj) {
+								const absPath = resolveAbsolutePath(sysObj.path, g.path);
+								gameMap.set(absPath, g);
+							}
 						});
+						allChildGames.forEach((childGames, childIdx) => {
+							const childSys = childSystems[childIdx];
+							childGames.forEach(g => {
+								const absPath = resolveAbsolutePath(childSys.path, g.path);
+								gameMap.set(absPath, g);
+							});
+						});
+						const merged = Array.from(gameMap.values());
 						merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 						updateGamesState(merged);
 					});
