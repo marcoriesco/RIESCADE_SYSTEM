@@ -166,6 +166,7 @@ function App() {
 
 	// RetroBat control system state refs
 	const pressedKeysRef = useRef<Record<string, boolean>>({});
+	const wasOverlayActiveOnKeyDownRef = useRef<Record<string, boolean>>({});
 	const longPressTimersRef = useRef<Record<string, NodeJS.Timeout>>({});
 	const longPressHandledRef = useRef<Record<string, boolean>>({});
 	const gamepadButtonsStateRef = useRef<Record<number, boolean>>({});
@@ -1689,6 +1690,7 @@ function App() {
 			return;
 		}
 		pressedKeysRef.current[key] = true;
+		wasOverlayActiveOnKeyDownRef.current[key] = isOverlayActive;
 		longPressHandledRef.current[key] = false;
 
 		const hasLongPress = ['x', 'q', 'a', 's', 'backspace'].includes(key);
@@ -1740,11 +1742,18 @@ function App() {
 		if (pressedKeysRef.current[key]) {
 			pressedKeysRef.current[key] = false;
 
+			const wasOverlayActive = wasOverlayActiveOnKeyDownRef.current[key];
+			delete wasOverlayActiveOnKeyDownRef.current[key];
+
 			if (!longPressHandledRef.current[key]) {
+				const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen;
+				if (wasOverlayActive && !isOverlayActive) {
+					return;
+				}
 				executeShortPressAction(key);
 			}
 		}
-	}, [executeShortPressAction]);
+	}, [executeShortPressAction, isMenuOpen, isGameOptionsOpen, isSaveStateManagerOpen, isHardwareSelectOpen]);
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
