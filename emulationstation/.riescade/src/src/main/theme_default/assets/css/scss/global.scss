@@ -1,33 +1,8 @@
-/* ========================================================
-   RIESCADE - GLOBAL / BASE STYLES
-   ======================================================== */
-
-@font-face {
-  font-family: 'Inter Tight';
-  src: url('../fonts/InterTight-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Inter Tight';
-  src: url('../fonts/InterTight-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Inter Tight';
-  src: url('../fonts/InterTight-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Roboto Condensed';
-  src: url('../fonts/RobotoCondensed-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-
+@import "./fonts.scss";
 @import "./menu.scss";
+
+
+
 
 $theme-color: #9f0043;
 $text-primary: #ffffff;
