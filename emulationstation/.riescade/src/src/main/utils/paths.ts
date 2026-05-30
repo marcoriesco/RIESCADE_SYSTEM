@@ -64,3 +64,11 @@ export function getDefaultThemePath(): string {
 export function getUserThemesPath(): string {
   return join(getRiescadePath(), 'themes')
 }
+
+/**
+ * Returns the path to the SQLite database used for ROM indexing.
+ * Located at: emulationstation/.riescade/riescade.db
+ */
+export function getDatabasePath(): string {
+  return join(getRiescadePath(), 'riescade.db')
+}

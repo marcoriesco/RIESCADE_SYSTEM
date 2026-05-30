@@ -1407,9 +1407,9 @@ function App() {
 
 	// Helper: Programmatically synthesize and dispatch keyboard events to the window
 	const dispatchKeyEvent = useCallback((keyName: string) => {
-		window.dispatchEvent(new KeyboardEvent('keydown', { key: keyName, bubbles: true }));
+		window.dispatchEvent(new KeyboardEvent('keydown', { key: keyName, bubbles: true, detail: 99 }));
 		setTimeout(() => {
-			window.dispatchEvent(new KeyboardEvent('keyup', { key: keyName, bubbles: true }));
+			window.dispatchEvent(new KeyboardEvent('keyup', { key: keyName, bubbles: true, detail: 99 }));
 		}, 50);
 	}, []);
 
@@ -1524,6 +1524,7 @@ function App() {
 
 	// ─── Keyboard Navigation ───
 	const handleKeyDown = useCallback((e: KeyboardEvent) => {
+		if (e.detail === 99) return;
 		// 1. Exclude input fields / textareas
 		const activeEl = document.activeElement;
 		if (activeEl) {
@@ -1599,35 +1600,6 @@ function App() {
 			if (!selectedSystem) {
 				if (filteredSystems.length === 0) return;
 				const currentHw = filteredSystems[systemIndex]?.hardware || '';
-				let next = (systemIndex + 1) % filteredSystems.length;
-				while (next !== systemIndex) {
-					if ((filteredSystems[next]?.hardware || '') !== currentHw) {
-						setSystemIndex(next);
-						break;
-					}
-					next = (next + 1) % filteredSystems.length;
-				}
-			} else {
-				if (games.length === 0) return;
-				const currentLetter = (games[selectedGameIndex]?.name?.[0] || '').toUpperCase();
-				let next = (selectedGameIndex + 1) % games.length;
-				while (next !== selectedGameIndex) {
-					if ((games[next]?.name?.[0] || '').toUpperCase() !== currentLetter) {
-						setSelectedGameIndex(next);
-						break;
-					}
-					next = (next + 1) % games.length;
-				}
-			}
-			return;
-		}
-
-		if (key === 'pagedown') {
-			if (isOverlayActive || isInitializing || isLaunching) return;
-			e.preventDefault();
-			if (!selectedSystem) {
-				if (filteredSystems.length === 0) return;
-				const currentHw = filteredSystems[systemIndex]?.hardware || '';
 				let prev = (systemIndex - 1 + filteredSystems.length) % filteredSystems.length;
 				while (prev !== systemIndex) {
 					if ((filteredSystems[prev]?.hardware || '') !== currentHw) {
@@ -1652,6 +1624,35 @@ function App() {
 						break;
 					}
 					prev = (prev - 1 + games.length) % games.length;
+				}
+			}
+			return;
+		}
+
+		if (key === 'pagedown') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
+			if (!selectedSystem) {
+				if (filteredSystems.length === 0) return;
+				const currentHw = filteredSystems[systemIndex]?.hardware || '';
+				let next = (systemIndex + 1) % filteredSystems.length;
+				while (next !== systemIndex) {
+					if ((filteredSystems[next]?.hardware || '') !== currentHw) {
+						setSystemIndex(next);
+						break;
+					}
+					next = (next + 1) % filteredSystems.length;
+				}
+			} else {
+				if (games.length === 0) return;
+				const currentLetter = (games[selectedGameIndex]?.name?.[0] || '').toUpperCase();
+				let next = (selectedGameIndex + 1) % games.length;
+				while (next !== selectedGameIndex) {
+					if ((games[next]?.name?.[0] || '').toUpperCase() !== currentLetter) {
+						setSelectedGameIndex(next);
+						break;
+					}
+					next = (next + 1) % games.length;
 				}
 			}
 			return;
@@ -1724,6 +1725,7 @@ function App() {
 	]);
 
 	const handleKeyUp = useCallback((e: KeyboardEvent) => {
+		if (e.detail === 99) return;
 		const activeEl = document.activeElement;
 		if (activeEl) {
 			const tagName = activeEl.tagName.toLowerCase();

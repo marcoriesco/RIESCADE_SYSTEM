@@ -31,6 +31,9 @@ const api = {
   resetGamelistUsage: () => ipcRenderer.invoke('reset-gamelist-usage'),
   resetFileExtensions: () => ipcRenderer.invoke('reset-file-extensions'),
   clearCaches: () => ipcRenderer.invoke('clear-caches'),
+  getDbStats: () => ipcRenderer.invoke('get-db-stats'),
+  rebuildDatabase: () => ipcRenderer.invoke('rebuild-database'),
+  getLibraryMode: () => ipcRenderer.invoke('get-library-mode'),
 
   // Theme Settings
   getThemeSettings: (themeName: string) => ipcRenderer.invoke('get-theme-settings', themeName),

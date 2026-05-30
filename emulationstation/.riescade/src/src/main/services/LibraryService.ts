@@ -5,6 +5,7 @@ import { GamelistParser } from '../parsers/GamelistParser'
 import { SettingsParser } from '../parsers/SettingsParser'
 import { getConfigPath, getRomsPath, getRetroBatPath, getCollectionsPath } from '../utils/paths'
 import { System, Game } from '../../shared/types'
+import { DatabaseService } from './DatabaseService'
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -21,10 +22,32 @@ function normalizePathForComparison(p: string): string {
 export class LibraryService {
   private systemsParser: SystemsParser
   private gamelistParser: GamelistParser
+  private static databaseService: DatabaseService = new DatabaseService()
 
   constructor() {
     this.systemsParser = new SystemsParser()
     this.gamelistParser = new GamelistParser()
+  }
+
+  /**
+   * Check if the library is in database mode (default) vs gamelist.xml mode.
+   */
+  public static isDbMode(): boolean {
+    try {
+      const settings = new SettingsParser()
+      const mode = settings.getSetting('LibraryMode', 'string')
+      // Default to 'database' if not set
+      return mode !== 'gamelist'
+    } catch {
+      return true // default to DB mode
+    }
+  }
+
+  /**
+   * Get the shared DatabaseService instance.
+   */
+  public static getDatabase(): DatabaseService {
+    return LibraryService.databaseService
   }
 
   private static cachedGames: Map<string, Game[]> = new Map()
@@ -51,6 +74,7 @@ export class LibraryService {
     try {
       SystemsParser.clearCache()
     } catch (e) {}
+    // Note: DB is NOT cleared on cache clear - it persists across sessions
   }
 
   /**
@@ -484,9 +508,59 @@ export class LibraryService {
     sendProgress(5)
     await delay(50)
 
-    // Trigger systems parsing if not already done
-    this.getDisplayedSystems()
-    this.calculateQuickAutoCounts()
+    const useDb = LibraryService.isDbMode()
+
+    if (useDb) {
+      // ─── DB Mode: sync systems into SQLite ───
+      const dbService = LibraryService.databaseService
+      dbService.open()
+
+      // Parse all systems first
+      const allSystems = this.systemsParser.parse()
+      sendProgress(10)
+
+      // Sync all systems (only changed ones will be re-indexed)
+      const scanFn = this.scanPhysicalGames.bind(this)
+      dbService.syncAll(allSystems, scanFn, (sysName, current, total) => {
+        const progress = 10 + Math.round((current / total) * 40)
+        sendProgress(progress)
+      })
+
+      sendProgress(50)
+
+      // Use SQL queries for auto-collection counts
+      const displayed = this.getDisplayedSystems()
+      const displayedNames = displayed.map(s => s.name)
+      const settings = new SettingsParser()
+      const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
+      const enabledCols = autoColsString.split(',').map((c: string) => c.trim()).filter((c: string) => c !== '')
+
+      // Get all game counts at once from DB
+      const allCounts = dbService.getAllGameCounts()
+
+      // Calculate auto-collection counts
+      const specificCols = new Set(['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players', 'arcade'])
+      for (const col of enabledCols) {
+        let countKey = col
+        if (col.startsWith('_')) countKey = col.substring(1)
+        else if (col.startsWith('z')) countKey = col.substring(1)
+
+        if (specificCols.has(col) || specificCols.has(countKey)) {
+          const count = dbService.getAutoCollectionCount(countKey, displayedNames)
+          LibraryService.quickAutoCounts.set(countKey, count)
+        } else {
+          // Genre/manufacturer collections
+          const count = dbService.getAutoCollectionCount(countKey, displayedNames)
+          LibraryService.quickAutoCounts.set(countKey, count)
+        }
+      }
+
+      sendProgress(80)
+    } else {
+      // ─── Gamelist.xml Mode: original behavior ───
+      this.getDisplayedSystems()
+      this.calculateQuickAutoCounts()
+    }
 
     sendProgress(50)
     await delay(50)
@@ -541,10 +615,41 @@ export class LibraryService {
     } catch (err) {}
   }
 
+  public rebuildDatabase(onProgress?: (systemName: string, current: number, total: number) => void): void {
+    if (LibraryService.isDbMode()) {
+      const dbService = LibraryService.databaseService
+      dbService.open()
+      const allSystems = this.systemsParser.parse()
+      const scanFn = this.scanPhysicalGames.bind(this)
+      dbService.rebuildAll(allSystems, scanFn, onProgress)
+    }
+  }
+
   public preloadAllSync(forcePhysicalScan = false): void {
     if (LibraryService.isPreloaded) return
-    this.getDisplayedSystems()
-    this.calculateQuickAutoCounts()
+    
+    if (LibraryService.isDbMode()) {
+      const dbService = LibraryService.databaseService
+      dbService.open()
+      
+      const displayed = this.getDisplayedSystems()
+      const displayedNames = displayed.map(s => s.name)
+      const settings = new SettingsParser()
+      const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
+      const enabledCols = autoColsString.split(',').map((c: string) => c.trim()).filter((c: string) => c !== '')
+
+      for (const col of enabledCols) {
+        let countKey = col
+        if (col.startsWith('_')) countKey = col.substring(1)
+        else if (col.startsWith('z')) countKey = col.substring(1)
+
+        const count = dbService.getAutoCollectionCount(countKey, displayedNames)
+        LibraryService.quickAutoCounts.set(countKey, count)
+      }
+    } else {
+      this.getDisplayedSystems()
+      this.calculateQuickAutoCounts()
+    }
     LibraryService.isPreloaded = true
   }
 
@@ -579,6 +684,9 @@ export class LibraryService {
     }
 
     // Set gamecount from preloaded cache or quick count
+    const useDbForCounts = LibraryService.isDbMode() && LibraryService.databaseService.isOpen()
+    const dbGameCounts = useDbForCounts ? LibraryService.databaseService.getAllGameCounts() : null
+
     systems.forEach(s => {
       if (s.name === 'collections') {
         const customSetting = settings.getSetting('CollectionSystemsCustom', 'string') || ''
@@ -603,6 +711,9 @@ export class LibraryService {
           }
         }
         s.gamecount = LibraryService.quickAutoCounts.get(countKey) || 0
+      } else if (dbGameCounts) {
+        // DB mode: use batch SQL counts
+        s.gamecount = dbGameCounts.get(s.name) || 0
       } else {
         s.gamecount = this.getQuickGameCount(s.name)
       }
@@ -731,10 +842,10 @@ export class LibraryService {
       } as any))
     }
 
-    // Check if it is an auto-collection
     // Check if it is an auto-collection by looking up system hardware
     const allSystems = this.systemsParser.parse()
     const matchedSystem = allSystems.find(s => s.name.toLowerCase() === nameLower)
+
     if (matchedSystem && matchedSystem.hardware === 'auto collection') {
       if (LibraryService.cachedGames.has(nameLower)) {
         return LibraryService.cachedGames.get(nameLower)!
@@ -742,11 +853,35 @@ export class LibraryService {
       let cleanColName = nameLower.startsWith('auto-') ? nameLower.substring(5) : nameLower
       if (cleanColName.startsWith('_')) cleanColName = cleanColName.substring(1)
       else if (cleanColName.startsWith('z')) cleanColName = cleanColName.substring(1)
+
+      // DB mode: use SQL queries for auto-collections
+      if (LibraryService.isDbMode() && LibraryService.databaseService.isOpen()) {
+        const displayed = this.getDisplayedSystems()
+        const displayedNames = displayed.map(s => s.name)
+        const games = LibraryService.databaseService.getAutoCollectionGames(cleanColName, displayedNames)
+        LibraryService.cachedGames.set(nameLower, games)
+        return games
+      }
+
       const games = this.resolveAutoCollectionGames(cleanColName)
       LibraryService.cachedGames.set(nameLower, games)
       return games
     }
 
+    // ─── DB Mode: load from SQLite for physical systems ───
+    if (LibraryService.isDbMode() && LibraryService.databaseService.isOpen()) {
+      if (LibraryService.cachedGames.has(nameLower)) {
+        return LibraryService.cachedGames.get(nameLower)!
+      }
+      const settings = new SettingsParser()
+      const showHidden = settings.getSetting('ShowHidden', 'bool') === true
+      const games = LibraryService.databaseService.getGamesBySystem(systemName, showHidden)
+      LibraryService.cachedGames.set(nameLower, games)
+      LibraryService.fullyLoadedSystems.add(nameLower)
+      return games
+    }
+
+    // ─── Gamelist.xml Mode: original behavior ───
     // For physical systems, verify if we have completed a full load/scan
     if (LibraryService.fullyLoadedSystems.has(nameLower)) {
       return LibraryService.cachedGames.get(nameLower)!
@@ -1238,6 +1373,15 @@ export class LibraryService {
 
     this.gamelistParser.save(targetPath, games)
 
+    // Dual-write: also update in SQLite database
+    if (LibraryService.isDbMode() && LibraryService.databaseService.isOpen()) {
+      try {
+        LibraryService.databaseService.upsertGame(gameData)
+      } catch (e) {
+        console.error('Failed to update game in database:', e)
+      }
+    }
+
     const cached = LibraryService.cachedGames.get(targetSystem.toLowerCase())
     if (cached) {
       const cIdx = cached.findIndex(g => normalizePathForComparison(g.path) === normalizePathForComparison(gameData.path))
@@ -1288,6 +1432,15 @@ export class LibraryService {
       }
     } catch (e) {
       console.error(`Failed to remove game from custom collections:`, e)
+    }
+
+    // 3.5 Dual-write: also delete from SQLite database
+    if (LibraryService.isDbMode() && LibraryService.databaseService.isOpen()) {
+      try {
+        LibraryService.databaseService.deleteGameFromDb(targetSystem, gamePath)
+      } catch (e) {
+        console.error('Failed to delete game from database:', e)
+      }
     }
 
     // 4. Update in-memory cache

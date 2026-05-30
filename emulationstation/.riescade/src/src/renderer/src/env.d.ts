@@ -35,6 +35,9 @@ declare global {
       resetGamelistUsage: () => Promise<any>
       resetFileExtensions: () => Promise<any>
       clearCaches: () => Promise<any>
+      getDbStats: () => Promise<{ totalGames: number; indexedSystems: number; systemsInfo: any[] }>
+      rebuildDatabase: () => Promise<boolean>
+      getLibraryMode: () => Promise<'database' | 'gamelist'>
       getMusicFiles: (subfolder?: string) => Promise<string[]>
       getMusicPath: () => Promise<string>
       startScrape: () => Promise<boolean>

@@ -390,6 +390,31 @@ app.whenReady().then(() => {
     return libraryService.clearCaches()
   })
 
+  ipcMain.handle('get-db-stats', async () => {
+    const db = LibraryService.getDatabase()
+    return {
+      totalGames: db.isOpen() ? db.getTotalGameCount() : 0,
+      indexedSystems: db.isOpen() ? db.getIndexedSystemCount() : 0,
+      systemsInfo: db.isOpen() ? db.getSystemSyncInfo() : []
+    }
+  })
+
+  ipcMain.handle('rebuild-database', async () => {
+    const db = LibraryService.getDatabase()
+    LibraryService.clearCache()
+    const win = BrowserWindow.getAllWindows()[0]
+    libraryService.rebuildDatabase((sysName, current, total) => {
+      if (win) {
+        win.webContents.send('systems-loading-progress', Math.round((current / total) * 100))
+      }
+    })
+    return true
+  })
+
+  ipcMain.handle('get-library-mode', async () => {
+    return LibraryService.isDbMode() ? 'database' : 'gamelist'
+  })
+
   ipcMain.handle('get-bios-information', async () => {
     const cmdPath = join(getRetroBatPath(), 'emulationstation', 'batocera-systems.exe')
     return new Promise((resolve) => {
