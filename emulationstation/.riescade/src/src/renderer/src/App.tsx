@@ -73,6 +73,41 @@ const resolveAbsolutePath = (systemPath: string, gamePath: string) => {
 	return resolvedParts.join('/').toLowerCase();
 };
 
+const getNotificationIcon = (category: string | undefined, type: string) => {
+	if (category === 'controller') {
+		return (
+			<svg className="riescade-notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+				<path d="M20 5H4c-1.66 0-3 1.34-3 3v8c0 1.66 1.34 3 3 3h16c1.66 0 3-1.34 3-3V8c0-1.66-1.34-3-3-3zM7.5 14H6v-1.5H4.5v-1H6V10h1.5v1.5H9v1H7.5V14zm7-2c-.83 0-1.5-.67-1.5-1.5S13.67 9 14.5 9s1.5.67 1.5 1.5S15.33 12 14.5 12zm3 3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+			</svg>
+		);
+	}
+	if (type === 'success') {
+		return (
+			<svg className="riescade-notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+				<circle cx="12" cy="12" r="10" />
+				<path d="m9 12 2 2 4-4" />
+			</svg>
+		);
+	}
+	if (type === 'warning') {
+		return (
+			<svg className="riescade-notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+				<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+				<line x1="12" y1="9" x2="12" y2="13" />
+				<line x1="12" y1="17" x2="12.01" y2="17" />
+			</svg>
+		);
+	}
+	// default/info
+	return (
+		<svg className="riescade-notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+			<circle cx="12" cy="12" r="10" />
+			<line x1="12" y1="16" x2="12" y2="12" />
+			<line x1="12" y1="8" x2="12.01" y2="8" />
+		</svg>
+	);
+};
+
 function App() {
 	// ─── State ───
 	const [systems, setSystems] = useState<System[]>([]);
@@ -128,6 +163,12 @@ function App() {
 	const currentPlaylistRef = useRef<string[]>([]);
 	const currentTrackIndexRef = useRef<number>(-1);
 	const activeSystemRef = useRef<string>('');
+
+	// RetroBat control system state refs
+	const pressedKeysRef = useRef<Record<string, boolean>>({});
+	const longPressTimersRef = useRef<Record<string, NodeJS.Timeout>>({});
+	const longPressHandledRef = useRef<Record<string, boolean>>({});
+	const gamepadButtonsStateRef = useRef<Record<number, boolean>>({});
 
 	const currentGame = games[selectedGameIndex];
 
@@ -520,7 +561,7 @@ function App() {
 				const isConnected = event.type === 'gamepadconnected';
 				const gpName = event.gamepad.id.split('(')[0].trim();
 				addNotification(
-					`${gpName}\n${isConnected ? 'Conectado' : 'Desconectado'}`,
+					`${gpName} ${isConnected ? 'connected' : 'disconnected'}`,
 					isConnected ? 'success' : 'warning',
 					'controller'
 				);
@@ -579,27 +620,50 @@ function App() {
 				}
 				// Skip gamepad-to-keyboard dispatch when InputConfigOverlay is active
 				// (it sets data-input-config-active on document.body to claim exclusive gamepad control)
-				if (time - lastInputTime > 200 && !document.body.hasAttribute('data-input-config-active')) {
-					let key = '';
-					if (gp.buttons[12]?.pressed || gp.axes[1] < -0.5) key = 'ArrowUp';
-					else if (gp.buttons[13]?.pressed || gp.axes[1] > 0.5)
-						key = 'ArrowDown';
-					else if (gp.buttons[14]?.pressed || gp.axes[0] < -0.5)
-						key = 'ArrowLeft';
-					else if (gp.buttons[15]?.pressed || gp.axes[0] > 0.5)
-						key = 'ArrowRight';
-					else if (gp.buttons[4]?.pressed) key = 'PageDown';
-					else if (gp.buttons[5]?.pressed) key = 'PageUp';
-					else if (gp.buttons[0]?.pressed) key = ' ';
-					else if (gp.buttons[1]?.pressed) key = 'Backspace';
-					else if (gp.buttons[8]?.pressed) key = 'Control';
-					else if (gp.buttons[9]?.pressed) key = 'Enter';
-					else if (gp.buttons[11]?.pressed) key = 'Control'; // Select button on many controllers is 11 or 8
-					if (key) {
-						window.dispatchEvent(new KeyboardEvent('keydown', { key }));
-						setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key })), 50);
-						lastInputTime = time;
+				if (!document.body.hasAttribute('data-input-config-active')) {
+					// 1. D-Pad & Left Stick navigation with 200ms repeat delay
+					if (time - lastInputTime > 200) {
+						let navKey = '';
+						if (gp.buttons[12]?.pressed || gp.axes[1] < -0.5) navKey = 'ArrowUp';
+						else if (gp.buttons[13]?.pressed || gp.axes[1] > 0.5) navKey = 'ArrowDown';
+						else if (gp.buttons[14]?.pressed || gp.axes[0] < -0.5) navKey = 'ArrowLeft';
+						else if (gp.buttons[15]?.pressed || gp.axes[0] > 0.5) navKey = 'ArrowRight';
+
+						if (navKey) {
+							window.dispatchEvent(new KeyboardEvent('keydown', { key: navKey, bubbles: true }));
+							setTimeout(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: navKey, bubbles: true })), 50);
+							lastInputTime = time;
+						}
 					}
+
+					// 2. Action buttons (dispatched once per press/release)
+					const actionButtonMap: Record<number, string> = {
+						0: 'x',          // Validate / Launch
+						1: 'z',          // Cancel
+						2: 's',          // Search/Filter
+						3: 'q',          // Random / Favorite
+						4: 'PageUp',     // Quick Select Prev
+						5: 'PageDown',   // Quick Select Next
+						6: 'Home',       // System Swap Prev
+						7: 'End',        // System Swap Next
+						8: 'Backspace',  // Options (Select button index 8)
+						11: 'Backspace', // Options (Select button index 11)
+						9: 'Enter'       // Main Menu (Start button index 9)
+					};
+
+					Object.entries(actionButtonMap).forEach(([btnIdxStr, key]) => {
+						const btnIdx = parseInt(btnIdxStr, 10);
+						const isPressed = gp.buttons[btnIdx]?.pressed || false;
+						const wasPressed = gamepadButtonsStateRef.current[btnIdx] || false;
+
+						if (isPressed && !wasPressed) {
+							gamepadButtonsStateRef.current[btnIdx] = true;
+							window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+						} else if (!isPressed && wasPressed) {
+							gamepadButtonsStateRef.current[btnIdx] = false;
+							window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+						}
+					});
 				}
 			}
 			rafId = requestAnimationFrame(pollGamepad);
@@ -1235,235 +1299,463 @@ function App() {
 		});
 	};
 
-	// ─── Keyboard Navigation ───
-	useEffect(() => {
-		const handleKey = (e: KeyboardEvent) => {
-			if (showGamelistUpdateModal) {
-				if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-					setReloadModalSelectedIndex((prev) => (prev === 0 ? 1 : 0));
-				} else if (e.key === 'Enter' || e.key === ' ') {
-					if (reloadModalSelectedIndex === 0) {
-						handleFastReload();
+	const handleLaunchGame = useCallback((gameToLaunch: Game, systemToLaunch: System) => {
+		const saveStatesSetting = String(settings['global.savestates']?.value ?? '0');
+
+		const executeDirectLaunch = () => {
+			setIsLaunching(true);
+			window.api
+				.launchGame(gameToLaunch, systemToLaunch)
+				.then(() => {
+					setTimeout(() => setIsLaunching(false), 5000);
+				})
+				.catch((err) => {
+					console.error('Launch game failed or exited with code:', err);
+					setTimeout(() => setIsLaunching(false), 5000);
+				});
+		};
+
+		if (saveStatesSetting === '0') {
+			executeDirectLaunch();
+		} else {
+			window.api
+				.scanSaveStates(systemToLaunch.name, gameToLaunch.path)
+				.then((states) => {
+					if (saveStatesSetting === '2' && (!states || states.length === 0)) {
+						executeDirectLaunch();
 					} else {
-						setShowGamelistUpdateModal(false);
+						setSaveManagerGame(gameToLaunch);
+						setSaveManagerSystem(systemToLaunch);
+						setIsSaveStateManagerOpen(true);
 					}
-				} else if (e.key === 'Escape' || e.key === 'Backspace') {
+				})
+				.catch((err) => {
+					console.error('Failed to scan save states before launch:', err);
+					executeDirectLaunch();
+				});
+		}
+	}, [settings]);
+
+	// Helper: Jump to a random game in the current list
+	const jumpToRandomGame = useCallback(() => {
+		if (games.length > 0) {
+			const randomIndex = Math.floor(Math.random() * games.length);
+			setSelectedGameIndex(randomIndex);
+		}
+	}, [games]);
+
+	// Helper: Toggle favorite status of the current game
+	const toggleFavoriteGame = useCallback(() => {
+		if (currentGame) {
+			const updated = { ...currentGame, favorite: !currentGame.favorite };
+			handleUpdateGame(updated);
+		}
+	}, [currentGame, handleUpdateGame]);
+
+	// Helper: Navigate directly to the Favorites collection
+	const showFavoritesCollection = useCallback(() => {
+		const favSys = filteredSystems.find(s => s.name === 'favorites');
+		if (favSys) {
+			setSelectedSystem(favSys);
+			setSelectedCollection(null);
+		} else {
+			const colSys = filteredSystems.find(s => s.name === 'collections');
+			if (colSys) {
+				setSelectedSystem(colSys);
+				setSelectedCollection('favorites');
+			}
+		}
+	}, [filteredSystems]);
+
+	// Helper: Swap system (Previous/Next system) in gamelist view
+	const swapSystem = useCallback((direction: 1 | -1) => {
+		if (filteredSystems.length === 0) return;
+		const nextIndex = (systemIndex + direction + filteredSystems.length) % filteredSystems.length;
+		setSystemIndex(nextIndex);
+		if (selectedSystem) {
+			setSelectedSystem(filteredSystems[nextIndex]);
+		}
+	}, [filteredSystems, systemIndex, selectedSystem]);
+
+	// Helper: Toggle TTS screen reader setting
+	const toggleScreenReader = useCallback(() => {
+		const currentTts = settings.TTS?.value === true || settings.TTS?.value === 'true';
+		const nextTts = !currentTts;
+		window.api.saveSetting('TTS', nextTts, 'bool').then(() => {
+			window.api.getSettings().then((latestSettings: any) => {
+				setSettings(latestSettings);
+				addNotification(
+					nextTts ? 'TTS ATIVADO' : 'TTS DESATIVADO',
+					'success',
+					'general'
+				);
+			});
+		});
+	}, [settings, addNotification]);
+
+	// Helper: Force live refresh of the active theme
+	const refreshTheme = useCallback(() => {
+		if (theme && theme.name) {
+			window.api.loadTheme(theme.name).then((t: any) => {
+				setTheme(t);
+				setThemeRevision((prev) => prev + 1);
+				addNotification('TEMA REINICIADO', 'success', 'general');
+			});
+		}
+	}, [theme, addNotification]);
+
+	// Helper: Programmatically synthesize and dispatch keyboard events to the window
+	const dispatchKeyEvent = useCallback((keyName: string) => {
+		window.dispatchEvent(new KeyboardEvent('keydown', { key: keyName, bubbles: true }));
+		setTimeout(() => {
+			window.dispatchEvent(new KeyboardEvent('keyup', { key: keyName, bubbles: true }));
+		}, 50);
+	}, []);
+
+	// Main execution of short-press actions based on view context
+	const executeShortPressAction = useCallback((key: string) => {
+		if (isInitializing || isLaunching) return;
+
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal;
+		if (isOverlayActive) {
+			if (key === 'x') {
+				dispatchKeyEvent('Enter');
+			} else if (key === 'z' || key === 'w' || key === 'escape') {
+				dispatchKeyEvent('Escape');
+			}
+			return;
+		}
+
+		if (!selectedSystem) {
+			// System view
+			if (key === 'x') {
+				if (filteredSystems[systemIndex]) {
+					setSelectedSystem(filteredSystems[systemIndex]);
+				}
+			} else if (key === 'backspace') {
+				setIsHardwareSelectOpen((prev) => !prev);
+			} else if (key === 'enter') {
+				setIsMenuOpen((prev) => !prev);
+			}
+		} else {
+			// Gamelist view
+			if (key === 'x') {
+				if (currentGame) {
+					if (currentGame.isCollectionFolder) {
+						setSelectedCollection(currentGame.path);
+					} else {
+						handleLaunchGame(currentGame, selectedSystem);
+					}
+				}
+			} else if (key === 'z' || key === 'w' || key === 'escape') {
+				if (selectedCollection) {
+					setSelectedCollection(null);
+					window.api.getGames(selectedSystem.name).then((g: Game[]) => {
+						setGames(g);
+						setSelectedGameIndex(0);
+					});
+				} else {
+					setSelectedSystem(null);
+				}
+			} else if (key === 'q' || key === 'a') {
+				jumpToRandomGame();
+			} else if (key === 's') {
+				addNotification('PESQUISA INDISPONÍVEL NESTA VERSÃO', 'info', 'general');
+			} else if (key === 'backspace') {
+				if (currentGame) {
+					setIsGameOptionsOpen((prev) => !prev);
+				}
+			} else if (key === 'enter') {
+				setIsMenuOpen((prev) => !prev);
+			}
+		}
+	}, [
+		isInitializing,
+		isLaunching,
+		isMenuOpen,
+		isGameOptionsOpen,
+		isSaveStateManagerOpen,
+		isHardwareSelectOpen,
+		showGamelistUpdateModal,
+		selectedSystem,
+		systemIndex,
+		filteredSystems,
+		currentGame,
+		selectedCollection,
+		jumpToRandomGame,
+		handleLaunchGame,
+		addNotification,
+		dispatchKeyEvent
+	]);
+
+	// Main execution of long-press actions based on view context
+	const executeLongPressAction = useCallback((key: string) => {
+		if (isInitializing || isLaunching) return;
+
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal;
+		if (isOverlayActive) return;
+
+		if (selectedSystem && currentGame) {
+			if (key === 'x') {
+				setIsGameOptionsOpen(true);
+			} else if (key === 'q' || key === 'a') {
+				toggleFavoriteGame();
+			} else if (key === 's') {
+				jumpToRandomGame();
+			} else if (key === 'backspace') {
+				showFavoritesCollection();
+			}
+		}
+	}, [
+		isInitializing,
+		isLaunching,
+		isMenuOpen,
+		isGameOptionsOpen,
+		isSaveStateManagerOpen,
+		isHardwareSelectOpen,
+		showGamelistUpdateModal,
+		selectedSystem,
+		currentGame,
+		toggleFavoriteGame,
+		jumpToRandomGame,
+		showFavoritesCollection
+	]);
+
+	// ─── Keyboard Navigation ───
+	const handleKeyDown = useCallback((e: KeyboardEvent) => {
+		// 1. Exclude input fields / textareas
+		const activeEl = document.activeElement;
+		if (activeEl) {
+			const tagName = activeEl.tagName.toLowerCase();
+			if (tagName === 'input' || tagName === 'textarea' || activeEl.hasAttribute('contenteditable')) {
+				return;
+			}
+		}
+
+		// Normalize key casing
+		const key = (e.key || '').toLowerCase();
+
+		if (showGamelistUpdateModal) {
+			if (key === 'arrowleft' || key === 'arrowright') {
+				setReloadModalSelectedIndex((prev) => (prev === 0 ? 1 : 0));
+			} else if (key === 'enter' || key === ' ') {
+				if (reloadModalSelectedIndex === 0) {
+					handleFastReload();
+				} else {
 					setShowGamelistUpdateModal(false);
 				}
-				return;
+			} else if (key === 'escape' || key === 'backspace') {
+				setShowGamelistUpdateModal(false);
 			}
+			return;
+		}
 
-			if (e.key === 'Control') {
-				setIsMenuOpen(false);
-				setIsGameOptionsOpen(false);
-				setIsHardwareSelectOpen(false);
-				setIsLaunching(false);
-				// Let it bubble or handle below
-			}
+		if (key === 'control') {
+			setIsMenuOpen(false);
+			setIsGameOptionsOpen(false);
+			setIsHardwareSelectOpen(false);
+			setIsLaunching(false);
+			return;
+		}
 
-			if (e.key === 'Enter' && !isGameOptionsOpen) {
-				setIsMenuOpen((prev) => !prev);
-				return;
-			}
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen;
 
-			if (isMenuOpen || isInitializing || isGameOptionsOpen || isLaunching || isHardwareSelectOpen) return;
-
+		// Navigation keys handled immediately on keydown
+		if (key === 'arrowup' || key === 'arrowdown' || key === 'arrowleft' || key === 'arrowright') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
 			if (!selectedSystem) {
-				// System view navigation
 				if (filteredSystems.length === 0) return;
-				
 				const systemHtml = theme?.views?.system || '';
 				const isVertical = systemHtml.includes('type="vertical"');
 
 				if (isVertical) {
-					if (e.key === 'ArrowDown') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
-					if (e.key === 'ArrowUp') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
+					if (key === 'arrowdown') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
+					if (key === 'arrowup') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
 				} else {
-					if (e.key === 'ArrowRight') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
-					if (e.key === 'ArrowLeft') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
-				}
-
-				// Quick jump by hardware group
-				if (e.key === 'PageUp') {
-					const currentHw = filteredSystems[systemIndex]?.hardware || '';
-					let next = (systemIndex + 1) % filteredSystems.length;
-					while (next !== systemIndex) {
-						if ((filteredSystems[next]?.hardware || '') !== currentHw) {
-							setSystemIndex(next);
-							break;
-						}
-						next = (next + 1) % filteredSystems.length;
-					}
-				}
-				if (e.key === 'PageDown') {
-					const currentHw = filteredSystems[systemIndex]?.hardware || '';
-					let prev = (systemIndex - 1 + filteredSystems.length) % filteredSystems.length;
-					while (prev !== systemIndex) {
-						if ((filteredSystems[prev]?.hardware || '') !== currentHw) {
-							const targetHw = filteredSystems[prev]?.hardware || '';
-							let first = prev;
-							while (
-								first > 0 &&
-								(filteredSystems[first - 1]?.hardware || '') === targetHw
-							)
-								first--;
-							setSystemIndex(first);
-							break;
-						}
-						prev = (prev - 1 + filteredSystems.length) % filteredSystems.length;
-					}
-				}
-
-				if (e.key === ' ') setSelectedSystem(filteredSystems[systemIndex]);
-
-				if (e.key === 'Control') {
-					setIsHardwareSelectOpen(true);
-					return;
+					if (key === 'arrowright') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
+					if (key === 'arrowleft') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
 				}
 			} else {
-				// Gamelist navigation
-				if (e.key === 'Backspace' || e.key === 'Escape') {
-					if (isGameOptionsOpen) {
-						setIsGameOptionsOpen(false);
-					} else if (selectedCollection) {
-						setSelectedCollection(null);
-						window.api.getGames(selectedSystem.name).then((g: Game[]) => {
-							setGames(g);
-							setSelectedGameIndex(0);
-						});
-					} else {
-						setSelectedSystem(null);
-					}
-					return;
-				}
 				if (games.length === 0) return;
-
 				const gamelistHtml = theme?.views?.gamelist || '';
 				const isHorizontal = gamelistHtml.includes('type="horizontal"');
 
 				if (isHorizontal) {
-					if (e.key === 'ArrowRight') setSelectedGameIndex((prev) => (prev + 1) % games.length);
-					if (e.key === 'ArrowLeft') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+					if (key === 'arrowright') setSelectedGameIndex((prev) => (prev + 1) % games.length);
+					if (key === 'arrowleft') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
 				} else {
-					if (e.key === 'ArrowDown') setSelectedGameIndex((prev) => (prev + 1) % games.length);
-					if (e.key === 'ArrowUp') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
-				}
-
-				// Quick jump by letter
-				if (e.key === 'PageUp') {
-					const currentLetter = (
-						games[selectedGameIndex]?.name?.[0] || ''
-					).toUpperCase();
-					let next = (selectedGameIndex + 1) % games.length;
-					while (next !== selectedGameIndex) {
-						if (
-							(games[next]?.name?.[0] || '').toUpperCase() !== currentLetter
-						) {
-							setSelectedGameIndex(next);
-							break;
-						}
-						next = (next + 1) % games.length;
-					}
-				}
-				if (e.key === 'PageDown') {
-					const currentLetter = (
-						games[selectedGameIndex]?.name?.[0] || ''
-					).toUpperCase();
-					let prev = (selectedGameIndex - 1 + games.length) % games.length;
-					while (prev !== selectedGameIndex) {
-						const prevLetter = (games[prev]?.name?.[0] || '').toUpperCase();
-						if (prevLetter !== currentLetter) {
-							let first = prev;
-							while (
-								first > 0 &&
-								(games[first - 1]?.name?.[0] || '').toUpperCase() === prevLetter
-							)
-								first--;
-							setSelectedGameIndex(first);
-							break;
-						}
-						prev = (prev - 1 + games.length) % games.length;
-					}
-				}
-
-				if (e.key === 'Control' && currentGame) {
-					setIsGameOptionsOpen((prev) => !prev);
-					return;
-				}
-				if (isGameOptionsOpen || isSaveStateManagerOpen) return;
-
-				if (e.key === ' ' && currentGame && !isLaunching) {
-					if (currentGame.isCollectionFolder) {
-						setSelectedCollection(currentGame.path);
-					} else {
-						const saveStatesSetting = String(settings['global.savestates']?.value ?? '0');
-
-						const executeDirectLaunch = () => {
-							setIsLaunching(true);
-							window.api
-								.launchGame(currentGame, selectedSystem)
-								.then(() => {
-									setTimeout(() => setIsLaunching(false), 5000);
-								})
-								.catch((err) => {
-									console.error('Launch game failed or exited with code:', err);
-									setTimeout(() => setIsLaunching(false), 5000);
-								});
-						};
-
-						if (saveStatesSetting === '0') {
-							executeDirectLaunch();
-						} else {
-							window.api
-								.scanSaveStates(selectedSystem!.name, currentGame.path)
-								.then((states) => {
-									if (saveStatesSetting === '2' && (!states || states.length === 0)) {
-										executeDirectLaunch();
-									} else {
-										setSaveManagerGame(currentGame);
-										setSaveManagerSystem(selectedSystem);
-										setIsSaveStateManagerOpen(true);
-									}
-								})
-								.catch((err) => {
-									console.error('Failed to scan save states before launch:', err);
-									executeDirectLaunch();
-								});
-						}
-					}
+					if (key === 'arrowdown') setSelectedGameIndex((prev) => (prev + 1) % games.length);
+					if (key === 'arrowup') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
 				}
 			}
-		};
+			return;
+		}
 
-		const handleKeyUp = (e: KeyboardEvent) => {
-			// No logic needed here for now
-		};
+		if (key === 'pageup') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
+			if (!selectedSystem) {
+				if (filteredSystems.length === 0) return;
+				const currentHw = filteredSystems[systemIndex]?.hardware || '';
+				let next = (systemIndex + 1) % filteredSystems.length;
+				while (next !== systemIndex) {
+					if ((filteredSystems[next]?.hardware || '') !== currentHw) {
+						setSystemIndex(next);
+						break;
+					}
+					next = (next + 1) % filteredSystems.length;
+				}
+			} else {
+				if (games.length === 0) return;
+				const currentLetter = (games[selectedGameIndex]?.name?.[0] || '').toUpperCase();
+				let next = (selectedGameIndex + 1) % games.length;
+				while (next !== selectedGameIndex) {
+					if ((games[next]?.name?.[0] || '').toUpperCase() !== currentLetter) {
+						setSelectedGameIndex(next);
+						break;
+					}
+					next = (next + 1) % games.length;
+				}
+			}
+			return;
+		}
 
-		window.addEventListener('keydown', handleKey);
-		window.addEventListener('keyup', handleKeyUp);
-		return () => {
-			window.removeEventListener('keydown', handleKey);
-			window.removeEventListener('keyup', handleKeyUp);
-		};
+		if (key === 'pagedown') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
+			if (!selectedSystem) {
+				if (filteredSystems.length === 0) return;
+				const currentHw = filteredSystems[systemIndex]?.hardware || '';
+				let prev = (systemIndex - 1 + filteredSystems.length) % filteredSystems.length;
+				while (prev !== systemIndex) {
+					if ((filteredSystems[prev]?.hardware || '') !== currentHw) {
+						const targetHw = filteredSystems[prev]?.hardware || '';
+						let first = prev;
+						while (first > 0 && (filteredSystems[first - 1]?.hardware || '') === targetHw) first--;
+						setSystemIndex(first);
+						break;
+					}
+					prev = (prev - 1 + filteredSystems.length) % filteredSystems.length;
+				}
+			} else {
+				if (games.length === 0) return;
+				const currentLetter = (games[selectedGameIndex]?.name?.[0] || '').toUpperCase();
+				let prev = (selectedGameIndex - 1 + games.length) % games.length;
+				while (prev !== selectedGameIndex) {
+					const prevLetter = (games[prev]?.name?.[0] || '').toUpperCase();
+					if (prevLetter !== currentLetter) {
+						let first = prev;
+						while (first > 0 && (games[first - 1]?.name?.[0] || '').toUpperCase() === prevLetter) first--;
+						setSelectedGameIndex(first);
+						break;
+					}
+					prev = (prev - 1 + games.length) % games.length;
+				}
+			}
+			return;
+		}
+
+		if (key === 'home') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
+			swapSystem(-1);
+			return;
+		}
+
+		if (key === 'end') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
+			swapSystem(1);
+			return;
+		}
+
+		if (key === 'f3') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
+			toggleScreenReader();
+			return;
+		}
+
+		if (key === 'f5') {
+			if (isOverlayActive || isInitializing || isLaunching) return;
+			e.preventDefault();
+			refreshTheme();
+			return;
+		}
+
+		// Prevent auto-repeat events for action keys
+		if (pressedKeysRef.current[key]) {
+			return;
+		}
+		pressedKeysRef.current[key] = true;
+		longPressHandledRef.current[key] = false;
+
+		const hasLongPress = ['x', 'q', 'a', 's', 'backspace'].includes(key);
+
+		if (hasLongPress) {
+			longPressTimersRef.current[key] = setTimeout(() => {
+				longPressHandledRef.current[key] = true;
+				executeLongPressAction(key);
+			}, 600);
+		}
 	}, [
-		systemIndex,
-		systems,
-		selectedSystem,
-		selectedGameIndex,
-		games.length,
-		isMenuOpen,
-		isGameOptionsOpen,
-		isHardwareSelectOpen,
-		currentGame,
 		isInitializing,
 		isLaunching,
-		enterPressTimer,
-		settings,
+		isMenuOpen,
+		isGameOptionsOpen,
+		isSaveStateManagerOpen,
+		isHardwareSelectOpen,
 		showGamelistUpdateModal,
 		reloadModalSelectedIndex,
 		handleFastReload,
-		isSaveStateManagerOpen,
+		selectedSystem,
+		systemIndex,
+		filteredSystems,
+		theme,
+		games,
+		selectedGameIndex,
+		swapSystem,
+		toggleScreenReader,
+		refreshTheme,
+		executeLongPressAction
 	]);
+
+	const handleKeyUp = useCallback((e: KeyboardEvent) => {
+		const activeEl = document.activeElement;
+		if (activeEl) {
+			const tagName = activeEl.tagName.toLowerCase();
+			if (tagName === 'input' || tagName === 'textarea' || activeEl.hasAttribute('contenteditable')) {
+				return;
+			}
+		}
+
+		const key = (e.key || '').toLowerCase();
+
+		if (longPressTimersRef.current[key]) {
+			clearTimeout(longPressTimersRef.current[key]);
+			delete longPressTimersRef.current[key];
+		}
+
+		if (pressedKeysRef.current[key]) {
+			pressedKeysRef.current[key] = false;
+
+			if (!longPressHandledRef.current[key]) {
+				executeShortPressAction(key);
+			}
+		}
+	}, [executeShortPressAction]);
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyDown);
+		window.addEventListener('keyup', handleKeyUp);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+			window.removeEventListener('keyup', handleKeyUp);
+			Object.values(longPressTimersRef.current).forEach(clearTimeout);
+			longPressTimersRef.current = {};
+		};
+	}, [handleKeyDown, handleKeyUp]);
 
 	// ─── Start screen: render once, update progress via DOM refs to avoid flickering ───
 	const startScreenRef = useRef<HTMLDivElement>(null);
@@ -1580,6 +1872,12 @@ function App() {
 					onUpdate={handleUpdateGame}
 					addNotification={addNotification}
 					onUpdateGamelists={handleUpdateGamelists}
+					onLaunch={() => handleLaunchGame(currentGame, selectedSystem)}
+					onOpenSaveStates={() => {
+						setSaveManagerGame(currentGame)
+						setSaveManagerSystem(selectedSystem)
+						setIsSaveStateManagerOpen(true)
+					}}
 				/>
 			)}
 
@@ -1597,8 +1895,11 @@ function App() {
 				{notifications
 					.filter((n) => n.category !== 'scraper')
 					.map((n) => (
-						<div key={n.id} className={`riescade-notification ${n.type}`}>
-							<div className="riescade-notification-status" />
+						<div 
+							key={n.id} 
+							className={`riescade-notification ${n.type} ${n.category === 'controller' ? 'controller' : ''} ${n.category === 'controller' && n.type === 'success' ? 'connected' : ''}`}
+						>
+							{getNotificationIcon(n.category, n.type)}
 							<span className="riescade-notification-message">{n.message}</span>
 						</div>
 					))}
@@ -1610,7 +1911,7 @@ function App() {
 					.filter((n) => n.category === 'scraper')
 					.map((n) => (
 						<div key={n.id} className={`riescade-notification ${n.type}`}>
-							<div className="riescade-notification-status" />
+							{getNotificationIcon(n.category, n.type)}
 							<span className="riescade-notification-message">{n.message}</span>
 						</div>
 					))}

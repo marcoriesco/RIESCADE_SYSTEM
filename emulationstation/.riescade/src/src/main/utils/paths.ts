@@ -26,6 +26,14 @@ export function getConfigPath(): string {
   return join(getRetroBatPath(), 'emulationstation', '.emulationstation')
 }
 
+export function getCollectionsPath(): string {
+  return join(getRetroBatPath(), 'emulationstation', 'collections')
+}
+
+export function getMusicPath(): string {
+  return join(getRetroBatPath(), 'emulationstation', 'music')
+}
+
 export function getRiescadePath(): string {
   return join(getRetroBatPath(), 'emulationstation', '.riescade')
 }

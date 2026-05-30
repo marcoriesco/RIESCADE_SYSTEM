@@ -177,7 +177,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [showScraperProgress, setShowScraperProgress] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [modalSelectedIndex, setModalSelectedIndex] = useState(0)
-  const [versions, setVersions] = useState({ app: '2.0.1', es: '' })
   const [showInputModal, setShowInputModal] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
@@ -403,7 +402,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         setPendingSettings({})
       })
       window.api.getThemes().then(setThemes)
-      window.api.getVersion?.().then(setVersions)
       window.api.getCustomCollections().then(setCustomCollections)
       window.api.getHostname?.().then(setHostname).catch(() => {})
       window.api.getConfiguredControllers?.().then(setConfiguredControllers).catch(console.error)
@@ -1928,7 +1926,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         id: 'system_settings', label: t('SYSTEM SETTINGS'), submenu: [
           { id: 'group_system', label: t('SYSTEM'), type: 'group' },
           { id: 'information_submenu', label: t('INFORMATION'), submenu: [
-            { id: 'info_version', label: t('VERSION'), type: 'info', value: versions.es || 'RIESCADE v2.0.0' },
+            { id: 'info_version', label: t('VERSION'), type: 'info', value: 'RIESCADE v2.0.1' },
             { id: 'info_user_disk', label: t('USER DISK USAGE'), type: 'info', value: '142.5 GB / 476.2 GB (30%)' },
             { id: 'info_sys_disk', label: t('SYSTEM DISK USAGE'), type: 'info', value: '45.1 GB / 118.0 GB (38%)' },
             { id: 'group_info_cpu', label: t('CPU'), type: 'group' },
@@ -2619,9 +2617,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                   </div>
                 </div>
               )}
-              <div className="riescade-menu-version">
-                RIESCADE {versions.app} | ES {versions.es}
-              </div>
+              {/* <div className="riescade-menu-version">
+                RIESCADE {versions.app}
+              </div> */}
             </div>
           )}
         </div>

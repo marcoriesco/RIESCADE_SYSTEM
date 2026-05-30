@@ -155,38 +155,6 @@ bool ApiSystem::isFreeSpaceLimit()
 	return getFreeSpaceGB(Paths::getRootPath()) < 2;
 }
 
-std::string ApiSystem::getVersion(bool extra)
-{
-	LOG(LogDebug) << "ApiSystem::getVersion";
-
-	if (isScriptingSupported(VERSIONINFO)) 
-	{
-		std::string command = "batocera-version";
-		if (extra) 
-			command += " --extra";
-
-		auto res = executeEnumerationScript(command);
-		if (res.size() > 0 && !res[0].empty())
-			return res[0];
-	}
-
-	if (extra)
-		return "none";
-
-	std::string localVersionFile = Paths::getVersionInfoPath();
-	if (!Utils::FileSystem::exists(localVersionFile))
-		localVersionFile = Paths::findEmulationStationFile("version.info");
-
-	if (Utils::FileSystem::exists(localVersionFile))
-	{
-		std::string localVersion = Utils::FileSystem::readAllText(localVersionFile);
-		localVersion = Utils::String::replace(Utils::String::replace(localVersion, "\r", ""), "\n", "");
-		return localVersion;
-	}
-
-	return PROGRAM_VERSION_STRING;	
-}
-
 std::string ApiSystem::getApplicationName()
 {
 	std::string localVersionFile = Paths::findEmulationStationFile("about.info");

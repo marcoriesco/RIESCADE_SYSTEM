@@ -910,14 +910,6 @@ bool Win32ApiSystem::canUpdate(std::vector<std::string>& output)
 		return (ret == 0);
 	}
 
-	std::string localVersion;
-	std::string localVersionFile = Paths::getEmulationStationPath() + "/version.info";
-	if (Utils::FileSystem::exists(localVersionFile))
-	{
-		localVersion = Utils::FileSystem::readAllText(localVersionFile);
-		localVersion = Utils::String::replace(Utils::String::replace(localVersion, "\r", ""), "\n", "");
-	}
-
 	HttpReq httpreq(getUrlFromUpdateType(VERSIONURL));
 	if (httpreq.wait())
 	{

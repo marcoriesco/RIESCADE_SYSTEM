@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'fs'
 import { SystemsParser } from '../parsers/SystemsParser'
 import { GamelistParser } from '../parsers/GamelistParser'
 import { SettingsParser } from '../parsers/SettingsParser'
-import { getConfigPath, getRomsPath, getRetroBatPath } from '../utils/paths'
+import { getConfigPath, getRomsPath, getRetroBatPath, getCollectionsPath } from '../utils/paths'
 import { System, Game } from '../../shared/types'
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -1104,7 +1104,7 @@ export class LibraryService {
   }
 
   public getCustomCollections(): string[] {
-    const collectionsDir = join(getConfigPath(), 'collections')
+    const collectionsDir = getCollectionsPath()
     if (!existsSync(collectionsDir)) return []
     
     try {
@@ -1124,8 +1124,7 @@ export class LibraryService {
   }
 
   public getCollectionGames(collectionName: string): Game[] {
-    const configPath = getConfigPath()
-    const cfgPath = join(configPath, 'collections', `custom-${collectionName}.cfg`)
+    const cfgPath = join(getCollectionsPath(), `custom-${collectionName}.cfg`)
     if (!existsSync(cfgPath)) return []
 
     try {
@@ -1364,11 +1363,10 @@ export class LibraryService {
     const targetLine = `./roms/${systemName}/${cleanGamePath}`.toLowerCase()
 
     const fs = require('fs')
-    const configPath = getConfigPath()
     const matching: string[] = []
 
     for (const col of collections) {
-      const cfgPath = join(configPath, 'collections', `custom-${col}.cfg`)
+      const cfgPath = join(getCollectionsPath(), `custom-${col}.cfg`)
       if (fs.existsSync(cfgPath)) {
         const content = fs.readFileSync(cfgPath, 'utf-8')
         const lines = content.split(/\r?\n/).map((l: string) => l.trim()).filter((l: string) => l.length > 0)
@@ -1382,8 +1380,7 @@ export class LibraryService {
   }
 
   public toggleGameInCollection(collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove'): boolean {
-    const configPath = getConfigPath()
-    const collectionsDir = join(configPath, 'collections')
+    const collectionsDir = getCollectionsPath()
     const fs = require('fs')
     if (!fs.existsSync(collectionsDir)) {
       fs.mkdirSync(collectionsDir, { recursive: true })

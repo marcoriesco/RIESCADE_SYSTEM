@@ -43,4 +43,17 @@ export interface Game {
   isCollectionFolder?: boolean
   cheevosId?: string
   cheevosHash?: string
+  sortname?: string
+  tags?: string
+  fanart?: string
+  titleshot?: string
+  manual?: string
+  magazine?: string
+  map?: string
+  bezel?: string
+  boxback?: string
+  gamefamily?: string
+  arcadesystem?: string
+  languages?: string
+  region?: string
 }

@@ -6,6 +6,54 @@ const getRomFileName = (path: string): string => {
   return parts[parts.length - 1] || ''
 }
 
+const getRomDisplayPath = (path: string): string => {
+  const parts = path.replace(/\\/g, '/').split('/')
+  if (parts.length >= 2) {
+    const secondLast = parts[parts.length - 2]
+    const last = parts[parts.length - 1]
+    if (secondLast === '.' || secondLast === '') return last
+    return `${secondLast}/${last}`
+  }
+  return parts[parts.length - 1] || ''
+}
+
+const getStarsString = (ratingVal: any): string => {
+  const ratingNum = typeof ratingVal === 'number' ? ratingVal : parseFloat(ratingVal || '0')
+  const filledStars = Math.round(ratingNum * 5)
+  return '★'.repeat(filledStars) + '☆'.repeat(5 - filledStars)
+}
+
+const fields = [
+  { key: 'name', label: 'NAME' },
+  { key: 'desc', label: 'DESCRIPTION' },
+  { key: 'tags', label: 'TAGS' },
+  { key: 'sortname', label: 'SORT NAME' },
+  { key: 'image', label: 'IMAGE' },
+  { key: 'video', label: 'VIDEO' },
+  { key: 'marquee', label: 'LOGO' },
+  { key: 'thumbnail', label: 'BOX' },
+  { key: 'fanart', label: 'FAN ART' },
+  { key: 'titleshot', label: 'TITLE SHOT' },
+  { key: 'manual', label: 'MANUAL' },
+  { key: 'magazine', label: 'MAGAZINE' },
+  { key: 'map', label: 'MAP' },
+  { key: 'bezel', label: 'BEZEL (16:9)' },
+  { key: 'boxback', label: 'BOX BACKSIDE' },
+  { key: 'rating', label: 'RATING', type: 'rating' },
+  { key: 'releasedate', label: 'RELEASE DATE' },
+  { key: 'developer', label: 'DEVELOPER' },
+  { key: 'publisher', label: 'PUBLISHER' },
+  { key: 'gamefamily', label: 'GAME FAMILY' },
+  { key: 'genre', label: 'GENRES' },
+  { key: 'arcadesystem', label: 'ARCADE SYSTEM' },
+  { key: 'players', label: 'PLAYERS' },
+  { key: 'favorite', label: 'FAVORITE', type: 'bool' },
+  { key: 'hidden', label: 'HIDDEN', type: 'bool' },
+  { key: 'kidgame', label: 'KIDGAME', type: 'bool' },
+  { key: 'languages', label: 'LANGUAGES' },
+  { key: 'region', label: 'REGION' }
+]
+
 interface GameOptionsProps {
   isOpen: boolean
   onClose: () => void
@@ -16,10 +64,12 @@ interface GameOptionsProps {
   onUpdate: (updatedGame: Game) => void | Promise<any>
   addNotification?: (message: string, type: 'info' | 'success' | 'warning', category?: 'controller' | 'scraper' | 'general') => void
   onUpdateGamelists?: (systemName?: string) => void
+  onLaunch?: () => void
+  onOpenSaveStates?: () => void
 }
 
 export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({ 
-  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists
+  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists, onLaunch, onOpenSaveStates
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -48,6 +98,14 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   // REMOVER JOGO states
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false)
   const [deleteModalSelectedIndex, setDeleteModalSelectedIndex] = useState(1) // Default to "NÃO" for safety
+
+  // METADATA EDITOR states
+  const [showMetadataEditor, setShowMetadataEditor] = useState(false)
+  const [draftMetadata, setDraftMetadata] = useState<Game>(game)
+  const [metadataSelectedIndex, setMetadataSelectedIndex] = useState(0)
+  const [showInputModal, setShowInputModal] = useState(false)
+  const [activeInputField, setActiveInputField] = useState<string>('')
+  const [inputValue, setInputValue] = useState('')
 
   useEffect(() => {
     if (scraperStage !== 2 || scraperMatches.length === 0) return
@@ -141,20 +199,51 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const getRootItems = (currentGame: Game, gameCols: string[], sys: System, allCols: string[], currentSettings: Record<string, any>) => {
     const items: any[] = []
 
-    // 1. Group: OPÇÕES
-    items.push({ id: 'group_games', label: 'GAMES', type: 'group' })
+    const currentLang = currentSettings['Language']?.value || 'en_US'
+    const isPt = currentLang.startsWith('pt')
+    const t = (en: string, pt: string) => isPt ? pt : en
+
+    const isLibretro = (() => {
+      const activeEmulator = currentGame.emulator || 'auto'
+      if (activeEmulator !== 'auto') {
+        return activeEmulator.toLowerCase() === 'libretro'
+      }
+      const systemWideEmulator = currentSettings[`${sys.name}.emulator`]?.value || 'auto'
+      if (systemWideEmulator !== 'auto') {
+        return systemWideEmulator.toLowerCase() === 'libretro'
+      }
+      const defaultEmulator = sys.emulators?.[0]?.name || ''
+      return defaultEmulator.toLowerCase() === 'libretro' || !sys.emulators || sys.emulators.length === 0
+    })()
+
+    // 1. Group: GAMES
+    items.push({ id: 'group_games', label: t('GAME', 'JOGO'), type: 'group' })
+    items.push({
+      id: 'launch_game',
+      label: t('LAUNCH', 'JOGAR'),
+      type: 'action',
+      actionType: 'launch'
+    })
+    if (isLibretro) {
+      items.push({
+        id: 'save_states',
+        label: t('SAVE STATES', 'ESTADOS DE SALVAMENTO'),
+        type: 'action',
+        actionType: 'save_states'
+      })
+    }
     items.push({
       id: 'delete_game',
-      label: 'REMOVER JOGO',
+      label: t('DELETE GAME', 'REMOVER JOGO'),
       type: 'action',
       actionType: 'delete'
     })
 
     // 2. Group: COLEÇÕES
-    items.push({ id: 'group_collections', label: 'COLEÇÕES', type: 'group' })
+    items.push({ id: 'group_collections', label: t('COLLECTIONS', 'COLEÇÕES'), type: 'group' })
     items.push({ 
       id: 'favorite', 
-      label: 'FAVORITAR JOGO', 
+      label: currentGame.favorite ? t('REMOVE FROM FAVORITES', 'REMOVER DOS FAVORITOS') : t('ADD TO FAVORITES', 'FAVORITAR JOGO'), 
       type: 'toggle', 
       value: currentGame.favorite 
     })
@@ -170,7 +259,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
     items.push({
       id: 'add_to_collection',
-      label: 'ADICIONAR A COLEÇÃO',
+      label: t('ADD TO CUSTOM COLLECTION...', 'ADICIONAR A COLEÇÃO'),
       type: 'submenu',
       submenu: addColSubmenu
     })
@@ -179,18 +268,18 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     gameCols.forEach(col => {
       items.push({
         id: `remove_col_${col}`,
-        label: `REMOVER DE ${col.toUpperCase()}`,
+        label: t(`REMOVE FROM ${col.toUpperCase()}`, `REMOVER DE ${col.toUpperCase()}`),
         type: 'action',
         collectionName: col,
         actionType: 'remove'
       })
     })
 
-    // 2. Group: OPÇÕES
-    items.push({ id: 'group_options', label: 'OPÇÕES', type: 'group' })
+    // 3. Group: OPTIONS
+    items.push({ id: 'group_options', label: t('OPTIONS', 'OPÇÕES'), type: 'group' })
     items.push({
       id: 'scrape_this_game',
-      label: 'PROCURAR POR MÍDIAS DESTE JOGO',
+      label: t('SCRAPE', 'PROCURAR POR MÍDIAS DESTE JOGO'),
       type: 'action',
       actionType: 'scrape'
     })
@@ -264,7 +353,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       },
       {
         id: 'game_smooth',
-        label: 'JOGOS SUAVES (FILTRO BILINEAR)',
+        label: t('SMOOTH GAMES (BILINEAR FILTERING)', 'JOGOS SUAVES (FILTRO BILINEAR)'),
         type: 'toggle',
         settingName: 'smooth',
         value: getGameSettingValue('smooth', 'auto') === 'true' || getGameSettingValue('smooth', 'auto') === true
@@ -273,9 +362,17 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
     items.push({
       id: 'advanced_game_options',
-      label: 'OPÇÕES AVANÇADAS DO JOGO',
+      label: t('ADVANCED GAME OPTIONS', 'OPÇÕES AVANÇADAS DO JOGO'),
       type: 'submenu',
       submenu: advancedSubmenu
+    })
+
+    // EDIT THIS GAME'S METADATA
+    items.push({
+      id: 'edit_metadata',
+      label: t("EDIT THIS GAME'S METADATA", "EDITAR METADADOS DESTE JOGO"),
+      type: 'action',
+      actionType: 'edit_metadata'
     })
 
     return items
@@ -284,7 +381,11 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   useEffect(() => {
     if (isOpen) {
       setDraftGame(game)
+      setDraftMetadata(game)
       setScraperStage(0)
+      setShowMetadataEditor(false)
+      setMetadataSelectedIndex(0)
+      setShowInputModal(false)
       
       window.api.getSettings().then(s => {
         setSettings(s)
@@ -399,6 +500,25 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   )
 
   const handleAction = async (item: any) => {
+    if (item.actionType === 'launch') {
+      onClose()
+      if (onLaunch) onLaunch()
+      return
+    }
+
+    if (item.actionType === 'save_states') {
+      onClose()
+      if (onOpenSaveStates) onOpenSaveStates()
+      return
+    }
+
+    if (item.actionType === 'edit_metadata') {
+      setDraftMetadata(draftGame)
+      setMetadataSelectedIndex(0)
+      setShowMetadataEditor(true)
+      return
+    }
+
     if (item.actionType === 'scrape') {
       setScraperStage(1)
       setScraperDbs({ ScreenScraper: true, ArcadeDB: true, TheGamesDB: true, HfsDB: true, IGDB: true })
@@ -491,6 +611,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     try {
       const updated = await window.api.downloadGameMedia(system.name, game.path, selectedMatch)
       if (updated) {
+        if (showMetadataEditor) {
+          setDraftMetadata(updated)
+        }
         const updateResult = onUpdate(updated)
         if (addNotification) addNotification(`MÍDIAS DE ${game.name.toUpperCase()} BAIXADAS COM SUCESSO!`, 'success', 'scraper')
         
@@ -574,9 +697,118 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
   }
 
+  const handleSaveMetadata = async () => {
+    setShowMetadataEditor(false)
+    if (addNotification) {
+      addNotification(`SALVANDO METADADOS PARA ${game.name.toUpperCase()}...`, 'info', 'general')
+    }
+    try {
+      await onUpdate(draftMetadata)
+      if (addNotification) {
+        addNotification(`METADADOS DE ${draftMetadata.name.toUpperCase()} SALVOS COM SUCESSO!`, 'success', 'general')
+      }
+      onClose()
+      if (onUpdateGamelists) {
+        onUpdateGamelists(system.name)
+      }
+    } catch (err) {
+      console.error(err)
+      if (addNotification) {
+        addNotification('ERRO AO SALVAR METADADOS', 'warning', 'general')
+      }
+    }
+  }
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!isOpen) return
+
+      if (showMetadataEditor) {
+        if (showInputModal) {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            e.stopPropagation()
+            setDraftMetadata(prev => ({ ...prev, [activeInputField]: inputValue }))
+            setShowInputModal(false)
+          } else if (e.key === 'Escape') {
+            e.preventDefault()
+            e.stopPropagation()
+            setShowInputModal(false)
+          }
+          return
+        }
+
+        e.preventDefault()
+        e.stopPropagation()
+
+        const totalFields = fields.length
+
+        if (e.key === 'ArrowDown') {
+          setMetadataSelectedIndex(prev => {
+            if (prev < totalFields - 1) {
+              return prev + 1
+            } else if (prev === totalFields - 1) {
+              return totalFields
+            } else {
+              return 0
+            }
+          })
+        } else if (e.key === 'ArrowUp') {
+          setMetadataSelectedIndex(prev => {
+            if (prev === 0) {
+              return totalFields + 3
+            } else if (prev >= totalFields) {
+              return totalFields - 1
+            } else {
+              return prev - 1
+            }
+          })
+        } else if (e.key === 'ArrowRight') {
+          if (metadataSelectedIndex >= totalFields) {
+            setMetadataSelectedIndex(prev => {
+              const currentBtn = prev - totalFields
+              const nextBtn = (currentBtn + 1) % 4
+              return totalFields + nextBtn
+            })
+          }
+        } else if (e.key === 'ArrowLeft') {
+          if (metadataSelectedIndex >= totalFields) {
+            setMetadataSelectedIndex(prev => {
+              const currentBtn = prev - totalFields
+              const nextBtn = (currentBtn - 1 + 4) % 4
+              return totalFields + nextBtn
+            })
+          }
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          if (metadataSelectedIndex < totalFields) {
+            const field = fields[metadataSelectedIndex]
+            if (field.type === 'bool') {
+              setDraftMetadata(prev => ({ ...prev, [field.key]: !prev[field.key as keyof Game] }))
+            } else {
+              setActiveInputField(field.key)
+              setInputValue((draftMetadata[field.key as keyof Game] as string) || '')
+              setShowInputModal(true)
+            }
+          } else {
+            const btnIdx = metadataSelectedIndex - totalFields
+            if (btnIdx === 0) {
+              handleSaveMetadata()
+            } else if (btnIdx === 1) {
+              setScraperStage(1)
+              setScraperDbs({ ScreenScraper: true, ArcadeDB: true, TheGamesDB: true, HfsDB: true, IGDB: true })
+              setScraperDbSelectedIndex(0)
+            } else if (btnIdx === 2) {
+              setDeleteModalSelectedIndex(1)
+              setShowDeleteConfirmModal(true)
+            } else if (btnIdx === 3) {
+              setShowMetadataEditor(false)
+            }
+          }
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          setShowMetadataEditor(false)
+        }
+        return
+      }
 
       if (showDeleteConfirmModal) {
         e.preventDefault()
@@ -714,7 +946,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
       }
     },
-    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings, showDeleteConfirmModal, deleteModalSelectedIndex, confirmDelete]
+    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings, showDeleteConfirmModal, deleteModalSelectedIndex, confirmDelete, showMetadataEditor, showInputModal, metadataSelectedIndex, activeInputField, inputValue, draftMetadata]
   )
 
   useEffect(() => {
@@ -1111,83 +1343,451 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     )
   }
 
+  const renderInputModal = () => {
+    if (!showInputModal) return null
+    const field = fields.find(f => f.key === activeInputField)
+    const label = field ? field.label : ''
+    const isMultiline = activeInputField === 'desc'
+    const isRating = activeInputField === 'rating'
 
+    return (
+      <div className="riescade-metadata-input-overlay" style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(0, 0, 0, 0.8)',
+        zIndex: 2000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+      onClick={() => setShowInputModal(false)}
+      >
+        <div className="riescade-metadata-input-container" style={{
+          background: '#141414',
+          border: '2px solid var(--theme-color, #ff007f)',
+          borderRadius: '10px',
+          width: '500px',
+          padding: '25px',
+          boxSizing: 'border-box',
+          boxShadow: '0 15px 40px rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '15px'
+        }}
+        onClick={e => e.stopPropagation()}
+        >
+          <div style={{
+            fontSize: '1.2rem',
+            fontWeight: 'bold',
+            color: 'var(--theme-color, #ff007f)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            {label}
+          </div>
+          
+          {isRating ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+              <div style={{ fontSize: '1.8rem', letterSpacing: '2px', color: '#fff' }}>
+                {getStarsString(inputValue)}
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={typeof inputValue === 'number' ? inputValue : parseFloat(inputValue || '0')}
+                onChange={e => setInputValue(parseFloat(e.target.value) as any)}
+                style={{
+                  width: '100%',
+                  accentColor: 'var(--theme-color, #ff007f)',
+                  cursor: 'pointer'
+                }}
+              />
+              <div style={{ color: '#888', fontSize: '0.9rem' }}>
+                {Math.round((typeof inputValue === 'number' ? inputValue : parseFloat(inputValue || '0')) * 100)}%
+              </div>
+            </div>
+          ) : isMultiline ? (
+            <textarea
+              autoFocus
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              style={{
+                background: '#222',
+                border: '1px solid #444',
+                borderRadius: '5px',
+                color: '#fff',
+                padding: '10px',
+                fontSize: '1rem',
+                minHeight: '120px',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+                outline: 'none'
+              }}
+            />
+          ) : (
+            <input
+              type="text"
+              autoFocus
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              style={{
+                background: '#222',
+                border: '1px solid #444',
+                borderRadius: '5px',
+                color: '#fff',
+                padding: '10px',
+                fontSize: '1rem',
+                width: '100%',
+                boxSizing: 'border-box',
+                outline: 'none'
+              }}
+            />
+          )}
+
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '10px',
+            marginTop: '10px'
+          }}>
+            <button
+              onClick={() => {
+                setDraftMetadata(prev => ({ ...prev, [activeInputField]: inputValue }))
+                setShowInputModal(false)
+              }}
+              style={{
+                background: 'var(--theme-color, #ff007f)',
+                color: '#fff',
+                border: 'none',
+                padding: '8px 20px',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              SAVE
+            </button>
+            <button
+              onClick={() => setShowInputModal(false)}
+              style={{
+                background: '#333',
+                color: '#ccc',
+                border: 'none',
+                padding: '8px 20px',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const renderMetadataEditor = () => {
+    const totalFields = fields.length
+    const romDisplayPath = getRomDisplayPath(game.path)
+
+    return (
+      <div className="riescade-metadata-editor-overlay" style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(15px)',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxSizing: 'border-box'
+      }}>
+        <div className="riescade-metadata-editor-container" style={{
+          width: '700px',
+          height: '85vh',
+          background: 'rgba(12, 12, 12, 0.95)',
+          border: '1.5px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          flexDirection: 'column',
+          fontFamily: '"Roboto Condensed", "Inter", sans-serif',
+          padding: '25px 35px',
+          boxSizing: 'border-box',
+          color: '#fff',
+          position: 'relative'
+        }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '20px', flexShrink: 0 }}>
+            <h2 style={{
+              margin: 0,
+              color: 'var(--theme-color, #ff007f)',
+              fontSize: '1.8rem',
+              fontWeight: 800,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase'
+            }}>EDIT METADATA</h2>
+            <div style={{
+              color: 'var(--theme-color, #ff007f)',
+              fontSize: '0.9rem',
+              marginTop: '5px',
+              fontWeight: 'bold',
+              opacity: 0.85
+            }}>{romDisplayPath}</div>
+          </div>
+
+          {/* Scrollable Fields List */}
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2px',
+            marginBottom: '20px',
+            paddingRight: '5px'
+          }}>
+            {fields.map((field, idx) => {
+              const isSelected = metadataSelectedIndex === idx
+              const val = (draftMetadata[field.key as keyof Game] as string) || ''
+              const isBool = field.type === 'bool'
+              const boolVal = !!draftMetadata[field.key as keyof Game]
+
+              return (
+                <div
+                  key={field.key}
+                  className={`riescade-metadata-row ${isSelected ? 'selected' : ''}`}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '10px 15px',
+                    cursor: 'pointer',
+                    background: isSelected ? 'var(--theme-color, #ff007f)' : 'transparent',
+                    color: isSelected ? '#fff' : '#b0b0b0',
+                    transition: 'background 0.1s ease',
+                    minHeight: '40px',
+                    boxSizing: 'border-box'
+                  }}
+                  onMouseEnter={() => {
+                    if (!showInputModal) setMetadataSelectedIndex(idx)
+                  }}
+                  onClick={() => {
+                    if (showInputModal) return
+                    if (isBool) {
+                      setDraftMetadata(prev => ({ ...prev, [field.key]: !prev[field.key as keyof Game] }))
+                    } else {
+                      setActiveInputField(field.key)
+                      setInputValue((draftMetadata[field.key as keyof Game] as string) || '')
+                      setShowInputModal(true)
+                    }
+                  }}
+                >
+                  <span style={{
+                    fontWeight: 'bold',
+                    fontSize: '1.05rem',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                    color: isSelected ? '#fff' : '#e0e0e0'
+                  }}>{field.label}</span>
+                  
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    maxWidth: '65%'
+                  }}>
+                    {isBool ? (
+                      <div style={{
+                        width: '40px',
+                        height: '22px',
+                        background: boolVal ? (isSelected ? '#fff' : 'var(--theme-color, #ff007f)') : '#333',
+                        border: isSelected ? '1.5px solid #fff' : '1.5px solid #555',
+                        borderRadius: '11px',
+                        position: 'relative',
+                        transition: 'background 0.2s ease',
+                        cursor: 'pointer'
+                      }}>
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          background: isSelected ? 'var(--theme-color, #ff007f)' : '#fff',
+                          borderRadius: '50%',
+                          position: 'absolute',
+                          top: '1.5px',
+                          left: boolVal ? '20px' : '2px',
+                          transition: 'left 0.2s ease'
+                        }} />
+                      </div>
+                    ) : (
+                      <>
+                        <span style={{
+                          fontSize: '1rem',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          color: isSelected ? '#fff' : '#888',
+                          textAlign: 'right'
+                        }}>
+                          {field.type === 'rating' ? getStarsString(val) : val}
+                        </span>
+                        <span style={{
+                          fontSize: '1.1rem',
+                          color: isSelected ? '#fff' : '#666',
+                          marginLeft: '5px'
+                        }}>&gt;</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Bottom Buttons */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '15px',
+            padding: '10px 0',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            flexShrink: 0
+          }}>
+            {['SAVE', 'SCRAPE', 'DELETE', 'CANCEL'].map((label, btnIdx) => {
+              const idx = totalFields + btnIdx
+              const isSelected = metadataSelectedIndex === idx
+              return (
+                <button
+                  key={label}
+                  className={`riescade-metadata-btn ${isSelected ? 'selected' : ''}`}
+                  style={{
+                    background: isSelected ? 'var(--theme-color, #ff007f)' : 'transparent',
+                    color: isSelected ? '#fff' : '#ccc',
+                    border: isSelected ? '1px solid var(--theme-color, #ff007f)' : '1px solid rgba(255, 255, 255, 0.3)',
+                    padding: '8px 25px',
+                    fontSize: '0.95rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    textTransform: 'uppercase',
+                    outline: 'none',
+                    minWidth: '100px'
+                  }}
+                  onMouseEnter={() => {
+                    if (!showInputModal) setMetadataSelectedIndex(idx)
+                  }}
+                  onClick={() => {
+                    if (btnIdx === 0) handleSaveMetadata()
+                    else if (btnIdx === 1) {
+                      setScraperStage(1)
+                      setScraperDbs({ ScreenScraper: true, ArcadeDB: true, TheGamesDB: true, HfsDB: true, IGDB: true })
+                      setScraperDbSelectedIndex(0)
+                    } else if (btnIdx === 2) {
+                      setDeleteModalSelectedIndex(1)
+                      setShowDeleteConfirmModal(true)
+                    } else if (btnIdx === 3) {
+                      setShowMetadataEditor(false)
+                    }
+                  }}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+
+          {showInputModal && renderInputModal()}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
       <div className={`riescade-menu-overlay game-options ${visible ? 'visible' : ''}`}>
-        <div className="riescade-menu-container">
-          <div className="riescade-menu-header">
-            {marqueeUrl ? (
-              <div className="riescade-menu-marquee-container">
-                <img src={marqueeUrl} alt="Game Marquee" className="riescade-menu-marquee" />
-              </div>
-            ) : (
-              <>
-                <h2 className="riescade-menu-title">{menuTitle}</h2>
-                <div className="riescade-menu-subtitle">{game.name}</div>
-              </>
-            )}
-            {marqueeUrl && menuTitle !== 'GAME OPTIONS' && (
-              <h2 className="riescade-menu-title" style={{ marginTop: '10px' }}>{menuTitle}</h2>
-            )}
-
-            {currentStackItem?.tabs && currentStackItem.tabs.length > 0 && (
-              <div className="riescade-menu-tabs">
-                {currentStackItem.tabs.map((tab, idx) => (
-                  <div
-                    key={tab}
-                    className={`riescade-menu-tab ${idx === currentStackItem.activeTab ? 'active' : ''}`}
-                    onClick={() => {
-                      setActiveMenuStack(prev => {
-                        const next = [...prev]
-                        next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
-                        return next
-                      })
-                      const tabItems = currentStackItem.items.filter(item => item.tab === idx)
-                      setSelectedIndex(getFirstSelectableIndex(tabItems))
-                    }}
-                  >
-                    {tab}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          <div className="riescade-menu-list-container">{menuItemsNode}</div>
-          
-          {bottomButtons.length > 0 && (
-            <div className="riescade-menu-bottom-bar">
-              {bottomButtons.map((btn, btnIdx) => {
-                const isSelected = selectedIndex === currentMenu.length + btnIdx
-                return (
-                  <button
-                    key={btn.id}
-                    className={`riescade-menu-bottom-button ${isSelected ? 'selected' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      btn.onClick()
-                    }}
-                  >
-                    {btn.label}
-                  </button>
-                )
-              })}
-            </div>
-          )}
-
-          <div className="riescade-menu-footer">
-            {bottomButtons.length === 0 && (
-              <div className="riescade-menu-footer-actions">
-                <div className="riescade-menu-footer-action">
-                  <span className="riescade-menu-footer-button">B</span>
-                  <span className="riescade-menu-footer-text">BACK</span>
+        {!showMetadataEditor && (
+          <div className="riescade-menu-container">
+            <div className="riescade-menu-header">
+              {marqueeUrl ? (
+                <div className="riescade-menu-marquee-container">
+                  <img src={marqueeUrl} alt="Game Marquee" className="riescade-menu-marquee" />
                 </div>
+              ) : (
+                <>
+                  <h2 className="riescade-menu-title">{menuTitle}</h2>
+                  <div className="riescade-menu-subtitle">{game.name}</div>
+                </>
+              )}
+              {marqueeUrl && menuTitle !== 'GAME OPTIONS' && (
+                <h2 className="riescade-menu-title" style={{ marginTop: '10px' }}>{menuTitle}</h2>
+              )}
+
+              {currentStackItem?.tabs && currentStackItem.tabs.length > 0 && (
+                <div className="riescade-menu-tabs">
+                  {currentStackItem.tabs.map((tab, idx) => (
+                    <div
+                      key={tab}
+                      className={`riescade-menu-tab ${idx === currentStackItem.activeTab ? 'active' : ''}`}
+                      onClick={() => {
+                        setActiveMenuStack(prev => {
+                          const next = [...prev]
+                          next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
+                          return next
+                        })
+                        const tabItems = currentStackItem.items.filter(item => item.tab === idx)
+                        setSelectedIndex(getFirstSelectableIndex(tabItems))
+                      }}
+                    >
+                      {tab}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="riescade-menu-list-container">{menuItemsNode}</div>
+            
+            {bottomButtons.length > 0 && (
+              <div className="riescade-menu-bottom-bar">
+                {bottomButtons.map((btn, btnIdx) => {
+                  const isSelected = selectedIndex === currentMenu.length + btnIdx
+                  return (
+                    <button
+                      key={btn.id}
+                      className={`riescade-menu-bottom-button ${isSelected ? 'selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        btn.onClick()
+                      }}
+                    >
+                      {btn.label}
+                    </button>
+                  )
+                })}
               </div>
             )}
+
+            <div className="riescade-menu-footer">
+              {bottomButtons.length === 0 && (
+                <div className="riescade-menu-footer-actions">
+                  <div className="riescade-menu-footer-action">
+                    <span className="riescade-menu-footer-button">B</span>
+                    <span className="riescade-menu-footer-text">BACK</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+        {showMetadataEditor && renderMetadataEditor()}
       </div>
 
       {scraperStage === 1 && renderStageStage1()}

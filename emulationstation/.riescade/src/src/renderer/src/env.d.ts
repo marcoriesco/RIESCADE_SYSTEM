@@ -25,7 +25,7 @@ declare global {
       saveInputConfig: (data: { deviceName: string; deviceGUID: string; mappings: any }) => Promise<boolean>
       getBluetoothDevices: () => Promise<any[]>
       executeCommand: (command: string, data?: any) => void
-      getVersion: () => Promise<{ app: string; es: string }>
+      getVersion: () => Promise<{ app: string; }>
       getCollectionsForGame: (systemName: string, gamePath: string) => Promise<string[]>
       toggleGameInCollection: (collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove') => Promise<boolean>
       getFileContent: (path: string) => Promise<string | null>

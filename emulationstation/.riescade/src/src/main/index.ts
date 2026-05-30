@@ -12,7 +12,7 @@ import { SassService } from './services/SassService'
 import { ScraperService } from './services/ScraperService'
 import { Game, System } from '../shared/types'
 import { watch, FSWatcher, readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs'
-import { getRetroBatPath, getConfigPath, getDefaultThemePath, getUserThemesPath } from './utils/paths'
+import { getRetroBatPath, getConfigPath, getDefaultThemePath, getUserThemesPath, getMusicPath } from './utils/paths'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from './services/ScraperService'
 
@@ -370,23 +370,6 @@ app.whenReady().then(() => {
     })
   })
 
-  ipcMain.handle('get-version', async () => {
-    let esVersion = 'unknown'
-    try {
-      const versionFile = join(getRetroBatPath(), 'emulationstation', 'version.info')
-      if (existsSync(versionFile)) {
-        esVersion = readFileSync(versionFile, 'utf-8').trim()
-      }
-    } catch (e) {
-      console.error('Failed to read version.info:', e)
-    }
-    
-    return {
-      app: app.getVersion(),
-      es: esVersion
-    }
-  })
-
   ipcMain.handle('get-hostname', async () => {
     return require('os').hostname()
   })
@@ -467,7 +450,7 @@ app.whenReady().then(() => {
     try {
       const { readdirSync, statSync } = require('fs')
       const { extname } = require('path')
-      const baseDir = join(getConfigPath(), 'music')
+      const baseDir = getMusicPath()
       const targetDir = subfolder ? join(baseDir, subfolder) : baseDir
       
       if (!existsSync(targetDir)) return []
@@ -492,7 +475,7 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('get-music-path', async () => {
-    return join(getConfigPath(), 'music')
+    return getMusicPath()
   })
 
   ipcMain.handle('start-scrape', async () => {
