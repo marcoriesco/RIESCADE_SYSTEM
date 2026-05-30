@@ -83,13 +83,22 @@ try {
   })
 } catch {}
 
-// 2. Create hard link/copy for RIESCADE.exe in the root
-console.log(`🔗 Creating shortcut/launcher at ${rootExe}...`)
+// 2. Create portable launcher for RIESCADE.exe in the root
+// The launcher resolves paths RELATIVE to its own location at runtime,
+// so the entire folder can be moved anywhere and it still works.
+const relTargetExe = path.relative(retroBatRoot, targetExe).replace(/\//g, '\\')
+const relWorkDir = path.relative(retroBatRoot, distDest).replace(/\//g, '\\')
+const relIcon = path.relative(retroBatRoot, iconIco).replace(/\//g, '\\')
+
+console.log(`🔗 Creating portable launcher at ${rootExe}...`)
+console.log(`   Relative target: ${relTargetExe}`)
+console.log(`   Relative workdir: ${relWorkDir}`)
 try {
   if (fs.existsSync(rootExe)) fs.unlinkSync(rootExe)
 } catch {}
 
-const escapePs = (s) => String(s).replace(/`/g, '``').replace(/"/g, '`"')
+const escapePs = (s) => String(s).replace(/`/g, '``').replace(/\"/g, '`"')
+const escapeCs = (s) => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 
 try {
   try {
@@ -99,8 +108,6 @@ try {
   const ps = `
 $ErrorActionPreference = 'Stop'
 $outExe = "${escapePs(rootExe)}"
-$targetExe = "${escapePs(targetExe)}"
-$workDir = "${escapePs(distDest)}"
 $icon = "${escapePs(iconIco)}"
 
 if (Test-Path $outExe) { Remove-Item -Force $outExe }
@@ -115,6 +122,7 @@ $code = @"
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 public static class RiescadeLauncher
 {
@@ -122,12 +130,18 @@ public static class RiescadeLauncher
   {
     try
     {
-      string targetExe = @"${escapePs(targetExe)}";
-      string workDir = @"${escapePs(distDest)}";
+      // Resolve paths relative to the launcher exe location (portable)
+      string launcherDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+      string targetExe = Path.GetFullPath(Path.Combine(launcherDir, "${escapeCs(relTargetExe)}"));
+      string workDir = Path.GetFullPath(Path.Combine(launcherDir, "${escapeCs(relWorkDir)}"));
 
       if (!File.Exists(targetExe))
       {
-        Console.Error.WriteLine("Missing target exe: " + targetExe);
+        System.Windows.Forms.MessageBox.Show(
+          "RIESCADE.exe not found at:\\n" + targetExe + "\\n\\nMake sure the folder structure is intact.",
+          "RIESCADE - Error",
+          System.Windows.Forms.MessageBoxButtons.OK,
+          System.Windows.Forms.MessageBoxIcon.Error);
         return 2;
       }
 
@@ -143,7 +157,11 @@ public static class RiescadeLauncher
     }
     catch (Exception ex)
     {
-      Console.Error.WriteLine(ex.ToString());
+      System.Windows.Forms.MessageBox.Show(
+        "Failed to start RIESCADE:\\n" + ex.Message,
+        "RIESCADE - Error",
+        System.Windows.Forms.MessageBoxButtons.OK,
+        System.Windows.Forms.MessageBoxIcon.Error);
       return 1;
     }
   }
@@ -156,6 +174,7 @@ $args = @(
   "/nologo",
   "/target:winexe",
   "/optimize+",
+  "/reference:System.Windows.Forms.dll",
   "/out:$outExe",
   $src
 )
@@ -169,11 +188,12 @@ if (Test-Path $icon) {
 
   const encoded = Buffer.from(ps, 'utf16le').toString('base64')
   execSync(`powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${encoded}`, { stdio: 'inherit' })
-  console.log('✅ Launcher created successfully!')
+  console.log('✅ Portable launcher created successfully!')
 } catch (e) {
   console.log('⚠️ Failed to compile launcher exe. Creating .cmd fallback...')
   const cmdPath = path.join(retroBatRoot, 'RIESCADE.cmd')
-  const cmd = `@echo off\r\npushd "${distDest}"\r\nstart "" "${targetExe}"\r\npopd\r\n`
+  // Fallback also uses relative paths for portability
+  const cmd = `@echo off\r\nset "LAUNCHER_DIR=%~dp0"\r\npushd "%LAUNCHER_DIR%${relWorkDir}"\r\nstart "" "%LAUNCHER_DIR%${relTargetExe}"\r\npopd\r\n`
   fs.writeFileSync(cmdPath, cmd, 'utf8')
   console.log(`✅ Fallback launcher created: ${cmdPath}`)
 }
