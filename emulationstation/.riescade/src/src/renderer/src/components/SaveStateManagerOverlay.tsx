@@ -171,110 +171,20 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 9999,
-        background: 'rgba(0, 0, 0, 0.88)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        animation: 'savestate-fadein 0.25s ease-out',
-        userSelect: 'none'
-      }}
-    >
-      {/* Dynamic Keyframes Animation Injection */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes savestate-fadein {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes savestate-pulse {
-          0% { box-shadow: 0 0 10px rgba(186, 12, 70, 0.4); }
-          50% { box-shadow: 0 0 25px rgba(186, 12, 70, 0.9); }
-          100% { box-shadow: 0 0 10px rgba(186, 12, 70, 0.4); }
-        }
-        .savestate-card {
-          position: relative;
-          width: 250px;
-          height: 350px;
-          border-radius: 16px;
-          overflow: hidden;
-          background: rgba(255, 255, 255, 0.05);
-          border: 2px solid rgba(255, 255, 255, 0.08);
-          display: flex;
-          flex-direction: column;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          cursor: pointer;
-          flex-shrink: 0;
-        }
-        .savestate-card.selected {
-          border-color: #ba0c46;
-          animation: savestate-pulse 1.8s infinite;
-        }
-        .savestate-card:hover {
-          border-color: rgba(255, 255, 255, 0.2);
-        }
-        .savestate-card.selected:hover {
-          border-color: #ba0c46;
-        }
-        .savestate-scroll::-webkit-scrollbar {
-          height: 8px;
-        }
-        .savestate-scroll::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.03);
-          border-radius: 4px;
-        }
-        .savestate-scroll::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.15);
-          border-radius: 4px;
-        }
-        .savestate-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.25);
-        }
-      `}} />
+    <div className="savestate-overlay">
 
       {/* Header Title */}
-      <h1
-        style={{
-          color: '#ba0c46',
-          fontSize: '2rem',
-          fontWeight: 900,
-          letterSpacing: '3px',
-          textAlign: 'center',
-          marginBottom: '50px',
-          textTransform: 'uppercase',
-          textShadow: '0 2px 10px rgba(186, 12, 70, 0.3)',
-          fontFamily: "'Inter', sans-serif"
-        }}
-      >
+      <h1 className="savestate-header-title">
         GERENCIADOR DE ESTADOS DE SALVAMENTO
       </h1>
 
       {loading ? (
-        <div style={{ color: '#fff', fontSize: '1.2rem', opacity: 0.7 }}>Carregando salvamentos...</div>
+        <div className="savestate-loading">Carregando salvamentos...</div>
       ) : (
         /* Horizontal Cards Container */
         <div
           ref={containerRef}
           className="savestate-scroll"
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '30px',
-            maxWidth: '90%',
-            overflowX: 'auto',
-            padding: '30px 40px',
-            scrollBehavior: 'smooth',
-            alignItems: 'center'
-          }}
         >
           {options.map((option, index) => {
             const isSelected = selectedIndex === index
@@ -283,26 +193,14 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
               return (
                 <div
                   key={option.id}
-                  className={`savestate-card ${isSelected ? 'selected' : ''}`}
+                  className={`savestate-card action-card ${isSelected ? 'selected' : ''}`}
                   onClick={() => {
                     setSelectedIndex(index)
                     onLaunch(option.slot)
                   }}
-                  style={{
-                    background: isSelected ? '#ba0c46' : 'rgba(255, 255, 255, 0.05)'
-                  }}
                 >
                   {/* Centered Curved Arrow Icon */}
-                  <div
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: isSelected ? '#fff' : 'rgba(255, 255, 255, 0.6)',
-                      transition: 'color 0.2s ease'
-                    }}
-                  >
+                  <div className="savestate-card-icon-container">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -315,25 +213,7 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
                   </div>
 
                   {/* Clean card label */}
-                  <div
-                    style={{
-                      padding: '24px 20px',
-                      textAlign: 'center',
-                      color: isSelected ? '#fff' : 'rgba(255, 255, 255, 0.7)',
-                      fontSize: '0.9rem',
-                      fontWeight: 'bold',
-                      letterSpacing: '1px',
-                      textTransform: 'uppercase',
-                      lineHeight: '1.3',
-                      minHeight: '80px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'color 0.2s ease',
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word'
-                    }}
-                  >
+                  <div className="savestate-card-label">
                     {option.label}
                   </div>
                 </div>
@@ -354,88 +234,28 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
                 {option.screenshotUrl ? (
                   <>
                     <div
+                      className="savestate-card-screenshot"
                       style={{
-                        height: '65%',
-                        width: '100%',
-                        backgroundImage: `url("${option.screenshotUrl}")`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                        backgroundImage: `url("${option.screenshotUrl}")`
                       }}
                     />
                     {/* Details Footer */}
-                    <div
-                      style={{
-                        height: '35%',
-                        padding: '15px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        background: 'rgba(0, 0, 0, 0.3)'
-                      }}
-                    >
-                      <div
-                        style={{
-                          color: isSelected ? '#ba0c46' : '#fff',
-                          fontSize: '0.85rem',
-                          fontWeight: 'bold',
-                          letterSpacing: '1px',
-                          textTransform: 'uppercase',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          transition: 'color 0.2s ease'
-                        }}
-                      >
+                    <div className="savestate-card-details">
+                      <div className="savestate-card-details-title">
                         {option.label}
                       </div>
-                      <div
-                        style={{
-                          color: 'rgba(255, 255, 255, 0.5)',
-                          fontSize: '0.75rem',
-                          fontFamily: "'Courier New', Courier, monospace"
-                        }}
-                      >
+                      <div className="savestate-card-details-date">
                         {formatDate(option.date || 0)}
                       </div>
                     </div>
                   </>
                 ) : (
                   /* Elegant full-card gradient containing the save metadata directly (No placeholder icon/separate footer) */
-                  <div
-                    style={{
-                      flex: 1,
-                      background: 'linear-gradient(135deg, #1c020c, #480520, #6e0830)',
-                      padding: '24px 20px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      height: '100%'
-                    }}
-                  >
-                    <div
-                      style={{
-                        color: isSelected ? '#ff4d80' : '#fff',
-                        fontSize: '0.9rem',
-                        fontWeight: 'bold',
-                        letterSpacing: '1px',
-                        textTransform: 'uppercase',
-                        lineHeight: '1.4',
-                        transition: 'color 0.2s ease',
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word',
-                        textShadow: isSelected ? '0 0 10px rgba(255, 77, 128, 0.5)' : 'none'
-                      }}
-                    >
+                  <div className="savestate-card-gradient">
+                    <div className="savestate-card-gradient-title">
                       {option.label}
                     </div>
-                    <div
-                      style={{
-                        color: 'rgba(255, 255, 255, 0.5)',
-                        fontSize: '0.75rem',
-                        fontFamily: "'Courier New', Courier, monospace"
-                      }}
-                    >
+                    <div className="savestate-card-details-date">
                       {formatDate(option.date || 0)}
                     </div>
                   </div>

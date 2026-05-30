@@ -593,96 +593,44 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
       <img
         src={src}
         alt={type}
+        className="input-config-row-icon"
         style={{
-          width: '46px',
-          height: '46px',
-          opacity: active ? 1 : 0.4,
-          transition: 'opacity 0.2s ease',
-          display: 'block'
+          opacity: active ? 1 : 0.4
         }}
       />
     )
   }
 
   return (
-    <div style={{
-      fontFamily: '"Roboto Condensed", sans-serif',
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      zIndex: 9999, display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      color: '#fff', userSelect: 'none'
-    }}>
+    <div className="input-config-overlay">
       
       {/* PHASE 1: WARNING DIALOG REPLICA (Screenshot 1) */}
       {phase === 'warning' && (
-        <div style={{
-          width: '720px',
-          backgroundColor: 'rgba(15, 15, 15, 0.98)',
-          border: '1.5px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 25px 50px rgba(0,0,0,0.8)',
-          padding: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '30px' }}>
+        <div className="input-config-warning-container">
+          <div className="input-config-warning-header">
             {/* Info Circle Icon */}
-            <div style={{
-              width: '56px', height: '56px',
-              borderRadius: '50%',
-              border: '2px solid rgba(255, 255, 255, 0.8)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '32px', fontWeight: 'bold', fontFamily: 'serif',
-              color: 'rgba(255, 255, 255, 0.9)',
-              flexShrink: 0,
-              marginTop: '5px'
-            }}>
+            <div className="input-config-warning-icon">
               i
             </div>
             
             {/* Warning Text */}
-            <div style={{
-              fontSize: '18px',
-              lineHeight: '1.7',
-              color: 'rgba(255, 255, 255, 0.85)',
-              fontWeight: 500,
-              letterSpacing: '0.5px'
-            }}>
+            <div className="input-config-warning-text">
               YOU ARE GOING TO MAP A CONTROLLER. MAP BASED ON THE BUTTON'S POSITION, NOT ITS PHYSICAL LABEL. IF YOU DO NOT HAVE A SPECIAL BUTTON FOR HOTKEY, USE THE SELECT BUTTON. SKIP ALL BUTTONS/STICKS YOU DO NOT HAVE BY HOLDING ANY BUTTON. PRESS THE SOUTH BUTTON TO CONFIRM WHEN DONE.
             </div>
           </div>
 
           {/* OK and CANCEL Action Buttons */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '20px',
-            marginTop: '45px'
-          }}>
-            <div style={{
-              padding: '8px 24px',
-              backgroundColor: warningSelection === 'ok' ? 'var(--theme-color)' : 'transparent',
-              border: warningSelection === 'ok' ? '2.5px solid var(--theme-color)' : '2.5px solid rgba(255,255,255,0.4)',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              letterSpacing: '1px',
-              fontSize: '15px',
-              textAlign: 'center',
-              minWidth: '90px'
-            }} onClick={() => setPhaseWithRef('detect')}>
+          <div className="input-config-warning-buttons">
+            <div
+              className={`input-config-warning-btn ${warningSelection === 'ok' ? 'active' : ''}`}
+              onClick={() => setPhaseWithRef('detect')}
+            >
               OK
             </div>
-            <div style={{
-              padding: '8px 24px',
-              backgroundColor: warningSelection === 'cancel' ? 'var(--theme-color)' : 'transparent',
-              border: warningSelection === 'cancel' ? '2.5px solid var(--theme-color)' : '2.5px solid rgba(255,255,255,0.4)',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              letterSpacing: '1px',
-              fontSize: '15px',
-              textAlign: 'center',
-              minWidth: '90px'
-            }} onClick={onClose}>
+            <div
+              className={`input-config-warning-btn ${warningSelection === 'cancel' ? 'active' : ''}`}
+              onClick={onClose}
+            >
               CANCEL
             </div>
           </div>
@@ -691,57 +639,23 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
 
       {/* PHASE 2: DETECTION OVERLAY REPLICA (Screenshots 2 & 3) */}
       {phase === 'detect' && (
-        <div style={{
-          textAlign: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          width: '100%'
-        }}>
+        <div className="input-config-detect-container">
           {/* Header titles */}
-          <h1 style={{
-            fontSize: '32px',
-            color: 'var(--theme-color)',
-            letterSpacing: '2px',
-            margin: '0 0 10px 0',
-            fontWeight: 700
-          }}>
+          <h1 className="input-config-detect-title">
             CONFIGURE INPUT
           </h1>
-          <h2 style={{
-            fontSize: '18px',
-            color: 'var(--theme-color)',
-            letterSpacing: '1px',
-            margin: '0 0 50px 0',
-            fontWeight: 600
-          }}>
+          <h2 className="input-config-detect-subtitle">
             {numGamepads > 0 ? `${numGamepads} GAMEPAD${numGamepads > 1 ? 'S' : ''} DETECTED` : 'NO GAMEPADS DETECTED'}
           </h2>
 
           {/* Prompts */}
-          <div style={{
-            fontSize: '18px',
-            letterSpacing: '0.5px',
-            lineHeight: '2',
-            color: 'rgba(255, 255, 255, 0.85)',
-            fontWeight: 500
-          }}>
+          <div className="input-config-detect-prompts">
             HOLD A BUTTON ON YOUR DEVICE TO CONFIGURE IT.<br />
             PRESS ESC OR A HOTKEY TO CANCEL.
           </div>
 
           {/* Gamepad Name display upon hold (Screenshot 3) */}
-          <div style={{
-            marginTop: '100px',
-            height: '40px',
-            fontSize: '22px',
-            color: 'rgba(255, 255, 255, 0.45)',
-            fontWeight: 600,
-            letterSpacing: '1.5px',
-            textTransform: 'uppercase'
-          }}>
+          <div className="input-config-detect-device">
             {device ? device.name.split(' (')[0].toUpperCase() : ''}
           </div>
         </div>
@@ -749,80 +663,40 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
 
       {/* PHASE 3 & 4: CONFIGURE/LIST SCREEN (Screenshots 4 & 5) */}
       {(phase === 'map' || phase === 'done') && device && (
-        <div style={{
-          width: '50vw',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '20px 0',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid #111'
-        }}>
+        <div className="input-config-panel">
           
           {/* Top Title Headers */}
-          <h1 style={{
-            fontSize: '24px',
-            color: 'var(--theme-color)',
-            letterSpacing: '2px',
-            margin: '0 0 5px 0',
-            fontWeight: 700,
-            textTransform: 'uppercase'
-          }}>
+          <h1 className="input-config-panel-title">
             {phase === 'done' ? 'CONFIGURATION' : 'CONFIGURING'}
           </h1>
-          <h2 style={{
-            fontSize: '18px',
-            color: 'var(--theme-color)',
-            letterSpacing: '1px',
-            margin: '0 0 5px 0',
-            fontWeight: 600,
-            textTransform: 'uppercase'
-          }}>
+          <h2 className="input-config-panel-subtitle">
             GAMEPAD {device.index + 1}
           </h2>
-          <h3 style={{
-            fontSize: '14px',
-            color: 'var(--theme-color)',
-            letterSpacing: '1px',
-            margin: '0 0 25px 0',
-            fontWeight: 600,
-            visibility: phase === 'done' ? 'hidden' : 'visible'
-          }}>
+          <h3
+            className="input-config-panel-hint"
+            style={{
+              visibility: phase === 'done' ? 'hidden' : 'visible'
+            }}
+          >
             HOLD ANY BUTTON TO SKIP
           </h3>
 
           {/* Hold to skip visual progress bar */}
           {phase === 'map' && skipProgress > 0 && (
-            <div style={{
-              width: '100%',
-              height: '4px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              marginBottom: '15px',
-              position: 'relative',
-              borderRadius: '2px',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                width: `${skipProgress}%`,
-                height: '100%',
-                backgroundColor: 'var(--theme-color)',
-                transition: 'width 0.05s linear'
-              }} />
+            <div className="input-config-skip-track">
+              <div
+                className="input-config-skip-fill"
+                style={{
+                  width: `${skipProgress}%`
+                }}
+              />
             </div>
           )}
 
           {/* Scrollable button configuration list container */}
           <div 
             ref={listContainerRef}
-            style={{
-              width: '100%',
-              height: '50vh',
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              boxSizing: 'border-box'
-            }}
-            className="custom-scrollbar"
+            className="input-config-scroll-list custom-scrollbar"
           >
             {MAPPING_ORDER.map((item, idx) => {
               const isActive = phase === 'map' && idx === mappingIndex
@@ -833,42 +707,26 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
                 <div
                   key={item.id}
                   ref={isActive ? activeRowRef : null}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    height: '40px',
-                    padding: '5px 25px',
-                    backgroundColor: isActive ? 'var(--theme-color)' : 'transparent',
-                    color: isActive ? '#fff' : 'rgba(255, 255, 255, 0.85)',
-                    fontSize: '15px',
-                    fontWeight: isActive ? 'bold' : 500,
-                    letterSpacing: '0.5px',
-                    flexShrink: 0
-                  }}
+                  className={`input-config-row ${isActive ? 'active' : ''}`}
                 >
                   {/* Left Label & SVG Icon */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <div className="input-config-row-label-section">
                     {renderIcon(item.icon, isActive)}
-                    <span style={{ fontSize: '1.6em' }}>{item.label}</span>
+                    <span className="input-config-row-label">{item.label}</span>
                   </div>
 
                   {/* Right Status / Mapped key */}
-                  <div style={{
-                    fontSize: '1.6em',
-                    fontWeight: 'bold',
-                    letterSpacing: '0.5px'
-                  }}>
+                  <div className="input-config-row-value">
                     {isTaken ? (
-                      <span style={{ color: isActive ? '#fff' : '#ff3333', animation: 'blink 0.5s infinite' }}>ALREADY TAKEN</span>
+                      <span className="status-text taken">ALREADY TAKEN</span>
                     ) : isActive ? (
-                      <span style={{ color: '#fff', animation: 'blink 0.8s infinite' }}>PRESS ANYTHING</span>
+                      <span className="status-text blink">PRESS ANYTHING</span>
                     ) : isMapped ? (
-                      <span style={{ color: isActive ? '#fff' : 'rgba(255, 255, 255, 0.9)' }}>
+                      <span>
                         {formatMappingValue(mappings[item.id])}
                       </span>
                     ) : (
-                      <span style={{ color: 'rgba(255, 255, 255, 0.35)' }}>-NOT DEFINED-</span>
+                      <span className="status-text undefined">-NOT DEFINED-</span>
                     )}
                   </div>
                 </div>
@@ -877,66 +735,29 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
           </div>
 
           {/* PHASE 4: Bottom confirmation OK & CANCEL dialog */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '20px',
-            marginTop: '20px',
-            width: '100%',
-            opacity: phase === 'done' ? 1 : 0.4,
-            pointerEvents: phase === 'done' ? 'auto' : 'none'
-          }}>
-            <div style={{
-              padding: '8px 24px',
-              backgroundColor: doneSelection === 'ok' && phase === 'done' ? 'var(--theme-color)' : 'transparent',
-              border: doneSelection === 'ok' && phase === 'done' ? '1.5px solid var(--theme-color)' : '1.5px solid rgba(255,255,255,0.4)',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              letterSpacing: '1px',
-              fontSize: '1.2em',
-              textAlign: 'center',
-              minWidth: '90px'
-            }} onClick={saveAndExit}>
+          <div
+            className="input-config-done-actions"
+            style={{
+              opacity: phase === 'done' ? 1 : 0.4,
+              pointerEvents: phase === 'done' ? 'auto' : 'none'
+            }}
+          >
+            <div
+              className={`input-config-done-btn ${doneSelection === 'ok' && phase === 'done' ? 'active' : ''}`}
+              onClick={saveAndExit}
+            >
               OK
             </div>
-            <div style={{
-              padding: '8px 24px',
-              backgroundColor: doneSelection === 'cancel' && phase === 'done' ? 'var(--theme-color)' : 'transparent',
-              border: doneSelection === 'cancel' && phase === 'done' ? '1.5px solid var(--theme-color)' : '1.5px solid rgba(255,255,255,0.4)',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              letterSpacing: '1px',
-              fontSize: '1.2em',
-              textAlign: 'center',
-              minWidth: '90px'
-            }} onClick={onClose}>
+            <div
+              className={`input-config-done-btn ${doneSelection === 'cancel' && phase === 'done' ? 'active' : ''}`}
+              onClick={onClose}
+            >
               CANCEL
             </div>
           </div>
 
         </div>
       )}
-
-      {/* Embedded keyframes stylesheet */}
-      <style>{`
-        @keyframes blink {
-          0% { opacity: 0.3; }
-          50% { opacity: 1; }
-          100% { opacity: 0.3; }
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(0,0,0,0.1);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: var(--theme-color);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(255,255,255,0.3);
-        }
-      `}</style>
 
     </div>
   )

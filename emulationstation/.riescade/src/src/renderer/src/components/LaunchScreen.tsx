@@ -47,26 +47,16 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
     <div
       className="launch-screen"
       style={{
-        position: 'fixed',
-        top: 0, left: 0, right: 0, bottom: 0,
-        zIndex: 10000,
-        background: '#000',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         opacity: isReady ? 1 : 0,
-        transition: 'opacity 0.3s ease',
         pointerEvents: isReady ? 'auto' : 'none'
       }}
     >
-      <div style={{
-        width: '100%', height: '100%', 
-        opacity: opacity, 
-        transition: 'opacity 0.4s ease',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+      <div
+        className="launch-screen-inner"
+        style={{
+          opacity: opacity
+        }}
+      >
         {theme?.isWebTheme && theme.views?.loading ? (
           <WebThemeRenderer
             htmlContent={theme.views.loading}
@@ -77,19 +67,17 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
             onReady={() => setIsReady(true)}
           />
         ) : (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '20px',
-            textAlign: 'center'
-          }}>
+          <div className="launch-screen-content">
             {logo ? (
-              <img src={resolveFilePath(logo)} style={{ maxWidth: '400px', maxHeight: '200px', objectFit: 'contain' }} alt="" />
+              <img
+                src={resolveFilePath(logo)}
+                className="launch-screen-logo"
+                alt=""
+              />
             ) : (
-              <h1 style={{ color: '#fff', fontSize: '3rem', margin: 0, fontWeight: 900 }}>{name}</h1>
+              <h1 className="launch-screen-title">{name}</h1>
             )}
-            <p style={{ color: '#fff', opacity: 0.5, letterSpacing: '3px', fontSize: '1.2rem' }}>
+            <p className="launch-screen-text">
               LAUNCHING...
             </p>
           </div>

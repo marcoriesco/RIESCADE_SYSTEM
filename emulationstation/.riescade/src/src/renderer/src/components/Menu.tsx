@@ -2656,135 +2656,17 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        .riescade-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
-        .riescade-menu-overlay.visible { opacity: 1; pointer-events: auto; }
-        .riescade-menu-container { width: 600px; background: #dfdfdf; display: flex; flex-direction: column; font-family: "Inter", sans-serif; transform: scale(0.95); transition: transform 0.2s ease; }
-        .riescade-menu-overlay.visible .riescade-menu-container { transform: scale(1); }
-        .riescade-menu-header { background: #eee; padding: 15px 0; text-align: center; }
-        .riescade-menu-title { margin: 0; color: #333; font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
-        .riescade-menu-subtitle { font-size: 0.8rem; color: #666; margin-top: 5px; }
-        .riescade-menu-list-container { height: auto; background: #fff; overflow-y: auto; }
-        .riescade-menu-item { padding: 12px 30px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.1); transition: background 0.15s ease, color 0.15s ease; color: #444; }
-        .riescade-menu-item.selected { background: #3b82f6; color: #fff; }
-        .riescade-menu-label { font-weight: 500; font-size: 0.95rem; text-transform: uppercase; }
-        .riescade-menu-item.selected .riescade-menu-label { font-weight: 800; }
-        .riescade-menu-label-container { display: flex; align-items: center; gap: 10px; }
-        .riescade-menu-text-container { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; }
-        .riescade-menu-description { font-size: 0.75rem; color: #777; font-weight: 400; text-transform: none; line-height: 1.3; margin-top: 2px; }
-        .riescade-menu-item.selected .riescade-menu-description { color: rgba(255, 255, 255, 0.8); }
-        .riescade-menu-icon { display: inline-block; width: 2.2em; height: 2em; background-size: contain; background-repeat: no-repeat; background-position: center; }
-        .riescade-menu-group { padding: 20px 30px 10px; color: #888; font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .riescade-menu-footer { background: #ddd; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .riescade-menu-footer-actions { display: flex; gap: 30px; font-size: 0.8rem; color: #444; font-weight: 700; }
-        .riescade-menu-footer-action { display: flex; align-items: center; gap: 8px; }
-        .riescade-menu-footer-button { background: #333; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-        .riescade-menu-version { font-size: 0.7rem; color: #666; font-weight: 600; }
-        
-        .riescade-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: "Inter", sans-serif; }
-        .riescade-modal-container { background: #fff; padding: 40px; border-radius: 4px; text-align: center; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-        .riescade-modal-title { margin: 0 0 20px; color: #333; font-size: 1.4rem; font-weight: 900; text-transform: uppercase; }
-        .riescade-modal-message { margin: 0 0 30px; color: #666; line-height: 1.6; }
-        .riescade-modal-buttons { display: flex; gap: 15px; justify-content: center; flex-direction: column; }
-        .riescade-modal-button-primary { padding: 12px 30px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; border: 3px solid transparent; }
-        .riescade-modal-button-primary.selected { border-color: #fff; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        .riescade-modal-button-danger { padding: 12px 30px; background: #f43f5e; color: #fff; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; border: 3px solid transparent; }
-        .riescade-modal-button-danger.selected { border-color: #fff; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); }
-        .riescade-modal-button-secondary { padding: 12px 30px; background: #eee; color: #444; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; border: 3px solid transparent; }
-        .riescade-modal-button-secondary.selected { border-color: #3b82f6; }
 
-        .menu-toggle { width: 40px; height: 20px; background: #ccc; border-radius: 10px; position: relative; transition: background 0.15s ease; }
-        .menu-toggle.on { background: #4ade80; }
-        .menu-toggle.on .toggle-thumb { transform: translateX(20px); }
-        .toggle-thumb { width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.15s ease; }
-        .menu-checkbox { width: 20px; height: 20px; border: 2px solid #aaa; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); transition: all 0.15s ease; }
-        .menu-checkbox.checked { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-        .menu-checkbox .checkmark { font-size: 12px; font-weight: bold; }
-        .menu-select { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.9rem; }
-        .menu-select .arrow { opacity: 0.3; }
-        .riescade-menu-item.selected .menu-select .arrow { opacity: 1; }
-        .riescade-menu-list-container::-webkit-scrollbar { width: 6px; }
-        .riescade-menu-list-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-        .menu-submenu-arrow { opacity: 0.5; font-size: 2em; }
-        .riescade-menu-item.selected .menu-submenu-arrow { opacity: 1; }
-        .menu-submenu-preview { display: flex; align-items: center; gap: 10px; }
-        .menu-selected-count { font-size: 0.75rem; font-weight: 800; opacity: 0.6; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 10px; }
-        .riescade-menu-item.selected .menu-selected-count { opacity: 0.9; background: rgba(255,255,255,0.2); }
-
-        .riescade-menu-tabs { width:100%; display: flex; justify-content: flex-start; gap: 0; padding: 12px 25px 0; }
-        .riescade-menu-tab { width:auto; padding: 5px 20px; font-size: 1.2rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; color: #999; border-bottom: 3px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; user-select: none; }
-        .riescade-menu-tab:hover { color: var(--theme-color); }
-        .riescade-menu-tab.active { color: var(--theme-color); border-bottom-color: var(--theme-color); }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        
-        .arrow-clickable {
-          padding: 0;
-          cursor: pointer;
-          user-select: none;
-          opacity: 0.5;
-          transition: opacity 0.15s ease, transform 0.15s ease;
-        }
-        .arrow-clickable:hover {
-          opacity: 1;
-          transform: scale(1.2);
-        }
-        .riescade-menu-item.selected .arrow-clickable {
-          opacity: 0.8;
-        }
-        .riescade-menu-item.selected .arrow-clickable:hover {
-          opacity: 1;
-          color: #fff;
-        }
-        
-        .riescade-menu-bottom-bar {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 20px;
-          padding: 20px;
-        }
-        
-        .riescade-menu-bottom-button {
-          background: transparent;
-          color: #999;
-          border: 2px solid #999;
-          border-radius: 4px;
-          padding: 8px 24px;
-          font-size: 0.9rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.15s ease;
-          text-transform: uppercase;
-          outline: none;
-        }
-        
-        .riescade-menu-bottom-button:hover,
-        .riescade-menu-bottom-button.selected {
-          border-color: var(--theme-color);
-          color: var(--theme-color);
-          transform: scale(1.05);
-        }
-      ` }} />
       {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />}
 
       {showScraperProgress && <ScraperProgressModal isOpen={showScraperProgress} onClose={() => setShowScraperProgress(false)} t={t} />}
       
       {isBluetoothScanning && (
-        <div className="riescade-modal-overlay" style={{ zIndex: 10000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
-          <div className="riescade-modal-container" style={{ textAlign: 'center', padding: '40px' }}>
-            <h3 className="riescade-modal-title" style={{ margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '2px' }}>{t('SCANNING BLUETOOTH')}</h3>
-            <p style={{ margin: '0 0 20px 0', opacity: 0.7 }}>{t('Searching for devices...')}</p>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              border: '3px solid rgba(0,0,0,0.1)',
-              borderTopColor: 'var(--theme-color, #3b82f6)',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 20px auto'
-            }} />
+        <div className="riescade-modal-overlay bluetooth-scanning">
+          <div className="riescade-modal-container bluetooth-scanning-container">
+            <h3 className="riescade-modal-title bluetooth-scanning-title">{t('SCANNING BLUETOOTH')}</h3>
+            <p className="riescade-modal-text bluetooth-scanning-text">{t('Searching for devices...')}</p>
+            <div className="riescade-modal-spinner" />
             <button
               onClick={() => {
                 if (bluetoothScanTimeoutRef.current) {
@@ -2793,18 +2675,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 }
                 setIsBluetoothScanning(false)
               }}
-              style={{
-                padding: '10px 24px',
-                background: '#f43f5e',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                textTransform: 'uppercase',
-                fontSize: '0.85rem',
-                boxShadow: '0 4px 12px rgba(244, 63, 94, 0.3)'
-              }}
+              className="riescade-modal-btn-cancel"
             >
               {t('Cancel')}
             </button>
