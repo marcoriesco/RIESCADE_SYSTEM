@@ -119,7 +119,7 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
 
   return (
     <>
-      <div className={`riescade-menu-overlay hardware-select ${visible ? 'visible' : ''}`}>
+      <div className={`riescade-overlay riescade-menu-overlay hardware-select ${visible ? 'visible' : ''}`}>
         <div className="riescade-menu-container">
           <div className="riescade-menu-header">
             <h2 className="riescade-menu-title">IR PARA O HARDWARE</h2>

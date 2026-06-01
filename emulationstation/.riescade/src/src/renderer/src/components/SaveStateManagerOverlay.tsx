@@ -171,7 +171,7 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
   }
 
   return (
-    <div className="savestate-overlay">
+    <div className="riescade-overlay savestate-overlay visible">
 
       {/* Header Title */}
       <h1 className="savestate-header-title">

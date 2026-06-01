@@ -602,7 +602,7 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
   }
 
   return (
-    <div className="input-config-overlay">
+    <div className="riescade-overlay input-config-overlay visible">
       
       {/* PHASE 1: WARNING DIALOG REPLICA (Screenshot 1) */}
       {phase === 'warning' && (
@@ -621,18 +621,18 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
 
           {/* OK and CANCEL Action Buttons */}
           <div className="input-config-warning-buttons">
-            <div
-              className={`input-config-warning-btn ${warningSelection === 'ok' ? 'active' : ''}`}
+            <button
+              className={`riescade-button ${warningSelection === 'ok' ? 'active selected' : ''}`}
               onClick={() => setPhaseWithRef('detect')}
             >
               OK
-            </div>
-            <div
-              className={`input-config-warning-btn ${warningSelection === 'cancel' ? 'active' : ''}`}
+            </button>
+            <button
+              className={`riescade-button ${warningSelection === 'cancel' ? 'active selected' : ''}`}
               onClick={onClose}
             >
               CANCEL
-            </div>
+            </button>
           </div>
         </div>
       )}
@@ -742,18 +742,18 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
               pointerEvents: phase === 'done' ? 'auto' : 'none'
             }}
           >
-            <div
-              className={`input-config-done-btn ${doneSelection === 'ok' && phase === 'done' ? 'active' : ''}`}
+            <button
+              className={`riescade-button ${doneSelection === 'ok' && phase === 'done' ? 'active selected' : ''}`}
               onClick={saveAndExit}
             >
               OK
-            </div>
-            <div
-              className={`input-config-done-btn ${doneSelection === 'cancel' && phase === 'done' ? 'active' : ''}`}
+            </button>
+            <button
+              className={`riescade-button ${doneSelection === 'cancel' && phase === 'done' ? 'active selected' : ''}`}
               onClick={onClose}
             >
               CANCEL
-            </div>
+            </button>
           </div>
 
         </div>

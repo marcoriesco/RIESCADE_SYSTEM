@@ -1,36 +1,18 @@
 .riescade-menu-overlay.hardware-select {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999999 !important;
-  display: flex;
   justify-content: flex-end;
   align-items: stretch;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  padding-top: 0 !important;
 
   &.visible {
-    opacity: 1;
-    pointer-events: auto;
-
     .riescade-menu-container {
       transform: translateX(0);
     }
   }
 
   .riescade-menu-container {
-    width: 30vw !important;
+    width: 30vw;
     height: 100vh;
-    background: #dfdfdf;
     display: flex;
     flex-direction: column;
-    font-family: "Inter", sans-serif;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
     transform: translateX(100%);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -72,7 +54,7 @@
   }
 
   .riescade-menu-item {
-    padding: 16px 30px;
+    padding: 5px 25px !important;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -83,9 +65,8 @@
     cursor: pointer;
 
     &.selected {
-      background: var(--theme-color, #3b82f6);
+      background: var(--theme-color);
       color: #fff;
-      padding-left: 36px;
 
       .riescade-menu-sublabel {
         color: rgba(255, 255, 255, 0.8);

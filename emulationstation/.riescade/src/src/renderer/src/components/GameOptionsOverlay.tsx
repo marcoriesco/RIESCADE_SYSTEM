@@ -66,17 +66,18 @@ interface GameOptionsProps {
   onUpdateGamelists?: (systemName?: string) => void
   onLaunch?: () => void
   onOpenSaveStates?: () => void
+  isSaveStateManagerOpen?: boolean
 }
 
 export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({ 
-  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists, onLaunch, onOpenSaveStates
+  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists, onLaunch, onOpenSaveStates, isSaveStateManagerOpen
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
   const [draftGame, setDraftGame] = useState<Game>(game)
   const [customCollections, setCustomCollections] = useState<string[]>([])
   const [gameCollections, setGameCollections] = useState<string[]>([])
-  const [activeMenuStack, setActiveMenuStack] = useState<{ items: any[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string }[]>([])
+  const [activeMenuStack, setActiveMenuStack] = useState<{ items: any[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string; savedSelectedIndex?: number }[]>([])
   const [settings, setSettings] = useState<Record<string, any>>({})
 
   // Single game scraper states
@@ -399,12 +400,16 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           })
         })
       })
+    }
+  }, [isOpen])
 
+  useEffect(() => {
+    if (isOpen && !isSaveStateManagerOpen) {
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)
     }
-  }, [isOpen, game])
+  }, [isOpen, isSaveStateManagerOpen])
 
   const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
   const currentMenu = currentStackItem ? (currentStackItem.tabs && currentStackItem.activeTab !== undefined ? currentStackItem.items.filter(item => item.tab === currentStackItem.activeTab) : currentStackItem.items) : []
@@ -413,9 +418,23 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const handleToggle = () => {
     const item = currentMenu[selectedIndex]
     if (item.id === 'favorite') {
-      const updated = { ...draftGame, favorite: !draftGame.favorite }
+      const nextFav = !draftGame.favorite
+      const updated = { ...draftGame, favorite: nextFav }
       setDraftGame(updated)
       onUpdate(updated)
+      setActiveMenuStack(prev => {
+        const rootItems = getRootItems(updated, gameCollections, system, customCollections, settings)
+        const nextStack = [...prev]
+        nextStack[0] = { ...nextStack[0], items: rootItems }
+        for (let i = 1; i < nextStack.length; i++) {
+          const parentId = nextStack[i].parentItemId
+          const parentItem = nextStack[i - 1].items.find(it => it.id === parentId)
+          if (parentItem && parentItem.submenu) {
+            nextStack[i] = { ...nextStack[i], items: parentItem.submenu }
+          }
+        }
+        return nextStack
+      })
     } else if (item.settingName) {
       const key = getGameSettingKey(item.settingName)
       const nextVal = !item.value
@@ -446,6 +465,19 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         const updated = { ...draftGame, emulator: nextVal, core: undefined }
         setDraftGame(updated)
         onUpdate(updated)
+        setActiveMenuStack(prev => {
+          const rootItems = getRootItems(updated, gameCollections, system, customCollections, settings)
+          const nextStack = [...prev]
+          nextStack[0] = { ...nextStack[0], items: rootItems }
+          for (let i = 1; i < nextStack.length; i++) {
+            const parentId = nextStack[i].parentItemId
+            const parentItem = nextStack[i - 1].items.find(it => it.id === parentId)
+            if (parentItem && parentItem.submenu) {
+              nextStack[i] = { ...nextStack[i], items: parentItem.submenu }
+            }
+          }
+          return nextStack
+        })
       } else if (item.settingName) {
         const key = getGameSettingKey(item.settingName)
         window.api.saveSetting(key, nextVal, 'string')
@@ -453,16 +485,15 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           ...prev,
           [key]: { value: nextVal, type: 'string' }
         }))
+        setActiveMenuStack(prev => {
+          const next = [...prev]
+          const updatedItems = next[next.length - 1].items.map((it, idx) => 
+            idx === selectedIndex ? { ...it, value: nextVal } : it
+          )
+          next[next.length - 1] = { ...next[next.length - 1], items: updatedItems }
+          return next
+        })
       }
-
-      setActiveMenuStack(prev => {
-        const next = [...prev]
-        const updatedItems = next[next.length - 1].items.map((it, idx) => 
-          idx === selectedIndex ? { ...it, value: nextVal } : it
-        )
-        next[next.length - 1] = { ...next[next.length - 1], items: updatedItems }
-        return next
-      })
     }
   }
 
@@ -879,13 +910,19 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             if (item.type === 'submenu') {
               const submenuItems = item.submenu!
               const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
-              setActiveMenuStack(prev => [...prev, { 
-                items: submenuItems, 
-                title: item.label, 
-                tabs: item.tabs, 
-                activeTab: item.tabs ? 0 : undefined,
-                parentItemId: item.id
-              }])
+              setActiveMenuStack(prev => {
+                const next = [...prev]
+                if (next.length > 0) {
+                  next[next.length - 1] = { ...next[next.length - 1], savedSelectedIndex: selectedIndex }
+                }
+                return [...next, { 
+                  items: submenuItems, 
+                  title: item.label, 
+                  tabs: item.tabs, 
+                  activeTab: item.tabs ? 0 : undefined,
+                  parentItemId: item.id
+                }]
+              })
               setSelectedIndex(getFirstSelectableIndex(filteredItems))
             } else if (item.type === 'toggle') {
               handleToggle()
@@ -940,7 +977,10 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         e.preventDefault()
         if (activeMenuStack.length > 1) {
           setActiveMenuStack(prev => prev.slice(0, -1))
-          setSelectedIndex(0)
+          const parentItem = activeMenuStack[activeMenuStack.length - 2]
+          const parentItems = parentItem?.items || []
+          const savedIdx = parentItem?.savedSelectedIndex
+          setSelectedIndex(savedIdx !== undefined ? savedIdx : getFirstSelectableIndex(parentItems))
         } else {
           onClose()
         }
@@ -983,13 +1023,19 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               if (item.type === 'submenu') {
                 const submenuItems = item.submenu!
                 const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
-                setActiveMenuStack(prev => [...prev, { 
-                  items: submenuItems, 
-                  title: item.label, 
-                  tabs: item.tabs, 
-                  activeTab: item.tabs ? 0 : undefined,
-                  parentItemId: item.id
-                }])
+                setActiveMenuStack(prev => {
+                  const next = [...prev]
+                  if (next.length > 0) {
+                    next[next.length - 1] = { ...next[next.length - 1], savedSelectedIndex: selectedIndex }
+                  }
+                  return [...next, { 
+                    items: submenuItems, 
+                    title: item.label, 
+                    tabs: item.tabs, 
+                    activeTab: item.tabs ? 0 : undefined,
+                    parentItemId: item.id
+                  }]
+                })
                 setSelectedIndex(getFirstSelectableIndex(filteredItems))
               } else if (item.type === 'toggle') {
                 handleToggle()
@@ -1010,11 +1056,11 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             </div>
             <div className="riescade-menu-value">
               {item.type === 'toggle' ? (
-                <div className={`menu-toggle ${item.value ? 'on' : 'off'}`}>
-                  <div className="toggle-thumb" />
+                <div className={`riescade-switch ${item.value ? 'on' : ''}`}>
+                  <div className="thumb toggle-thumb" />
                 </div>
               ) : item.type === 'submenu' ? (
-                <span className="menu-submenu-arrow">▶</span>
+                <span className="menu-submenu-arrow">›</span>
               ) : item.type === 'select' ? (
                 <div className="menu-select">
                   <span className="arrow">«</span>
@@ -1040,7 +1086,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const renderStageStage1 = () => {
     const dbKeys = ['ScreenScraper', 'ArcadeDB', 'TheGamesDB', 'HfsDB', 'IGDB']
     return (
-      <div className="scraper-modal-overlay">
+      <div className="riescade-overlay scraper-modal-overlay visible">
         <div className="scraper-modal-container db-select-modal">
           <h3 className="scraper-modal-title">BUSCAR MÍDIAS</h3>
           <div className="scraper-db-list">
@@ -1056,7 +1102,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                     setScraperDbs(prev => ({ ...prev, [db]: !prev[db] }))
                   }}
                 >
-                  <div className={`scraper-checkbox ${isChecked ? 'checked' : ''}`}>
+                  <div className={`riescade-checkbox ${isChecked ? 'checked' : ''}`}>
                     {isChecked && <span className="checkmark">✔</span>}
                   </div>
                   <span className="scraper-db-name">{db.toUpperCase()}</span>
@@ -1066,13 +1112,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           </div>
           <div className="scraper-modal-buttons">
             <button 
-              className={`scraper-modal-btn ${scraperDbSelectedIndex === dbKeys.length ? 'selected' : ''}`}
+              className={`riescade-button ${scraperDbSelectedIndex === dbKeys.length ? 'selected' : ''}`}
               onClick={triggerScraperSearch}
             >
               BUSCAR
             </button>
             <button 
-              className={`scraper-modal-btn secondary ${scraperDbSelectedIndex === dbKeys.length + 1 ? 'selected' : ''}`}
+              className={`riescade-button secondary ${scraperDbSelectedIndex === dbKeys.length + 1 ? 'selected' : ''}`}
               onClick={() => setScraperStage(0)}
             >
               CANCELAR
@@ -1086,7 +1132,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const renderStageStage2 = () => {
     if (scraperIsSearching) {
       return (
-        <div className="scraper-modal-overlay">
+        <div className="riescade-overlay scraper-modal-overlay visible">
           <div className="scraper-modal-container searching-modal">
             <div className="scraper-spinner"></div>
             <p className="searching-text">BUSCANDO MÍDIAS NAS BASES DE DADOS...</p>
@@ -1097,12 +1143,12 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
     if (scraperMatches.length === 0) {
       return (
-        <div className="scraper-modal-overlay">
+        <div className="riescade-overlay scraper-modal-overlay visible">
           <div className="scraper-modal-container no-results-modal">
             <h3 className="scraper-modal-title">RESULTADOS</h3>
             <p className="no-results-text">NENHUMA MÍDIA ENCONTRADA PARA ESTE JOGO.</p>
             <div className="scraper-modal-buttons" style={{ justifyContent: 'center' }}>
-              <button className="scraper-modal-btn selected" onClick={() => setScraperStage(1)}>
+              <button className="riescade-button selected" onClick={() => setScraperStage(1)}>
                 VOLTAR
               </button>
             </div>
@@ -1195,7 +1241,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
 
     return (
-      <div className="scraper-modal-overlay stage2-overlay">
+      <div className="riescade-overlay scraper-modal-overlay stage2-overlay visible">
         <div className="scraper-header">
           <div className="rom-filename">{getRomFileName(game.path).toUpperCase()}</div>
           <div className="system-fullname">{(system.fullname || system.name).toUpperCase()}</div>
@@ -1328,7 +1374,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             </div>
 
             {/* Synopsis Description Text */}
-            <div className="scraper-details-description">
+            <div className="scraper-details-description custom-scrollbar">
               {selectedMatch?.desc || selectedMatch?.synopsis || 'Nenhuma descrição disponível para este jogo.'}
             </div>
           </div>
@@ -1336,8 +1382,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
         {/* Footer actions center bottom */}
         <div className="scraper-footer-buttons">
-          <button className="scraper-footer-btn" onClick={triggerScraperDownload}>ENTRADA</button>
-          <button className="scraper-footer-btn" onClick={() => setScraperStage(0)}>CANCELAR</button>
+          <button className="riescade-button" onClick={triggerScraperDownload}>ENTRADA</button>
+          <button className="riescade-button" onClick={() => setScraperStage(0)}>CANCELAR</button>
         </div>
       </div>
     )
@@ -1398,13 +1444,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 setDraftMetadata(prev => ({ ...prev, [activeInputField]: inputValue }))
                 setShowInputModal(false)
               }}
-              className="riescade-metadata-modal-btn-save"
+              className="riescade-button"
             >
               SAVE
             </button>
             <button
               onClick={() => setShowInputModal(false)}
-              className="riescade-metadata-modal-btn-cancel"
+              className="riescade-button"
             >
               CANCEL
             </button>
@@ -1421,7 +1467,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
     return (
       <div className="riescade-metadata-editor-overlay">
-        <div className="riescade-metadata-editor-container">
+        <div className="riescade-metadata-editor-container riescade-menu-container">
           {/* Header */}
           <div className="riescade-metadata-editor-header">
             <h2 className="riescade-metadata-editor-title">EDIT METADATA</h2>
@@ -1429,7 +1475,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           </div>
 
           {/* Scrollable Fields List */}
-          <div className="riescade-metadata-fields-list">
+          <div className="riescade-metadata-fields-list custom-scrollbar">
             {fields.map((field, idx) => {
               const isSelected = metadataSelectedIndex === idx
               const val = (draftMetadata[field.key as keyof Game] as string) || ''
@@ -1458,8 +1504,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                   
                   <div className="riescade-metadata-value-wrapper">
                     {isBool ? (
-                      <div className={`riescade-metadata-toggle-track ${boolVal ? 'on' : ''} ${isSelected ? 'selected-row' : ''}`}>
-                        <div className={`riescade-metadata-toggle-thumb ${boolVal ? 'on' : ''} ${isSelected ? 'selected-row' : ''}`} />
+                      <div className={`riescade-switch ${boolVal ? 'on' : ''} ${isSelected ? 'selected-row' : ''}`}>
+                        <div className={`thumb ${boolVal ? 'on' : ''} ${isSelected ? 'selected-row' : ''}`} />
                       </div>
                     ) : (
                       <>
@@ -1483,7 +1529,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               return (
                 <button
                   key={label}
-                  className={`riescade-metadata-btn ${isSelected ? 'selected' : ''}`}
+                  className={`riescade-button ${isSelected ? 'selected' : ''}`}
                   onMouseEnter={() => {
                     if (!showInputModal) setMetadataSelectedIndex(idx)
                   }}
@@ -1515,8 +1561,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
   return (
     <>
-      <div className={`riescade-menu-overlay game-options ${visible ? 'visible' : ''}`}>
-        {!showMetadataEditor && (
+      <div className={`riescade-overlay riescade-menu-overlay game-options ${visible && scraperStage === 0 ? 'visible' : ''}`}>
+        {!showMetadataEditor && scraperStage === 0 && (
           <div className="riescade-menu-container">
             <div className="riescade-menu-header">
               {marqueeUrl ? (
@@ -1565,7 +1611,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                   return (
                     <button
                       key={btn.id}
-                      className={`riescade-menu-bottom-button ${isSelected ? 'selected' : ''}`}
+                      className={`riescade-button ${isSelected ? 'selected' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation()
                         btn.onClick()
@@ -1590,13 +1636,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             </div>
           </div>
         )}
-        {showMetadataEditor && renderMetadataEditor()}
+        {showMetadataEditor && scraperStage === 0 && renderMetadataEditor()}
       </div>
 
       {scraperStage === 1 && renderStageStage1()}
       {scraperStage === 2 && renderStageStage2()}
       {showDeleteConfirmModal && (
-        <div className="scraper-completion-overlay" onClick={() => setShowDeleteConfirmModal(false)}>
+        <div className="riescade-overlay scraper-completion-overlay visible" onClick={() => setShowDeleteConfirmModal(false)}>
           <div className="scraper-completion-modal" onClick={e => e.stopPropagation()}>
             <h3 className="scraper-completion-title">REMOVER JOGO</h3>
             <p className="scraper-completion-text">
@@ -1605,13 +1651,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             </p>
             <div className="scraper-completion-buttons">
               <button 
-                className={`scraper-completion-btn primary ${deleteModalSelectedIndex === 0 ? 'selected' : ''}`}
+                className={`riescade-button primary ${deleteModalSelectedIndex === 0 ? 'selected' : ''}`}
                 onClick={() => confirmDelete(true)}
               >
                 SIM (APAGAR ROM)
               </button>
               <button 
-                className={`scraper-completion-btn secondary ${deleteModalSelectedIndex === 1 ? 'selected' : ''}`}
+                className={`riescade-button secondary ${deleteModalSelectedIndex === 1 ? 'selected' : ''}`}
                 onClick={() => confirmDelete(false)}
               >
                 NÃO (APENAS DA LISTA)

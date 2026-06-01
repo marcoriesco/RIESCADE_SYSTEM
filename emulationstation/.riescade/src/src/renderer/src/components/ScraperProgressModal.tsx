@@ -80,7 +80,7 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
     : 0
 
   return (
-    <div className="scraper-progress-overlay">
+    <div className="riescade-overlay scraper-progress-overlay visible">
       <div className="scraper-progress-card">
         {/* Decorative Header Border */}
         <div className="scraper-progress-glow"></div>
@@ -94,10 +94,10 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
             {/* Current Game Details */}
             <div className="scraper-progress-details">
               <div className="scraper-progress-system">
-                {progress ? progress.systemName : t('PREPARANDO...')}
+                {progress ? progress.systemName : t('PREPARING...')}
               </div>
               <div className="scraper-progress-game">
-                {progress ? progress.gameName : t('Carregando lista de jogos...')}
+                {progress ? progress.gameName : t('Loading gamelist...')}
               </div>
             </div>
 
@@ -119,13 +119,13 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
                 <span className="scraper-progress-val">{progress ? progress.total : 0}</span>
               </div>
               <div className="scraper-progress-item">
-                <span className="scraper-progress-label">{t('SUCESSO')}</span>
+                <span className="scraper-progress-label">{t('SUCCESS')}</span>
                 <span className="scraper-progress-val success">
                   {progress ? progress.successCount : 0}
                 </span>
               </div>
               <div className="scraper-progress-item">
-                <span className="scraper-progress-label">{t('FALHAS')}</span>
+                <span className="scraper-progress-label">{t('FAILURES')}</span>
                 <span className="scraper-progress-val fail">
                   {progress ? progress.failCount : 0}
                 </span>
@@ -134,11 +134,11 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
 
             {/* Cancel hint */}
             <div className="scraper-progress-cancel" onClick={handleCancel}>
-              <button className="scraper-progress-cancel-btn">
-                {t('CANCELAR')}
+              <button className="riescade-button scraper-progress-cancel-btn">
+                {t('CANCEL')}
               </button>
               <div className="scraper-progress-hint">
-                {t('Pressione B ou ESC para cancelar')}
+                {t('Press B or ESC to cancel')}
               </div>
             </div>
           </>
@@ -150,20 +150,20 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
                 <div className="scraper-progress-reason">{finishReason}</div>
               ) : (
                 <div className="scraper-progress-success-msg">
-                  {t('Scraping finalizado com sucesso!')}
+                  {t('Scraping completed successfully!')}
                 </div>
               )}
               <div className="scraper-progress-final-count">
-                {t('Jogos atualizados:')} <strong style={{ color: 'var(--theme-color, #f042b0)' }}>{scrapedCount}</strong>
+                {t('Games updated:')} <strong style={{ color: 'var(--theme-color, #f042b0)' }}>{scrapedCount}</strong>
               </div>
             </div>
 
             <div className="scraper-progress-close" onClick={onClose}>
-              <button className="scraper-progress-close-btn">
+              <button className="riescade-button scraper-progress-close-btn">
                 {t('OK')}
               </button>
               <div className="scraper-progress-hint">
-                {t('Pressione A ou ENTER para fechar')}
+                {t('Press A or ENTER to close')}
               </div>
             </div>
           </>

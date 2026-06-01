@@ -1875,6 +1875,7 @@ function App() {
 			{selectedSystem && currentGame && (
 				<GameOptionsOverlay
 					isOpen={isGameOptionsOpen}
+					isSaveStateManagerOpen={isSaveStateManagerOpen}
 					onClose={() => setIsGameOptionsOpen(false)}
 					game={currentGame}
 					system={selectedSystem}
@@ -1888,6 +1889,7 @@ function App() {
 						setSaveManagerGame(currentGame)
 						setSaveManagerSystem(selectedSystem)
 						setIsSaveStateManagerOpen(true)
+						setIsGameOptionsOpen(false)
 					}}
 				/>
 			)}
@@ -1956,7 +1958,7 @@ function App() {
 
 			{/* Glassmorphic Gamelist Completion/Reload Modal */}
 			{showGamelistUpdateModal && (
-				<div className="scraper-completion-overlay">
+				<div className="riescade-overlay scraper-completion-overlay visible">
 					<div className="scraper-completion-modal">
 						<div className="scraper-completion-icon">⚡</div>
 						<div className="scraper-completion-title">SCRAPE CONCLUÍDO</div>
@@ -1984,7 +1986,7 @@ function App() {
 			{/* Graphical Gamelist Update Overlay */}
 			{isUpdatingGamelist && (
 				<div 
-					className="scraper-modal-overlay"
+					className="riescade-overlay scraper-modal-overlay visible"
 					style={{
 						position: 'fixed',
 						top: 0,

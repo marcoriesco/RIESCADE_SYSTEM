@@ -1,12 +1,11 @@
 @import "./fonts.scss";
+@import "./components.scss";
 @import "./menu.scss";
 @import "./overlays.scss";
 @import "./save_state.scss";
 @import "./hardware_select.scss";
 @import "./game_options.scss";
 @import "./input_config.scss";
-
-
 
 
 $theme-color: #9f0043;
@@ -39,13 +38,6 @@ body {
   user-select: none;
 }
 
-/* UTILS */
-.centered {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
 /* CLOCK */
 .riescade-clock-time {
   font-family: var(--font-clock);
@@ -55,7 +47,7 @@ body {
   text-shadow: var(--font-shadow);
 }
 
-
+// HEADER
 .riescade-header {
   position: fixed;
   top: 0;
@@ -266,6 +258,11 @@ body {
 
 
 // UTILS
+.centered {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
 .hide {
   display: none !important; 
 }

@@ -578,12 +578,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (isChecklist) {
       buttons.push({
         id: 'select_all',
-        label: t('SELECIONAR TUDO'),
+        label: t('SELECT ALL'),
         onClick: handleSelectAll
       })
       buttons.push({
         id: 'select_none',
-        label: t('SELECIONAR NENHUM'),
+        label: t('SELECT NONE'),
         onClick: handleSelectNone
       })
     }
@@ -591,7 +591,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (currentStackItem?.parentItemId === 'scraper' && currentStackItem?.activeTab === 0) {
       buttons.push({
         id: 'scrape_now_btn',
-        label: t('BAIXAR AGORA'),
+        label: t('SCRAPE NOW'),
         onClick: () => {
           handleSaveQuietly(pendingSettings).then(() => {
             onClose()
@@ -604,7 +604,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (currentStackItem?.parentItemId === 'missing_bios_submenu') {
       buttons.push({
         id: 'bios_refresh_btn',
-        label: t('ATUALIZAR'),
+        label: t('REFRESH'),
         onClick: async () => {
           const [bios, systems] = await Promise.all([
             window.api.getBiosInformation(),
@@ -822,7 +822,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'retroachievements_submenu', label: t('RETROACHIEVEMENTS'), submenu: [
             { id: 'cheevos_enable', label: t('RETROACHIEVEMENTS'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },
             { id: 'cheevos_user', label: t('USERNAME'), type: 'input', settingName: 'global.cheevos.username', settingType: 'string' },
-            { id: 'cheevos_pass', label: t('SENHA'), type: 'input', settingName: 'global.cheevos.password', settingType: 'string', isPassword: true },
+            { id: 'cheevos_pass', label: t('PASSWORD'), type: 'input', settingName: 'global.cheevos.password', settingType: 'string', isPassword: true },
           ]},
           { id: 'netplay_submenu', label: t('NETPLAY SETTINGS'), submenu: [
             { id: 'netplay_enable', label: t('ENABLE NETPLAY'), type: 'toggle', settingName: 'global.netplay', settingType: 'bool' },
@@ -866,7 +866,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 if (!hasAnyBios) {
                   tabItems.push({
                     id: `bios_empty_tab${tabIndex}`,
-                    label: t('NENHUM ARQUIVO DE BIOS AUSENTE'),
+                    label: t('NO MISSING BIOS FILES'),
                     type: 'info',
                     value: '',
                     tab: tabIndex
@@ -2380,13 +2380,15 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       }
 
       return (
-        <div className={`menu-toggle ${isOn ? 'on' : 'off'}`}>
-          <div className="toggle-thumb" />
+        <div className={`riescade-switch ${isOn ? 'on' : ''}`}>
+          <div className="thumb toggle-thumb" />
         </div>
       )
     }
     if (item.type === 'select') {
-      const currentVal = currentSettingVal !== undefined ? currentSettingVal : item.options?.[0]?.value
+      const currentVal = (currentSettingVal !== undefined && currentSettingVal !== null && currentSettingVal !== '') 
+        ? currentSettingVal 
+        : (item.options?.[0]?.value !== undefined ? item.options[0].value : '')
       const label = item.options?.find(o => isOptionMatch(o.value, currentVal))?.label || currentVal
       return (
         <div className="menu-select">
@@ -2546,7 +2548,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
   return (
     <>
-      <div className={`riescade-menu-overlay ${visible ? 'visible' : ''}`}>
+      <div className={`riescade-overlay riescade-menu-overlay ${visible && !showInputConfig && !showScraperProgress ? 'visible' : ''}`}>
         <div className="riescade-menu-container">
           <div className="riescade-menu-header">
             <h2 className="riescade-menu-title">{menuTitle}</h2>
@@ -2583,7 +2585,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 return (
                   <button
                     key={btn.id}
-                    className={`riescade-menu-bottom-button ${isSelected ? 'selected' : ''}`}
+                    className={`riescade-button ${isSelected ? 'selected' : ''}`}
                     onMouseMove={(e) => {
                       if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
                         setLastMousePos({ x: e.clientX, y: e.clientY })
@@ -2626,7 +2628,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       </div>
 
       {showSaveModal && (
-        <div className="riescade-modal-overlay">
+        <div className="riescade-overlay riescade-modal-overlay visible">
           <div className="riescade-modal-container">
             <h3 className="riescade-modal-title">{t('Apply Changes?')}</h3>
             <p className="riescade-modal-message">
@@ -2635,19 +2637,19 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             <div className="riescade-modal-buttons">
               <button 
                 onClick={handleSave}
-                className={`riescade-modal-button-primary ${modalSelectedIndex === 0 ? 'selected' : ''}`}
+                className={`riescade-button ${modalSelectedIndex === 0 ? 'selected' : ''}`}
               >
                 {t('Save & Apply')}
               </button>
               <button 
                 onClick={onClose}
-                className={`riescade-modal-button-danger ${modalSelectedIndex === 1 ? 'selected' : ''}`}
+                className={`riescade-button ${modalSelectedIndex === 1 ? 'selected' : ''}`}
               >
                 {t('Discard Changes')}
               </button>
               <button 
                 onClick={() => setShowSaveModal(false)}
-                className={`riescade-modal-button-secondary ${modalSelectedIndex === 2 ? 'selected' : ''}`}
+                className={`riescade-button ${modalSelectedIndex === 2 ? 'selected' : ''}`}
               >
                 {t('Cancel')}
               </button>
@@ -2662,7 +2664,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       {showScraperProgress && <ScraperProgressModal isOpen={showScraperProgress} onClose={() => setShowScraperProgress(false)} t={t} />}
       
       {isBluetoothScanning && (
-        <div className="riescade-modal-overlay bluetooth-scanning">
+        <div className="riescade-overlay riescade-modal-overlay bluetooth-scanning visible">
           <div className="riescade-modal-container bluetooth-scanning-container">
             <h3 className="riescade-modal-title bluetooth-scanning-title">{t('SCANNING BLUETOOTH')}</h3>
             <p className="riescade-modal-text bluetooth-scanning-text">{t('Searching for devices...')}</p>
@@ -2675,7 +2677,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 }
                 setIsBluetoothScanning(false)
               }}
-              className="riescade-modal-btn-cancel"
+              className="riescade-button"
             >
               {t('Cancel')}
             </button>
@@ -2684,7 +2686,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       )}
       
       {showInputModal && (
-        <div className="riescade-modal-overlay">
+        <div className="riescade-overlay riescade-modal-overlay visible">
           <div className="riescade-modal-container">
             <h3 className="riescade-modal-title">{activeInputItem?.label}</h3>
             <div style={{ margin: '20px 0' }}>
@@ -2713,7 +2715,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             </div>
             <div className="riescade-modal-buttons">
               <button 
-                className="riescade-modal-button-primary selected"
+                className="riescade-button selected"
                 onClick={() => {
                   updateSetting(activeInputItem!.settingName!, inputValue)
                   setShowInputModal(false)
@@ -2722,7 +2724,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 {t('OK')}
               </button>
               <button 
-                className="riescade-modal-button-secondary"
+                className="riescade-button"
                 onClick={() => setShowInputModal(false)}
               >
                 {t('Cancel')}
