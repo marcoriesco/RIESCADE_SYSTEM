@@ -304,16 +304,16 @@ public static class RiescadeUpdater
                 if (!File.Exists(sevenZipExe))
                 {
                     sevenZipExe = "7z.exe"; // Fallback to PATH
-                    if (!File.Exists(sevenZipExe) && File.Exists("C:\\\\\\\\Program Files\\\\\\\\7-Zip\\\\\\\\7z.exe"))
+                    if (!File.Exists(sevenZipExe) && File.Exists("C:\\\\Program Files\\\\7-Zip\\\\7z.exe"))
                     {
-                        sevenZipExe = "C:\\\\\\\\Program Files\\\\\\\\7-Zip\\\\\\\\7z.exe";
+                        sevenZipExe = "C:\\\\Program Files\\\\7-Zip\\\\7z.exe";
                     }
                 }
 
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = sevenZipExe,
-                    Arguments = string.Format("x \\\\\\\"{0}\\\\\\\" -o\\\\\\\"{1}\\\\\\\" -y", zipPath, tempExtractDir),
+                    Arguments = string.Format("x \\"{0}\\" -o\\"{1}\\" -y", zipPath, tempExtractDir),
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
@@ -327,7 +327,7 @@ public static class RiescadeUpdater
                     {
                         string err = process.StandardError.ReadToEnd();
                         string opt = process.StandardOutput.ReadToEnd();
-                        throw new Exception("7-Zip extraction failed with exit code " + process.ExitCode + "\\\\nOutput: " + opt + "\\\\nError: " + err);
+                        throw new Exception("7-Zip extraction failed with exit code " + process.ExitCode + "\\nOutput: " + opt + "\\nError: " + err);
                     }
                 }
             }
@@ -373,7 +373,7 @@ public static class RiescadeUpdater
             else
             {
                 MessageBox.Show(
-                    "Update completed, but launcher executable was not found:\\\\n" + execPath,
+                    "Update completed, but launcher executable was not found:\\n" + execPath,
                     "RIESCADE Updater Warning",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
@@ -384,7 +384,7 @@ public static class RiescadeUpdater
         catch (Exception ex)
         {
             MessageBox.Show(
-                "An error occurred during update installation:\\\\n\\\\n" + ex.Message + "\\\\n\\\\n" + ex.StackTrace,
+                "An error occurred during update installation:\\n\\n" + ex.Message + "\\n\\n" + ex.StackTrace,
                 "RIESCADE Updater Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);

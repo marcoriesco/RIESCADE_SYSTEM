@@ -135,6 +135,12 @@ async function run() {
     } else {
       console.log('   ✓ emulationstation/');
     }
+    // Remove the database file (each user generates their own)
+    const dbFile = path.join(esDest, '.riescade', 'riescade.db');
+    if (fs.existsSync(dbFile)) {
+      fs.unlinkSync(dbFile);
+      console.log('   ✓ riescade.db excluded');
+    }
   }
 
   // --- EMPTY PLACEHOLDER FOLDERS with .keep ---

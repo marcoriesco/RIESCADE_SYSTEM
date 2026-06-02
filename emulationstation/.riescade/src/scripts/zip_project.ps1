@@ -55,6 +55,12 @@ if (Test-Path $esSource) {
     } else {
         Write-Host "   [OK] emulationstation/"
     }
+    # Remove the database file (each user generates their own)
+    $dbFile = Join-Path (Join-Path $esDest '.riescade') 'riescade.db'
+    if (Test-Path $dbFile) {
+        Remove-Item -Path $dbFile -Force
+        Write-Host "   [OK] riescade.db excluded"
+    }
 }
 
 # --- EMPTY PLACEHOLDER FOLDERS ---
