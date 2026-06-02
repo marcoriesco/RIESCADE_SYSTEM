@@ -156,16 +156,23 @@ async function run() {
     }
   }
 
-  // --- Compress using local 7z.exe with maximum compression ---
+  // --- Compress using local 7z.exe ---
   const sevenZipPath = path.join(projectRoot, 'emulationstation', '7z.exe');
-  console.log('🤐 Compressing with 7-Zip...');
+  console.log('🤐 Compressing with 7-Zip (7z format)...');
   execSync(`"${sevenZipPath}" a -t7z -mx=9 -ms=on "${zipPath}" "${tempDir}\\*"`, { stdio: 'inherit' });
   
+  const zipPathZip = path.join(projectRoot, 'RIESCADE_SYSTEM.zip');
+  if (fs.existsSync(zipPathZip)) fs.unlinkSync(zipPathZip);
+  console.log('🤐 Compressing with 7-Zip (zip format)...');
+  execSync(`"${sevenZipPath}" a -tzip -mx=5 "${zipPathZip}" "${tempDir}\\*"`, { stdio: 'inherit' });
+
   // Cleanup temp
   fs.rmSync(tempDir, { recursive: true, force: true });
 
-  const zipSizeMB = (fs.statSync(zipPath).size / (1024 * 1024)).toFixed(1);
-  console.log(`✅ 7z package created (${zipSizeMB} MB)`);
+  const sevenZipSizeMB = (fs.statSync(zipPath).size / (1024 * 1024)).toFixed(1);
+  const zipSizeMB = (fs.statSync(zipPathZip).size / (1024 * 1024)).toFixed(1);
+  console.log(`✅ 7z package created (${sevenZipSizeMB} MB)`);
+  console.log(`✅ ZIP package created (${zipSizeMB} MB)`);
 
   // 4. Git Commit, Tag & Push
   console.log('🐙 Staging and committing version changes...');
@@ -225,27 +232,36 @@ async function run() {
   const releaseId = releaseData.id;
   console.log(`✅ GitHub Release created (ID: ${releaseId})`);
 
-  // 6. Upload RIESCADE_SYSTEM.7z to GitHub Release
-  const uploadUrl = uploadUrlTemplate.replace(/\{.*?\}/, '') + '?name=RIESCADE_SYSTEM.7z';
-  console.log(`📤 Uploading RIESCADE_SYSTEM.7z to release assets...`);
+  // 6. Upload RIESCADE_SYSTEM.7z and RIESCADE_SYSTEM.zip to GitHub Release
+  const assetsToUpload = [
+    { name: 'RIESCADE_SYSTEM.7z', path: zipPath, contentType: 'application/x-7z-compressed' },
+    { name: 'RIESCADE_SYSTEM.zip', path: zipPathZip, contentType: 'application/zip' }
+  ];
 
-  const zipBuffer = fs.readFileSync(zipPath);
+  for (const asset of assetsToUpload) {
+    const assetUploadUrl = uploadUrlTemplate.replace(/\{.*?\}/, '') + `?name=${asset.name}`;
+    console.log(`📤 Uploading ${asset.name} to release assets...`);
+    const fileStream = fs.createReadStream(asset.path);
+    const fileSize = fs.statSync(asset.path).size;
 
-  const uploadResponse = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      'Authorization': `token ${token}`,
-      'Content-Type': 'application/x-7z-compressed',
-      'Content-Length': zipBuffer.length.toString(),
-      'User-Agent': 'RIESCADE-Release-Script',
-      'X-GitHub-Api-Version': '2022-11-28'
-    },
-    body: zipBuffer
-  });
+    const uploadResponse = await fetch(assetUploadUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Content-Type': asset.contentType,
+        'Content-Length': fileSize.toString(),
+        'User-Agent': 'RIESCADE-Release-Script',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'duplex': 'half'
+      },
+      body: fileStream
+    });
 
-  if (!uploadResponse.ok) {
-    const errorText = await uploadResponse.text();
-    throw new Error(`Failed to upload asset: ${uploadResponse.status} ${uploadResponse.statusText}\n${errorText}`);
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text();
+      throw new Error(`Failed to upload asset ${asset.name}: ${uploadResponse.status} ${uploadResponse.statusText}\n${errorText}`);
+    }
+    console.log(`   ✓ ${asset.name} uploaded successfully.`);
   }
 
   console.log(`\n🎉 Release v${version} successfully completed and published to GitHub!`);
