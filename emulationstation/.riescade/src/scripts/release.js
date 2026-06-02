@@ -238,9 +238,9 @@ async function run() {
       'Content-Type': 'application/x-7z-compressed',
       'Content-Length': fileSize.toString(),
       'User-Agent': 'RIESCADE-Release-Script',
-      'X-GitHub-Api-Version': '2022-11-28',
-      'duplex': 'half'
+      'X-GitHub-Api-Version': '2022-11-28'
     },
+    duplex: 'half',
     body: fileStream
   });
 
