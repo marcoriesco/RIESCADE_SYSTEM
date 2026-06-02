@@ -213,6 +213,7 @@ try {
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -233,6 +234,18 @@ public static class RiescadeUpdater
         string zipPath = args[0];
         string currentAppDir = args[1];
         string execPath = args[2];
+
+        // Cleanup any .old files from previous runs
+        try
+        {
+            string selfPath = Assembly.GetExecutingAssembly().Location;
+            string oldSelf = selfPath + ".old";
+            if (File.Exists(oldSelf))
+            {
+                File.Delete(oldSelf);
+            }
+        }
+        catch {}
 
         try
         {
@@ -350,6 +363,29 @@ public static class RiescadeUpdater
         foreach (string file in Directory.GetFiles(sourceDir))
         {
             string destFile = Path.Combine(destDir, Path.GetFileName(file));
+            
+            // Check if we are trying to copy RIESCADEUpdater.exe (ourselves)
+            if (string.Equals(Path.GetFileName(file), "RIESCADEUpdater.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                if (File.Exists(destFile))
+                {
+                    try
+                    {
+                        string oldFile = destFile + ".old";
+                        if (File.Exists(oldFile))
+                        {
+                            File.Delete(oldFile);
+                        }
+                        File.Move(destFile, oldFile);
+                    }
+                    catch
+                    {
+                        // If rename fails, skip copying this file to prevent updater crash
+                        continue;
+                    }
+                }
+            }
+
             int attempts = 0;
             while (true)
             {
