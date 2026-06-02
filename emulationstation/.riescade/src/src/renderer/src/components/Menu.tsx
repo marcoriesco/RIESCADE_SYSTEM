@@ -1921,12 +1921,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         id: 'updates_downloads', label: t('UPDATES & DOWNLOADS'), submenu: [
           { id: 'group_software_updates', label: t('SOFTWARE UPDATES'), type: 'group' },
           { id: 'updates_enabled', label: t('CHECK FOR UPDATES'), type: 'toggle', settingName: 'updates.enabled', settingType: 'bool' },
-          { id: 'updates_type', label: t('UPDATE TYPE'), type: 'select', settingName: 'updates.type', options: [
-            { label: t('STABLE'), value: 'stable' },
-            { label: t('BETA'), value: 'beta' },
-            { label: t('BETA (BUTTERFLY)'), value: 'butterfly' },
-            { label: t('UNSTABLE'), value: 'unstable' }
-          ]},
           { id: 'group_updates_actions', label: t('ACTIONS'), type: 'group' },
           { id: 'start_update', label: t('START UPDATE'), type: 'action', onClick: () => {
             setUpdateState({ status: 'checking' })
