@@ -138,7 +138,7 @@ async function run() {
   }
 
   // --- EMPTY PLACEHOLDER FOLDERS with .keep ---
-  const emptyFolders = ['bios', 'emulators', 'roms', 'saves', 'screenshots'];
+  const emptyFolders = ['bios', 'roms', 'saves', 'screenshots'];
   for (const folder of emptyFolders) {
     const folderPath = path.join(tempDir, folder);
     fs.mkdirSync(folderPath, { recursive: true });
@@ -146,8 +146,8 @@ async function run() {
     console.log(`   ✓ ${folder}/ (.keep)`);
   }
 
-  // --- ADDITIONAL ROOT FOLDERS (sounds, decorations, cheats, system, user) ---
-  const extraFolders = ['sounds', 'decorations', 'cheats', 'system', 'user'];
+  // --- ADDITIONAL ROOT FOLDERS (sounds, decorations, cheats, system, user, emulators) ---
+  const extraFolders = ['sounds', 'decorations', 'cheats', 'system', 'user', 'emulators'];
   for (const folder of extraFolders) {
     const src = path.join(projectRoot, folder);
     if (fs.existsSync(src) && fs.statSync(src).isDirectory()) {

@@ -1183,8 +1183,7 @@
   justify-content: center !important;
   z-index: 20000 !important;
 }
-
-.scraper-progress-card {
+.scraper-progress-overlay .scraper-progress-card {
   background: rgba(20, 20, 20, 0.9);
   border: 2px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
@@ -1197,8 +1196,7 @@
   align-items: center;
   overflow: hidden;
 }
-
-.scraper-progress-glow {
+.scraper-progress-overlay .scraper-progress-glow {
   position: absolute;
   top: 0;
   left: 0;
@@ -1207,8 +1205,7 @@
   background: linear-gradient(to right, var(--theme-color, #f042b0), #9333ea);
   box-shadow: 0 2px 20px var(--theme-color, #f042b0);
 }
-
-.scraper-progress-title {
+.scraper-progress-overlay .scraper-progress-title {
   color: #fff;
   font-size: 1.4rem;
   font-weight: 800;
@@ -1217,8 +1214,7 @@
   margin-bottom: 30px;
   margin-top: 0;
 }
-
-.scraper-progress-details {
+.scraper-progress-overlay .scraper-progress-details {
   width: 100%;
   text-align: center;
   background: rgba(255, 255, 255, 0.03);
@@ -1227,8 +1223,7 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 25px;
 }
-
-.scraper-progress-system {
+.scraper-progress-overlay .scraper-progress-system {
   color: var(--theme-color, #f042b0);
   font-size: 0.8rem;
   font-weight: 800;
@@ -1236,8 +1231,7 @@
   text-transform: uppercase;
   margin-bottom: 6px;
 }
-
-.scraper-progress-game {
+.scraper-progress-overlay .scraper-progress-game {
   color: #fff;
   font-size: 1.1rem;
   font-weight: 600;
@@ -1246,8 +1240,7 @@
   text-overflow: ellipsis;
   width: 100%;
 }
-
-.scraper-progress-track {
+.scraper-progress-overlay .scraper-progress-track {
   width: 100%;
   height: 10px;
   background: rgba(255, 255, 255, 0.05);
@@ -1256,31 +1249,27 @@
   border: 1px solid rgba(255, 255, 255, 0.03);
   margin-bottom: 10px;
 }
-
-.scraper-progress-fill {
+.scraper-progress-overlay .scraper-progress-fill {
   height: 100%;
   background: linear-gradient(to right, var(--theme-color, #f042b0), #a855f7);
   border-radius: 5px;
   box-shadow: 0 0 10px var(--theme-color, #f042b0);
   transition: width 0.15s ease;
 }
-
-.scraper-progress-percent {
+.scraper-progress-overlay .scraper-progress-percent {
   color: #fff;
   font-size: 1.1rem;
   font-weight: 800;
   margin-bottom: 25px;
 }
-
-.scraper-progress-grid {
+.scraper-progress-overlay .scraper-progress-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
   gap: 15px;
   margin-bottom: 35px;
 }
-
-.scraper-progress-item {
+.scraper-progress-overlay .scraper-progress-item {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 10px;
@@ -1289,8 +1278,7 @@
   flex-direction: column;
   align-items: center;
 }
-
-.scraper-progress-label {
+.scraper-progress-overlay .scraper-progress-label {
   font-size: 0.65rem;
   color: #888;
   font-weight: 800;
@@ -1298,21 +1286,19 @@
   text-transform: uppercase;
   margin-bottom: 4px;
 }
-
-.scraper-progress-val {
+.scraper-progress-overlay .scraper-progress-val {
   font-size: 1.2rem;
   color: #fff;
   font-weight: 800;
 }
-.scraper-progress-val.success {
+.scraper-progress-overlay .scraper-progress-val.success {
   color: #4ade80;
 }
-.scraper-progress-val.fail {
+.scraper-progress-overlay .scraper-progress-val.fail {
   color: #f87171;
 }
-
-.scraper-progress-cancel,
-.scraper-progress-close {
+.scraper-progress-overlay .scraper-progress-cancel,
+.scraper-progress-overlay .scraper-progress-close {
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -1320,8 +1306,7 @@
   gap: 8px;
   width: 100%;
 }
-
-.scraper-progress-cancel-btn {
+.scraper-progress-overlay .scraper-progress-cancel-btn {
   background: rgba(248, 113, 113, 0.1);
   border: 2px solid #f87171;
   color: #f87171;
@@ -1335,15 +1320,13 @@
   transition: all 0.2s ease;
   text-transform: uppercase;
 }
-
-.scraper-progress-hint {
+.scraper-progress-overlay .scraper-progress-hint {
   font-size: 0.7rem;
   color: #666;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
-
-.scraper-progress-finished {
+.scraper-progress-overlay .scraper-progress-finished {
   text-align: center;
   width: 100%;
   background: rgba(255, 255, 255, 0.03);
@@ -1352,28 +1335,24 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 35px;
 }
-
-.scraper-progress-success-msg {
+.scraper-progress-overlay .scraper-progress-success-msg {
   font-size: 1.15rem;
   color: #4ade80;
   font-weight: 700;
   margin-bottom: 15px;
 }
-
-.scraper-progress-reason {
+.scraper-progress-overlay .scraper-progress-reason {
   font-size: 1.1rem;
   color: #e2e8f0;
   font-weight: 600;
   margin-bottom: 15px;
 }
-
-.scraper-progress-final-count {
+.scraper-progress-overlay .scraper-progress-final-count {
   font-size: 1rem;
   color: #fff;
   font-weight: 500;
 }
-
-.scraper-progress-close-btn {
+.scraper-progress-overlay .scraper-progress-close-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid var(--theme-color, #f042b0);
   color: #fff;
