@@ -1350,6 +1350,18 @@ app.whenReady().then(() => {
       const wrapperLauncherPath = join(currentAppDir, 'RIESCADE.exe')
       const execPath = existsSync(wrapperLauncherPath) ? wrapperLauncherPath : process.execPath
 
+      const updaterPath = join(currentAppDir, 'emulationstation', 'RIESCADEUpdater.exe')
+      if (fs.existsSync(updaterPath)) {
+        const { spawn } = require('child_process')
+        const child = spawn(updaterPath, [zipPath, currentAppDir, execPath], {
+          detached: true,
+          stdio: 'ignore'
+        })
+        child.unref()
+        app.quit()
+        return
+      }
+
       if (fs.existsSync(tempExtractDir)) {
         try {
           fs.rmSync(tempExtractDir, { recursive: true, force: true })

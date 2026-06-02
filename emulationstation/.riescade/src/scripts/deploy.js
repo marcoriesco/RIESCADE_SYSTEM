@@ -198,4 +198,222 @@ if (Test-Path $icon) {
   console.log(`✅ Fallback launcher created: ${cmdPath}`)
 }
 
+// 3. Create RIESCADEUpdater.exe inside emulationstation/ folder
+const updaterExe = path.join(retroBatRoot, 'emulationstation', 'RIESCADEUpdater.exe')
+console.log(`🔗 Creating updater at ${updaterExe}...`)
+try {
+  if (fs.existsSync(updaterExe)) fs.unlinkSync(updaterExe)
+} catch {}
+
+try {
+  const tempDir = process.env.TEMP || process.env.TMP || 'C:\\Windows\\Temp'
+  const updaterCsPath = path.join(tempDir, 'riescade_updater.cs')
+  
+  const updaterCode = `using System;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Threading;
+using System.Windows.Forms;
+
+public static class RiescadeUpdater
+{
+    public static int Main(string[] args)
+    {
+        if (args.Length < 3)
+        {
+            MessageBox.Show(
+                "Usage: RIESCADEUpdater.exe <zipPath> <currentAppDir> <execPath>",
+                "RIESCADE Updater Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            return 1;
+        }
+
+        string zipPath = args[0];
+        string currentAppDir = args[1];
+        string execPath = args[2];
+
+        try
+        {
+            // 1. Wait for RIESCADE processes to close
+            Thread.Sleep(2000);
+            var currentPid = Process.GetCurrentProcess().Id;
+            foreach (var process in Process.GetProcessesByName("RIESCADE"))
+            {
+                if (process.Id != currentPid)
+                {
+                    try
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.WaitForExit(5000);
+                        }
+                    }
+                    catch {}
+                }
+            }
+
+            foreach (var process in Process.GetProcessesByName("riescade"))
+            {
+                if (process.Id != currentPid)
+                {
+                    try
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.WaitForExit(5000);
+                        }
+                    }
+                    catch {}
+                }
+            }
+
+            // 2. Prepare temp extraction directory
+            string tempExtractDir = Path.Combine(Path.GetTempPath(), "riescade_updater_extracted_" + Guid.NewGuid().ToString("N"));
+            if (Directory.Exists(tempExtractDir))
+            {
+                Directory.Delete(tempExtractDir, true);
+            }
+            Directory.CreateDirectory(tempExtractDir);
+
+            // 3. Extract the ZIP
+            if (!File.Exists(zipPath))
+            {
+                throw new FileNotFoundException("Update ZIP file not found: " + zipPath);
+            }
+            ZipFile.ExtractToDirectory(zipPath, tempExtractDir);
+
+            // 4. Find the source directory to copy from
+            string srcDir = tempExtractDir;
+            string[] foundExes = Directory.GetFiles(tempExtractDir, "RIESCADE.exe", SearchOption.AllDirectories);
+            if (foundExes.Length > 0)
+            {
+                Array.Sort(foundExes, (a, b) => a.Length.CompareTo(b.Length));
+                srcDir = Path.GetDirectoryName(foundExes[0]);
+            }
+
+            // 5. Recursively copy files to currentAppDir
+            CopyDirectory(srcDir, currentAppDir);
+
+            // 6. Clean up
+            try
+            {
+                Directory.Delete(tempExtractDir, true);
+            }
+            catch {}
+            try
+            {
+                File.Delete(zipPath);
+            }
+            catch {}
+
+            // 7. Re-launch RIESCADE.exe
+            if (File.Exists(execPath))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = execPath,
+                    WorkingDirectory = Path.GetDirectoryName(execPath),
+                    UseShellExecute = true
+                });
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Update completed, but launcher executable was not found:\\\\n" + execPath,
+                    "RIESCADE Updater Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                "An error occurred during update installation:\\\\n\\\\n" + ex.Message + "\\\\n\\\\n" + ex.StackTrace,
+                "RIESCADE Updater Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            return 1;
+        }
+    }
+
+    private static void CopyDirectory(string sourceDir, string destDir)
+    {
+        if (!Directory.Exists(destDir))
+        {
+            Directory.CreateDirectory(destDir);
+        }
+
+        foreach (string file in Directory.GetFiles(sourceDir))
+        {
+            string destFile = Path.Combine(destDir, Path.GetFileName(file));
+            int attempts = 0;
+            while (true)
+            {
+                try
+                {
+                    File.Copy(file, destFile, true);
+                    break;
+                }
+                catch (Exception)
+                {
+                    attempts++;
+                    if (attempts >= 20)
+                    {
+                        throw;
+                    }
+                    Thread.Sleep(1000);
+                }
+            }
+        }
+
+        foreach (string subDir in Directory.GetDirectories(sourceDir))
+        {
+            string destSubDir = Path.Combine(destDir, Path.GetFileName(subDir));
+            CopyDirectory(subDir, destSubDir);
+        }
+    }
+}
+`
+
+  fs.writeFileSync(updaterCsPath, updaterCode, 'utf8')
+
+  const psUpdater = `
+$ErrorActionPreference = 'Stop'
+$outExe = "${escapePs(updaterExe)}"
+
+if (Test-Path $outExe) { Remove-Item -Force $outExe }
+
+$rt = [System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory()
+$csc = Join-Path $rt "csc.exe"
+if (!(Test-Path $csc)) { throw "csc.exe not found at: $csc" }
+
+$args = @(
+  "/nologo",
+  "/target:winexe",
+  "/optimize+",
+  "/reference:System.Windows.Forms.dll",
+  "/reference:System.IO.Compression.dll",
+  "/reference:System.IO.Compression.FileSystem.dll",
+  "/out:$outExe",
+  "${escapePs(updaterCsPath)}"
+)
+
+& $csc @args | Out-Null
+`
+
+  const encodedUpdater = Buffer.from(psUpdater, 'utf16le').toString('base64')
+  execSync(`powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${encodedUpdater}`, { stdio: 'inherit' })
+  console.log('✅ Updater compiled successfully!')
+
+  try {
+    fs.unlinkSync(updaterCsPath)
+  } catch {}
+} catch (e) {
+  console.error('❌ Failed to compile RIESCADEUpdater.exe:', e.message || e)
+}
+
 console.log('🎉 Deployment complete!')
