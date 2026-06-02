@@ -52,3 +52,10 @@ emulators
 saves/
 screenshots/
 records/
+
+# Local environment variables
+.env
+.env.local
+
+# Release artifacts
+RIESCADE_SYSTEM.zip

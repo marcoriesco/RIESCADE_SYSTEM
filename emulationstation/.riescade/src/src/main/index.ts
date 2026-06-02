@@ -1276,6 +1276,124 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('get-version', () => {
+    return { app: app.getVersion() }
+  })
+
+  ipcMain.handle('check-for-updates', async () => {
+    try {
+      const response = await fetch('https://api.github.com/repos/marcoriesco/RIESCADE_SYSTEM/releases/latest', {
+        headers: {
+          'User-Agent': 'RIESCADE-Updater'
+        }
+      })
+      if (!response.ok) {
+        throw new Error(`GitHub API returned status ${response.status}`)
+      }
+      const release = await response.json()
+      const releaseTag = release.tag_name || ''
+      const currentVersion = app.getVersion()
+
+      const cleanTag = releaseTag.replace(/^v/, '')
+      const cleanApp = currentVersion.replace(/^v/, '')
+
+      const compareSemver = (v1: string, v2: string): number => {
+        const a = v1.split('.').map(Number)
+        const b = v2.split('.').map(Number)
+        for (let i = 0; i < 3; i++) {
+          const na = a[i] || 0
+          const nb = b[i] || 0
+          if (na > nb) return 1
+          if (na < nb) return -1
+        }
+        return 0
+      }
+
+      const updateAvailable = compareSemver(cleanTag, cleanApp) > 0
+      const zipAsset = release.assets?.find((a: any) => a.name.endsWith('.zip'))
+      const zipUrl = zipAsset ? zipAsset.browser_download_url : null
+
+      return {
+        updateAvailable,
+        version: cleanTag,
+        releaseNotes: release.body || '',
+        zipUrl
+      }
+    } catch (e: any) {
+      console.error('check-for-updates error:', e)
+      throw e
+    }
+  })
+
+  ipcMain.handle('download-and-install-update', async (_, zipUrl: string) => {
+    if (!zipUrl) throw new Error('No zip URL provided')
+    try {
+      const fs = require('fs')
+      const zipPath = join(app.getPath('temp'), 'riescade-update.zip')
+      const response = await fetch(zipUrl)
+      if (!response.ok) {
+        throw new Error(`Failed to download update: ${response.statusText}`)
+      }
+
+      const fileStream = fs.createWriteStream(zipPath)
+      for await (const chunk of response.body as any) {
+        fileStream.write(chunk)
+      }
+      fileStream.end()
+
+      await new Promise((resolve, reject) => {
+        fileStream.on('finish', resolve)
+        fileStream.on('error', reject)
+      })
+
+      const tempExtractDir = join(app.getPath('temp'), 'riescade_extracted')
+      const currentAppDir = getRetroBatPath()
+      const wrapperLauncherPath = join(currentAppDir, 'RIESCADE.exe')
+      const execPath = existsSync(wrapperLauncherPath) ? wrapperLauncherPath : process.execPath
+
+      if (fs.existsSync(tempExtractDir)) {
+        try {
+          fs.rmSync(tempExtractDir, { recursive: true, force: true })
+        } catch (err) {
+          console.error('Failed to clean tempExtractDir:', err)
+        }
+      }
+      fs.mkdirSync(tempExtractDir, { recursive: true })
+
+      const psCommand = `Start-Sleep -s 2;
+$zipPath = '${zipPath.replace(/'/g, "''")}';
+$tempExtractDir = '${tempExtractDir.replace(/'/g, "''")}';
+$currentAppDir = '${currentAppDir.replace(/'/g, "''")}';
+$execPath = '${execPath.replace(/'/g, "''")}';
+
+Expand-Archive -Path $zipPath -DestinationPath $tempExtractDir -Force;
+$exes = Get-ChildItem -Path $tempExtractDir -Filter "RIESCADE.exe" -Recurse | Sort-Object {$_.FullName.Length};
+$exe = if ($exes) { $exes[0] } else { $null };
+$srcDir = if ($exe) { $exe.DirectoryName } else { $tempExtractDir };
+Copy-Item -Path "$srcDir\\*" -Destination $currentAppDir -Recurse -Force;
+Start-Process -FilePath $execPath;
+Remove-Item -Path $tempExtractDir -Recurse -Force;
+Remove-Item -Path $zipPath -Force;
+`
+
+      const { spawn } = require('child_process')
+      const child = spawn('powershell.exe', [
+        '-NoProfile',
+        '-ExecutionPolicy', 'Bypass',
+        '-Command', psCommand
+      ], {
+        detached: true,
+        stdio: 'ignore'
+      })
+      child.unref()
+
+      app.quit()
+    } catch (e: any) {
+      console.error('download-and-install-update error:', e)
+      throw e
+    }
+  })
+
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

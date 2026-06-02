@@ -152,6 +152,14 @@ const getGamepadGuid = (pad: Gamepad): string => {
 
 export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists }) => {
   const [settings, setSettings] = useState<Record<string, any>>({})
+  const [appVersion, setAppVersion] = useState('2.0.1')
+  const [updateState, setUpdateState] = useState<{
+    status: 'idle' | 'checking' | 'available' | 'no-update' | 'downloading' | 'error'
+    version?: string
+    releaseNotes?: string
+    zipUrl?: string
+    errorMsg?: string
+  }>({ status: 'idle' })
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
   const [themes, setThemes] = useState<string[]>([])
@@ -401,6 +409,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         setSettings(s)
         setPendingSettings({})
       })
+      window.api.getVersion?.().then((res: any) => {
+        if (res && res.app) setAppVersion(res.app)
+      }).catch(console.error)
       window.api.getThemes().then(setThemes)
       window.api.getCustomCollections().then(setCustomCollections)
       window.api.getHostname?.().then(setHostname).catch(() => {})
@@ -1918,7 +1929,27 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'group_updates_actions', label: t('ACTIONS'), type: 'group' },
           { id: 'start_update', label: t('START UPDATE'), type: 'action', onClick: () => {
-            alert(t('START UPDATE'))
+            setUpdateState({ status: 'checking' })
+            setModalSelectedIndex(0)
+            window.api.checkForUpdates()
+              .then((res: any) => {
+                if (res.updateAvailable) {
+                  setUpdateState({
+                    status: 'available',
+                    version: res.version,
+                    releaseNotes: res.releaseNotes,
+                    zipUrl: res.zipUrl
+                  })
+                } else {
+                  setUpdateState({ status: 'no-update' })
+                }
+              })
+              .catch((err: any) => {
+                setUpdateState({
+                  status: 'error',
+                  errorMsg: err.message || String(err)
+                })
+              })
           }}
         ]
       },
@@ -1926,7 +1957,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         id: 'system_settings', label: t('SYSTEM SETTINGS'), submenu: [
           { id: 'group_system', label: t('SYSTEM'), type: 'group' },
           { id: 'information_submenu', label: t('INFORMATION'), submenu: [
-            { id: 'info_version', label: t('VERSION'), type: 'info', value: 'RIESCADE v2.0.1' },
+            { id: 'info_version', label: t('VERSION'), type: 'info', value: `RIESCADE v${appVersion}` },
             { id: 'info_user_disk', label: t('USER DISK USAGE'), type: 'info', value: '142.5 GB / 476.2 GB (30%)' },
             { id: 'info_sys_disk', label: t('SYSTEM DISK USAGE'), type: 'info', value: '45.1 GB / 118.0 GB (38%)' },
             { id: 'group_info_cpu', label: t('CPU'), type: 'group' },
@@ -2175,6 +2206,47 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     (e: KeyboardEvent) => {
       if (!isOpen || showInputConfig || showScraperProgress) return
 
+      if (updateState.status !== 'idle') {
+        const modalButtons: { label: string; action: () => void }[] = []
+        if (updateState.status === 'available') {
+          modalButtons.push({
+            label: t('DOWNLOAD & UPDATE'),
+            action: () => {
+              setUpdateState(prev => ({ ...prev, status: 'downloading' }))
+              window.api.downloadAndInstallUpdate(updateState.zipUrl!)
+                .catch((err: any) => {
+                  setUpdateState({
+                    status: 'error',
+                    errorMsg: err.message || String(err)
+                  })
+                })
+            }
+          })
+          modalButtons.push({
+            label: t('Cancel'),
+            action: () => setUpdateState({ status: 'idle' })
+          })
+        } else if (updateState.status === 'no-update' || updateState.status === 'error') {
+          modalButtons.push({
+            label: t('OK'),
+            action: () => setUpdateState({ status: 'idle' })
+          })
+        }
+
+        if (modalButtons.length > 0) {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            setModalSelectedIndex(prev => (prev + 1) % modalButtons.length)
+          } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            setModalSelectedIndex(prev => (prev - 1 + modalButtons.length) % modalButtons.length)
+          } else if (e.key === 'Enter' || e.key === ' ') {
+            modalButtons[modalSelectedIndex]?.action()
+          } else if (e.key === 'Backspace' || e.key === 'Escape') {
+            setUpdateState({ status: 'idle' })
+          }
+        }
+        return
+      }
+
       if (showSaveModal) {
         const modalButtons = [
           { label: t('Save & Apply'), action: handleSave },
@@ -2339,7 +2411,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         handleBackAction()
       }
     },
-    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData, needsReload, showInputConfig, showScraperProgress, getBottomButtons, handleBackAction]
+    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData, needsReload, showInputConfig, showScraperProgress, getBottomButtons, handleBackAction, updateState]
   )
 
   useEffect(() => {
@@ -2729,6 +2801,107 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               >
                 {t('Cancel')}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {updateState.status !== 'idle' && (
+        <div className="riescade-overlay riescade-modal-overlay visible">
+          <div className="riescade-modal-container updater-modal-container" style={{ maxWidth: '600px', width: '90%' }}>
+            <h3 className="riescade-modal-title">
+              {updateState.status === 'checking' && t('CHECKING FOR UPDATES')}
+              {updateState.status === 'no-update' && t('SOFTWARE UPDATES')}
+              {updateState.status === 'available' && `${t('UPDATE AVAILABLE')} (v${updateState.version})`}
+              {updateState.status === 'downloading' && t('DOWNLOADING UPDATE')}
+              {updateState.status === 'error' && t('UPDATE ERROR')}
+            </h3>
+
+            <div className="riescade-modal-content" style={{ margin: '20px 0', maxHeight: '300px', overflowY: 'auto' }}>
+              {updateState.status === 'checking' && (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <div className="riescade-modal-spinner" style={{ margin: '0 auto 15px' }} />
+                  <p>{t('Checking for updates...')}</p>
+                </div>
+              )}
+
+              {updateState.status === 'no-update' && (
+                <p style={{ textAlign: 'center', padding: '10px' }}>{t('Your software is up to date.')}</p>
+              )}
+
+              {updateState.status === 'error' && (
+                <p style={{ color: '#ef4444', textAlign: 'center', padding: '10px' }}>
+                  {t('An error occurred during update:')}<br/>
+                  <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>{updateState.errorMsg}</span>
+                </p>
+              )}
+
+              {updateState.status === 'available' && (
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>{t('Release Notes:')}</p>
+                  <pre style={{
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: 'inherit',
+                    fontSize: '0.95rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    padding: '12px',
+                    borderRadius: '4px',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }} className="custom-scrollbar">
+                    {updateState.releaseNotes || t('No release notes provided.')}
+                  </pre>
+                  <p style={{ marginTop: '15px', fontSize: '0.9rem', opacity: 0.8 }}>
+                    {t('The application will download the update and apply it portable.')}
+                  </p>
+                </div>
+              )}
+
+              {updateState.status === 'downloading' && (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <div className="riescade-modal-spinner" style={{ margin: '0 auto 15px' }} />
+                  <p>{t('Downloading and extracting update files...')}</p>
+                  <p style={{ fontSize: '0.85rem', opacity: 0.7, marginTop: '10px' }}>
+                    {t('The application will restart automatically when finished.')}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="riescade-modal-buttons">
+              {updateState.status === 'available' && (
+                <>
+                  <button 
+                    className={`riescade-button ${modalSelectedIndex === 0 ? 'selected' : ''}`}
+                    onClick={() => {
+                      setUpdateState(prev => ({ ...prev, status: 'downloading' }))
+                      window.api.downloadAndInstallUpdate(updateState.zipUrl!)
+                        .catch((err: any) => {
+                          setUpdateState({
+                            status: 'error',
+                            errorMsg: err.message || String(err)
+                          })
+                        })
+                    }}
+                  >
+                    {t('DOWNLOAD & UPDATE')}
+                  </button>
+                  <button 
+                    className={`riescade-button ${modalSelectedIndex === 1 ? 'selected' : ''}`}
+                    onClick={() => setUpdateState({ status: 'idle' })}
+                  >
+                    {t('Cancel')}
+                  </button>
+                </>
+              )}
+
+              {(updateState.status === 'no-update' || updateState.status === 'error') && (
+                <button 
+                  className={`riescade-button ${modalSelectedIndex === 0 ? 'selected' : ''}`}
+                  onClick={() => setUpdateState({ status: 'idle' })}
+                >
+                  {t('OK')}
+                </button>
+              )}
             </div>
           </div>
         </div>

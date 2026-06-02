@@ -49,6 +49,8 @@ const api = {
 
   executeCommand: (command: string, data?: any) => ipcRenderer.send('system-command', command, data),
   getVersion: () => ipcRenderer.invoke('get-version'),
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadAndInstallUpdate: (zipUrl: string) => ipcRenderer.invoke('download-and-install-update', zipUrl),
   getMusicFiles: (subfolder?: string) => ipcRenderer.invoke('get-music-files', subfolder),
   getMusicPath: () => ipcRenderer.invoke('get-music-path'),
   startScrape: () => ipcRenderer.invoke('start-scrape'),
