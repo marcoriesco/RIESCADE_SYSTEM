@@ -14,7 +14,7 @@ function askQuestion(query) {
   }));
 }
 
-// Load env files (.env or src/.env)
+// Load env files (.env)
 function loadEnv() {
   const possiblePaths = [
     path.join(__dirname, '..', '.env'),
@@ -43,6 +43,21 @@ function loadEnv() {
   }
 }
 
+// Recursive copy helper
+function copyRecursiveSync(src, dest) {
+  const stat = fs.statSync(src);
+  if (stat.isDirectory()) {
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    for (const child of fs.readdirSync(src)) {
+      copyRecursiveSync(path.join(src, child), path.join(dest, child));
+    }
+  } else {
+    const destDir = path.dirname(dest);
+    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+    fs.copyFileSync(src, dest);
+  }
+}
+
 async function run() {
   loadEnv();
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
@@ -62,7 +77,6 @@ async function run() {
     version = defaultVersionInput.trim();
   }
 
-  // Clean the version tag prefix v if provided
   version = version.replace(/^v/, '');
   if (!/^\d+\.\d+\.\d+$/.test(version)) {
     console.error('\x1b[31mError: Version must match semver format (X.Y.Z)!\x1b[0m');
@@ -86,32 +100,71 @@ async function run() {
   execSync('npm run deploy', { stdio: 'inherit', cwd: path.join(__dirname, '..') });
   console.log('✅ Electron app built and deployed successfully.');
 
-  // 3. Zip the project (production-only, no source code)
+  // 3. Build the ZIP using Node.js for precise control
   console.log('📦 Packing project into RIESCADE_SYSTEM.zip...');
-  const psCommand = `
-    $temp = Join-Path $env:TEMP 'riescade_zip_temp'
-    if (Test-Path $temp) { Remove-Item -Path $temp -Recurse -Force }
-    New-Item -ItemType Directory -Path $temp | Out-Null
-    $exclude = @('bios', 'emulators', 'roms', 'saves', 'screenshots', '.git', '.gitignore', '.env', '.env.local', 'RIESCADE_SYSTEM.zip', 'zip_project.bat', 'node_modules')
-    Get-ChildItem -Path . -Force | Where-Object { $_.Name -notin $exclude } | ForEach-Object {
-        Copy-Item -Path $_.FullName -Destination $temp -Recurse -Force
+  const tempDir = path.join(require('os').tmpdir(), 'riescade_zip_temp');
+  const zipPath = path.join(projectRoot, 'RIESCADE_SYSTEM.zip');
+
+  // Clean previous temp and zip
+  if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+  if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
+  fs.mkdirSync(tempDir, { recursive: true });
+
+  // --- ROOT FILES: only RIESCADE.exe and README.md ---
+  const rootFiles = ['RIESCADE.exe', 'README.md'];
+  for (const file of rootFiles) {
+    const src = path.join(projectRoot, file);
+    if (fs.existsSync(src)) {
+      fs.copyFileSync(src, path.join(tempDir, file));
+      console.log(`   ✓ ${file}`);
+    } else {
+      console.log(`   ⚠ ${file} not found, skipping.`);
     }
-    # Remove development source code from the packaged output
-    $srcDir = Join-Path (Join-Path (Join-Path $temp 'emulationstation') '.riescade') 'src'
-    if (Test-Path $srcDir) { Remove-Item -Path $srcDir -Recurse -Force }
-    # Create empty placeholder folders with .keep files
-    $emptyFolders = @('bios', 'emulators', 'roms', 'saves', 'screenshots')
-    foreach ($folder in $emptyFolders) {
-        $folderPath = Join-Path $temp $folder
-        New-Item -ItemType Directory -Path $folderPath -Force | Out-Null
-        New-Item -ItemType File -Path (Join-Path $folderPath '.keep') -Force | Out-Null
+  }
+
+  // --- EMULATIONSTATION folder (complete .riescade minus src/) ---
+  const esSource = path.join(projectRoot, 'emulationstation');
+  const esDest = path.join(tempDir, 'emulationstation');
+  if (fs.existsSync(esSource)) {
+    copyRecursiveSync(esSource, esDest);
+    // Remove the development source code folder
+    const srcDir = path.join(esDest, '.riescade', 'src');
+    if (fs.existsSync(srcDir)) {
+      fs.rmSync(srcDir, { recursive: true, force: true });
+      console.log('   ✓ emulationstation/.riescade/ (src/ excluded)');
+    } else {
+      console.log('   ✓ emulationstation/');
     }
-    Compress-Archive -Path (Join-Path $temp '*') -DestinationPath 'RIESCADE_SYSTEM.zip' -Force
-    Remove-Item -Path $temp -Recurse -Force
-  `;
-  const base64Command = Buffer.from(psCommand, 'utf16le').toString('base64');
-  execSync(`powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand ${base64Command}`, { stdio: 'inherit', cwd: projectRoot });
-  console.log('✅ ZIP package created at project root.');
+  }
+
+  // --- EMPTY PLACEHOLDER FOLDERS with .keep ---
+  const emptyFolders = ['bios', 'emulators', 'roms', 'saves', 'screenshots'];
+  for (const folder of emptyFolders) {
+    const folderPath = path.join(tempDir, folder);
+    fs.mkdirSync(folderPath, { recursive: true });
+    fs.writeFileSync(path.join(folderPath, '.keep'), '', 'utf8');
+    console.log(`   ✓ ${folder}/ (.keep)`);
+  }
+
+  // --- ADDITIONAL ROOT FOLDERS (sounds, decorations, cheats, system, user) ---
+  const extraFolders = ['sounds', 'decorations', 'cheats', 'system', 'user'];
+  for (const folder of extraFolders) {
+    const src = path.join(projectRoot, folder);
+    if (fs.existsSync(src) && fs.statSync(src).isDirectory()) {
+      copyRecursiveSync(src, path.join(tempDir, folder));
+      console.log(`   ✓ ${folder}/`);
+    }
+  }
+
+  // --- Compress with PowerShell using .NET ZipFile to preserve empty directories ---
+  const psZip = `[System.Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem') | Out-Null; [System.IO.Compression.ZipFile]::CreateFromDirectory('${tempDir.replace(/\\/g, '/')}', '${zipPath.replace(/\\/g, '/')}')`;
+  execSync(`powershell -NoProfile -ExecutionPolicy Bypass -Command "${psZip}"`, { stdio: 'inherit' });
+  
+  // Cleanup temp
+  fs.rmSync(tempDir, { recursive: true, force: true });
+
+  const zipSizeMB = (fs.statSync(zipPath).size / (1024 * 1024)).toFixed(1);
+  console.log(`✅ ZIP package created (${zipSizeMB} MB)`);
 
   // 4. Git Commit, Tag & Push
   console.log('🐙 Staging and committing version changes...');
@@ -139,7 +192,7 @@ async function run() {
   const createReleaseUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/releases`;
 
   console.log(`🌐 Creating GitHub Release for v${version}...`);
-  const releaseBody = {
+  const releasePayload = {
     tag_name: `v${version}`,
     target_commitish: 'main',
     name: `RIESCADE v${version}`,
@@ -158,7 +211,7 @@ async function run() {
       'User-Agent': 'RIESCADE-Release-Script',
       'X-GitHub-Api-Version': '2022-11-28'
     },
-    body: JSON.stringify(releaseBody)
+    body: JSON.stringify(releasePayload)
   });
 
   if (!createResponse.ok) {
@@ -175,8 +228,7 @@ async function run() {
   const uploadUrl = uploadUrlTemplate.replace(/\{.*?\}/, '') + '?name=RIESCADE_SYSTEM.zip';
   console.log(`📤 Uploading RIESCADE_SYSTEM.zip to release assets...`);
 
-  const zipFilePath = path.join(projectRoot, 'RIESCADE_SYSTEM.zip');
-  const zipBuffer = fs.readFileSync(zipFilePath);
+  const zipBuffer = fs.readFileSync(zipPath);
 
   const uploadResponse = await fetch(uploadUrl, {
     method: 'POST',
