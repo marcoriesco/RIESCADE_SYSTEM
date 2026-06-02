@@ -251,9 +251,9 @@ async function run() {
         'Content-Type': asset.contentType,
         'Content-Length': fileSize.toString(),
         'User-Agent': 'RIESCADE-Release-Script',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'duplex': 'half'
+        'X-GitHub-Api-Version': '2022-11-28'
       },
+      duplex: 'half',
       body: fileStream
     });
 
