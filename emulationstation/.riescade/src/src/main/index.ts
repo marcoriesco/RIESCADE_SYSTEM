@@ -1310,7 +1310,7 @@ app.whenReady().then(() => {
       }
 
       const updateAvailable = compareSemver(cleanTag, cleanApp) > 0
-      const zipAsset = release.assets?.find((a: any) => a.name.endsWith('.zip'))
+      const zipAsset = release.assets?.find((a: any) => a.name.endsWith('.7z')) || release.assets?.find((a: any) => a.name.endsWith('.zip'))
       const zipUrl = zipAsset ? zipAsset.browser_download_url : null
 
       return {
@@ -1328,7 +1328,8 @@ app.whenReady().then(() => {
     if (!zipUrl) throw new Error('No zip URL provided')
     try {
       const fs = require('fs')
-      const zipPath = join(app.getPath('temp'), 'riescade-update.zip')
+      const ext = zipUrl.endsWith('.7z') ? '.7z' : '.zip'
+      const zipPath = join(app.getPath('temp'), `riescade-update${ext}`)
       const response = await fetch(zipUrl)
       if (!response.ok) {
         throw new Error(`Failed to download update: ${response.statusText}`)
@@ -1378,7 +1379,14 @@ $currentAppDir = '${currentAppDir.replace(/'/g, "''")}';
 $execPath = '${execPath.replace(/'/g, "''")}';
 
 try {
-    Expand-Archive -Path $zipPath -DestinationPath $tempExtractDir -Force;
+    if ($zipPath.EndsWith('.7z')) {
+        $sevenZip = Join-Path $currentAppDir "emulationstation\\7z.exe";
+        if (!(Test-Path $sevenZip)) { $sevenZip = "C:\\Program Files\\7-Zip\\7z.exe"; }
+        if (!(Test-Path $sevenZip)) { $sevenZip = "7z"; }
+        & $sevenZip x $zipPath "-o$tempExtractDir" -y | Out-Null;
+    } else {
+        Expand-Archive -Path $zipPath -DestinationPath $tempExtractDir -Force;
+    }
     $exes = Get-ChildItem -Path $tempExtractDir -Filter "RIESCADE.exe" -Recurse | Sort-Object {$_.FullName.Length};
     $exe = if ($exes) { $exes[0] } else { $null };
     $srcDir = if ($exe) { $exe.DirectoryName } else { $tempExtractDir };

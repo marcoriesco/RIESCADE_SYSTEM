@@ -290,12 +290,51 @@ public static class RiescadeUpdater
             }
             Directory.CreateDirectory(tempExtractDir);
 
-            // 3. Extract the ZIP
+            // 3. Extract the ZIP / 7Z
             if (!File.Exists(zipPath))
             {
-                throw new FileNotFoundException("Update ZIP file not found: " + zipPath);
+                throw new FileNotFoundException("Update file not found: " + zipPath);
             }
-            ZipFile.ExtractToDirectory(zipPath, tempExtractDir);
+            
+            string extension = Path.GetExtension(zipPath).ToLower();
+            if (extension == ".7z")
+            {
+                string selfDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string sevenZipExe = Path.Combine(selfDir, "7z.exe");
+                if (!File.Exists(sevenZipExe))
+                {
+                    sevenZipExe = "7z.exe"; // Fallback to PATH
+                    if (!File.Exists(sevenZipExe) && File.Exists("C:\\\\\\\\Program Files\\\\\\\\7-Zip\\\\\\\\7z.exe"))
+                    {
+                        sevenZipExe = "C:\\\\\\\\Program Files\\\\\\\\7-Zip\\\\\\\\7z.exe";
+                    }
+                }
+
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = sevenZipExe,
+                    Arguments = string.Format("x \\\\\\\"{0}\\\\\\\" -o\\\\\\\"{1}\\\\\\\" -y", zipPath, tempExtractDir),
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                using (var process = Process.Start(startInfo))
+                {
+                    process.WaitForExit();
+                    if (process.ExitCode != 0)
+                    {
+                        string err = process.StandardError.ReadToEnd();
+                        string opt = process.StandardOutput.ReadToEnd();
+                        throw new Exception("7-Zip extraction failed with exit code " + process.ExitCode + "\\\\nOutput: " + opt + "\\\\nError: " + err);
+                    }
+                }
+            }
+            else
+            {
+                ZipFile.ExtractToDirectory(zipPath, tempExtractDir);
+            }
 
             // 4. Find the source directory to copy from
             string srcDir = tempExtractDir;

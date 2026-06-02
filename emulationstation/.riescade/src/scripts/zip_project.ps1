@@ -15,11 +15,11 @@ Write-Host "===================================================" -ForegroundColo
 Write-Host "RIESCADE SYSTEM - PORTABLE PROJECT PACKAGER" -ForegroundColor Cyan
 Write-Host "===================================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Packaging project into RIESCADE_SYSTEM.zip..."
+Write-Host "Packaging project into RIESCADE_SYSTEM.7z..."
 Write-Host "Project Root: $projectRoot"
 
 $temp = Join-Path $env:TEMP 'riescade_zip_temp'
-$zipPath = Join-Path $projectRoot 'RIESCADE_SYSTEM.zip'
+$zipPath = Join-Path $projectRoot 'RIESCADE_SYSTEM.7z'
 
 # Clean previous temp and zip
 if (Test-Path $temp) {
@@ -77,10 +77,16 @@ foreach ($folder in $extraFolders) {
     }
 }
 
-# --- Compress using .NET ZipFile to include empty folders ---
-Write-Host "Creating ZIP archive..." -ForegroundColor Cyan
-[System.Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem') | Out-Null
-[System.IO.Compression.ZipFile]::CreateFromDirectory($temp, $zipPath)
+# --- Compress using 7z.exe (prioritizing system installation for up-to-date version) ---
+Write-Host "Creating 7z archive..." -ForegroundColor Cyan
+$7zExe = "C:\Program Files\7-Zip\7z.exe"
+if (!(Test-Path $7zExe)) {
+    $7zExe = Join-Path $projectRoot "emulationstation\7z.exe"
+}
+if (!(Test-Path $7zExe)) {
+    $7zExe = "7z" # Fallback to PATH
+}
+& $7zExe a -t7z -mx=5 -ms=on $zipPath (Join-Path $temp "*")
 
 # Cleanup
 if (Test-Path $temp) {
@@ -90,5 +96,5 @@ if (Test-Path $temp) {
 $zipSizeMB = [math]::Round((Get-Item $zipPath).Length / 1MB, 1)
 Write-Host ""
 Write-Host "===================================================" -ForegroundColor Green
-Write-Host "Success! Created RIESCADE_SYSTEM.zip ($zipSizeMB MB)" -ForegroundColor Green
+Write-Host "Success! Created RIESCADE_SYSTEM.7z ($zipSizeMB MB)" -ForegroundColor Green
 Write-Host "===================================================" -ForegroundColor Green

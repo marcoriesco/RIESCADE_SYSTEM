@@ -100,12 +100,12 @@ async function run() {
   execSync('npm run deploy', { stdio: 'inherit', cwd: path.join(__dirname, '..') });
   console.log('✅ Electron app built and deployed successfully.');
 
-  // 3. Build the ZIP using Node.js for precise control
-  console.log('📦 Packing project into RIESCADE_SYSTEM.zip...');
+  // 3. Build the 7z using Node.js for precise control
+  console.log('📦 Packing project into RIESCADE_SYSTEM.7z...');
   const tempDir = path.join(require('os').tmpdir(), 'riescade_zip_temp');
-  const zipPath = path.join(projectRoot, 'RIESCADE_SYSTEM.zip');
+  const zipPath = path.join(projectRoot, 'RIESCADE_SYSTEM.7z');
 
-  // Clean previous temp and zip
+  // Clean previous temp and 7z
   if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
   if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
   fs.mkdirSync(tempDir, { recursive: true });
@@ -156,15 +156,16 @@ async function run() {
     }
   }
 
-  // --- Compress with PowerShell using .NET ZipFile to preserve empty directories ---
-  const psZip = `[System.Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem') | Out-Null; [System.IO.Compression.ZipFile]::CreateFromDirectory('${tempDir.replace(/\\/g, '/')}', '${zipPath.replace(/\\/g, '/')}')`;
-  execSync(`powershell -NoProfile -ExecutionPolicy Bypass -Command "${psZip}"`, { stdio: 'inherit' });
+  // --- Compress using local 7z.exe with maximum compression ---
+  const sevenZipPath = path.join(projectRoot, 'emulationstation', '7z.exe');
+  console.log('🤐 Compressing with 7-Zip...');
+  execSync(`"${sevenZipPath}" a -t7z -mx=9 -ms=on "${zipPath}" "${tempDir}\\*"`, { stdio: 'inherit' });
   
   // Cleanup temp
   fs.rmSync(tempDir, { recursive: true, force: true });
 
   const zipSizeMB = (fs.statSync(zipPath).size / (1024 * 1024)).toFixed(1);
-  console.log(`✅ ZIP package created (${zipSizeMB} MB)`);
+  console.log(`✅ 7z package created (${zipSizeMB} MB)`);
 
   // 4. Git Commit, Tag & Push
   console.log('🐙 Staging and committing version changes...');
@@ -224,9 +225,9 @@ async function run() {
   const releaseId = releaseData.id;
   console.log(`✅ GitHub Release created (ID: ${releaseId})`);
 
-  // 6. Upload RIESCADE_SYSTEM.zip to GitHub Release
-  const uploadUrl = uploadUrlTemplate.replace(/\{.*?\}/, '') + '?name=RIESCADE_SYSTEM.zip';
-  console.log(`📤 Uploading RIESCADE_SYSTEM.zip to release assets...`);
+  // 6. Upload RIESCADE_SYSTEM.7z to GitHub Release
+  const uploadUrl = uploadUrlTemplate.replace(/\{.*?\}/, '') + '?name=RIESCADE_SYSTEM.7z';
+  console.log(`📤 Uploading RIESCADE_SYSTEM.7z to release assets...`);
 
   const zipBuffer = fs.readFileSync(zipPath);
 
@@ -234,7 +235,7 @@ async function run() {
     method: 'POST',
     headers: {
       'Authorization': `token ${token}`,
-      'Content-Type': 'application/zip',
+      'Content-Type': 'application/x-7z-compressed',
       'Content-Length': zipBuffer.length.toString(),
       'User-Agent': 'RIESCADE-Release-Script',
       'X-GitHub-Api-Version': '2022-11-28'
