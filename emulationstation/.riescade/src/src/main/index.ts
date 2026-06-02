@@ -1346,7 +1346,7 @@ app.whenReady().then(() => {
         fileStream.on('error', reject)
       })
 
-      const tempExtractDir = join(app.getPath('temp'), 'riescade_extracted')
+      const tempExtractDir = join(app.getPath('temp'), 'rcupd')
       const currentAppDir = getRetroBatPath()
       const wrapperLauncherPath = join(currentAppDir, 'RIESCADE.exe')
       const execPath = existsSync(wrapperLauncherPath) ? wrapperLauncherPath : process.execPath

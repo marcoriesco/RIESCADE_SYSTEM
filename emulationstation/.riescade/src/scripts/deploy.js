@@ -283,7 +283,7 @@ public static class RiescadeUpdater
             }
 
             // 2. Prepare temp extraction directory
-            string tempExtractDir = Path.Combine(Path.GetTempPath(), "riescade_updater_extracted_" + Guid.NewGuid().ToString("N"));
+            string tempExtractDir = Path.Combine(Path.GetTempPath(), "rcupd");
             if (Directory.Exists(tempExtractDir))
             {
                 Directory.Delete(tempExtractDir, true);
