@@ -138,6 +138,17 @@ function App() {
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
 	const [isLoadingGames, setIsLoadingGames] = useState(false);
 
+	const addNotification = useCallback(
+		(message: string, type: 'info' | 'success' | 'warning' = 'info', category: 'controller' | 'scraper' | 'general' = 'general') => {
+			const id = Math.random().toString(36).substring(2, 9);
+			setNotifications((prev) => [...prev, { id, message, type, category }]);
+			setTimeout(() => {
+				setNotifications((prev) => prev.filter((n) => n.id !== id));
+			}, 3000);
+		},
+		[],
+	);
+
 	// ─── Audio System State & Refs ───
 	const [musicFiles, setMusicFiles] = useState<string[]>([]);
 	const [musicPath, setMusicPath] = useState<string>('');
@@ -495,6 +506,18 @@ function App() {
 									setSettings(initialSettings);
 									setMusicFiles(files);
 									setMusicPath(mPath);
+
+									// Auto check for updates on startup if enabled
+									const isUpdatesEnabled = initialSettings['updates.enabled']?.value !== 'false' && initialSettings['updates.enabled']?.value !== false;
+									if (isUpdatesEnabled) {
+										window.api.checkForUpdates().then((res: any) => {
+											if (res && res.updateAvailable) {
+												addNotification(`ATUALIZAÇÃO DISPONÍVEL (v${res.version})! Abra o Menu > Updates para atualizar.`, 'info', 'general');
+											}
+										}).catch(err => {
+											console.error('Auto update check failed:', err);
+										});
+									}
 								});
 							});
 						}, 100);
@@ -681,17 +704,6 @@ function App() {
 			if (removeThemeListener) removeThemeListener();
 		};
 	}, []);
-
-	const addNotification = useCallback(
-		(message: string, type: 'info' | 'success' | 'warning' = 'info', category: 'controller' | 'scraper' | 'general' = 'general') => {
-			const id = Math.random().toString(36).substring(2, 9);
-			setNotifications((prev) => [...prev, { id, message, type, category }]);
-			setTimeout(() => {
-				setNotifications((prev) => prev.filter((n) => n.id !== id));
-			}, 3000);
-		},
-		[],
-	);
 
 	const performInPlaceGamelistReload = useCallback((forcePhysical = true, systemName?: string) => {
 		setIsUpdatingGamelist(true);

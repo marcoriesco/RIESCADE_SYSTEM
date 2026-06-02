@@ -1324,7 +1324,6 @@ app.whenReady().then(() => {
       throw e
     }
   })
-
   ipcMain.handle('download-and-install-update', async (_, zipUrl: string) => {
     if (!zipUrl) throw new Error('No zip URL provided')
     try {
@@ -1360,20 +1359,41 @@ app.whenReady().then(() => {
       }
       fs.mkdirSync(tempExtractDir, { recursive: true })
 
-      const psCommand = `Start-Sleep -s 2;
+      const psCommand = `Start-Sleep -s 1;
 $zipPath = '${zipPath.replace(/'/g, "''")}';
 $tempExtractDir = '${tempExtractDir.replace(/'/g, "''")}';
 $currentAppDir = '${currentAppDir.replace(/'/g, "''")}';
 $execPath = '${execPath.replace(/'/g, "''")}';
 
-Expand-Archive -Path $zipPath -DestinationPath $tempExtractDir -Force;
-$exes = Get-ChildItem -Path $tempExtractDir -Filter "RIESCADE.exe" -Recurse | Sort-Object {$_.FullName.Length};
-$exe = if ($exes) { $exes[0] } else { $null };
-$srcDir = if ($exe) { $exe.DirectoryName } else { $tempExtractDir };
-Copy-Item -Path "$srcDir\\*" -Destination $currentAppDir -Recurse -Force;
-Start-Process -FilePath $execPath;
-Remove-Item -Path $tempExtractDir -Recurse -Force;
-Remove-Item -Path $zipPath -Force;
+try {
+    Expand-Archive -Path $zipPath -DestinationPath $tempExtractDir -Force;
+    $exes = Get-ChildItem -Path $tempExtractDir -Filter "RIESCADE.exe" -Recurse | Sort-Object {$_.FullName.Length};
+    $exe = if ($exes) { $exes[0] } else { $null };
+    $srcDir = if ($exe) { $exe.DirectoryName } else { $tempExtractDir };
+
+    # Retry copying up to 20 times (with 1s sleep in between) to allow file locks to clear
+    $copied = $false;
+    for ($i = 1; $i -le 20; $i++) {
+        try {
+            Copy-Item -Path "$srcDir\\*" -Destination $currentAppDir -Recurse -Force -ErrorAction Stop;
+            $copied = $true;
+            break;
+        } catch {
+            Start-Sleep -s 1;
+        }
+    }
+
+    if ($copied) {
+        Start-Process -FilePath $execPath;
+    } else {
+        Out-File -FilePath "$currentAppDir\\update_error.log" -InputObject "Failed to copy update files after 20 attempts. File locks might still be active." -Encoding UTF8;
+    }
+} catch {
+    Out-File -FilePath "$currentAppDir\\update_error.log" -InputObject $_.Exception.Message -Encoding UTF8;
+} finally {
+    if (Test-Path $tempExtractDir) { Remove-Item -Path $tempExtractDir -Recurse -Force; }
+    if (Test-Path $zipPath) { Remove-Item -Path $zipPath -Force; }
+}
 `
 
       const { spawn } = require('child_process')
@@ -1393,8 +1413,6 @@ Remove-Item -Path $zipPath -Force;
       throw e
     }
   })
-
-
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
