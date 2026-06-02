@@ -415,6 +415,110 @@ app.whenReady().then(() => {
     return LibraryService.isDbMode() ? 'database' : 'gamelist'
   })
 
+  ipcMain.handle('get-system-information', async () => {
+    const os = require('os')
+    const fs = require('fs')
+    const { execSync } = require('child_process')
+
+    // 1. CPU Info
+    const cpus = os.cpus()
+    const cpuModel = cpus.length > 0 ? cpus[0].model.trim() : 'Unknown CPU'
+    const cpuCores = `${cpus.length} threads`
+    
+    let cpuSpeed = 'N/A'
+    if (cpus.length > 0) {
+      try {
+        const speedOutput = execSync('powershell -Command "Get-CimInstance Win32_Processor | Select-Object -ExpandProperty MaxClockSpeed"', { encoding: 'utf8' }).trim()
+        const speedMhz = parseInt(speedOutput, 10)
+        if (!isNaN(speedMhz)) {
+          cpuSpeed = `${(speedMhz / 1000).toFixed(1)} GHz`
+        } else {
+          cpuSpeed = `${(cpus[0].speed / 1000).toFixed(1)} GHz`
+        }
+      } catch {
+        cpuSpeed = `${(cpus[0].speed / 1000).toFixed(1)} GHz`
+      }
+    }
+
+    // 2. RAM Info
+    const totalRam = os.totalmem()
+    const freeRam = os.freemem()
+    const usedRam = totalRam - freeRam
+    const ramInfo = `${(usedRam / 1024 / 1024 / 1024).toFixed(1)} GB / ${(totalRam / 1024 / 1024 / 1024).toFixed(1)} GB`
+
+    // 3. Disks Info
+    let userDisk = 'N/A'
+    let sysDisk = 'N/A'
+    
+    try {
+      const sysDrive = process.env.SystemDrive || 'C:'
+      const statSys = fs.statfsSync(sysDrive)
+      const totalSys = statSys.bsize * statSys.blocks
+      const freeSys = statSys.bsize * statSys.bfree
+      const usedSys = totalSys - freeSys
+      const pctSys = Math.round((usedSys / totalSys) * 100)
+      sysDisk = `${(usedSys / 1024 / 1024 / 1024).toFixed(1)} GB / ${(totalSys / 1024 / 1024 / 1024).toFixed(1)} GB (${pctSys}%)`
+    } catch (e) {
+      console.error('Failed to get sys disk space:', e)
+    }
+
+    try {
+      const retroBatPath = getRetroBatPath()
+      const userDrive = retroBatPath && retroBatPath.includes(':') ? retroBatPath.split(':')[0] + ':' : 'C:'
+      const statUser = fs.statfsSync(userDrive)
+      const totalUser = statUser.bsize * statUser.blocks
+      const freeUser = statUser.bsize * statUser.bfree
+      const usedUser = totalUser - freeUser
+      const pctUser = Math.round((usedUser / totalUser) * 100)
+      userDisk = `${(usedUser / 1024 / 1024 / 1024).toFixed(1)} GB / ${(totalUser / 1024 / 1024 / 1024).toFixed(1)} GB (${pctUser}%)`
+    } catch (e) {
+      console.error('Failed to get user disk space:', e)
+    }
+
+    // 4. GPU & Resolution & Driver
+    let gpuModel = 'Unknown GPU'
+    let displayRes = 'N/A'
+    let videoDriver = 'N/A'
+
+    try {
+      gpuModel = execSync('powershell -Command "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name"', { encoding: 'utf8' }).trim()
+      if (gpuModel.includes('\n')) {
+        gpuModel = gpuModel.split('\n')[0].trim()
+      }
+    } catch (e) {
+      console.error('Failed to get GPU model:', e)
+    }
+
+    try {
+      displayRes = execSync('powershell -Command "Get-CimInstance Win32_VideoController | ForEach-Object { \\"{0}x{1}@{2}Hz\\" -f $_.CurrentHorizontalResolution, $_.CurrentVerticalResolution, $_.CurrentRefreshRate }"', { encoding: 'utf8' }).trim()
+      if (displayRes.includes('\n')) {
+        displayRes = displayRes.split('\n')[0].trim()
+      }
+    } catch (e) {
+      console.error('Failed to get resolution:', e)
+    }
+
+    try {
+      const driverVer = execSync('powershell -Command "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty DriverVersion"', { encoding: 'utf8' }).trim()
+      const vendor = gpuModel.toLowerCase().includes('nvidia') ? 'NVIDIA' : (gpuModel.toLowerCase().includes('amd') ? 'AMD' : (gpuModel.toLowerCase().includes('intel') ? 'Intel' : 'GPU'))
+      videoDriver = `${vendor} v${driverVer.split('\n')[0].trim()}`
+    } catch (e) {
+      console.error('Failed to get video driver:', e)
+    }
+
+    return {
+      cpuModel,
+      cpuCores,
+      cpuSpeed,
+      ramInfo,
+      sysDisk,
+      userDisk,
+      gpuModel,
+      displayRes,
+      videoDriver
+    }
+  })
+
   ipcMain.handle('get-bios-information', async () => {
     const cmdPath = join(getRetroBatPath(), 'emulationstation', 'batocera-systems.exe')
     return new Promise((resolve) => {

@@ -799,7 +799,9 @@ export class LibraryService {
     return baseSystems.filter(s => 
       s.name !== 'collections' && 
       !s.path.startsWith('virtual://') && 
-      s.hardware !== 'auto collection'
+      s.hardware !== 'auto collection' &&
+      s.hardware !== 'system' &&
+      s.hardware !== 'custom-collections'
     )
   }
 

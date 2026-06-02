@@ -152,7 +152,8 @@ const getGamepadGuid = (pad: Gamepad): string => {
 
 export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists }) => {
   const [settings, setSettings] = useState<Record<string, any>>({})
-  const [appVersion, setAppVersion] = useState('2.0.1')
+  const [appVersion, setAppVersion] = useState('2.2.2')
+  const [realSystemInfo, setRealSystemInfo] = useState<Record<string, string>>({})
   const [updateState, setUpdateState] = useState<{
     status: 'idle' | 'checking' | 'available' | 'no-update' | 'downloading' | 'error'
     version?: string
@@ -412,6 +413,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       window.api.getVersion?.().then((res: any) => {
         if (res && res.app) setAppVersion(res.app)
       }).catch(console.error)
+      window.api.getSystemInformation?.().then(setRealSystemInfo).catch(console.error)
       window.api.getThemes().then(setThemes)
       window.api.getCustomCollections().then(setCustomCollections)
       window.api.getHostname?.().then(setHostname).catch(() => {})
@@ -473,7 +475,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       nextStack.push(prevItem)
     }
     return nextStack
-  }, [favoriteSongsList, rawBiosData, installedSystems, biosViewMode])
+  }, [favoriteSongsList, rawBiosData, installedSystems, biosViewMode, realSystemInfo])
 
   // Update menu when settings/themes change
   useEffect(() => {
@@ -490,7 +492,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     favoriteSongsList,
     rawBiosData,
     installedSystems,
-    biosViewMode
+    biosViewMode,
+    realSystemInfo
   ])
 
   // Helpers for checklist selection
@@ -1952,18 +1955,18 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'group_system', label: t('SYSTEM'), type: 'group' },
           { id: 'information_submenu', label: t('INFORMATION'), submenu: [
             { id: 'info_version', label: t('VERSION'), type: 'info', value: `RIESCADE v${appVersion}` },
-            { id: 'info_user_disk', label: t('USER DISK USAGE'), type: 'info', value: '142.5 GB / 476.2 GB (30%)' },
-            { id: 'info_sys_disk', label: t('SYSTEM DISK USAGE'), type: 'info', value: '45.1 GB / 118.0 GB (38%)' },
+            { id: 'info_user_disk', label: t('USER DISK USAGE'), type: 'info', value: realSystemInfo.userDisk || 'N/A' },
+            { id: 'info_sys_disk', label: t('SYSTEM DISK USAGE'), type: 'info', value: realSystemInfo.sysDisk || 'N/A' },
             { id: 'group_info_cpu', label: t('CPU'), type: 'group' },
-            { id: 'info_cpu_model', label: t('CPU MODEL'), type: 'info', value: 'AMD Ryzen 5 5600X 6-Core Processor' },
-            { id: 'info_cpu_cores', label: t('CPU CORES'), type: 'info', value: '12 threads' },
-            { id: 'info_cpu_speed', label: t('CPU MAX FREQUENCY'), type: 'info', value: '4.6 GHz' },
+            { id: 'info_cpu_model', label: t('CPU MODEL'), type: 'info', value: realSystemInfo.cpuModel || 'N/A' },
+            { id: 'info_cpu_cores', label: t('CPU CORES'), type: 'info', value: realSystemInfo.cpuCores || 'N/A' },
+            { id: 'info_cpu_speed', label: t('CPU MAX FREQUENCY'), type: 'info', value: realSystemInfo.cpuSpeed || 'N/A' },
             { id: 'group_info_ram', label: t('RAM'), type: 'group' },
-            { id: 'info_ram_total', label: t('AVAILABLE MEMORY'), type: 'info', value: '11.8 GB / 15.9 GB' },
+            { id: 'info_ram_total', label: t('AVAILABLE MEMORY'), type: 'info', value: realSystemInfo.ramInfo || 'N/A' },
             { id: 'group_info_graphics', label: t('GRAPHICS'), type: 'group' },
-            { id: 'info_gpu_model', label: t('GPU MODEL'), type: 'info', value: 'NVIDIA GeForce RTX 3060' },
-            { id: 'info_display_res', label: t('DISPLAY RESOLUTION'), type: 'info', value: '1920x1080@60Hz' },
-            { id: 'info_video_driver', label: t('VIDEO DRIVER'), type: 'info', value: 'OpenGL v4.6 (NVIDIA 551.23)' }
+            { id: 'info_gpu_model', label: t('GPU MODEL'), type: 'info', value: realSystemInfo.gpuModel || 'N/A' },
+            { id: 'info_display_res', label: t('DISPLAY RESOLUTION'), type: 'info', value: realSystemInfo.displayRes || 'N/A' },
+            { id: 'info_video_driver', label: t('VIDEO DRIVER'), type: 'info', value: realSystemInfo.videoDriver || 'N/A' }
           ]},
           { id: 'language', label: t('LANGUAGE (REGION)'), type: 'select', settingName: 'Language', options: 
             Object.keys(locales).sort().map(lang => ({ 

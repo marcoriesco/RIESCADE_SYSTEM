@@ -369,11 +369,13 @@ export class DatabaseService {
     const db = this.ensureOpen()
     const isFirstRun = this.getIndexedSystemCount() === 0
 
-    // Filter to only real systems (not virtual/auto-collections)
+    // Filter to only real systems (not virtual/auto-collections/system utilities)
     const realSystems = systems.filter(s =>
       !s.path.startsWith('virtual://') &&
       s.name !== 'collections' &&
-      s.hardware !== 'auto collection'
+      s.hardware !== 'auto collection' &&
+      s.hardware !== 'system' &&
+      s.hardware !== 'custom-collections'
     )
 
     if (isFirstRun) {

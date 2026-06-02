@@ -486,6 +486,8 @@ function App() {
 
 	// ─── Initial Load ───
 	useEffect(() => {
+		let initialLoadCancelled = false;
+
 		// Load theme first so splash screen is rendered immediately
 		const loadTheme = (themeName: string, isInitial = false) => {
 			if (themeName) {
@@ -495,7 +497,9 @@ function App() {
 					if (isInitial) {
 						// Wait a tiny bit (100ms) to ensure React has fully rendered and painted the splash screen to the DOM
 						setTimeout(() => {
+							if (initialLoadCancelled) return;
 							window.api.preloadLibrary().then(() => {
+								if (initialLoadCancelled) return;
 								Promise.all([
 									window.api.getSystems(),
 									window.api.getSettings(),
@@ -509,9 +513,9 @@ function App() {
 
 									// Auto check for updates on startup if enabled
 									const isUpdatesEnabled = initialSettings['updates.enabled']?.value !== 'false' && initialSettings['updates.enabled']?.value !== false;
-									if (isUpdatesEnabled) {
+									if (isUpdatesEnabled && !initialLoadCancelled) {
 										window.api.checkForUpdates().then((res: any) => {
-											if (res && res.updateAvailable) {
+											if (res && res.updateAvailable && !initialLoadCancelled) {
 												addNotification(`ATUALIZAÇÃO DISPONÍVEL (v${res.version})! Abra o Menu > Updates para atualizar.`, 'info', 'general');
 											}
 										}).catch(err => {
@@ -698,6 +702,7 @@ function App() {
 		window.addEventListener('gamepaddisconnected', updateControllers);
 
 		return () => {
+			initialLoadCancelled = true;
 			cancelAnimationFrame(rafId);
 			window.removeEventListener('gamepadconnected', updateControllers);
 			window.removeEventListener('gamepaddisconnected', updateControllers);

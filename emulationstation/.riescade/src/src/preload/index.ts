@@ -27,6 +27,7 @@ const api = {
     ipcRenderer.invoke('save-setting', name, value, type),
   getHostname: () => ipcRenderer.invoke('get-hostname'),
   getBiosInformation: () => ipcRenderer.invoke('get-bios-information'),
+  getSystemInformation: () => ipcRenderer.invoke('get-system-information'),
   cleanGamelists: () => ipcRenderer.invoke('clean-gamelists'),
   resetGamelistUsage: () => ipcRenderer.invoke('reset-gamelist-usage'),
   resetFileExtensions: () => ipcRenderer.invoke('reset-file-extensions'),

@@ -26,6 +26,9 @@ declare global {
       getBluetoothDevices: () => Promise<any[]>
       executeCommand: (command: string, data?: any) => void
       getVersion: () => Promise<{ app: string; }>
+      checkForUpdates: () => Promise<{ updateAvailable: boolean; version: string; releaseNotes: string; zipUrl: string | null }>
+      downloadAndInstallUpdate: (zipUrl: string) => Promise<boolean>
+      getSystemInformation: () => Promise<Record<string, string>>
       getCollectionsForGame: (systemName: string, gamePath: string) => Promise<string[]>
       toggleGameInCollection: (collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove') => Promise<boolean>
       getFileContent: (path: string) => Promise<string | null>
