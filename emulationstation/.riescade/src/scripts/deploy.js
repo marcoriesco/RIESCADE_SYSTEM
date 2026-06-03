@@ -211,11 +211,104 @@ try {
   
   const updaterCode = `using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+
+public class ProgressForm : Form
+{
+    private System.Windows.Forms.Timer animationTimer;
+    private float spinAngle = 0;
+    private string statusText = "Inicializando...";
+
+    public ProgressForm()
+    {
+        this.Text = "RIESCADE Updater";
+        this.FormBorderStyle = FormBorderStyle.None;
+        this.StartPosition = FormStartPosition.CenterScreen;
+        this.Size = new Size(380, 120);
+        this.BackColor = Color.FromArgb(24, 24, 27); // Modern dark color (zinc-900)
+        this.DoubleBuffered = true;
+
+        this.animationTimer = new System.Windows.Forms.Timer();
+        this.animationTimer.Interval = 30; // ~33 FPS
+        this.animationTimer.Tick += (s, e) => {
+            spinAngle = (spinAngle + 10) % 360;
+            this.Invalidate();
+        };
+        this.animationTimer.Start();
+    }
+
+    public string StatusText
+    {
+        get { return statusText; }
+        set {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new Action(() => { StatusText = value; }));
+            }
+            else
+            {
+                statusText = value;
+                this.Invalidate();
+            }
+        }
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+        Graphics g = e.Graphics;
+        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+        // Draw border (using theme color #9f0043)
+        using (Pen borderPen = new Pen(Color.FromArgb(159, 0, 67), 2))
+        {
+            g.DrawRectangle(borderPen, 1, 1, this.Width - 2, this.Height - 2);
+        }
+
+        // Draw animated spinner
+        int spinnerSize = 36;
+        int spinnerX = 30;
+        int spinnerY = (this.Height - spinnerSize) / 2;
+
+        // Draw background track of spinner (darker gray)
+        using (Pen trackPen = new Pen(Color.FromArgb(39, 39, 42), 4))
+        {
+            g.DrawEllipse(trackPen, spinnerX, spinnerY, spinnerSize, spinnerSize);
+        }
+
+        // Draw animated arc of spinner (pink)
+        using (Pen arcPen = new Pen(Color.FromArgb(159, 0, 67), 4))
+        {
+            g.DrawArc(arcPen, spinnerX, spinnerY, spinnerSize, spinnerSize, spinAngle, 100);
+        }
+
+        // Draw title
+        using (Font titleFont = new Font("Segoe UI", 12, FontStyle.Bold))
+        using (Brush titleBrush = new SolidBrush(Color.White))
+        {
+            g.DrawString("Atualizando RIESCADE...", titleFont, titleBrush, 85, 30);
+        }
+
+        // Draw status description
+        using (Font descFont = new Font("Segoe UI", 9, FontStyle.Regular))
+        using (Brush descBrush = new SolidBrush(Color.FromArgb(161, 161, 170))) // zinc-400
+        {
+            g.DrawString(statusText, descFont, descBrush, 85, 58);
+        }
+
+        // Draw footer "Aguarde..."
+        using (Font footerFont = new Font("Segoe UI", 8, FontStyle.Italic))
+        using (Brush footerBrush = new SolidBrush(Color.FromArgb(113, 113, 122))) // zinc-500
+        {
+            g.DrawString("Por favor, aguarde...", footerFont, footerBrush, 85, 78);
+        }
+    }
+}
 
 public static class RiescadeUpdater
 {
@@ -247,149 +340,145 @@ public static class RiescadeUpdater
         }
         catch {}
 
-        try
-        {
-            // 1. Wait for RIESCADE processes to close
-            Thread.Sleep(2000);
-            var currentPid = Process.GetCurrentProcess().Id;
-            foreach (var process in Process.GetProcessesByName("RIESCADE"))
-            {
-                if (process.Id != currentPid)
-                {
-                    try
-                    {
-                        if (!process.HasExited)
-                        {
-                            process.WaitForExit(5000);
-                        }
-                    }
-                    catch {}
-                }
-            }
+        ProgressForm form = new ProgressForm();
 
-            foreach (var process in Process.GetProcessesByName("riescade"))
-            {
-                if (process.Id != currentPid)
-                {
-                    try
-                    {
-                        if (!process.HasExited)
-                        {
-                            process.WaitForExit(5000);
-                        }
-                    }
-                    catch {}
-                }
-            }
-
-            // 2. Prepare temp extraction directory
-            string tempExtractDir = Path.Combine(Path.GetTempPath(), "rcupd");
-            if (Directory.Exists(tempExtractDir))
-            {
-                Directory.Delete(tempExtractDir, true);
-            }
-            Directory.CreateDirectory(tempExtractDir);
-
-            // 3. Extract the ZIP / 7Z
-            if (!File.Exists(zipPath))
-            {
-                throw new FileNotFoundException("Update file not found: " + zipPath);
-            }
-            
-            string extension = Path.GetExtension(zipPath).ToLower();
-            if (extension == ".7z")
-            {
-                string selfDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string sevenZipExe = Path.Combine(selfDir, "7z.exe");
-                if (!File.Exists(sevenZipExe))
-                {
-                    sevenZipExe = "7z.exe"; // Fallback to PATH
-                    if (!File.Exists(sevenZipExe) && File.Exists("C:\\\\Program Files\\\\7-Zip\\\\7z.exe"))
-                    {
-                        sevenZipExe = "C:\\\\Program Files\\\\7-Zip\\\\7z.exe";
-                    }
-                }
-
-                var startInfo = new ProcessStartInfo
-                {
-                    FileName = sevenZipExe,
-                    Arguments = string.Format("x \\"{0}\\" -o\\"{1}\\" -y", zipPath, tempExtractDir),
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                };
-
-                using (var process = Process.Start(startInfo))
-                {
-                    process.WaitForExit();
-                    if (process.ExitCode != 0)
-                    {
-                        string err = process.StandardError.ReadToEnd();
-                        string opt = process.StandardOutput.ReadToEnd();
-                        throw new Exception("7-Zip extraction failed with exit code " + process.ExitCode + "\\nOutput: " + opt + "\\nError: " + err);
-                    }
-                }
-            }
-            else
-            {
-                ZipFile.ExtractToDirectory(zipPath, tempExtractDir);
-            }
-
-            // 4. Find the source directory to copy from
-            string srcDir = tempExtractDir;
-            string[] foundExes = Directory.GetFiles(tempExtractDir, "RIESCADE.exe", SearchOption.AllDirectories);
-            if (foundExes.Length > 0)
-            {
-                Array.Sort(foundExes, (a, b) => a.Length.CompareTo(b.Length));
-                srcDir = Path.GetDirectoryName(foundExes[0]);
-            }
-
-            // 5. Recursively copy files to currentAppDir
-            CopyDirectory(srcDir, currentAppDir);
-
-            // 6. Clean up
+        Thread worker = new Thread(() => {
             try
             {
-                Directory.Delete(tempExtractDir, true);
-            }
-            catch {}
-            try
-            {
-                File.Delete(zipPath);
-            }
-            catch {}
-
-            // 7. Re-launch RIESCADE.exe
-            if (File.Exists(execPath))
-            {
-                Process.Start(new ProcessStartInfo
+                // 1. Wait for RIESCADE processes to close
+                form.StatusText = "Fechando RIESCADE...";
+                Thread.Sleep(2000);
+                var currentPid = Process.GetCurrentProcess().Id;
+                foreach (var process in Process.GetProcessesByName("RIESCADE"))
                 {
-                    FileName = execPath,
-                    WorkingDirectory = Path.GetDirectoryName(execPath),
-                    UseShellExecute = true
-                });
-            }
-            else
-            {
-                MessageBox.Show(
-                    "Update completed, but launcher executable was not found:\\n" + execPath,
-                    "RIESCADE Updater Warning",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
+                    if (process.Id != currentPid)
+                    {
+                        try { if (!process.HasExited) process.WaitForExit(5000); } catch {}
+                    }
+                }
+                foreach (var process in Process.GetProcessesByName("riescade"))
+                {
+                    if (process.Id != currentPid)
+                    {
+                        try { if (!process.HasExited) process.WaitForExit(5000); } catch {}
+                    }
+                }
 
-            return 0;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(
-                "An error occurred during update installation:\\n\\n" + ex.Message + "\\n\\n" + ex.StackTrace,
-                "RIESCADE Updater Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
-            return 1;
-        }
+                // 2. Prepare temp extraction directory
+                form.StatusText = "Preparando diretório temporário...";
+                string tempExtractDir = Path.Combine(Path.GetTempPath(), "rcupd");
+                if (Directory.Exists(tempExtractDir))
+                {
+                    Directory.Delete(tempExtractDir, true);
+                }
+                Directory.CreateDirectory(tempExtractDir);
+
+                // 3. Extract the ZIP / 7Z
+                if (!File.Exists(zipPath))
+                {
+                    throw new FileNotFoundException("Arquivo de atualização não encontrado: " + zipPath);
+                }
+
+                form.StatusText = "Descompactando arquivos da atualização...";
+                string extension = Path.GetExtension(zipPath).ToLower();
+                if (extension == ".7z")
+                {
+                    string selfDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string sevenZipExe = Path.Combine(selfDir, "7z.exe");
+                    if (!File.Exists(sevenZipExe))
+                    {
+                        sevenZipExe = "7z.exe";
+                        if (!File.Exists(sevenZipExe) && File.Exists("C:\\\\Program Files\\\\7-Zip\\\\7z.exe"))
+                        {
+                            sevenZipExe = "C:\\\\Program Files\\\\7-Zip\\\\7z.exe";
+                        }
+                    }
+
+                    var startInfo = new ProcessStartInfo
+                    {
+                        FileName = sevenZipExe,
+                        Arguments = string.Format("x \\"{0}\\" -o\\"{1}\\" -y", zipPath, tempExtractDir),
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    };
+
+                    using (var process = Process.Start(startInfo))
+                    {
+                        process.WaitForExit();
+                        if (process.ExitCode != 0)
+                        {
+                            string err = process.StandardError.ReadToEnd();
+                            string opt = process.StandardOutput.ReadToEnd();
+                            throw new Exception("Falha na extração com o 7-Zip: " + err);
+                        }
+                    }
+                }
+                else
+                {
+                    ZipFile.ExtractToDirectory(zipPath, tempExtractDir);
+                }
+
+                // 4. Find the source directory to copy from
+                string srcDir = tempExtractDir;
+                string[] foundExes = Directory.GetFiles(tempExtractDir, "RIESCADE.exe", SearchOption.AllDirectories);
+                if (foundExes.Length > 0)
+                {
+                    Array.Sort(foundExes, (a, b) => a.Length.CompareTo(b.Length));
+                    srcDir = Path.GetDirectoryName(foundExes[0]);
+                }
+
+                // 5. Recursively copy files to currentAppDir
+                form.StatusText = "Copiando novos arquivos do sistema...";
+                CopyDirectory(srcDir, currentAppDir);
+
+                // 6. Clean up
+                form.StatusText = "Limpando arquivos temporários...";
+                try { Directory.Delete(tempExtractDir, true); } catch {}
+                try { File.Delete(zipPath); } catch {}
+
+                // 7. Re-launch RIESCADE.exe
+                form.StatusText = "Reiniciando...";
+                Thread.Sleep(1000);
+
+                if (File.Exists(execPath))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = execPath,
+                        WorkingDirectory = Path.GetDirectoryName(execPath),
+                        UseShellExecute = true
+                    });
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Atualização concluída, mas o executável do inicializador não foi encontrado:\\n" + execPath,
+                        "RIESCADE Updater",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+
+                form.Invoke(new Action(() => form.Close()));
+            }
+            catch (Exception ex)
+            {
+                form.Invoke(new Action(() => {
+                    form.Hide();
+                    MessageBox.Show(
+                        "Ocorreu um erro durante a instalação da atualização:\\n\\n" + ex.Message,
+                        "Erro do Atualizador",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    form.Close();
+                }));
+            }
+        });
+
+        worker.Start();
+        Application.Run(form);
+        return 0;
     }
 
     private static void CopyDirectory(string sourceDir, string destDir)
@@ -403,7 +492,6 @@ public static class RiescadeUpdater
         {
             string destFile = Path.Combine(destDir, Path.GetFileName(file));
             
-            // Check if we are trying to copy RIESCADEUpdater.exe (ourselves)
             if (string.Equals(Path.GetFileName(file), "RIESCADEUpdater.exe", StringComparison.OrdinalIgnoreCase))
             {
                 if (File.Exists(destFile))
@@ -419,7 +507,6 @@ public static class RiescadeUpdater
                     }
                     catch
                     {
-                        // If rename fails, skip copying this file to prevent updater crash
                         continue;
                     }
                 }
@@ -471,6 +558,7 @@ $args = @(
   "/target:winexe",
   "/optimize+",
   "/reference:System.Windows.Forms.dll",
+  "/reference:System.Drawing.dll",
   "/reference:System.IO.Compression.dll",
   "/reference:System.IO.Compression.FileSystem.dll",
   "/out:$outExe",

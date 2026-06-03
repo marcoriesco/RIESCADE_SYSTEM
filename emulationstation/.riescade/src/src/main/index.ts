@@ -1428,7 +1428,7 @@ app.whenReady().then(() => {
       throw e
     }
   })
-  ipcMain.handle('download-and-install-update', async (_, zipUrl: string) => {
+  ipcMain.handle('download-and-install-update', async (event, zipUrl: string) => {
     if (!zipUrl) throw new Error('No zip URL provided')
     try {
       const fs = require('fs')
@@ -1439,9 +1439,21 @@ app.whenReady().then(() => {
         throw new Error(`Failed to download update: ${response.statusText}`)
       }
 
+      const totalBytesStr = response.headers.get('content-length')
+      const totalBytes = totalBytesStr ? parseInt(totalBytesStr, 10) : 0
+      let downloadedBytes = 0
+
       const fileStream = fs.createWriteStream(zipPath)
       for await (const chunk of response.body as any) {
         fileStream.write(chunk)
+        downloadedBytes += chunk.length
+        const percent = totalBytes > 0 ? Math.round((downloadedBytes / totalBytes) * 100) : 0
+        event.sender.send('update-progress', {
+          status: 'downloading',
+          percent,
+          downloadedBytes,
+          totalBytes
+        })
       }
       fileStream.end()
 

@@ -1977,20 +1977,19 @@ function App() {
 			{showGamelistUpdateModal && (
 				<div className="riescade-overlay scraper-completion-overlay visible">
 					<div className="scraper-completion-modal">
-						<div className="scraper-completion-icon">⚡</div>
 						<div className="scraper-completion-title">SCRAPE CONCLUÍDO</div>
 						<div className="scraper-completion-text">
 							Deseja atualizar a lista de jogos agora para aplicar as novas mídias baixadas?
 						</div>
 						<div className="scraper-completion-buttons">
 							<button 
-								className={`scraper-completion-btn primary ${reloadModalSelectedIndex === 0 ? 'selected' : ''}`}
+								className={`riescade-button primary ${reloadModalSelectedIndex === 0 ? 'selected' : ''}`}
 								onClick={handleFastReload}
 							>
 								SIM
 							</button>
 							<button 
-								className={`scraper-completion-btn secondary ${reloadModalSelectedIndex === 1 ? 'selected' : ''}`}
+								className={`riescade-button secondary ${reloadModalSelectedIndex === 1 ? 'selected' : ''}`}
 								onClick={() => setShowGamelistUpdateModal(false)}
 							>
 								NÃO
@@ -2017,18 +2016,17 @@ function App() {
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						fontFamily: "'Outfit', 'Inter', sans-serif",
 						color: '#fff'
 					}}
 				>
 					<div 
 						className="scraper-modal-container searching-modal"
 						style={{
-							background: 'rgba(20, 20, 20, 0.85)',
+							background: 'rgba(0, 0, 0, 0.85)',
 							backdropFilter: 'blur(10px)',
 							WebkitBackdropFilter: 'blur(10px)',
-							border: '2px solid rgba(240, 66, 176, 0.2)',
-							borderRadius: '16px',
+							border: '1px solid #111',
+							borderRadius: '4px',
 							padding: '40px 30px',
 							width: '420px',
 							boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
@@ -2044,7 +2042,7 @@ function App() {
 								width: '50px', 
 								height: '50px', 
 								border: '5px solid rgba(255, 255, 255, 0.1)', 
-								borderTopColor: 'var(--theme-color, #f042b0)', 
+								borderTopColor: 'var(--theme-color)', 
 								borderRadius: '50%',
 								animation: 'scraper-spin 1s linear infinite'
 							}} 
@@ -2054,7 +2052,7 @@ function App() {
 							style={{ 
 								fontSize: '1.25rem', 
 								fontWeight: 900, 
-								color: 'var(--theme-color, #f042b0)', 
+								color: 'var(--theme-color)', 
 								margin: '25px 0 8px 0',
 								letterSpacing: '2px',
 								textTransform: 'uppercase'
@@ -2138,7 +2136,7 @@ const FPSCounter: React.FC<{ visible: boolean }> = ({ visible }) => {
 				right: '12px',
 				background: 'rgba(0, 0, 0, 0.75)',
 				color: '#00ff66',
-				fontFamily: '"Outfit", "Inter", monospace',
+				fontFamily: '"Roboto Condensed", sans-serif',
 				fontSize: '11px',
 				fontWeight: 800,
 				letterSpacing: '1px',

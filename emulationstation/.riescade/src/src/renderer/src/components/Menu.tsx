@@ -160,6 +160,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     releaseNotes?: string
     zipUrl?: string
     errorMsg?: string
+    percent?: number
+    downloadedBytes?: number
+    totalBytes?: number
   }>({ status: 'idle' })
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
@@ -434,6 +437,22 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       const removeThemesListener = window.api.on('themes-updated', () => {
         window.api.getThemes().then(setThemes)
       })
+
+      const removeUpdateProgressListener = window.api.on('update-progress', (_, data: any) => {
+        if (data && data.status === 'downloading') {
+          setUpdateState(prev => {
+            if (prev.status === 'downloading') {
+              return {
+                ...prev,
+                percent: data.percent,
+                downloadedBytes: data.downloadedBytes,
+                totalBytes: data.totalBytes
+              }
+            }
+            return prev
+          })
+        }
+      })
       
       if (theme?.name) {
         window.api.getThemeSettings(theme.name).then(setThemeSettings)
@@ -448,6 +467,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         window.removeEventListener('gamepadconnected', updateGamepads)
         window.removeEventListener('gamepaddisconnected', updateGamepads)
         removeThemesListener()
+        removeUpdateProgressListener()
       }
     } else {
       setVisible(false)
@@ -983,9 +1003,34 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             ]
           },
           { id: 'game_ratio', label: t('GAME ASPECT RATIO'), type: 'select', settingName: 'global.ratio', options: [
-            { label: t('AUTO'), value: 'auto' }, { label: '4/3', value: '4/3' }, { label: '16/9', value: '16/9' },
-            { label: '16/10', value: '16/10' }, { label: 'FULL', value: 'full' }
+            { label: t('AUTO'), value: 'auto' }, 
+            { label: '4/3', value: '4/3' }, 
+            { label: '16/9', value: '16/9' },
+            { label: '16/10', value: '16/10' }, 
+            { label: '16/15', value: '16/15' },
+            { label: '21/9', value: '21/9' },
+            { label: '1/1', value: '1/1' },
+            { label: '2/1', value: '2/1' },
+            { label: '3/2', value: '3/2' },
+            { label: '3/4', value: '3/4' },
+            { label: '4/1', value: '4/1' },
+            { label: '9/16', value: '9/16' },
+            { label: '5/4', value: '5/4' },
+            { label: '6/5', value: '6/5' },
+            { label: '7/9', value: '7/9' },
+            { label: '8/3', value: '8/3' },
+            { label: '8/7', value: '8/7' },
+            { label: '19/12', value: '19/12' },
+            { label: '19/14', value: '19/14' },
+            { label: '30/17', value: '30/17' },
+            { label: '32/9', value: '32/9' },
+            { label: 'Config', value: 'config' },
+            { label: 'Square pixel', value: 'squarepixel' },
+            { label: 'Core provided', value: 'core' },
+            { label: 'Custom', value: 'custom' },
+            { label: 'FULL', value: 'full' }
           ]},
+          
           { id: 'forcefullscreen', label: t('FORCE FULLSCREEN'), type: 'toggle', settingName: 'global.forcefullscreen', settingType: 'bool', description: t('Force emulator in fullscreen even if RetroBat is windowed') },
           { id: 'exclusivefs', label: t('PREFER EXCLUSIVE FULLSCREEN'), type: 'toggle', settingName: 'global.exclusivefs', settingType: 'bool', description: t('When available, prefer exclusive fullscreen for emulators.') },
           { id: 'nopauseonlostfocus', label: t('NEVER PAUSE EMULATION ON LOST FOCUS'), type: 'toggle', settingName: 'global.nopauseonlostfocus', settingType: 'bool', description: t('This setting will prevent pause in emulation when losing focus.') },
@@ -1021,27 +1066,48 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'group_compression', label: t('COMPRESSION'), type: 'group' },
           { id: 'decompressedfolders', label: t('DECOMPRESSION'), type: 'select', settingName: 'decompressedfolders', description: t('Keep or delete games files once extracted (squashfs, 7z)'), options: [
-            { label: t('AUTOMATIC'), value: 'ask' },
+            { label: t('AUTO'), value: '' },
+            { label: t('ALWAYS ASK'), value: 'ask' },
             { label: t('KEEP'), value: 'keep' },
             { label: t('DELETE'), value: 'delete' }
           ]},
           { id: 'decompressedpath', label: t('DECOMPRESSION PATH'), type: 'input', settingName: 'decompressedpath', settingType: 'string', description: t('Change path for decompressed games (default is roms/.uncompressed).') },
           { id: 'nevermount', label: t('NEVER TRY TO MOUNT AS DRIVE'), type: 'toggle', settingName: 'nevermount', settingType: 'bool', description: t('Always decompress archives, even if dokan could be used to mount as a drive letter.') },
+          
+          { id: 'group_special_controllers', label: t('CONTROLS'), type: 'group' },
+          {
+            id: 'controls_submenu',
+            label: t('SPECIAL CONTROLLERS'),
+            submenu: [
+              { id: 'analogDpad', label: t('DPAD AS ANALOG'), type: 'toggle', settingName: 'analogDpad', settingType: 'bool' },
+              { id: 'n64_special_trigger', label: t('N64 TRIGGER INVERT'), type: 'toggle', settingName: 'n64_special_trigger', settingType: 'bool', description: t('For n64 controllers with 2 triggers, use R2 instead of L2 as Z button.') },
+              { id: 'ps_controller_enhanced', label: t('PS4/PS5 ENHANCED'), type: 'toggle', settingName: 'ps_controller_enhanced', settingType: 'bool', description: t('Enable enhanced features for DS4 and DualSense, this will break compatibility with emulators using dinput until switch off.') },
+            ]
+          },
+
+          { id: 'group_guns', label: t('GUNS'), type: 'group' },
+          { id: 'sinden_submenu', label: t('SINDEN'), submenu: [
+            { id: 'sindensoftwarepath', label: t('SINDEN SOFTWARE PATH'), type: 'input', settingName: 'sindensoftwarepath', settingType: 'string' },
+            { id: 'global_sindenJoyMode', label: t('SINDEN BUTTONS CONFIGURATION'), type: 'select', settingName: 'global.sindenJoyMode', description: t('Define how to configure Sinden Gun.'), options: [
+              { label: t('AUTO'), value: '' },
+              { label: t('STANDARD'), value: 'standard' },
+              { label: t('GAMEPAD MODE'), value: 'joypad' },
+              { label: t('NO CONFIGURATION'), value: 'none' }
+            ]},
+            { id: 'sindenKill', label: t('KILL SINDEN SOFTWARE'), type: 'toggle', settingName: 'sindenKill', settingType: 'bool', description: t('When using a Sinden gun, kill the Lightgun software when game ends.') }
+          ]},
+          { id: 'wiimote_submenu', label: t('WIIMOTE'), submenu: [
+            { id: 'WiimoteMode', label: t('WIIMOTE CONNECTION MODE'), type: 'select', settingName: 'WiimoteMode', description: t('Define how your wiimote is connected to the DolphinBar.'), options: [
+              { label: t('MODE 2 (NORMAL)'), value: 'normal' },
+              { label: t('MODE 2 (GAME)'), value: 'game' },
+              { label: t('MODE 4 (WIIMOTEGUN)'), value: 'wiimotegun' }
+            ]},
+            { id: 'WiimoteKbOrder', label: t('WIIMOTE FIX ASSOCIATION'), type: 'toggle', settingName: 'WiimoteKbOrder', settingType: 'bool', description: t('For some emulators, can be used to fix wiimote keyboard and mouse association when using 2 wiimotes.') }
+          ]},
+         
+          
           { id: 'group_retroarch', label: t('RETROARCH OPTIONS'), type: 'group' },
           { id: 'video_submenu', label: t('VIDEO'), submenu: [
-            { id: 'RotateScreen', label: t('SCREEN ORIENTATION'), type: 'select', settingName: 'RotateScreen', description: t('This setting will rotate your windows desktop, it will not be set back when exiting game.'), options: [
-              { label: t('Normal'), value: '0' },
-              { label: '90°', value: '1' },
-              { label: '180°', value: '2' },
-              { label: '270°', value: '3' }
-            ]},
-            { id: 'RotateVideo', label: t('VIDEO ROTATION'), type: 'select', settingName: 'RotateVideo', options: [
-              { label: t('Normal'), value: '0' },
-              { label: '90°', value: '1' },
-              { label: '180°', value: '2' },
-              { label: '270°', value: '3' }
-            ]},
-            { id: 'MonitorIndex', label: t('MONITOR INDEX'), type: 'select', settingName: 'MonitorIndex', description: t('Games will be displayed on the monitor corresponding to the selected index.'), options: Array.from({ length: 11 }, (_, i) => ({ label: String(i), value: String(i) })) },
             { id: 'GPUIndex', label: t('GRAPHIC CARD INDEX'), type: 'select', settingName: 'GPUIndex', description: t('Change this only if multiple GPU are used by your system.'), options: Array.from({ length: 5 }, (_, i) => ({ label: String(i), value: String(i) })) },
             { id: 'CRTSwitch', label: t('CRT SCREEN OUTPUT'), type: 'select', settingName: 'CRTSwitch', options: [
               { label: t('OFF'), value: '0' },
@@ -1252,32 +1318,37 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               ]}
             ]
           },
+
           {
-            id: 'controls_submenu',
+            id: 'controls_re_submenu',
             label: t('CONTROLS'),
             submenu: [
-              { id: 'analogDpad', label: t('DPAD AS ANALOG'), type: 'toggle', settingName: 'analogDpad', settingType: 'bool' },
-              { id: 'n64_special_trigger', label: t('N64 TRIGGER INVERT'), type: 'toggle', settingName: 'n64_special_trigger', settingType: 'bool', description: t('For n64 controllers with 2 triggers, use R2 instead of L2 as Z button.') },
-              { id: 'ps_controller_enhanced', label: t('PS4/PS5 ENHANCED'), type: 'toggle', settingName: 'ps_controller_enhanced', settingType: 'bool', description: t('Enable enhanced features for DS4 and DualSense, this will break compatibility with emulators using dinput until switch off.') },
-              { id: 'analog_deadzone', label: t('ANALOG DEADZONE'), type: 'select', settingName: 'analog_deadzone', description: t('Ignore analog stick movement below this threshold.'), options: Array.from({ length: 11 }, (_, i) => {
+              { id: 'pause_on_disconnect', label: t('PAUSE ON DISCONNECT'), type: 'toggle', settingName: 'pause_on_disconnect' },
+              { id: 'analog_deadzone', label: t('ANALOG DEADZONE'), type: 'select', settingName: 'analog_deadzone', description: t('Ignore analog stick movement below this threshold.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 11 }, (_, i) => {
                 const val = (i * 0.1).toFixed(1)
                 return { label: val, value: val }
-              })},
-              { id: 'analog_sensitivity', label: t('ANALOG SENSITIVITY'), type: 'select', settingName: 'analog_sensitivity', description: t('Sets the sensitivity of the analog sticks.'), options: Array.from({ length: 11 }, (_, i) => {
+              })]},
+              { id: 'analog_sensitivity', label: t('ANALOG SENSITIVITY'), type: 'select', settingName: 'analog_sensitivity', description: t('Sets the sensitivity of the analog sticks.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 11 }, (_, i) => {
                 const val = String(i - 5)
                 return { label: val, value: val }
-              })},
+              })]},
               { id: 'keyboard_arcade', label: t('CONFIGURE SPECIAL KEYBOARD STICK'), type: 'select', settingName: 'keyboard_arcade', description: t('use this option when using a pad recognized as keyboard (ipac, etc.)'), options: [
-                { label: t('NONE'), value: 'null' },
+                { label: t('AUTO'), value: '' },
                 { label: 'IPAC2', value: 'ipac2' },
                 { label: 'X-ARCADE TANKSTICK', value: 'tankstick' }
               ]},
               { id: 'arcade_stick', label: t('USE CUSTOM ARCADE STICK MAPPING'), type: 'toggle', settingName: 'arcade_stick', settingType: 'bool', description: t('Allows you to perform a dedicated mapping for your arcade stick based in arcade_sticks.json file.') },
-              { id: 'p1_stick_index', label: t('FORCE ARCADE STICK INDEX P1'), type: 'select', settingName: 'p1_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
-              { id: 'p2_stick_index', label: t('FORCE ARCADE STICK INDEX P2'), type: 'select', settingName: 'p2_stick_index', options: Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'revertXIndex', label: t('SWITCH XINPUT INDEX'), type: 'toggle', settingName: 'revertXIndex', settingType: 'bool', description: t('Enable this if XInput controllers index are switched.') },
+              { id: 'p1_stick_index', label: t('FORCE ARCADE STICK INDEX P1'), type: 'select', settingName: 'p1_stick_index', options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
+              { id: 'p2_stick_index', label: t('FORCE ARCADE STICK INDEX P2'), type: 'select', settingName: 'p2_stick_index', options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 6 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
               { id: 'buttonTrigger', label: t('USE BUTTON FOR TRIGGER'), type: 'toggle', settingName: 'buttonTrigger', settingType: 'bool', description: t('Force button instead of axis for triggers, can help with Sony controllers.') }
             ]
           },
+
           {
             id: 'guns_submenu',
             label: t('GUNS'),
@@ -1286,24 +1357,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               { id: 'p2_gunIndex', label: t('P2 MOUSE/GUN INDEX'), type: 'select', settingName: 'p2_gunIndex', description: t('Define mouse index to use for player 2.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
               { id: 'p3_gunIndex', label: t('P3 MOUSE/GUN INDEX'), type: 'select', settingName: 'p3_gunIndex', description: t('Define mouse index to use for player 3.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
               { id: 'p4_gunIndex', label: t('P4 MOUSE/GUN INDEX'), type: 'select', settingName: 'p4_gunIndex', description: t('Define mouse index to use for player 4.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
-              { id: 'sinden_submenu', label: t('SINDEN'), submenu: [
-                { id: 'global_sindenJoyMode', label: t('SINDEN BUTTONS CONFIGURATION'), type: 'select', settingName: 'global.sindenJoyMode', description: t('Define how to configure Sinden Gun.'), options: [
-                  { label: t('STANDARD'), value: 'standard' },
-                  { label: t('GAMEPAD MODE'), value: 'joypad' },
-                  { label: t('NO CONFIGURATION'), value: 'none' }
-                ]},
-                { id: 'sindenKill', label: t('KILL SINDEN SOFTWARE'), type: 'toggle', settingName: 'sindenKill', settingType: 'bool', description: t('When using a Sinden gun, kill the Lightgun software when game ends.') }
-              ]},
-              { id: 'wiimote_submenu', label: t('WIIMOTE'), submenu: [
-                { id: 'WiimoteMode', label: t('WIIMOTE CONNECTION MODE'), type: 'select', settingName: 'WiimoteMode', description: t('Define how your wiimote is connected to the DolphinBar.'), options: [
-                  { label: t('MODE 2 (NORMAL)'), value: 'normal' },
-                  { label: t('MODE 2 (GAME)'), value: 'game' },
-                  { label: t('MODE 4 (WIIMOTEGUN)'), value: 'wiimotegun' }
-                ]},
-                { id: 'WiimoteKbOrder', label: t('WIIMOTE FIX ASSOCIATION'), type: 'toggle', settingName: 'WiimoteKbOrder', settingType: 'bool', description: t('For some emulators, can be used to fix wiimote keyboard and mouse association when using 2 wiimotes.') }
-              ]}
-            ]
-          },
+          ]},
+
           { id: 'group_system_settings', label: t('SYSTEM SETTINGS'), type: 'group' },
           {
             id: 'advanced_system_settings',
@@ -2776,7 +2831,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                   width: '100%',
                   padding: '12px',
                   fontSize: '1.2rem',
-                  border: '2px solid #3b82f6',
+                  border: '2px solid var(--theme-color)',
                   borderRadius: '4px',
                   outline: 'none'
                 }}
@@ -2855,8 +2910,26 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
               {updateState.status === 'downloading' && (
                 <div style={{ textAlign: 'center', padding: '20px' }}>
-                  <div className="riescade-modal-spinner" style={{ margin: '0 auto 15px' }} />
-                  <p>{t('Downloading and extracting update files...')}</p>
+                  {updateState.percent !== undefined ? (
+                    <div style={{ margin: '0 auto 20px', width: '100%', maxWidth: '400px' }}>
+                      <div className="scraper-progress-overlay" style={{ position: 'static', background: 'none', backdropFilter: 'none', padding: 0 }}>
+                        <div className="scraper-progress-track" style={{ height: '14px', borderRadius: '7px', background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.05)', overflow: 'hidden', marginBottom: '10px' }}>
+                          <div className="scraper-progress-fill" style={{ width: `${updateState.percent}%`, height: '100%', background: 'linear-gradient(to right, var(--theme-color), #a855f7)', borderRadius: '6px', boxShadow: '0 0 10px var(--theme-color)', transition: 'width 0.2s ease-out' }} />
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '1.1rem', fontWeight: 800, marginTop: '5px' }}>
+                        <span style={{ color: 'var(--theme-color)' }}>{updateState.percent}%</span>
+                        {updateState.downloadedBytes !== undefined && updateState.totalBytes !== undefined && (
+                          <span style={{ opacity: 0.6, fontSize: '0.9rem' }}>
+                            {((updateState.downloadedBytes) / 1024 / 1024).toFixed(1)} MB / {((updateState.totalBytes) / 1024 / 1024).toFixed(1)} MB
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="riescade-modal-spinner" style={{ margin: '0 auto 15px' }} />
+                  )}
+                  <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{t('Downloading and extracting update files...')}</p>
                   <p style={{ fontSize: '0.85rem', opacity: 0.7, marginTop: '10px' }}>
                     {t('The application will restart automatically when finished.')}
                   </p>

@@ -356,7 +356,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
 }
 
 .riescade-modal-button-primary {
@@ -855,10 +854,10 @@
 }
 
 .riescade-notification {
-  background: rgba(26, 26, 26, 0.85);
+  background: rgba(0, 0, 0, 0.85);
   color: #c0c0c0;
   padding: 10px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #111;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -868,7 +867,7 @@
   text-transform: none;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-radius: 0px;
+  border-radius: 4px;
   animation: riescadeNotificationSlideIn 0.3s ease-out forwards;
 }
 .riescade-notification.controller.connected {
@@ -916,11 +915,11 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  background: rgba(15, 15, 15, 0.85);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 2px solid var(--theme-color, #bf0052);
-  border-left-width: 6px;
+  border: 1px solid #111;
+  border-radius: 4px;
   padding: 12px 24px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
   min-width: 280px;
@@ -931,8 +930,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--theme-color, #bf0052);
-  box-shadow: 0 0 10px var(--theme-color, #bf0052), 0 0 20px var(--theme-color, #bf0052);
+  background: var(--theme-color);
+  box-shadow: 0 0 10px var(--theme-color), 0 0 20px var(--theme-color);
   animation: musicPulse 1.5s infinite alternate;
   flex-shrink: 0;
 }
@@ -941,12 +940,12 @@
   from {
     transform: scale(1);
     opacity: 0.6;
-    box-shadow: 0 0 8px var(--theme-color, #bf0052);
+    box-shadow: 0 0 8px var(--theme-color);
   }
   to {
     transform: scale(1.3);
     opacity: 1;
-    box-shadow: 0 0 16px var(--theme-color, #bf0052), 0 0 24px var(--theme-color, #bf0052);
+    box-shadow: 0 0 16px var(--theme-color), 0 0 24px var(--theme-color);
   }
 }
 .music-title-text-wrap {
@@ -979,12 +978,11 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  background: rgba(15, 17, 26, 0.85);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-left: 4px solid var(--theme-color, #f042b0);
-  border-radius: 8px;
+  border: 1px solid #111;
+  border-radius: 4px;
   padding: 12px 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   display: flex;
@@ -1000,7 +998,7 @@
   width: 20px;
   height: 20px;
   border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--theme-color, #f042b0);
+  border-top-color: var(--theme-color);
   border-radius: 50%;
   animation: scraper-spin 1s linear infinite;
   flex-shrink: 0;
@@ -1021,7 +1019,7 @@
 .scraper-progress-title {
   font-size: 0.8rem;
   font-weight: 800;
-  color: var(--theme-color, #f042b0);
+  color: var(--theme-color);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -1042,7 +1040,7 @@
 
 /* Glassmorphic Gamelist Completion/Reload Modal */
 .scraper-completion-overlay {
-  background: rgba(0, 0, 0, 0.65) !important;
+  background: rgba(0, 0, 0, 0.85) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
   z-index: 13000 !important;
@@ -1081,6 +1079,8 @@
 
 .scraper-completion-buttons {
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 15px;
   width: 100%;
 }
@@ -1102,7 +1102,7 @@
   color: #fff;
 }
 .scraper-completion-btn.primary.selected, .scraper-completion-btn.primary:hover {
-  background: var(--theme-color, #f042b0);
+  background: var(--theme-color);
   border-color: transparent;
 }
 .scraper-completion-btn.primary:hover ~ .scraper-completion-btn.secondary {
@@ -1113,7 +1113,7 @@
   color: #bdbdbd;
 }
 .scraper-completion-btn.secondary.selected, .scraper-completion-btn.secondary:hover {
-  background: var(--theme-color, #f042b0);
+  background: var(--theme-color);
   border-color: transparent;
   color: #fff;
 }
@@ -1184,9 +1184,9 @@
   z-index: 20000 !important;
 }
 .scraper-progress-overlay .scraper-progress-card {
-  background: rgba(20, 20, 20, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #111;
+  border-radius: 4px;
   width: 500px;
   padding: 40px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -1202,8 +1202,8 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(to right, var(--theme-color, #f042b0), #9333ea);
-  box-shadow: 0 2px 20px var(--theme-color, #f042b0);
+  background: linear-gradient(to right, var(--theme-color), #9333ea);
+  box-shadow: 0 2px 20px var(--theme-color);
 }
 .scraper-progress-overlay .scraper-progress-title {
   color: #fff;
@@ -1217,14 +1217,14 @@
 .scraper-progress-overlay .scraper-progress-details {
   width: 100%;
   text-align: center;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
   padding: 20px 15px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #111;
   margin-bottom: 25px;
 }
 .scraper-progress-overlay .scraper-progress-system {
-  color: var(--theme-color, #f042b0);
+  color: var(--theme-color);
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -1251,9 +1251,9 @@
 }
 .scraper-progress-overlay .scraper-progress-fill {
   height: 100%;
-  background: linear-gradient(to right, var(--theme-color, #f042b0), #a855f7);
-  border-radius: 5px;
-  box-shadow: 0 0 10px var(--theme-color, #f042b0);
+  background: linear-gradient(to right, var(--theme-color));
+  border-radius: 4px;
+  box-shadow: 0 0 10px var(--theme-color);
   transition: width 0.15s ease;
 }
 .scraper-progress-overlay .scraper-progress-percent {
@@ -1270,8 +1270,8 @@
   margin-bottom: 35px;
 }
 .scraper-progress-overlay .scraper-progress-item {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.03);
   border-radius: 10px;
   padding: 12px 10px;
   display: flex;
@@ -1354,9 +1354,9 @@
 }
 .scraper-progress-overlay .scraper-progress-close-btn {
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid var(--theme-color, #f042b0);
+  border: 1px solid #111;
   color: #fff;
-  border-radius: 30px;
+  border-radius: 4px;
   padding: 12px 50px;
   font-size: 0.9rem;
   font-weight: 800;
