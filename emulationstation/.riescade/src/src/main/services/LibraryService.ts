@@ -1003,16 +1003,171 @@ export class LibraryService {
       } catch (err) {}
     }
 
+    const localArtEnabled = settings.getSetting('LocalArt', 'bool') === true
+    const systemPath = system && system.path ? system.path : null
+
     const processedGames = games.map(g => {
       const sysLower = String(g.system || systemName).toLowerCase()
       if (!g.image || String(g.image).trim() === '') {
         const ext = (g.path.includes('.') ? g.path.substring(g.path.lastIndexOf('.')) : '').toLowerCase()
         if (ext === '.png' || (sysLower === 'pico8' && ext === '.p8')) {
-          if (system && system.path) {
-            g.image = resolve(system.path, g.path).replace(/\\/g, '/')
+          if (systemPath) {
+            g.image = resolve(systemPath, g.path).replace(/\\/g, '/')
           }
         }
       }
+
+      if (localArtEnabled && systemPath) {
+        const lastSlash = Math.max(g.path.lastIndexOf('/'), g.path.lastIndexOf('\\'))
+        const filename = lastSlash !== -1 ? g.path.substring(lastSlash + 1) : g.path
+        const lastDot = filename.lastIndexOf('.')
+        const stem = lastDot !== -1 ? filename.substring(0, lastDot) : filename
+
+        const imageExtensions = ['.png', '.jpg', '.jpeg']
+        const videoExtensions = ['.mp4', '.avi', '.mkv']
+
+        // 1. Resolve image if not specified
+        if (!g.image || String(g.image).trim() === '') {
+          let foundPath = ''
+          for (const ext of imageExtensions) {
+            const checkPath = join(systemPath, 'images', `${stem}-image${ext}`)
+            if (existsSync(checkPath)) {
+              foundPath = checkPath.replace(/\\/g, '/')
+              break
+            }
+          }
+          if (!foundPath) {
+            for (const ext of imageExtensions) {
+              const checkPath = join(systemPath, 'images', `${stem}${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (!foundPath) {
+            for (const ext of imageExtensions) {
+              const checkPath = join(systemPath, 'media', 'fanart', `${stem}${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (foundPath) {
+            g.image = foundPath
+          }
+        }
+
+        // 2. Resolve thumbnail if not specified
+        if (!g.thumbnail || String(g.thumbnail).trim() === '') {
+          let foundPath = ''
+          for (const ext of imageExtensions) {
+            const checkPath = join(systemPath, 'images', `${stem}-thumb${ext}`)
+            if (existsSync(checkPath)) {
+              foundPath = checkPath.replace(/\\/g, '/')
+              break
+            }
+          }
+          if (!foundPath) {
+            for (const ext of imageExtensions) {
+              const checkPath = join(systemPath, 'images', `${stem}-image${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (!foundPath) {
+            for (const ext of imageExtensions) {
+              const checkPath = join(systemPath, 'images', `${stem}${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (!foundPath) {
+            for (const ext of imageExtensions) {
+              const checkPath = join(systemPath, 'media', 'cover', `${stem}${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (foundPath) {
+            g.thumbnail = foundPath
+          }
+        }
+
+        // 3. Resolve marquee if not specified
+        if (!g.marquee || String(g.marquee).trim() === '') {
+          let foundPath = ''
+          for (const ext of imageExtensions) {
+            const checkPath = join(systemPath, 'images', `${stem}-marquee${ext}`)
+            if (existsSync(checkPath)) {
+              foundPath = checkPath.replace(/\\/g, '/')
+              break
+            }
+          }
+          if (!foundPath) {
+            for (const ext of imageExtensions) {
+              const checkPath = join(systemPath, 'media', 'logo', `${stem}${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (foundPath) {
+            g.marquee = foundPath
+          }
+        }
+
+        // 4. Resolve video if not specified
+        if (!g.video || String(g.video).trim() === '') {
+          let foundPath = ''
+          for (const ext of videoExtensions) {
+            const checkPath = join(systemPath, 'images', `${stem}-video${ext}`)
+            if (existsSync(checkPath)) {
+              foundPath = checkPath.replace(/\\/g, '/')
+              break
+            }
+          }
+          if (!foundPath) {
+            for (const ext of videoExtensions) {
+              const checkPath = join(systemPath, 'videos', `${stem}-video${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (!foundPath) {
+            for (const ext of videoExtensions) {
+              const checkPath = join(systemPath, 'videos', `${stem}${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (!foundPath) {
+            for (const ext of videoExtensions) {
+              const checkPath = join(systemPath, 'media', 'video', `${stem}${ext}`)
+              if (existsSync(checkPath)) {
+                foundPath = checkPath.replace(/\\/g, '/')
+                break
+              }
+            }
+          }
+          if (foundPath) {
+            g.video = foundPath
+          }
+        }
+      }
+
       return g
     })
 

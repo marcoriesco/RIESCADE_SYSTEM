@@ -18,12 +18,13 @@ export class ThemeSettingsParser {
     const settingsPath = this.getSettingsPath(themeName, themePath)
     const settings: Record<string, string> = {}
 
-    // 1. Load defaults from options.json if it exists
-    const optionsPath = join(themePath, 'options.json')
-    if (existsSync(optionsPath)) {
+    // 1. Load defaults from theme.json options if it exists
+    const themeJsonPath = join(themePath, 'theme.json')
+    if (existsSync(themeJsonPath)) {
       try {
-        const optionsContent = readFileSync(optionsPath, 'utf8')
-        const optionsData = JSON.parse(optionsContent)
+        const themeContent = readFileSync(themeJsonPath, 'utf8')
+        const themeData = JSON.parse(themeContent)
+        const optionsData = themeData?.options
         if (Array.isArray(optionsData)) {
           for (const opt of optionsData) {
             if (opt.id && opt.default !== undefined) {
@@ -32,7 +33,7 @@ export class ThemeSettingsParser {
           }
         }
       } catch (e) {
-        console.error('Error parsing theme options.json:', e)
+        console.error('Error parsing theme.json for options:', e)
       }
     }
 

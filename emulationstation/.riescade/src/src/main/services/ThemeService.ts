@@ -108,16 +108,8 @@ export class ThemeService {
       return existsSync(filePath) ? readFileSync(filePath, 'utf8') : ''
     }
 
-    // Load options if available
-    let options: any[] = []
-    const optionsPath = join(themePath, 'options.json')
-    if (existsSync(optionsPath)) {
-      try {
-        options = JSON.parse(readFileSync(optionsPath, 'utf8'))
-      } catch (e) {
-        console.error('Error reading options.json:', e)
-      }
-    }
+    // Load options if available from theme.json metadata
+    const options = Array.isArray(metadata.options) ? metadata.options : []
 
     // Load locales
     let locales: Record<string, Record<string, string>> = {}

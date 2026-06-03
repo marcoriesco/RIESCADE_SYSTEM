@@ -345,3 +345,53 @@ body {
   font-size: 22px;
   margin-right: 8px;
 }
+
+/* GAMELIST LOADING VIEW */
+.gamelist-loading-view {
+  background: var(--bg);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.gamelist-loading-center {
+  text-align: center;
+}
+
+.gamelist-loading-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 30px auto;
+  border: 6px solid var(--text);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: sw-spin 1s linear infinite;
+}
+
+.gamelist-loading-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 5px;
+}
+
+.gamelist-loading-subtext {
+  margin-top: 20px;
+  opacity: 0.5;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+@keyframes sw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

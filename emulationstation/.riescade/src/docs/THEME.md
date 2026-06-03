@@ -23,8 +23,7 @@ theme_name/
 ├── gamelist.html     # Layout for the Game List View
 ├── loading.html      # Splash screen during game launch
 ├── start.html        # Initial app splash screen
-├── theme.json        # Main manifest (name, author, version, defaultLocale)
-├── options.json      # Custom settings definition for the theme
+├── theme.json        # Main manifest & custom settings definition (name, author, version, options)
 └── config.json       # (Auto-generated) Current user settings for this theme
 ```
 
@@ -33,7 +32,7 @@ theme_name/
 ## Configuration Files
 
 ### `theme.json`
-Defines the theme identity and default locale.
+Defines the theme identity, default locale, templates, and custom theme configuration options.
 ```json
 {
   "name": "My Epic Theme",
@@ -45,7 +44,19 @@ Defines the theme identity and default locale.
     "gamelist": "gamelist.html",
     "start": "start.html",
     "loading": "loading.html"
-  }
+  },
+  "options": [
+    {
+      "id": "theme_color",
+      "name": "PRIMARY COLOR",
+      "type": "select",
+      "options": [
+        { "value": "#ff0000", "label": "RED" },
+        { "value": "#0000ff", "label": "BLUE" }
+      ],
+      "default": "#ff0000"
+    }
+  ]
 }
 ```
 
@@ -56,23 +67,7 @@ Defines the theme identity and default locale.
 | `version` | No | Semantic version string. |
 | `defaultLocale` | No | Default locale code used as fallback when the user's language is not available. Defaults to `en_US`. |
 | `templates` | No | Map of view names to HTML file names. If omitted, defaults to `system.html`, `gamelist.html`, `start.html`, `loading.html`. |
-
-### `options.json`
-Defines the settings that appear in the **"THEME CONFIGURATION"** menu.
-```json
-[
-  {
-    "id": "theme_color",
-    "name": "PRIMARY COLOR",
-    "type": "select",
-    "options": [
-      { "value": "#ff0000", "label": "RED" },
-      { "value": "#0000ff", "label": "BLUE" }
-    ],
-    "default": "#ff0000"
-  }
-]
-```
+| `options` | No | Array of custom theme settings definition that appear in the **"THEME CONFIGURATION"** menu. |
 
 ---
 

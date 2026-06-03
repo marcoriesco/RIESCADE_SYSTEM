@@ -459,6 +459,24 @@ function App() {
 		return () => removeProgress();
 	}, []);
 
+	// Inject active theme's global.css into document head to prevent FOUC (Flash of Unstyled Content)
+	// and guarantee that menu styles, fonts, and icons load instantly and stay loaded.
+	useEffect(() => {
+		if (theme?.path) {
+			const cleanThemePath = theme.path.replace(/\\/g, '/');
+			const stylesheetUrl = `file:///${cleanThemePath}/assets/css/global.css`;
+			
+			let link = document.getElementById('active-theme-styles') as HTMLLinkElement;
+			if (!link) {
+				link = document.createElement('link');
+				link.id = 'active-theme-styles';
+				link.rel = 'stylesheet';
+				document.head.appendChild(link);
+			}
+			link.href = stylesheetUrl;
+		}
+	}, [theme?.path]);
+
 	// Listen for scraper progress and finish events
 	useEffect(() => {
 		const removeScrapeProgress = window.api.on('scrape-progress', (_: any, data: any) => {
@@ -1161,6 +1179,15 @@ function App() {
 				if (normalized.match(/^[a-zA-Z]:/) || normalized.startsWith('/')) {
 					return normalized.match(/^[a-zA-Z]:/) ? `file:///${normalized}` : `file://${normalized}`;
 				}
+				// Resolve relative paths (e.g. ./media/fanart/... or media/fanart/...) relative to game's system path
+				const sysLower = (currentGame.system || selectedSystem.name || '').toLowerCase();
+				const gameSystem = systems.find(s => s.name.toLowerCase() === sysLower);
+				if (gameSystem && gameSystem.path && !gameSystem.path.startsWith('virtual://')) {
+					const sysPath = gameSystem.path.replace(/\\/g, '/');
+					const cleanP = normalized.replace(/^\.\//, '');
+					const absolute = sysPath.endsWith('/') ? `${sysPath}${cleanP}` : `${sysPath}/${cleanP}`;
+					return absolute.match(/^[a-zA-Z]:/) ? `file:///${absolute}` : `file://${absolute}`;
+				}
 				return normalized;
 			};
 
@@ -1211,7 +1238,7 @@ function App() {
 				'game:fanart': gameFanart,
 				'game:titleshot': resolveMedia(currentGame.titleshot || currentGame.image) || gameImage,
 				'game:wheel': gameWheel,
-				'game:mix': currentGame.mix || currentGame.image || gameImage,
+				'game:mix': resolveMedia(currentGame.mix || currentGame.image) || gameImage,
 				'game:rating': currentGame.rating,
 				'game:releasedate': currentGame.releasedate,
 				'game:developer': currentGame.developer,
@@ -1859,6 +1886,7 @@ function App() {
 			/>
 			<Menu
 				isOpen={isMenuOpen}
+				settings={settings}
 				selectedSystem={selectedSystem}
 				onUpdateGamelists={handleUpdateGamelists}
 				onClose={() => {

@@ -132,9 +132,14 @@
   display: inline-block;
   width: 2.2em;
   height: 2em;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-color: currentColor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  transition: background-color 0.15s ease;
 }
 
 .riescade-menu-group {
@@ -463,34 +468,49 @@
     padding: 0 15px !important;
     transition: none !important;
 
+    &.selected .riescade-menu-icon {
+      color: #fff !important;
+    }
+
     .riescade-menu-icon {
-        &#game_settings {
-            background-image: url(../icons/games.png);
-        }
-        &#ui_settings {
-            background-image: url(../icons/ui.png);
-        }
-        &#controller_settings {
-            background-image: url(../icons/controllers.png);
-        }
-        &#sound_settings {
-            background-image: url(../icons/sound.png);
-        }
-        &#game_collections {
-            background-image: url(../icons/advanced.png);
-        }
-        &#scraper {
-            background-image: url(../icons/scraper.png);
-        }        
-        &#updates_downloads {
-            background-image: url(../icons/updates.png);
-        }
-        &#system_settings {
-            background-image: url(../icons/config.png);
-        }        
-        &#quit {
-            background-image: url(../icons/quit.png);
-        }
+      color: #999 !important;
+
+      &#game_settings {
+          mask-image: url("../icons/game_settings.svg");
+          -webkit-mask-image: url("../icons/game_settings.svg");
+      }
+      &#ui_settings {
+          mask-image: url("../icons/ui_settings.svg");
+          -webkit-mask-image: url("../icons/ui_settings.svg");
+      }
+      &#controller_settings {
+          mask-image: url("../icons/controller_settings.svg");
+          -webkit-mask-image: url("../icons/controller_settings.svg");
+      }
+      &#sound_settings {
+          mask-image: url("../icons/sound_settings.svg");
+          -webkit-mask-image: url("../icons/sound_settings.svg");
+      }
+      &#game_collections {
+          mask-image: url("../icons/game_collections.svg");
+          -webkit-mask-image: url("../icons/game_collections.svg");
+      }
+      &#scraper {
+          mask-image: url("../icons/scraper.svg");
+          -webkit-mask-image: url("../icons/scraper.svg");
+      }        
+      &#updates_downloads {
+          mask-image: url("../icons/updates_downloads.svg");
+          -webkit-mask-image: url("../icons/updates_downloads.svg");
+      }
+      &#system_settings {
+          mask-image: url("../icons/system_settings.svg");
+          -webkit-mask-image: url("../icons/system_settings.svg");
+      }        
+      &#quit {
+          mask-image: url("../icons/quit.svg");
+          -webkit-mask-image: url("../icons/quit.svg");
+      }
     }
 
     .riescade-menu-label {

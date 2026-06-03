@@ -131,6 +131,7 @@ interface MenuProps {
   allSystems?: any[]
   selectedSystem?: any
   onUpdateGamelists?: (systemName?: string) => void
+  settings: Record<string, any>
 }
 
 const getGamepadGuid = (pad: Gamepad): string => {
@@ -150,8 +151,15 @@ const getGamepadGuid = (pad: Gamepad): string => {
   return id
 }
 
-export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists }) => {
-  const [settings, setSettings] = useState<Record<string, any>>({})
+export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists, settings: initialSettings }) => {
+  const [settings, setSettings] = useState<Record<string, any>>(initialSettings || {})
+
+  useEffect(() => {
+    if (initialSettings) {
+      setSettings(initialSettings)
+    }
+  }, [initialSettings])
+
   const [appVersion, setAppVersion] = useState('2.2.2')
   const [realSystemInfo, setRealSystemInfo] = useState<Record<string, string>>({})
   const [updateState, setUpdateState] = useState<{
@@ -2668,10 +2676,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     </div>
   )
 
-  if (!isOpen) return null
-
   return (
-    <>
+    <div style={{ display: isOpen ? 'block' : 'none' }}>
       <div className={`riescade-overlay riescade-menu-overlay ${visible && !showInputConfig && !showScraperProgress ? 'visible' : ''}`}>
         <div className="riescade-menu-container">
           <div className="riescade-menu-header">
@@ -2976,6 +2982,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }

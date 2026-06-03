@@ -259,9 +259,14 @@
   display: inline-block;
   width: 2.2em;
   height: 2em;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-color: currentColor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  transition: background-color 0.15s ease;
 }
 
 .riescade-menu-group {
@@ -578,32 +583,47 @@
   padding: 0 15px !important;
   transition: none !important;
 }
+.riescade-menu-item.selected .riescade-menu-icon {
+  color: #fff !important;
+}
+.riescade-menu-item .riescade-menu-icon {
+  color: #999 !important;
+}
 .riescade-menu-item .riescade-menu-icon#game_settings {
-  background-image: url(../icons/games.png);
+  mask-image: url("../icons/game_settings.svg");
+  -webkit-mask-image: url("../icons/game_settings.svg");
 }
 .riescade-menu-item .riescade-menu-icon#ui_settings {
-  background-image: url(../icons/ui.png);
+  mask-image: url("../icons/ui_settings.svg");
+  -webkit-mask-image: url("../icons/ui_settings.svg");
 }
 .riescade-menu-item .riescade-menu-icon#controller_settings {
-  background-image: url(../icons/controllers.png);
+  mask-image: url("../icons/controller_settings.svg");
+  -webkit-mask-image: url("../icons/controller_settings.svg");
 }
 .riescade-menu-item .riescade-menu-icon#sound_settings {
-  background-image: url(../icons/sound.png);
+  mask-image: url("../icons/sound_settings.svg");
+  -webkit-mask-image: url("../icons/sound_settings.svg");
 }
 .riescade-menu-item .riescade-menu-icon#game_collections {
-  background-image: url(../icons/advanced.png);
+  mask-image: url("../icons/game_collections.svg");
+  -webkit-mask-image: url("../icons/game_collections.svg");
 }
 .riescade-menu-item .riescade-menu-icon#scraper {
-  background-image: url(../icons/scraper.png);
+  mask-image: url("../icons/scraper.svg");
+  -webkit-mask-image: url("../icons/scraper.svg");
 }
 .riescade-menu-item .riescade-menu-icon#updates_downloads {
-  background-image: url(../icons/updates.png);
+  mask-image: url("../icons/updates_downloads.svg");
+  -webkit-mask-image: url("../icons/updates_downloads.svg");
 }
 .riescade-menu-item .riescade-menu-icon#system_settings {
-  background-image: url(../icons/config.png);
+  mask-image: url("../icons/system_settings.svg");
+  -webkit-mask-image: url("../icons/system_settings.svg");
 }
 .riescade-menu-item .riescade-menu-icon#quit {
-  background-image: url(../icons/quit.png);
+  mask-image: url("../icons/quit.svg");
+  -webkit-mask-image: url("../icons/quit.svg");
 }
 .riescade-menu-item .riescade-menu-label {
   font-size: 1.75rem !important;
@@ -1891,14 +1911,6 @@
   border-color: var(--theme-color);
   color: var(--theme-color);
   transform: scale(1.05);
-}
-
-.riescade-menu-text-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 2px;
 }
 
 .riescade-menu-description {
