@@ -9,8 +9,8 @@
   }
 
   .riescade-menu-container {
-    width: 30vw;
-    height: 100vh;
+    width: 30vw !important;
+    height: 100vh !important;
     display: flex;
     flex-direction: column;
     transform: translateX(100%);

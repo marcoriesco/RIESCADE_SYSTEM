@@ -61,6 +61,28 @@ const isOptionMatch = (optVal: any, settingVal: any) => {
   return isOptNull && isSetNull
 }
 
+const getEmulatorValue = (
+  emulator: string | undefined,
+  core: string | undefined,
+  emulators: any[] | undefined,
+  autoValue: string = ''
+): string => {
+  if (!emulator || emulator === 'auto' || emulator === '') return autoValue
+  
+  const foundEmulator = emulators?.find(e => e.name.toLowerCase() === emulator.toLowerCase())
+  if (foundEmulator && foundEmulator.cores && foundEmulator.cores.length > 0) {
+    if (core && core !== 'auto' && core !== '') {
+      const matchedCore = foundEmulator.cores.find((c: any) => String(c).toLowerCase() === core.toLowerCase())
+      if (matchedCore) {
+        return `${foundEmulator.name}:${matchedCore}`
+      }
+    }
+    return `${foundEmulator.name}:${foundEmulator.cores[0]}`
+  }
+  
+  return foundEmulator ? foundEmulator.name : emulator
+}
+
 const findMenuItemBySettingName = (items: MenuItem[], settingName: string): MenuItem | undefined => {
   for (const item of items) {
     if (item.settingName === settingName) {
@@ -121,6 +143,7 @@ interface MenuItem {
   tabs?: string[]
   tab?: number
   invert?: boolean
+  allowAuto?: boolean
 }
 
 interface MenuProps {
@@ -149,6 +172,13 @@ const getGamepadGuid = (pad: Gamepad): string => {
     return '030000005e0400008e02000000007200'
   }
   return id
+}
+
+const isGameSystem = (s: any) => {
+  if (!s || !s.hardware) return false
+  const hw = String(s.hardware).toLowerCase().trim()
+  const allowedHardware = ['arcade', 'computer', 'console', 'extension', 'pinball', 'port', 'portable']
+  return allowedHardware.includes(hw)
 }
 
 export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists, settings: initialSettings }) => {
@@ -219,6 +249,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     if (name === 'bios_view_mode_temp') {
       return biosViewMode
     }
+    if (name.endsWith('.emulator') && !name.startsWith('global.') && !name.startsWith('RIESCADE.')) {
+      const sysName = name.replace('.emulator', '')
+      const coreKey = `${sysName}.core`
+      const emuVal = (pendingSettingsRef.current[name] !== undefined ? pendingSettingsRef.current[name] : settingsRef.current[name]?.value) ?? ''
+      const coreVal = (pendingSettingsRef.current[coreKey] !== undefined ? pendingSettingsRef.current[coreKey] : settingsRef.current[coreKey]?.value) ?? ''
+      const sys = allSystems.find(s => s.name === sysName)
+      return getEmulatorValue(emuVal, coreVal, sys?.emulators, '')
+    }
     let val = (pendingSettingsRef.current[name] !== undefined ? pendingSettingsRef.current[name] : settingsRef.current[name]?.value)
     if (val === undefined || val === null || val === '') {
       if (name.includes('.') && !name.startsWith('global.') && !name.startsWith('RIESCADE.')) {
@@ -281,7 +319,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       baseSystems = baseSystems.filter(s => s.name !== 'collections')
     }
 
-    return baseSystems.filter(s => s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware')
+    return baseSystems.filter(s => s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware' && s.name !== 'system')
   }, [allSystems, pendingSettings, settings])
 
   const getFriendlySystemName = (sys: any) => {
@@ -341,6 +379,46 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
         return
       }
+    }
+
+    if (name.endsWith('.emulator') && !name.startsWith('global.') && !name.startsWith('RIESCADE.')) {
+      const sysName = name.replace('.emulator', '')
+      const coreKey = `${sysName}.core`
+      
+      let newEmulator = ''
+      let newCore = ''
+      
+      if (stringVal && stringVal !== 'auto') {
+        if (stringVal.includes(':')) {
+          const parts = stringVal.split(':')
+          newEmulator = parts[0]
+          newCore = parts[1]
+        } else {
+          newEmulator = stringVal
+        }
+      }
+      
+      const dbEmulator = settingsRef.current[name]?.value ?? ''
+      const dbCore = settingsRef.current[coreKey]?.value ?? ''
+      
+      setPendingSettings(prev => {
+        const next = { ...prev }
+        
+        if (newEmulator === dbEmulator) {
+          delete next[name]
+        } else {
+          next[name] = newEmulator
+        }
+        
+        if (newCore === dbCore) {
+          delete next[coreKey]
+        } else {
+          next[coreKey] = newCore
+        }
+        
+        return next
+      })
+      return
     }
 
     const dbValue = settingsRef.current[name]?.value ?? ''
@@ -821,8 +899,27 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       const min = item.min ?? 0
       const max = item.max ?? 100
       const step = item.step ?? 5
-      const current = parseFloat(getSetting(item.settingName, Math.floor((min + max) / 2)))
+      
+      const currentVal = getSetting(item.settingName, item.allowAuto ? '' : min)
+      const isCurrentlyAuto = currentVal === '' || currentVal === 'AUTO' || currentVal === 'auto'
+      
+      if (item.allowAuto && isCurrentlyAuto) {
+        if (direction === 1) {
+          updateSetting(item.settingName, min)
+        }
+        return
+      }
+
+      const current = parseFloat(currentVal !== '' ? currentVal : min)
+      if (isNaN(current)) return
+
       let newVal = current + direction * step
+      
+      if (item.allowAuto && direction === -1 && current === min) {
+        updateSetting(item.settingName, '')
+        return
+      }
+
       newVal = Math.max(min, Math.min(max, newVal))
       if (step % 1 !== 0) {
         newVal = parseFloat(newVal.toFixed(2))
@@ -1115,9 +1212,23 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
          
           
           { id: 'group_retroarch', label: t('RETROARCH OPTIONS'), type: 'group' },
+          
           { id: 'video_submenu', label: t('VIDEO'), submenu: [
-            { id: 'GPUIndex', label: t('GRAPHIC CARD INDEX'), type: 'select', settingName: 'GPUIndex', description: t('Change this only if multiple GPU are used by your system.'), options: Array.from({ length: 5 }, (_, i) => ({ label: String(i), value: String(i) })) },
+            { id: 'RotateScreen', label: t('SCREEN ORIENTATION'), type: 'select', settingName: 'RotateScreen', description: t('This setting will rotate your windows desktop, it will not be set back when exiting game.'), options: [
+              { label: t('AUTO'), value: '' },
+              { label: t('Normal'), value: '0' },
+              { label: '90°', value: '1' },
+              { label: '180°', value: '2' },
+              { label: '270°', value: '3' }
+            ]},
+
+            { id: 'MonitorIndex', label: t('MONITOR INDEX'), type: 'select', settingName: 'MonitorIndex', description: t('Games will be displayed on the monitor corresponding to the selected index.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 11 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
+            { id: 'GPUIndex', label: t('GRAPHIC CARD INDEX'), type: 'select', settingName: 'GPUIndex', description: t('Change this only if multiple GPU are used by your system.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 5 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
+
             { id: 'CRTSwitch', label: t('CRT SCREEN OUTPUT'), type: 'select', settingName: 'CRTSwitch', options: [
+              { label: t('AUTO'), value: '' },
               { label: t('OFF'), value: '0' },
               { label: '15KHz', value: '1' },
               { label: '31KHz (Standard)', value: '2' },
@@ -1125,6 +1236,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               { label: t('FROM INI FILE'), value: '4' }
             ]},
             { id: 'CRTSuperRes', label: t('CRT SCREEN RESOLUTION'), type: 'select', settingName: 'CRTSuperRes', options: [
+              { label: t('AUTO'), value: '' },
               { label: t('Native'), value: '0' },
               { label: t('Dynamic'), value: '1' },
               { label: '1920', value: '1920' },
@@ -1132,7 +1244,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               { label: '3840', value: '3840' }
             ]},
             { id: 'enable_hdr', label: t('ENABLE HDR'), type: 'toggle', settingName: 'enable_hdr', settingType: 'bool', description: t('Enable HDR for HDR-compatible displays.') },
+            { id: 'forcefullscreen_re', label: t('FORCE FULLSCREEN'), type: 'toggle', settingName: 'forcefullscreen', settingType: 'bool', description: t('Force emulator in fullscreen even if RetroBat is windowed') },
             { id: 'video_scale_integer_scaling', label: t('INTEGER SCALE TYPE'), type: 'select', settingName: 'video_scale_integer_scaling', options: [
+              { label: t('AUTO'), value: '' },
               { label: t('UNDERSCALE'), value: '0' },
               { label: t('OVERSCALE'), value: '1' },
               { label: t('SMART'), value: '2' }
@@ -1141,18 +1255,20 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'visual_rendering_submenu', label: t('VISUAL RENDERING'), submenu: [
             { id: 'use_shader_override', label: t('ALLOW GAME/CORE SHADERS OVERRIDE'), type: 'toggle', settingName: 'use_shader_override', settingType: 'bool', description: t('Enable this to enable shaders even when RetroBat has no shader set.') }
           ]},
+
           {
             id: 'screen_sync_submenu',
             label: t('SCREEN SYNC'),
             description: t('G-SYNC/FREESYNC COMPATIBILITY') + ' : ' + (getSetting('vrr_runloop_enable', 'false') === 'true' ? t('ON') : t('OFF')),
             submenu: [
-              { id: 'vrr_runloop_enable', label: t('G-SYNC/FREESYNC COMPATIBILITY'), type: 'toggle', settingName: 'vrr_runloop_enable', settingType: 'bool', description: t('Sync to exact content framerate. Only for G-Sync/FreeSync/HDMI-2.1-VRR compatible monitors.') },
               { id: 'video_vsync', label: t('VERTICAL SYNC'), type: 'select', settingName: 'video_vsync', options: [
+                { label: t('AUTO'), value: '' },
                 { label: t('NO'), value: 'false' },
                 { label: t('YES'), value: 'true' },
                 { label: t('ADAPTATIVE'), value: 'adaptative' }
               ]},
               { id: 'video_hard_sync', label: t('HARD SYNC'), type: 'select', settingName: 'video_hard_sync', description: t('Only compatible with OpenGL, hard-sync GPU and CPU. Reduce latency at the cost of inscreased performance requirements.'), options: [
+                { label: t('AUTO'), value: '' },
                 { label: t('NO'), value: 'false' },
                 { label: '0 frame', value: '0' },
                 { label: '1 frame', value: '1' },
@@ -1160,41 +1276,48 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 { label: '3 frames', value: '3' }
               ]},
               { id: 'video_swap_interval', label: t('SWAP INTERVAL'), type: 'select', settingName: 'video_swap_interval', description: t('Set this to effectively halve monitor refresh rate.'), options: [
+                { label: t('AUTO'), value: '' },
                 { label: '1', value: '1' },
                 { label: '2', value: '2' },
                 { label: '3', value: '3' },
                 { label: '4', value: '4' }
               ]},
               { id: 'video_black_frame_insertion', label: t('BLACK FRAMES INSERTION'), type: 'select', settingName: 'video_black_frame_insertion', description: t('Useful on some high refresh rate screen to eliminate ghosting.'), options: [
+                { label: t('AUTO'), value: '' },
                 { label: '1', value: '1' },
                 { label: '2', value: '2' },
                 { label: '3', value: '3' },
                 { label: '4', value: '4' }
               ]},
               { id: 'video_max_swapchain_images', label: t('MAX SWAP CHAIN IMAGES'), type: 'select', settingName: 'video_max_swapchain_images', description: t('Vulkan only: tells the video driver to use a specified buffering mode.'), options: [
+                { label: t('AUTO'), value: '' },
                 { label: '2', value: '2' },
                 { label: '3', value: '3' },
                 { label: '4', value: '4' }
-              ]}
+              ]},
+              { id: 'vrr_runloop_enable', label: t('G-SYNC/FREESYNC COMPATIBILITY'), type: 'toggle', settingName: 'vrr_runloop_enable', settingType: 'bool', description: t('Sync to exact content framerate. Only for G-Sync/FreeSync/HDMI-2.1-VRR compatible monitors.') },
             ]
           },
           { id: 'audio_submenu', label: t('AUDIO'), submenu: [
             { id: 'audio_resampler', label: t('RESAMPLER'), type: 'select', settingName: 'audio_resampler', options: [
+              { label: t('AUTO'), value: '' },
               { label: 'sinc', value: 'sinc' },
               { label: 'CC', value: 'CC' },
               { label: 'nearest', value: 'nearest' },
               { label: t('NONE'), value: 'null' }
             ]},
             { id: 'audio_resampler_quality', label: t('QUALITY'), type: 'select', settingName: 'audio_resampler_quality', options: [
+              { label: t('AUTO'), value: '' },
               { label: t('Lowest'), value: '1' },
               { label: t('Lower'), value: '2' },
               { label: t('Normal'), value: '3' },
               { label: t('Higher'), value: '4' },
               { label: t('Highest'), value: '5' }
             ]},
-            { id: 'audio_volume', label: t('VOLUME GAIN'), type: 'slider', settingName: 'audio_volume', settingType: 'int', min: -80, max: 12, step: 2, suffix: ' dB' },
-            { id: 'audio_mixer_volume', label: t('MIXER VOLUME GAIN'), type: 'slider', settingName: 'audio_mixer_volume', settingType: 'int', min: -80, max: 12, step: 2, suffix: ' dB' },
+            { id: 'audio_volume', label: t('VOLUME GAIN'), type: 'slider', settingName: 'audio_volume', settingType: 'int', min: -80, max: 12, step: 2, suffix: ' dB', allowAuto: true },
+            { id: 'audio_mixer_volume', label: t('MIXER VOLUME GAIN'), type: 'slider', settingName: 'audio_mixer_volume', settingType: 'int', min: -80, max: 12, step: 2, suffix: ' dB', allowAuto: true },
             { id: 'audio_dsp_plugin', label: t('DSP PLUGIN'), type: 'select', settingName: 'audio_dsp_plugin', options: [
+              { label: t('AUTO'), value: '' },
               { label: t('NONE'), value: 'none' },
               { label: t('BASS BOOST'), value: ':\\filters\\audio\\BassBoost.dsp' },
               { label: t('CHIPTUNE ENHANCE'), value: ':\\filters\\audio\\ChipTuneEnhance.dsp' },
@@ -1218,75 +1341,55 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           ]},
           { id: 'emulation_submenu', label: t('EMULATION'), submenu: [
             { id: 'rewind', label: t('REWIND'), type: 'toggle', settingName: 'rewind', settingType: 'bool' },
-            { id: 'global_fastforward_ratio', label: t('FAST FORWARD RATIO'), type: 'slider', settingName: 'global.fastforward_ratio', settingType: 'int', min: 0, max: 50, step: 1, suffix: 'x' },
+            { id: 'global_fastforward_ratio', label: t('FAST FORWARD RATIO'), type: 'slider', settingName: 'global.fastforward_ratio', settingType: 'int', min: 0, max: 50, step: 1, suffix: 'x', allowAuto: true },
             { id: 'fastforward_toggle', label: t('FAST FORWARD BEHAVIOR'), type: 'select', settingName: 'fastforward_toggle', description: t('Define whether the fast-forward shortcuts acts as a toggle or needs to be held.'), options: [
+              { label: t('AUTO'), value: '' },
               { label: t('HOLD'), value: '0' },
               { label: t('TOGGLE'), value: '1' }
             ]},
             { id: 'global_applyPatch', label: t('SOFTPATCHING'), type: 'select', settingName: 'global.applyPatch', description: t('Define if patch should be applied and where patch files are located, AUTO will apply patches if they are located near rom with same name as rom file.'), options: [
+              { label: t('AUTO'), value: '' },
               { label: t('DISABLED'), value: 'none' },
               { label: t('PATCH IN PATCH SUBFOLDER'), value: 'patchFolder' },
               { label: t('PATCH IN ROM SUBFOLDER'), value: 'subFolder' }
             ]},
             { id: 'game_specific_options', label: t('ALLOW GAME/CORE OPTIONS OVERRIDE'), type: 'toggle', settingName: 'game_specific_options', settingType: 'bool', description: t('By default, RetroBat discards core specific option files.') }
           ]},
+          
           { id: 'latency_reduction_submenu', label: t('LATENCY REDUCTION'), submenu: [
-            { id: 'runahead', label: t('RUN-AHEAD FRAMES'), type: 'slider', settingName: 'runahead', settingType: 'int', min: 0, max: 12, step: 1, suffix: ' f' },
+            { id: 'runahead', label: t('RUN-AHEAD FRAMES'), type: 'slider', settingName: 'runahead', settingType: 'int', min: 0, max: 12, step: 1, suffix: ' f', allowAuto: true },
             { id: 'preemptive_frames', label: t('USE PREEMPTIVE FRAMES'), type: 'toggle', settingName: 'preemptive_frames', settingType: 'bool', description: t('Use preemptive frames instead of run-ahead, the run-ahead frame number applies.') },
             { id: 'secondinstance', label: t('RUN-AHEAD USE SECOND INSTANCE'), type: 'toggle', settingName: 'secondinstance', settingType: 'bool' },
             { id: 'video_frame_delay_auto', label: t('AUTOMATIC FRAME DELAY'), type: 'toggle', settingName: 'video_frame_delay_auto', settingType: 'bool', description: t('Automatically decrease frame delay temporarily to prevent frame drops. Turn off if this worsens audio/video stuttering.') },
             { id: 'input_poll_type_behavior', label: t('INPUT POLLING BEHAVIOUR'), type: 'select', settingName: 'input_poll_type_behavior', description: t('Depending on the configuration, can increase or decrease latency.'), options: [
+              { label: t('AUTO'), value: '' },
               { label: t('EARLY'), value: '0' },
               { label: t('NORMAL'), value: '1' },
               { label: t('LATE'), value: '2' }
             ]}
           ]},
-          { id: 'ai_translation_submenu', label: t('AI GAME TRANSLATION'), submenu: [
-            { id: 'ai_service_enabled', label: t('ENABLE AI TRANSLATION SERVICE'), type: 'toggle', settingName: 'ai_service_enabled', settingType: 'bool' },
-            { id: 'ai_target_lang', label: t('TARGET LANGUAGE'), type: 'select', settingName: 'ai_target_lang', options: [
-              { label: 'Dansk', value: 'Da' },
-              { label: 'Deutsch', value: 'De' },
-              { label: 'English', value: 'En' },
-              { label: 'Español', value: 'Es' },
-              { label: 'Français', value: 'Fr' },
-              { label: 'Hrvatski', value: 'Hr' },
-              { label: 'Italiano', value: 'It' },
-              { label: 'Magyar', value: 'Hu' },
-              { label: 'Nederlands', value: 'Nl' },
-              { label: 'Norsk', value: 'Nn' },
-              { label: 'Polski', value: 'Po' },
-              { label: 'Português', value: 'Pt' },
-              { label: 'Română', value: 'Ro' },
-              { label: 'Svenska', value: 'Sv' },
-              { label: 'Türkçe', value: 'Tr' },
-              { label: 'Čeština', value: 'Cs' },
-              { label: 'Ελληνικά (Greek)', value: 'El' },
-              { label: 'Русский (Russian)', value: 'Ru' },
-              { label: '日本語 (Japanese)', value: 'Ja' },
-              { label: '简体中文 (Chinese)', value: 'Zh' },
-              { label: '한국어 (Korean)', value: 'Ko' }
-            ]},
-            { id: 'ai_service_url', label: t('AI TRANSLATION SERVICE URL'), type: 'input', settingName: 'ai_service_url', settingType: 'string' },
-            { id: 'ai_service_pause', label: t('PAUSE ON TRANSLATED SCREEN'), type: 'toggle', settingName: 'ai_service_pause', settingType: 'bool' }
-          ]},
+          
           {
             id: 'ui_elements_submenu',
             label: t('USER INTERFACE'),
             description: t('SHOW MENU ELEMENTS') + ' : ' + String(getSetting('OptionsMenu', 'full')).toUpperCase(),
             submenu: [
-              { id: 'OptionsMenu', label: t('SHOW MENU ELEMENTS'), type: 'select', settingName: 'OptionsMenu', description: t('Show or hide RetroArch settings. Auto is the recommended setting.'), options: [
-                { label: t('minimal'), value: 'minimal' },
-                { label: t('full'), value: 'full' }
-              ]},
               { id: 'OnScreenMsg', label: t('NOTIFICATIONS'), type: 'toggle', settingName: 'OnScreenMsg', settingType: 'bool', description: t('Display or not on-screen notifications.') },
               { id: 'DrawStats', label: t('DRAW STATISTICS'), type: 'select', settingName: 'DrawStats', description: t('Display different level of information about performance statistics.'), options: [
+                { label: t('AUTO'), value: '' },
                 { label: t('FPS ONLY'), value: 'fps_only' },
                 { label: t('MEMORY USAGE ONLY'), value: 'mem_only' },
                 { label: t('FPS + MEMORY USAGE'), value: 'fps_mem' },
                 { label: t('TECHNICAL STATS'), value: 'tech_stats' }
               ]},
+              { id: 'OptionsMenu', label: t('SHOW MENU ELEMENTS'), type: 'select', settingName: 'OptionsMenu', description: t('Show or hide RetroArch settings. Auto is the recommended setting.'), options: [
+                { label: t('AUTO'), value: '' },
+                { label: t('minimal'), value: 'minimal' },
+                { label: t('full'), value: 'full' }
+              ]},
               { id: 'PressTwice', label: t('PRESS HOTKEYS TWICE TO EXIT'), type: 'toggle', settingName: 'PressTwice', settingType: 'bool' },
               { id: 'input_menu_toggle_gamepad_combo', label: t('GAMEPAD MENU COMBO'), type: 'select', settingName: 'input_menu_toggle_gamepad_combo', options: [
+                { label: 'AUTO', value: '' },
                 { label: t('NONE'), value: '0' },
                 { label: 'DOWN+Y+R1+L1', value: '1' },
                 { label: 'L3+R3', value: '2' },
@@ -1305,6 +1408,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             description: t('VIDEO') + ' : ' + String(getSetting('video_driver', 'vulkan')).toUpperCase(),
             submenu: [
               { id: 'video_driver', label: t('VIDEO'), type: 'select', settingName: 'video_driver', description: t('The driver vulkan will generally offer better performance if hardware compatible. Some libretro cores will force the choosen driver.'), options: [
+                { label: 'AUTO', value: '' },
                 { label: 'opengl', value: 'gl' },
                 { label: 'opengl core', value: 'glcore' },
                 { label: 'directx 12', value: 'd3d12' },
@@ -1314,12 +1418,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 { label: 'vulkan', value: 'vulkan' }
               ]},
               { id: 'audio_driver', label: t('AUDIO'), type: 'select', settingName: 'audio_driver', description: t('Choose the audio driver compatible with the hardware.'), options: [
+                { label: 'AUTO', value: '' },
                 { label: 'xaudio', value: 'xaudio' },
                 { label: 'directsound', value: 'dsound' },
                 { label: 'SDL', value: 'sdl2' },
                 { label: 'wasapi', value: 'wasapi' }
               ]},
               { id: 'input_driver', label: t('CONTROLLERS'), type: 'select', settingName: 'input_driver', description: t('The driver xinput will enable features like rumble effects. Choose sdl for compatibility with a wide range of controllers.'), options: [
+                { label: 'AUTO', value: '' },
                 { label: 'SDL', value: 'sdl2' },
                 { label: 'XINPUT', value: 'xinput' },
                 { label: 'DINPUT', value: 'dinput' }
@@ -1361,10 +1467,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             id: 'guns_submenu',
             label: t('GUNS'),
             submenu: [
-              { id: 'p1_gunIndex', label: t('P1 MOUSE/GUN INDEX'), type: 'select', settingName: 'p1_gunIndex', description: t('Define mouse index to use for player 1.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
-              { id: 'p2_gunIndex', label: t('P2 MOUSE/GUN INDEX'), type: 'select', settingName: 'p2_gunIndex', description: t('Define mouse index to use for player 2.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
-              { id: 'p3_gunIndex', label: t('P3 MOUSE/GUN INDEX'), type: 'select', settingName: 'p3_gunIndex', description: t('Define mouse index to use for player 3.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
-              { id: 'p4_gunIndex', label: t('P4 MOUSE/GUN INDEX'), type: 'select', settingName: 'p4_gunIndex', description: t('Define mouse index to use for player 4.'), options: Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) },
+              { id: 'p1_gunIndex', label: t('P1 MOUSE/GUN INDEX'), type: 'select', settingName: 'p1_gunIndex', description: t('Define mouse index to use for player 1.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
+              { id: 'p2_gunIndex', label: t('P2 MOUSE/GUN INDEX'), type: 'select', settingName: 'p2_gunIndex', description: t('Define mouse index to use for player 2.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
+              { id: 'p3_gunIndex', label: t('P3 MOUSE/GUN INDEX'), type: 'select', settingName: 'p3_gunIndex', description: t('Define mouse index to use for player 3.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
+              { id: 'p4_gunIndex', label: t('P4 MOUSE/GUN INDEX'), type: 'select', settingName: 'p4_gunIndex', description: t('Define mouse index to use for player 4.'), options: [
+                { label: t('AUTO'), value: '' }, ...Array.from({ length: 9 }, (_, i) => ({ label: String(i), value: String(i) })) ]},
           ]},
 
           { id: 'group_system_settings', label: t('SYSTEM SETTINGS'), type: 'group' },
@@ -1373,13 +1483,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             label: t('PER SYSTEM ADVANCED CONFIGURATION'),
             submenu: (() => {
               const systemsSource = allSystems || []
-              const realSystems = systemsSource.filter((s: any) => {
-                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
-                const isGenre = s.name.startsWith('_')
-                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
-                const hasExtension = s.extension && s.extension.length > 0
-                return !isAuto && !isGenre && !isCustom && hasExtension && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
-              })
+              const realSystems = systemsSource.filter(isGameSystem)
 
               return realSystems.map(sys => ({
                 id: `sys_adv_${sys.name}`,
@@ -1390,13 +1494,25 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                     label: t('EMULATOR'),
                     type: 'select',
                     settingName: `${sys.name}.emulator`,
-                    options: [
-                      { label: t('AUTOMATIC'), value: 'auto' },
-                      ...(sys.emulators?.map((e: any) => ({
-                        label: e.name.toUpperCase(),
-                        value: e.name
-                      })) || [])
-                    ]
+                    options: (() => {
+                      const opts = [{ label: t('AUTO'), value: '' }]
+                      sys.emulators?.forEach((e: any) => {
+                        if (e.cores && e.cores.length > 0) {
+                          e.cores.forEach((c: any) => {
+                            opts.push({
+                              label: `${e.name.toUpperCase()}: ${String(c).toUpperCase()}`,
+                              value: `${e.name}:${c}`
+                            })
+                          })
+                        } else {
+                          opts.push({
+                            label: e.name.toUpperCase(),
+                            value: e.name
+                          })
+                        }
+                      })
+                      return opts
+                    })()
                   },
                   {
                     id: `sys_adv_${sys.name}_ratio`,
@@ -1404,12 +1520,32 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                     type: 'select',
                     settingName: `${sys.name}.ratio`,
                     options: [
-                      { label: t('AUTO'), value: 'auto' },
-                      { label: '4/3', value: '4/3' },
+                      { label: t('AUTO'), value: '' },
+                      { label: '4/3', value: '4/3' }, 
                       { label: '16/9', value: '16/9' },
-                      { label: '16/10', value: '16/10' },
-                      { label: 'FULL', value: 'full' }
-                    ]
+                      { label: '16/10', value: '16/10' }, 
+                      { label: '16/15', value: '16/15' },
+                      { label: '21/9', value: '21/9' },
+                      { label: '1/1', value: '1/1' },
+                      { label: '2/1', value: '2/1' },
+                      { label: '3/2', value: '3/2' },
+                      { label: '3/4', value: '3/4' },
+                      { label: '4/1', value: '4/1' },
+                      { label: '9/16', value: '9/16' },
+                      { label: '5/4', value: '5/4' },
+                      { label: '6/5', value: '6/5' },
+                      { label: '7/9', value: '7/9' },
+                      { label: '8/3', value: '8/3' },
+                      { label: '8/7', value: '8/7' },
+                      { label: '19/12', value: '19/12' },
+                      { label: '19/14', value: '19/14' },
+                      { label: '30/17', value: '30/17' },
+                      { label: '32/9', value: '32/9' },
+                      { label: 'Config', value: 'config' },
+                      { label: 'Square pixel', value: 'squarepixel' },
+                      { label: 'Core provided', value: 'core' },
+                      { label: 'Custom', value: 'custom' },
+                      { label: 'FULL', value: 'full' }                    ]
                   },
                   {
                     id: `sys_adv_${sys.name}_shaderset`,
@@ -1417,7 +1553,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                     type: 'select',
                     settingName: `${sys.name}.shaderset`,
                     options: [
-                      { label: t('AUTO'), value: 'auto' },
+                      { label: t('AUTO'), value: '' },
                       { label: t('NONE'), value: 'none' },
                       { label: 'RIESCADE', value: '[riescade]' },
                       { label: 'CRT-NEW-PIXIE', value: 'crt-new-pixie' },
@@ -1453,7 +1589,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                     type: 'select',
                     settingName: `${sys.name}.bezel`,
                     options: [
-                      { label: t('AUTO'), value: 'auto' },
+                      { label: t('AUTO'), value: '' },
                       { label: t('NONE'), value: 'none' }
                     ]
                   },
@@ -1630,13 +1766,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             showCount: true,
             submenu: (() => {
               const systemsSource = allSystems || []
-              const realSystems = systemsSource.filter((s: any) => {
-                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
-                const isGenre = s.name.startsWith('_')
-                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
-                const hasExtension = s.extension && s.extension.length > 0
-                return !isAuto && !isGenre && !isCustom && hasExtension && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
-              })
+              const realSystems = systemsSource.filter(isGameSystem)
               
               const groups: Record<string, any[]> = {}
               realSystems.forEach((s: any) => {
@@ -1784,12 +1914,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             submenu: (() => {
               const systemsSource = allSystems || []
               const realSystems = systemsSource.filter((s: any) => {
-                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
-                const isGenre = s.name.startsWith('_')
-                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
-                const hasExtension = s.extension && s.extension.length > 0
                 const isMaster = s.group && s.name.toLowerCase() === s.group.toLowerCase()
-                return !isAuto && !isGenre && !isCustom && hasExtension && s.group && !isMaster && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
+                return isGameSystem(s) && s.group && !isMaster
               })
               
               if (realSystems.length === 0) {
@@ -1893,13 +2019,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             tab: 0,
             submenu: (() => {
               const systemsSource = allSystems || []
-              const scrapableSystems = systemsSource.filter((s: any) => {
-                const isAuto = ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players'].includes(s.name)
-                const isGenre = s.name.startsWith('_')
-                const isCustom = s.name.startsWith('auto-') || s.name.startsWith('custom-')
-                const hasExtension = s.extension && s.extension.length > 0
-                return !isAuto && !isGenre && !isCustom && hasExtension && s.name !== 'hardware' && s.theme !== 'hardware' && s.hardware !== 'hardware'
-              })
+              const scrapableSystems = systemsSource.filter(isGameSystem)
 
               if (scrapableSystems.length === 0) {
                 return [{ id: 'no_scraper_systems', label: t('NO SYSTEMS FOUND'), type: 'info', value: '' }] as MenuItem[]
@@ -2547,7 +2667,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       )
     }
     if (item.type === 'slider') {
-      const currentVal = getSetting(item.settingName!, item.min ?? 0)
+      const currentVal = getSetting(item.settingName!, item.allowAuto ? '' : (item.min ?? 0))
+      const isAuto = currentVal === '' || currentVal === 'AUTO' || currentVal === 'auto'
       return (
         <div className="menu-slider">
           <span 
@@ -2559,7 +2680,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           >
             ◁
           </span>
-          <span className="value">{currentVal}{item.suffix || '%'}</span>
+          <span className="value">
+            {isAuto ? t('AUTO') : `${currentVal}${item.suffix || '%'}`}
+          </span>
           <span 
             className="arrow-clickable" 
             onClick={(e) => {

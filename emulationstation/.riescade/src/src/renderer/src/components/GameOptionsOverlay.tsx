@@ -31,6 +31,66 @@ const getStarsString = (ratingVal: any): string => {
   return '★'.repeat(filledStars) + '☆'.repeat(5 - filledStars)
 }
 
+const formatDateForDisplay = (dateStr?: string, fallback = ''): string => {
+  if (!dateStr) return fallback
+  const clean = dateStr.trim()
+  const matchYmd = clean.match(/^(\d{4})(\d{2})(\d{2})(?:T\d+)?$/)
+  if (matchYmd) {
+    return `${matchYmd[3]}/${matchYmd[2]}/${matchYmd[1]}`
+  }
+  const matchHyphen = clean.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (matchHyphen) {
+    return `${matchHyphen[3]}/${matchHyphen[2]}/${matchHyphen[1]}`
+  }
+  return clean
+}
+
+const parseDateForDb = (dateStr?: string): string => {
+  if (!dateStr) return ''
+  const clean = dateStr.trim()
+  const matchDmy = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  if (matchDmy) {
+    const d = matchDmy[1].padStart(2, '0')
+    const m = matchDmy[2].padStart(2, '0')
+    const y = matchDmy[3]
+    return `${y}${m}${d}T000000`
+  }
+  const matchYmd = clean.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (matchYmd) {
+    const y = matchYmd[1]
+    const m = matchYmd[2]
+    const d = matchYmd[3]
+    return `${y}${m}${d}T000000`
+  }
+  const matchYear = clean.match(/^(\d{4})$/)
+  if (matchYear) {
+    return `${matchYear[1]}0101T000000`
+  }
+  return clean
+}
+
+const getEmulatorValue = (
+  emulator: string | undefined,
+  core: string | undefined,
+  emulators: any[] | undefined,
+  autoValue: string = ''
+): string => {
+  if (!emulator || emulator === 'auto' || emulator === '') return autoValue
+  
+  const foundEmulator = emulators?.find(e => e.name.toLowerCase() === emulator.toLowerCase())
+  if (foundEmulator && foundEmulator.cores && foundEmulator.cores.length > 0) {
+    if (core && core !== 'auto' && core !== '') {
+      const matchedCore = foundEmulator.cores.find((c: any) => String(c).toLowerCase() === core.toLowerCase())
+      if (matchedCore) {
+        return `${foundEmulator.name}:${matchedCore}`
+      }
+    }
+    return `${foundEmulator.name}:${foundEmulator.cores[0]}`
+  }
+  
+  return foundEmulator ? foundEmulator.name : emulator
+}
+
 const fields = [
   { key: 'name', label: 'NAME' },
   { key: 'desc', label: 'DESCRIPTION' },
@@ -308,11 +368,26 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         label: 'EMULATOR',
         type: 'select',
         settingName: 'emulator',
-        value: currentGame.emulator || 'auto',
-        items: [
-          { label: 'AUTO', value: 'auto' },
-          ...(sys.emulators?.map(e => ({ label: e.name.toUpperCase(), value: e.name })) || [])
-        ]
+        value: getEmulatorValue(currentGame.emulator, currentGame.core, sys.emulators, 'auto'),
+        items: (() => {
+          const opts = [{ label: 'AUTO', value: 'auto' }]
+          sys.emulators?.forEach(e => {
+            if (e.cores && e.cores.length > 0) {
+              e.cores.forEach((c: any) => {
+                opts.push({
+                  label: `${e.name.toUpperCase()}: ${String(c).toUpperCase()}`,
+                  value: `${e.name}:${c}`
+                })
+              })
+            } else {
+              opts.push({
+                label: e.name.toUpperCase(),
+                value: e.name
+              })
+            }
+          })
+          return opts
+        })()
       },
       {
         id: 'game_ratio',
@@ -421,6 +496,15 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
   }, [isOpen, isSaveStateManagerOpen])
 
+  useEffect(() => {
+    if (isOpen && showMetadataEditor) {
+      const selectedEl = document.querySelector('.riescade-metadata-row.selected')
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+      }
+    }
+  }, [metadataSelectedIndex, showMetadataEditor, isOpen])
+
   const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
   const currentMenu = currentStackItem ? (currentStackItem.tabs && currentStackItem.activeTab !== undefined ? currentStackItem.items.filter(item => item.tab === currentStackItem.activeTab) : currentStackItem.items) : []
   const menuTitle = currentStackItem?.title || 'GAME OPTIONS'
@@ -472,7 +556,18 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       const nextVal = item.items[nextIdx].value
 
       if (item.id === 'game_emulator') {
-        const updated = { ...draftGame, emulator: nextVal, core: undefined }
+        let emulator = 'auto'
+        let core: string | undefined = undefined
+        if (nextVal !== 'auto') {
+          if (nextVal.includes(':')) {
+            const parts = nextVal.split(':')
+            emulator = parts[0]
+            core = parts[1]
+          } else {
+            emulator = nextVal
+          }
+        }
+        const updated = { ...draftGame, emulator, core }
         setDraftGame(updated)
         onUpdate(updated)
         setActiveMenuStack(prev => {
@@ -769,7 +864,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           if (e.key === 'Enter') {
             e.preventDefault()
             e.stopPropagation()
-            setDraftMetadata(prev => ({ ...prev, [activeInputField]: inputValue }))
+            const savedVal = activeInputField === 'releasedate' ? parseDateForDb(inputValue) : inputValue
+            setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
             setShowInputModal(false)
           } else if (e.key === 'Escape') {
             e.preventDefault()
@@ -827,7 +923,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               setDraftMetadata(prev => ({ ...prev, [field.key]: !prev[field.key as keyof Game] }))
             } else {
               setActiveInputField(field.key)
-              setInputValue((draftMetadata[field.key as keyof Game] as string) || '')
+              const rawVal = (draftMetadata[field.key as keyof Game] as string) || ''
+              setInputValue(field.key === 'releasedate' ? formatDateForDisplay(rawVal) : rawVal)
               setShowInputModal(true)
             }
           } else {
@@ -1073,9 +1170,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 <span className="menu-submenu-arrow">›</span>
               ) : item.type === 'select' ? (
                 <div className="menu-select">
-                  <span className="arrow">«</span>
+                  <span className="arrow">◁</span>
                   <span className="value">{item.items?.find(i => i.value === item.value)?.label || item.value}</span>
-                  <span className="arrow">»</span>
+                  <span className="arrow">▷</span>
                 </div>
               ) : item.type === 'info' ? (
                 <div className="menu-info" style={{ fontSize: '0.85rem', fontWeight: 600, color: index === selectedIndex ? '#fff' : '#888' }}>
@@ -1096,7 +1193,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const renderStageStage1 = () => {
     const dbKeys = ['ScreenScraper', 'ArcadeDB', 'TheGamesDB', 'HfsDB', 'IGDB']
     return (
-      <div className="riescade-overlay scraper-modal-overlay visible">
+      <div className="riescade-overlay scraper-modal-overlay game-options-scraper visible">
         <div className="scraper-modal-container db-select-modal">
           <h3 className="scraper-modal-title">BUSCAR MÍDIAS</h3>
           <div className="scraper-db-list">
@@ -1142,7 +1239,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const renderStageStage2 = () => {
     if (scraperIsSearching) {
       return (
-        <div className="riescade-overlay scraper-modal-overlay visible">
+        <div className="riescade-overlay scraper-modal-overlay game-options-scraper visible">
           <div className="scraper-modal-container searching-modal">
             <div className="scraper-spinner"></div>
             <p className="searching-text">BUSCANDO MÍDIAS NAS BASES DE DADOS...</p>
@@ -1153,7 +1250,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
     if (scraperMatches.length === 0) {
       return (
-        <div className="riescade-overlay scraper-modal-overlay visible">
+        <div className="riescade-overlay scraper-modal-overlay game-options-scraper visible">
           <div className="scraper-modal-container no-results-modal">
             <h3 className="scraper-modal-title">RESULTADOS</h3>
             <p className="no-results-text">NENHUMA MÍDIA ENCONTRADA PARA ESTE JOGO.</p>
@@ -1214,20 +1311,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     })
 
     const formatReleaseDate = (dateStr?: string) => {
-      if (!dateStr) return 'N/A'
-      try {
-        if (dateStr.length >= 8 && !dateStr.includes('-')) {
-          const y = dateStr.substring(0, 4)
-          const m = dateStr.substring(4, 6)
-          const d = dateStr.substring(6, 8)
-          return `${d}/${m}/${y}`
-        }
-        const date = new Date(dateStr)
-        if (!isNaN(date.getTime())) {
-          return date.toLocaleDateString('pt-BR')
-        }
-      } catch (e) {}
-      return dateStr
+      return formatDateForDisplay(dateStr) || 'N/A'
     }
 
     const renderStars = (rating?: number) => {
@@ -1251,7 +1335,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
 
     return (
-      <div className="riescade-overlay scraper-modal-overlay stage2-overlay visible">
+      <div className="riescade-overlay scraper-modal-overlay stage2-overlay game-options-scraper visible">
         <div className="scraper-header">
           <div className="rom-filename">{getRomFileName(game.path).toUpperCase()}</div>
           <div className="system-fullname">{(system.fullname || system.name).toUpperCase()}</div>
@@ -1451,7 +1535,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           <div className="riescade-metadata-modal-buttons">
             <button
               onClick={() => {
-                setDraftMetadata(prev => ({ ...prev, [activeInputField]: inputValue }))
+                const savedVal = activeInputField === 'releasedate' ? parseDateForDb(inputValue) : inputValue
+                setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
                 setShowInputModal(false)
               }}
               className="riescade-button"
@@ -1505,7 +1590,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                       setDraftMetadata(prev => ({ ...prev, [field.key]: !prev[field.key as keyof Game] }))
                     } else {
                       setActiveInputField(field.key)
-                      setInputValue((draftMetadata[field.key as keyof Game] as string) || '')
+                      const rawVal = (draftMetadata[field.key as keyof Game] as string) || ''
+                      setInputValue(field.key === 'releasedate' ? formatDateForDisplay(rawVal) : rawVal)
                       setShowInputModal(true)
                     }
                   }}
@@ -1520,9 +1606,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                     ) : (
                       <>
                         <span className="riescade-metadata-value-text">
-                          {field.type === 'rating' ? getStarsString(val) : val}
+                          {field.key === 'releasedate' ? formatDateForDisplay(val) : (field.type === 'rating' ? getStarsString(val) : val)}
                         </span>
-                        <span className="riescade-metadata-arrow">&gt;</span>
+                        <span className="riescade-metadata-arrow">›</span>
                       </>
                     )}
                   </div>
@@ -1571,7 +1657,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
   return (
     <>
-      <div className={`riescade-overlay riescade-menu-overlay game-options ${visible && scraperStage === 0 ? 'visible' : ''}`}>
+      <div className={`riescade-overlay riescade-menu-overlay ${showMetadataEditor ? 'game-options-metatada game-options-metadata' : 'game-options-root'} ${visible && scraperStage === 0 ? 'visible' : ''}`}>
         {!showMetadataEditor && scraperStage === 0 && (
           <div className="riescade-menu-container">
             <div className="riescade-menu-header">
