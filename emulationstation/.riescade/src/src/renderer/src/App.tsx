@@ -73,6 +73,14 @@ const resolveAbsolutePath = (systemPath: string, gamePath: string) => {
 	return resolvedParts.join('/').toLowerCase();
 };
 
+const escapeFileUrl = (url: string): string => {
+	if (url.startsWith('file://')) {
+		const [pathPart, ...queryParts] = url.split('?');
+		return [pathPart.replace(/#/g, '%23'), ...queryParts].join('?');
+	}
+	return url;
+};
+
 const getNotificationIcon = (category: string | undefined, type: string) => {
 	if (category === 'controller') {
 		return (
@@ -202,7 +210,7 @@ function App() {
 			srcUrl = `file:///${cleanPath}/${fileOrUrl}`;
 		}
 		
-		bgMusicRef.current.src = srcUrl;
+		bgMusicRef.current.src = escapeFileUrl(srcUrl);
 		bgMusicRef.current.load();
 		bgMusicRef.current.play().catch(e => {
 			console.warn('Playback blocked or failed:', e);
@@ -1109,11 +1117,11 @@ function App() {
 					const normalizedThemePath = theme.path.replace(/\\/g, '/');
 					return {
 						...g,
-						marquee: `file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`,
-						wheel: `file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`,
-						image: `file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`,
-						fanart: `file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`,
-						thumbnail: `file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`,
+						marquee: escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`),
+						wheel: escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`),
+						image: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`),
+						fanart: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`),
+						thumbnail: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`),
 					};
 				}
 				return g;
@@ -1174,21 +1182,23 @@ function App() {
 		if (selectedSystem && currentGame) {
 			const resolveMedia = (p?: string) => {
 				if (!p) return '';
-				if (p.startsWith('http') || p.startsWith('file://')) return p;
+				if (p.startsWith('http') || p.startsWith('file://')) return escapeFileUrl(p);
 				const normalized = p.replace(/\\/g, '/');
+				let url = normalized;
 				if (normalized.match(/^[a-zA-Z]:/) || normalized.startsWith('/')) {
-					return normalized.match(/^[a-zA-Z]:/) ? `file:///${normalized}` : `file://${normalized}`;
+					url = normalized.match(/^[a-zA-Z]:/) ? `file:///${normalized}` : `file://${normalized}`;
+				} else {
+					// Resolve relative paths (e.g. ./media/fanart/... or media/fanart/...) relative to game's system path
+					const sysLower = (currentGame.system || selectedSystem.name || '').toLowerCase();
+					const gameSystem = systems.find(s => s.name.toLowerCase() === sysLower);
+					if (gameSystem && gameSystem.path && !gameSystem.path.startsWith('virtual://')) {
+						const sysPath = gameSystem.path.replace(/\\/g, '/');
+						const cleanP = normalized.replace(/^\.\//, '');
+						const absolute = sysPath.endsWith('/') ? `${sysPath}${cleanP}` : `${sysPath}/${cleanP}`;
+						url = absolute.match(/^[a-zA-Z]:/) ? `file:///${absolute}` : `file://${absolute}`;
+					}
 				}
-				// Resolve relative paths (e.g. ./media/fanart/... or media/fanart/...) relative to game's system path
-				const sysLower = (currentGame.system || selectedSystem.name || '').toLowerCase();
-				const gameSystem = systems.find(s => s.name.toLowerCase() === sysLower);
-				if (gameSystem && gameSystem.path && !gameSystem.path.startsWith('virtual://')) {
-					const sysPath = gameSystem.path.replace(/\\/g, '/');
-					const cleanP = normalized.replace(/^\.\//, '');
-					const absolute = sysPath.endsWith('/') ? `${sysPath}${cleanP}` : `${sysPath}/${cleanP}`;
-					return absolute.match(/^[a-zA-Z]:/) ? `file:///${absolute}` : `file://${absolute}`;
-				}
-				return normalized;
+				return escapeFileUrl(url);
 			};
 
 			let gameImage = resolveMedia(currentGame.image);
@@ -1203,8 +1213,8 @@ function App() {
 				const normalizedThemePath = theme.path.replace(/\\/g, '/');
 				
 				// Standard theme paths for this collection folder using absolute file:/// URLs
-				const logoPath = `file:///${normalizedThemePath}/assets/logos/collections/${currentGame.name}.png`;
-				const artPath = `file:///${normalizedThemePath}/assets/arts/collections/${currentGame.name}.jpg`;
+				const logoPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${currentGame.name}.png`);
+				const artPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${currentGame.name}.jpg`);
 
 				gameMarquee = logoPath;
 				gameWheel = logoPath;

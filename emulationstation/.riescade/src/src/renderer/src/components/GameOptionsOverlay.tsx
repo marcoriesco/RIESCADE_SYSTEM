@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Game, System } from '../../../shared/types'
 
+const escapeFileUrl = (url: string): string => {
+  if (url.startsWith('file://')) {
+    const [pathPart, ...queryParts] = url.split('?')
+    return [pathPart.replace(/#/g, '%23'), ...queryParts].join('?')
+  }
+  return url
+}
+
 const getRomFileName = (path: string): string => {
   const parts = path.replace(/\\/g, '/').split('/')
   return parts[parts.length - 1] || ''
@@ -144,13 +152,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         if (bestImageUrl && bestImageUrl.startsWith('http')) {
           const localPath = await window.api.downloadTempMedia(bestImageUrl)
           if (localPath) {
-            updates.image = `file:///${localPath.replace(/\\/g, '/')}`
+            updates.image = escapeFileUrl(`file:///${localPath.replace(/\\/g, '/')}`)
           }
         } else if (videoUrl && videoUrl.startsWith('http')) {
           // Only download video if no image-type source is available
           const localPath = await window.api.downloadTempMedia(videoUrl)
           if (localPath) {
-            updates.video = `file:///${localPath.replace(/\\/g, '/')}`
+            updates.video = escapeFileUrl(`file:///${localPath.replace(/\\/g, '/')}`)
           }
         }
       } catch (err) {
@@ -180,15 +188,17 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
   const getMarqueeUrl = () => {
     if (!game.marquee) return null
-    if (game.marquee.startsWith('http') || game.marquee.startsWith('file://') || game.marquee.startsWith('data:')) {
-      return game.marquee
+    let url = game.marquee
+    if (!game.marquee.startsWith('http') && !game.marquee.startsWith('file://') && !game.marquee.startsWith('data:')) {
+      const normalized = game.marquee.replace(/\\/g, '/')
+      if (normalized.match(/^[a-zA-Z]:/) || normalized.startsWith('/')) {
+        url = `file:///${normalized.replace(/^\/+/, '')}`
+      } else {
+        const systemPath = (system.path || '').replace(/\\/g, '/')
+        url = `file:///${systemPath}/${normalized.replace(/^\.\//, '')}`
+      }
     }
-    const normalized = game.marquee.replace(/\\/g, '/')
-    if (normalized.match(/^[a-zA-Z]:/) || normalized.startsWith('/')) {
-      return `file:///${normalized.replace(/^\/+/, '')}`
-    }
-    const systemPath = (system.path || '').replace(/\\/g, '/')
-    return `file:///${systemPath}/${normalized.replace(/^\.\//, '')}`
+    return escapeFileUrl(url)
   }
 
   const getGameSettingKey = (settingName: string) => {

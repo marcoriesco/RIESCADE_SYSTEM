@@ -39,8 +39,9 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
 
   const resolveFilePath = (path: string) => {
     if (!path) return ''
-    if (path.startsWith('file://')) return path
-    return `file:///${path.replace(/\\/g, '/')}`
+    const url = path.startsWith('file://') ? path : `file:///${path.replace(/\\/g, '/')}`
+    const [pathPart, ...queryParts] = url.split('?')
+    return [pathPart.replace(/#/g, '%23'), ...queryParts].join('?')
   }
 
   return (

@@ -1,3 +1,11 @@
+const escapeFileUrl = (url: string): string => {
+  if (url.startsWith('file://')) {
+    const [pathPart, ...queryParts] = url.split('?')
+    return [pathPart.replace(/#/g, '%23'), ...queryParts].join('?')
+  }
+  return url
+}
+
 /**
  * Resolves a path to a file:// URL suitable for Electron rendering.
  * Handles variables, relative paths, and Windows absolute paths.
@@ -24,7 +32,7 @@ export const resolvePath = (path: string | undefined, data?: any): string => {
         url = url.includes('?') ? `${url}&rev=${mediaRev}` : `${url}?rev=${mediaRev}`
       }
     }
-    return url
+    return escapeFileUrl(url)
   }
 
   // Ensure it's a file:/// URL for Electron if it's an absolute path
@@ -45,5 +53,5 @@ export const resolvePath = (path: string | undefined, data?: any): string => {
     }
   }
 
-  return url
+  return escapeFileUrl(url)
 }
