@@ -879,4 +879,16 @@ export class DatabaseService {
       cheevosHash: row.cheevos_hash || undefined
     } as any
   }
+
+  public getRandomGameWithMedia(mediaType: 'video' | 'image'): Game | null {
+    const db = this.ensureOpen()
+    const field = mediaType === 'video' ? 'video' : 'image'
+    try {
+      const row = db.prepare(`SELECT * FROM games WHERE ${field} IS NOT NULL AND ${field} != '' AND hidden = 0 ORDER BY RANDOM() LIMIT 1`).get() as any
+      return row ? this.rowToGame(row) : null
+    } catch (e) {
+      console.error(`Failed to get random game with ${mediaType}:`, e)
+      return null
+    }
+  }
 }

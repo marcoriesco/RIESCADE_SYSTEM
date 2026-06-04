@@ -5,6 +5,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { LibraryService } from './services/LibraryService'
 import { LauncherService } from './services/LauncherService'
 import { ThemeService } from './services/ThemeService'
+import { NetplayService } from './services/NetplayService'
 import { SettingsParser } from './parsers/SettingsParser'
 import { ThemeSettingsParser } from './parsers/ThemeSettingsParser'
 import { SystemService } from './services/SystemService'
@@ -15,6 +16,9 @@ import { watch, FSWatcher, readFileSync, existsSync, writeFileSync, mkdirSync } 
 import { getRetroBatPath, getConfigPath, getDefaultThemePath, getUserThemesPath, getMusicPath } from './utils/paths'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from './services/ScraperService'
+import { setupLogger } from './utils/logger'
+
+setupLogger()
 
 const libraryService = new LibraryService()
 const launcherService = new LauncherService()
@@ -127,6 +131,22 @@ app.whenReady().then(() => {
     }
     
     return result
+  })
+
+  ipcMain.handle('get-netplay-lobby', async () => {
+    const netplayService = new NetplayService()
+    return netplayService.getLobbyList()
+  })
+
+  ipcMain.handle('launch-netplay-game', async (_, game: Game, system: System, netplayOptions: any) => {
+    let targetSystem = system
+    if (system.name === 'collections' || (game.system && game.system.toLowerCase() !== system.name.toLowerCase())) {
+      const realSystem = libraryService.getSystems().find(s => s.name.toLowerCase() === game.system.toLowerCase())
+      if (realSystem) {
+        targetSystem = realSystem
+      }
+    }
+    return launcherService.launch(game, targetSystem, activeControllers, undefined, netplayOptions)
   })
 
   ipcMain.handle('scan-save-states', async (_, systemName: string, gamePath: string) => {
@@ -388,6 +408,42 @@ app.whenReady().then(() => {
 
   ipcMain.handle('clear-caches', async () => {
     return libraryService.clearCaches()
+  })
+
+  ipcMain.handle('get-random-game-with-media', async (_, mediaType: 'video' | 'image') => {
+    return libraryService.getRandomGameWithMedia(mediaType)
+  })
+
+  ipcMain.handle('get-network-connection-type', async () => {
+    try {
+      const { networkInterfaces } = require('os')
+      const interfaces = networkInterfaces()
+      let hasWifi = false
+      let hasEthernet = false
+      let hasInternet = false
+
+      for (const [name, info] of Object.entries(interfaces)) {
+        if (!info) continue
+        for (const addr of info) {
+          if (!addr.internal && addr.family === 'IPv4') {
+            hasInternet = true
+            const lowerName = name.toLowerCase()
+            if (lowerName.includes('wi-fi') || lowerName.includes('wifi') || lowerName.includes('wireless') || lowerName.includes('wlan')) {
+              hasWifi = true
+            } else if (lowerName.includes('ethernet') || lowerName.includes('lan') || lowerName.includes('conexão local')) {
+              hasEthernet = true
+            }
+          }
+        }
+      }
+
+      if (!hasInternet) return 'none'
+      if (hasWifi) return 'wifi'
+      if (hasEthernet) return 'ethernet'
+      return 'other'
+    } catch (e) {
+      return 'unknown'
+    }
   })
 
   ipcMain.handle('get-db-stats', async () => {

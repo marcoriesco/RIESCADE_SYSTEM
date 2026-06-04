@@ -11,6 +11,8 @@ declare global {
       updateGame: (systemName: string, gameData: any) => Promise<void>
       deleteGame: (systemName: string, gamePath: string, deletePhysical: boolean) => Promise<void>
       launchGame: (game: any, system: any, saveStateSlot?: number) => Promise<any>
+      getNetplayLobby: () => Promise<any[]>
+      launchNetplayGame: (game: any, system: any, netplayOptions: any) => Promise<any>
       scanSaveStates: (systemName: string, gamePath: string) => Promise<any[]>
       getCustomCollections: () => Promise<string[]>
       getCollectionGames: (collectionName: string) => Promise<any[]>
@@ -38,6 +40,8 @@ declare global {
       resetGamelistUsage: () => Promise<any>
       resetFileExtensions: () => Promise<any>
       clearCaches: () => Promise<any>
+      getRandomGameWithMedia: (mediaType: 'video' | 'image') => Promise<any>
+      getNetworkConnectionType: () => Promise<'wifi' | 'ethernet' | 'none' | 'other' | 'unknown'>
       getDbStats: () => Promise<{ totalGames: number; indexedSystems: number; systemsInfo: any[] }>
       rebuildDatabase: () => Promise<boolean>
       getLibraryMode: () => Promise<'database' | 'gamelist'>

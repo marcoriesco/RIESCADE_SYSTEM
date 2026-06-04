@@ -155,6 +155,7 @@ interface MenuProps {
   selectedSystem?: any
   onUpdateGamelists?: (systemName?: string) => void
   settings: Record<string, any>
+  onOpenNetplayLobby?: () => void
 }
 
 const getGamepadGuid = (pad: Gamepad): string => {
@@ -181,7 +182,7 @@ const isGameSystem = (s: any) => {
   return allowedHardware.includes(hw)
 }
 
-export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists, settings: initialSettings }) => {
+export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists, settings: initialSettings, onOpenNetplayLobby }) => {
   const [settings, setSettings] = useState<Record<string, any>>(initialSettings || {})
 
   useEffect(() => {
@@ -966,7 +967,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           { id: 'netplay_submenu', label: t('NETPLAY SETTINGS'), submenu: [
             { id: 'netplay_enable', label: t('ENABLE NETPLAY'), type: 'toggle', settingName: 'global.netplay', settingType: 'bool' },
             { id: 'netplay_nickname', label: t('NICKNAME'), type: 'input', settingName: 'global.netplay.nickname', settingType: 'string' },
-            { id: 'netplay_port', label: t('PORT'), type: 'input', settingName: 'global.netplay.port', settingType: 'string' }
+            { id: 'netplay_port', label: t('PORT'), type: 'input', settingName: 'global.netplay.port', settingType: 'string' },
+            { id: 'netplay_auto_lobby', label: t('AUTOMATIC LOBBY CREATION'), type: 'toggle', settingName: 'NetPlayAutomaticallyCreateLobby', settingType: 'bool' },
+            { id: 'netplay_open_lobby', label: t('CONNECT TO NETPLAY'), type: 'action', onClick: () => {
+              handleSaveQuietly(pendingSettings).then(() => {
+                onClose()
+                if (onOpenNetplayLobby) {
+                  onOpenNetplayLobby()
+                }
+              })
+            }}
           ]},
           { id: 'group_bios', label: t('BIOS SETTINGS'), type: 'group' },
           {
@@ -1631,10 +1641,21 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               })) as MenuItem[]
             })()
           },
-          { id: 'group_ui_gen', label: t('GENERAL UI'), type: 'group' },
-          { id: 'screensaver_time', label: t('SCREENSAVER'), type: 'select', settingName: 'ScreenSaverTime', options: [
-            { label: t('OFF'), value: '0' }, { label: t('1 MIN'), value: '60000' },
-            { label: t('5 MIN'), value: '300000' }
+          { id: 'group_ui_gen', label: t('DISPLAY OPTIONS'), type: 'group' },
+          { id: 'screensaver_settings', label: t('SCREENSAVER SETTINGS'), submenu: [
+            { id: 'screensaver_time', label: t('START SCREENSAVER AFTER'), type: 'select', settingName: 'ScreenSaverTime', options: [
+              { label: t('OFF'), value: '0' }, 
+              { label: t('1 MIN'), value: '60000' },
+              { label: t('5 MIN'), value: '300000' },
+              { label: t('10 MIN'), value: '600000' },
+            ]},
+            { id: 'screensaver_type', label: t('SCREENSAVER TYPE'), type: 'select', settingName: 'ScreenSaverType', options: [
+              { label: t('DIM'), value: 'dim' }, 
+              { label: t('BLACK'), value: 'black' },
+              { label: t('RANDOM VIDEO'), value: 'video' },
+              { label: t('SLIDESHOW'), value: 'slide' },
+              { label: t('SUSPEND'), value: 'suspend' },
+            ]}
           ]}
         ]
       },
@@ -1686,7 +1707,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             const savedName = getSetting(nameSetting)
 
             const options = [
-              { label: t('AUTOMATIC'), value: 'DEFAULT' }
+              { label: t('AUTO'), value: '' }
             ]
 
             connectedGamepads.forEach(pad => {
@@ -2157,14 +2178,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               value: lang 
             }))
           },
-          { id: 'clock_mode', label: t('SHOW CLOCK IN 12-HOUR FORMAT'), type: 'toggle', settingName: 'ClockMode12', settingType: 'bool' },
-          { id: 'power_saving', label: t('POWER SAVING MODE'), type: 'select', settingName: 'PowerSaverMode', description: t('Reduces power consumption when idle (useful for handhelds).'), options: [
-            { label: t('DISABLED'), value: 'disabled' },
-            { label: t('DEFAULT'), value: 'default' },
-            { label: t('ENHANCED'), value: 'enhanced' },
-            { label: t('INSTANT'), value: 'instant' }
-          ]},
-          { id: 'screen_reader', label: t('SCREEN READER (TEXT TO SPEECH)'), type: 'toggle', settingName: 'TTS', settingType: 'bool' },
           { id: 'ui_mode', label: t('USER INTERFACE MODE'), type: 'select', settingName: 'UIMode', description: t('Lock down certain config menus for use with guest users/kids.'), options: [
             { label: t('FULL'), value: 'Full' },
             { label: t('BASIC'), value: 'Basic' },
@@ -2181,14 +2194,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             // === TOOLS ===
             { id: 'group_dev_tools', label: t('TOOLS'), type: 'group' },
             { 
-              id: 'public_web_api', 
-              label: t('ENABLE PUBLIC WEB API ACCESS'), 
-              type: 'toggle', 
-              settingName: 'PublicWebAccess', 
-              settingType: 'bool', 
-              description: t('Allow public web access API using') + ' http://' + hostname + ':1234'
-            },
-            { 
               id: 'log_level', 
               label: t('LOG LEVEL'), 
               type: 'select', 
@@ -2203,44 +2208,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               ]
             },
             { 
-              id: 'clean_gamelists_action', 
-              label: t('CLEAN GAMELISTS & REMOVE UNUSED MEDIA'), 
-              type: 'action', 
-              onClick: () => {
-                if (confirm(t('Are you sure you want to clean gamelists? ROM entries that do not exist will be deleted, and missing media paths will be removed.'))) {
-                  window.api.cleanGamelists().then(() => alert(t('Gamelist cleaning completed!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
-                }
-              } 
-            },
-            { 
-              id: 'reset_gamelist_usage_action', 
-              label: t('RESET GAMELISTS USAGE DATA'), 
-              type: 'action', 
-              onClick: () => {
-                if (confirm(t('Are you sure you want to reset play count, last played time, and game time for all games? This cannot be undone.'))) {
-                  window.api.resetGamelistUsage().then(() => alert(t('Gamelist usage data reset!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
-                }
-              } 
-            },
-            { 
-              id: 'reset_file_extensions_action', 
-              label: t('RESET FILE EXTENSIONS'), 
-              type: 'action', 
-              onClick: () => {
-                if (confirm(t('Are you sure you want to clear custom hidden extensions config?'))) {
-                  window.api.resetFileExtensions().then(() => alert(t('Hidden extensions reset!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
-                }
-              } 
-            },
-            { 
-              id: 'redetect_lang_region_action', 
-              label: t("REDETECT ALL GAMES' LANG/REGION"), 
-              type: 'action', 
-              onClick: () => {
-                alert(t('Language and region redetection is processed in background by EmulationStation.'))
-              } 
-            },
-            { 
               id: 'find_netplay_achievements_action', 
               label: t('FIND ALL GAMES WITH NETPLAY/ACHIEVEMENTS'), 
               type: 'action', 
@@ -2251,94 +2218,27 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { 
               id: 'clear_caches_action', 
               label: t('CLEAR CACHES'), 
-              type: 'action', 
+              type: 'action',
+              description: t("This will clear all media cache and game database."), 
               onClick: () => {
                 if (confirm(t('Are you sure you want to delete cache files?'))) {
-                  window.api.clearCaches().then(() => alert(t('Caches cleared successfully!'))).catch((err: any) => alert(t('Error:') + ' ' + err))
+                  window.api.clearCaches().then(() => {
+                    window.api.executeCommand('restart-frontend')
+                  }).catch((err: any) => alert(t('Error:') + ' ' + err))
                 }
               } 
-            },
-
-            // === DISPLAY SETTINGS ===
-            { id: 'group_dev_display', label: t('DISPLAY SETTINGS'), type: 'group' },
-            { 
-              id: 'menu_font_scale', 
-              label: t('MENU FONT SCALE'), 
-              type: 'select', 
-              settingName: 'MenuFontScale', 
-              settingType: 'string',
-              options: [
-                { label: t('AUTO'), value: '' },
-                { label: '50%', value: '0.5' },
-                { label: '75%', value: '0.75' },
-                { label: '100%', value: '1.0' },
-                { label: '110%', value: '1.1' },
-                { label: '125%', value: '1.25' },
-                { label: '133%', value: '1.31' },
-                { label: '150%', value: '1.5' },
-                { label: '175%', value: '1.75' },
-                { label: '200%', value: '2' }
-              ]
-            },
-            { 
-              id: 'theme_font_scale', 
-              label: t('THEME FONT SCALE'), 
-              type: 'select', 
-              settingName: 'FontScale', 
-              settingType: 'string',
-              options: [
-                { label: t('AUTO'), value: '' },
-                { label: '50%', value: '0.5' },
-                { label: '75%', value: '0.75' },
-                { label: '100%', value: '1.0' },
-                { label: '110%', value: '1.1' },
-                { label: '125%', value: '1.25' },
-                { label: '133%', value: '1.31' },
-                { label: '150%', value: '1.5' },
-                { label: '175%', value: '1.75' },
-                { label: '200%', value: '2' }
-              ]
-            },
-            { 
-              id: 'fullscreen_menus', 
-              label: t('FULL SCREEN MENUS'), 
-              type: 'select', 
-              settingName: 'FullScreenMenu', 
-              settingType: 'string',
-              options: [
-                { label: t('AUTO'), value: '' },
-                { label: t('YES'), value: 'true' },
-                { label: t('NO'), value: 'false' }
-              ]
-            },
-            { 
-              id: 'force_small_screen_theming', 
-              label: t('FORCE SMALL SCREEN THEMING'), 
-              type: 'select', 
-              settingName: 'ForceSmallScreen', 
-              settingType: 'string',
-              options: [
-                { label: t('AUTO'), value: '' },
-                { label: t('YES'), value: 'true' },
-                { label: t('NO'), value: 'false' }
-              ]
             },
 
             // === DATA MANAGEMENT ===
             { id: 'group_dev_data', label: t('DATA MANAGEMENT'), type: 'group' },
             { id: 'ignore_multidisk', label: t('IGNORE MULTI-FILE DISK CONTENT (CUE/GDI/CCD/M3U)'), type: 'toggle', settingName: 'RemoveMultiDiskContent', settingType: 'bool' },
             { id: 'enable_filtering', label: t('ENABLE GAME FILTERING'), type: 'toggle', settingName: 'ForceDisableFilters', settingType: 'bool', invert: true },
-            { id: 'save_metadata_exit', label: t('SAVE METADATA ON EXIT'), type: 'toggle', settingName: 'SaveGamelistsOnExit', settingType: 'bool' },
             { id: 'parse_gamelist_only', label: t('PARSE GAMELISTS ONLY'), type: 'toggle', settingName: 'ParseGamelistOnly', settingType: 'bool', description: t("Debug tool: Don't check if the ROMs actually exist. Can cause problems!") },
             { id: 'search_local_art', label: t('SEARCH FOR LOCAL ART'), type: 'toggle', settingName: 'LocalArt', settingType: 'bool', description: t("If no image is specified in the gamelist, try to find media with the same filename to use.") },
 
             // === USER INTERFACE ===
             { id: 'group_dev_ui', label: t('USER INTERFACE'), type: 'group' },
-            { id: 'carousel_transitions', label: t('CAROUSEL TRANSITIONS'), type: 'toggle', settingName: 'MoveCarousel', settingType: 'bool' },
-            { id: 'quick_system_select', label: t('QUICK SYSTEM SELECT'), type: 'toggle', settingName: 'QuickSystemSelect', settingType: 'bool' },
-            { id: 'quick_jump_letter', label: t('QUICK JUMP LETTER'), type: 'toggle', settingName: 'QuickJumpLetter', settingType: 'bool' },
             { id: 'osk', label: t('ON-SCREEN KEYBOARD'), type: 'toggle', settingName: 'UseOSK', settingType: 'bool' },
-            { id: 'hide_es_run', label: t('HIDE EMULATIONSTATION WHEN RUNNING A GAME'), type: 'toggle', settingName: 'HideWindow', settingType: 'bool' },
             { id: 'complete_quit_menu', label: t('COMPLETE QUIT MENU'), type: 'toggle', settingName: 'ShowOnlyExit', settingType: 'bool', invert: true },
             { 
               id: 'retroarch_menu_driver', 
@@ -2354,8 +2254,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 { label: 'glui', value: 'glui' }
               ]
             },
-            { id: 'invert_buttons', label: t('SWITCH CONFIRM & CANCEL BUTTONS IN EMULATIONSTATION'), type: 'toggle', settingName: 'InvertButtons', settingType: 'bool', description: t("Switches the South and East buttons' functionality") },
-            { id: 'game_options_north', label: t('ACCESS GAME OPTIONS WITH NORTH BUTTON'), type: 'toggle', settingName: 'GameOptionsAtNorth', settingType: 'bool', description: t("Switches to short-press North for Savestates & long-press South button for Game Options") },
             { id: 'first_joystick_only', label: t('CONTROL EMULATIONSTATION WITH FIRST JOYSTICK ONLY'), type: 'toggle', settingName: 'FirstJoystickOnly', settingType: 'bool' },
             { id: 'gun_move_tolerence', label: t('GUN MOVE TOLERENCE'), type: 'slider', settingName: 'GunMoveTolerence', settingType: 'float', min: 0, max: 10, step: 0.1, suffix: '%' },
             { id: 'hid_joysticks', label: t('ENABLE HID JOYSTICK DRIVERS'), type: 'toggle', settingName: 'HidJoysticks', settingType: 'bool' },
@@ -2363,8 +2261,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
             // === OPTIMIZATIONS ===
             { id: 'group_dev_optimizations', label: t('OPTIMIZATIONS'), type: 'group' },
-            { id: 'preload_ui', label: t('PRELOAD UI ELEMENTS ON BOOT'), type: 'toggle', settingName: 'PreloadUI', settingType: 'bool', description: t("Reduces lag when entering gamelists from the system menu, increases boot time") },
-            { id: 'preload_medias', label: t('PRELOAD METADATA MEDIA ON BOOT'), type: 'toggle', settingName: 'PreloadMedias', settingType: 'bool', description: t("Reduces lag when scrolling through a fully scraped gamelist, increases boot time") },
             { id: 'threaded_loading', label: t('THREADED LOADING'), type: 'toggle', settingName: 'ThreadedLoading', settingType: 'bool' },
             { id: 'async_images', label: t('ASYNC IMAGE LOADING'), type: 'toggle', settingName: 'AsyncImages', settingType: 'bool' },
             { id: 'optimize_vram', label: t('OPTIMIZE IMAGES VRAM USE'), type: 'toggle', settingName: 'OptimizeVRAM', settingType: 'bool' },

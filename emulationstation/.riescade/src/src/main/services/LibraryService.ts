@@ -991,16 +991,16 @@ export class LibraryService {
     }
 
     try {
-      const logStr = `getGames systemName: ${systemName}\n  systemFound: ${!!system}\n  systemPath: ${system ? system.path : 'N/A'}\n  gamelistPath: ${gamelistPath} (exists: ${existsSync(gamelistPath)})\n  romsGamelistPath: ${romsGamelistPath} (exists: ${romsGamelistPath ? existsSync(romsGamelistPath) : false})\n  systemGamelistPath: ${systemGamelistPath} (exists: ${systemGamelistPath ? existsSync(systemGamelistPath) : false})\n  finalSource: ${source}\n  gamesCount: ${games.length}\n\n`
-      readFileSync(join(configPath, '..', '.riescade', 'src', 'debug_games.log')) // Force dependency
+      const { getRiescadePath } = require('../utils/paths')
+      const logsDir = join(getRiescadePath(), 'logs')
       const fs = require('fs')
-      fs.appendFileSync(join(configPath, '..', '.riescade', 'src', 'debug_games.log'), logStr, 'utf-8')
+      if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true })
+      }
+      const logStr = `getGames systemName: ${systemName}\n  systemFound: ${!!system}\n  systemPath: ${system ? system.path : 'N/A'}\n  gamelistPath: ${gamelistPath} (exists: ${existsSync(gamelistPath)})\n  romsGamelistPath: ${romsGamelistPath} (exists: ${romsGamelistPath ? existsSync(romsGamelistPath) : false})\n  systemGamelistPath: ${systemGamelistPath} (exists: ${systemGamelistPath ? existsSync(systemGamelistPath) : false})\n  finalSource: ${source}\n  gamesCount: ${games.length}\n\n`
+      fs.appendFileSync(join(logsDir, 'debug_games.log'), logStr, 'utf-8')
     } catch(e) {
-      try {
-        const fs = require('fs')
-        const logStr = `getGames systemName: ${systemName}\n  systemFound: ${!!system}\n  systemPath: ${system ? system.path : 'N/A'}\n  finalSource: ${source}\n  gamesCount: ${games.length}\n\n`
-        fs.appendFileSync(join(configPath, '..', '.riescade', 'src', 'debug_games.log'), logStr, 'utf-8')
-      } catch (err) {}
+      console.error('Failed to write debug_games.log:', e)
     }
 
     const localArtEnabled = settings.getSetting('LocalArt', 'bool') === true
@@ -1819,6 +1819,33 @@ export class LibraryService {
     const fs = require('fs')
     const os = require('os')
     const configPath = getConfigPath()
+    const { getDatabasePath } = require('../utils/paths')
+    
+    // 1. Close database connection
+    try {
+      if (LibraryService.databaseService) {
+        LibraryService.databaseService.close()
+      }
+    } catch (e) {
+      console.error('Failed to close database in clearCaches:', e)
+    }
+
+    // 2. Delete database files
+    try {
+      const dbPath = getDatabasePath()
+      if (fs.existsSync(dbPath)) {
+        fs.unlinkSync(dbPath)
+        console.log(`Database deleted: ${dbPath}`)
+      }
+      if (fs.existsSync(dbPath + '-wal')) {
+        fs.unlinkSync(dbPath + '-wal')
+      }
+      if (fs.existsSync(dbPath + '-shm')) {
+        fs.unlinkSync(dbPath + '-shm')
+      }
+    } catch (e) {
+      console.error('Failed to delete database files in clearCaches:', e)
+    }
     
     const deleteDirFiles = (dir: string) => {
       if (!fs.existsSync(dir)) return
@@ -1944,5 +1971,25 @@ export class LibraryService {
       console.error(`Error scanning save states in ${savesDir}:`, e)
       return []
     }
+  }
+
+  public getRandomGameWithMedia(mediaType: 'video' | 'image'): Game | null {
+    if (LibraryService.isDbMode() && LibraryService.databaseService.isOpen()) {
+      return LibraryService.databaseService.getRandomGameWithMedia(mediaType)
+    }
+    
+    const systems = this.getSystems()
+    const validSystems = systems.filter(s => !s.path.startsWith('virtual://') && s.name !== 'collections')
+    if (validSystems.length === 0) return null
+    
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const randSys = validSystems[Math.floor(Math.random() * validSystems.length)]
+      const games = this.getGames(randSys.name)
+      const matches = games.filter(g => mediaType === 'video' ? !!g.video : !!g.image)
+      if (matches.length > 0) {
+        return matches[Math.floor(Math.random() * matches.length)]
+      }
+    }
+    return null
   }
 }

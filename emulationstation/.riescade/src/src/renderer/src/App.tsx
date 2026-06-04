@@ -5,6 +5,7 @@ import { GameOptionsOverlay } from './components/GameOptionsOverlay';
 import { LaunchScreen } from './components/LaunchScreen';
 import { HardwareSelectOverlay } from './components/HardwareSelectOverlay';
 import { SaveStateManagerOverlay } from './components/SaveStateManagerOverlay';
+import { NetplayLobbyOverlay } from './components/NetplayLobbyOverlay';
 
 // Simple types inline - no need for separate store
 interface System {
@@ -116,10 +117,31 @@ const getNotificationIcon = (category: string | undefined, type: string) => {
 	);
 };
 
+// Load locale files for translations
+const localeModules = import.meta.glob('./locales/*.json', { eager: true })
+const appLocales: Record<string, any> = {}
+Object.entries(localeModules).forEach(([path, module]: [string, any]) => {
+  const lang = path.split('/').pop()?.replace('.json', '')
+  if (lang) appLocales[lang] = module.default || module
+})
+
 function App() {
 	// ─── State ───
 	const [systems, setSystems] = useState<System[]>([]);
 	const [games, setGames] = useState<Game[]>([]);
+
+	// Screensaver & Network states
+	const [isScreensaverActive, setIsScreensaverActive] = useState(false);
+	const [screensaverGame, setScreensaverGame] = useState<Game | null>(null);
+	const [slideshowGame, setSlideshowGame] = useState<Game | null>(null);
+
+	const lastActivityTimeRef = useRef(Date.now());
+	const isScreensaverActiveRef = useRef(false);
+
+	// Keep ref in sync
+	useEffect(() => {
+		isScreensaverActiveRef.current = isScreensaverActive;
+	}, [isScreensaverActive]);
 	const [theme, setTheme] = useState<any>(null);
 	const [systemIndex, setSystemIndex] = useState(0);
 	const [selectedSystem, setSelectedSystem] = useState<System | null>(null);
@@ -127,6 +149,8 @@ function App() {
 	const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLaunching, setIsLaunching] = useState(false);
+	const [launchingGame, setLaunchingGame] = useState<Game | null>(null);
+	const [launchingSystem, setLaunchingSystem] = useState<System | null>(null);
 	const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
 	const [isHardwareSelectOpen, setIsHardwareSelectOpen] = useState(false);
 	const [isInitializing, setIsInitializing] = useState(true);
@@ -142,6 +166,7 @@ function App() {
 	const [isSaveStateManagerOpen, setIsSaveStateManagerOpen] = useState(false);
 	const [saveManagerGame, setSaveManagerGame] = useState<Game | null>(null);
 	const [saveManagerSystem, setSaveManagerSystem] = useState<System | null>(null);
+	const [isNetplayLobbyOpen, setIsNetplayLobbyOpen] = useState(false);
 	const [hasRestoredLastSystem, setHasRestoredLastSystem] = useState(false);
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
 	const [isLoadingGames, setIsLoadingGames] = useState(false);
@@ -155,6 +180,15 @@ function App() {
 			}, 3000);
 		},
 		[],
+	);
+
+	// ─── Translation function ───
+	const t = useCallback(
+		(key: string): string => {
+			const lang = settings['Language']?.value || 'en_US';
+			return appLocales[lang]?.[key] || appLocales['en_US']?.[key] || key;
+		},
+		[settings],
 	);
 
 	// ─── Audio System State & Refs ───
@@ -653,6 +687,20 @@ function App() {
 			}
 
 			if (hasActivity) {
+				lastActivityTimeRef.current = Date.now();
+				if (isScreensaverActiveRef.current) {
+					setIsScreensaverActive(false);
+					// Mark buttons as pressed to avoid triggering actions on release
+					const gpActive = Array.from(gamepads).find(g => g !== null);
+					if (gpActive) {
+						for (let i = 0; i < gpActive.buttons.length; i++) {
+							gamepadButtonsStateRef.current[i] = gpActive.buttons[i].pressed;
+						}
+					}
+					rafId = requestAnimationFrame(pollGamepad);
+					return;
+				}
+
 				const elements = document.querySelectorAll('riescade-controller-activity, [riescade-controller-activity]');
 				if (elements.length > 0) {
 					elements.forEach(el => el.classList.add('active'));
@@ -1099,7 +1147,10 @@ function App() {
 	}, [selectedSystem]);
 
 	const themeData = useMemo(() => {
-		const sys = selectedSystem || currentSystem;
+		const activeGame = isLaunching ? launchingGame : (selectedSystem ? currentGame : null);
+		const activeSystem = isLaunching ? launchingSystem : selectedSystem;
+
+		const sys = activeSystem || currentSystem;
 		const sysFullName = getFriendlySystemName(sys);
 
 		// Flatten global settings
@@ -1108,7 +1159,7 @@ function App() {
 			return acc;
 		}, {} as any);
 
-		const isCollectionsVal = !!(selectedSystem && selectedSystem.name === 'collections' && !selectedCollection);
+		const isCollectionsVal = !!(activeSystem && activeSystem.name === 'collections' && !selectedCollection);
 
 		// Pre-populate collection folder media in the games array for carousel elements!
 		const resolvedGames = (isCollectionsVal && theme?.path)
@@ -1143,11 +1194,11 @@ function App() {
 			'system.fullName': sysFullName,
 			'system.name': sys?.name || 'all',
 			'system.theme': sys?.theme || sys?.name || 'auto-allgames',
-			'system.gamecount': (selectedSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
+			'system.gamecount': (activeSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
 			'system.hardwareType': sys?.hardware || 'console',
 			'system:fullName': sysFullName,
 			'system:name': sys?.name || 'all',
-			'system:gamecount': (selectedSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
+			'system:gamecount': (activeSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
 			'system:theme': sys?.theme || sys?.name || 'auto-allgames',
 			'system:hardwareType': sys?.hardware || 'console',
 			'global:time': new Date().toLocaleTimeString([], {
@@ -1179,7 +1230,7 @@ function App() {
 			baseData.global = { ...baseData.global, cheevos: { username: cheevosUser } };
 		}
 
-		if (selectedSystem && currentGame) {
+		if (activeSystem && activeGame) {
 			const resolveMedia = (p?: string) => {
 				if (!p) return '';
 				if (p.startsWith('http') || p.startsWith('file://')) return escapeFileUrl(p);
@@ -1188,8 +1239,8 @@ function App() {
 				if (normalized.match(/^[a-zA-Z]:/) || normalized.startsWith('/')) {
 					url = normalized.match(/^[a-zA-Z]:/) ? `file:///${normalized}` : `file://${normalized}`;
 				} else {
-					// Resolve relative paths (e.g. ./media/fanart/... or media/fanart/...) relative to game's system path
-					const sysLower = (currentGame.system || selectedSystem.name || '').toLowerCase();
+					// Resolve relative paths relative to activeGame's system path
+					const sysLower = (activeGame.system || activeSystem.name || '').toLowerCase();
 					const gameSystem = systems.find(s => s.name.toLowerCase() === sysLower);
 					if (gameSystem && gameSystem.path && !gameSystem.path.startsWith('virtual://')) {
 						const sysPath = gameSystem.path.replace(/\\/g, '/');
@@ -1201,20 +1252,20 @@ function App() {
 				return escapeFileUrl(url);
 			};
 
-			let gameImage = resolveMedia(currentGame.image);
-			let gameThumbnail = resolveMedia(currentGame.thumbnail);
-			let gameVideo = resolveMedia(currentGame.video);
-			let gameMarquee = resolveMedia(currentGame.marquee || currentGame.wheel);
-			let gameFanart = resolveMedia(currentGame.fanart || currentGame.image);
-			let gameWheel = resolveMedia(currentGame.wheel || currentGame.marquee || currentGame.image);
+			let gameImage = resolveMedia(activeGame.image);
+			let gameThumbnail = resolveMedia(activeGame.thumbnail);
+			let gameVideo = resolveMedia(activeGame.video);
+			let gameMarquee = resolveMedia(activeGame.marquee || activeGame.wheel);
+			let gameFanart = resolveMedia(activeGame.fanart || activeGame.image);
+			let gameWheel = resolveMedia(activeGame.wheel || activeGame.marquee || activeGame.image);
 
 			// Dynamic theme resolution for collection folders (Layer 2)
-			if (isCollectionsVal && currentGame.isCollectionFolder && theme?.path) {
+			if (isCollectionsVal && activeGame.isCollectionFolder && theme?.path) {
 				const normalizedThemePath = theme.path.replace(/\\/g, '/');
 				
 				// Standard theme paths for this collection folder using absolute file:/// URLs
-				const logoPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${currentGame.name}.png`);
-				const artPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${currentGame.name}.jpg`);
+				const logoPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${activeGame.name}.png`);
+				const artPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${activeGame.name}.jpg`);
 
 				gameMarquee = logoPath;
 				gameWheel = logoPath;
@@ -1223,40 +1274,40 @@ function App() {
 				gameThumbnail = artPath;
 			}
 
-			const isCollectionSystem = selectedSystem && (
-				selectedSystem.name === 'collections' ||
-				selectedSystem.path.startsWith('virtual://') ||
-				['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players', 'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'].includes(selectedSystem.name.toLowerCase())
+			const isCollectionSystem = activeSystem && (
+				activeSystem.name === 'collections' ||
+				activeSystem.path.startsWith('virtual://') ||
+				['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players', 'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'].includes(activeSystem.name.toLowerCase())
 			);
 
-			const gameSystem = systems.find(s => s.name.toLowerCase() === currentGame.system.toLowerCase());
-			const sysDisplayName = gameSystem ? gameSystem.name : currentGame.system;
+			const gameSystem = systems.find(s => s.name.toLowerCase() === activeGame.system.toLowerCase());
+			const sysDisplayName = gameSystem ? gameSystem.name : activeGame.system;
 
 			const displayNameWithSystem = isCollectionSystem
-				? `${currentGame.name} <span class="gamelist-meta-system">[${sysDisplayName}]</span>`
-				: currentGame.name;
+				? `${activeGame.name} <span class="gamelist-meta-system">[${sysDisplayName}]</span>`
+				: activeGame.name;
 
 			return {
 				...baseData,
-				...currentGame,
+				...activeGame,
 				'game:name': displayNameWithSystem,
-				'game:desc': currentGame.desc,
+				'game:desc': activeGame.desc,
 				'game:image': gameImage,
 				'game:thumbnail': gameThumbnail,
 				'game:video': gameVideo,
 				'game:marquee': gameMarquee,
 				'game:fanart': gameFanart,
-				'game:titleshot': resolveMedia(currentGame.titleshot || currentGame.image) || gameImage,
+				'game:titleshot': resolveMedia(activeGame.titleshot || activeGame.image) || gameImage,
 				'game:wheel': gameWheel,
-				'game:mix': resolveMedia(currentGame.mix || currentGame.image) || gameImage,
-				'game:rating': currentGame.rating,
-				'game:releasedate': currentGame.releasedate,
-				'game:developer': currentGame.developer,
-				'game:publisher': currentGame.publisher,
-				'game:genre': currentGame.genre,
-				'game:players': currentGame.players,
-				'game:playcount': currentGame.playcount,
-				'game:lastplayed': currentGame.lastplayed,
+				'game:mix': resolveMedia(activeGame.mix || activeGame.image) || gameImage,
+				'game:rating': activeGame.rating,
+				'game:releasedate': activeGame.releasedate,
+				'game:developer': activeGame.developer,
+				'game:publisher': activeGame.publisher,
+				'game:genre': activeGame.genre,
+				'game:players': activeGame.players,
+				'game:playcount': activeGame.playcount,
+				'game:lastplayed': activeGame.lastplayed,
 			};
 		}
 		return baseData;
@@ -1266,6 +1317,8 @@ function App() {
 		selectedSystem,
 		currentSystem,
 		currentGame,
+		launchingGame,
+		launchingSystem,
 		isMenuOpen,
 		isGameOptionsOpen,
 		isLaunching,
@@ -1273,6 +1326,7 @@ function App() {
 		selectedCollection,
 		themeRevision,
 		mediaRevision,
+		settings
 	]);
 
 	const handleUpdateGame = (updatedGame: Game) => {
@@ -1358,15 +1412,25 @@ function App() {
 		const saveStatesSetting = String(settings['global.savestates']?.value ?? '0');
 
 		const executeDirectLaunch = () => {
+			setLaunchingGame(gameToLaunch);
+			setLaunchingSystem(systemToLaunch);
 			setIsLaunching(true);
 			window.api
 				.launchGame(gameToLaunch, systemToLaunch)
 				.then(() => {
-					setTimeout(() => setIsLaunching(false), 5000);
+					setTimeout(() => {
+						setIsLaunching(false);
+						setLaunchingGame(null);
+						setLaunchingSystem(null);
+					}, 5000);
 				})
 				.catch((err) => {
 					console.error('Launch game failed or exited with code:', err);
-					setTimeout(() => setIsLaunching(false), 5000);
+					setTimeout(() => {
+						setIsLaunching(false);
+						setLaunchingGame(null);
+						setLaunchingSystem(null);
+					}, 5000);
 				});
 		};
 
@@ -1390,6 +1454,53 @@ function App() {
 				});
 		}
 	}, [settings]);
+
+	const handleLaunchNetplayRoom = useCallback((room: any, mode: 'client' | 'spectator') => {
+		if (!room.localGame) return;
+		setIsNetplayLobbyOpen(false);
+
+		const matchedSystem = systems.find(s => s.name === room.localGame.system);
+		if (!matchedSystem) {
+			console.error('System not found for Netplay launch:', room.localGame.system);
+			return;
+		}
+
+		const gameToLaunch = {
+			id: room.localGame.id,
+			name: room.localGame.name,
+			path: room.localGame.path,
+			system: room.localGame.system
+		} as Game;
+
+		setLaunchingGame(gameToLaunch);
+		setLaunchingSystem(matchedSystem);
+		setIsLaunching(true);
+		
+		const netplayOptions = {
+			netPlayMode: mode,
+			ip: room.host_method === 3 ? room.mitm_ip : room.ip,
+			port: room.host_method === 3 ? room.mitm_port : room.port,
+			session: room.host_method === 3 ? room.mitm_session : ''
+		};
+
+		window.api
+			.launchNetplayGame(gameToLaunch, matchedSystem, netplayOptions)
+			.then(() => {
+				setTimeout(() => {
+					setIsLaunching(false);
+					setLaunchingGame(null);
+					setLaunchingSystem(null);
+				}, 5000);
+			})
+			.catch((err) => {
+				console.error('Launch Netplay game failed:', err);
+				setTimeout(() => {
+					setIsLaunching(false);
+					setLaunchingGame(null);
+					setLaunchingSystem(null);
+				}, 5000);
+			});
+	}, [systems]);
 
 	// Helper: Jump to a random game in the current list
 	const jumpToRandomGame = useCallback(() => {
@@ -1491,6 +1602,11 @@ function App() {
 				setIsHardwareSelectOpen((prev) => !prev);
 			} else if (key === 'enter') {
 				setIsMenuOpen((prev) => !prev);
+			} else if (key === 'q') {
+				const netplayEnabled = settings['global.netplay']?.value === 'true' || settings['global.netplay']?.value === true || settings['global.netplay']?.value === '1' || settings['global.netplay']?.value === 1;
+				if (netplayEnabled) {
+					setIsNetplayLobbyOpen(true);
+				}
 			}
 		} else {
 			// Gamelist view
@@ -1579,6 +1695,14 @@ function App() {
 	// ─── Keyboard Navigation ───
 	const handleKeyDown = useCallback((e: KeyboardEvent) => {
 		if (e.detail === 99) return;
+
+		if (isScreensaverActiveRef.current) {
+			setIsScreensaverActive(false);
+			lastActivityTimeRef.current = Date.now();
+			e.preventDefault();
+			e.stopPropagation();
+			return;
+		}
 		// 1. Exclude input fields / textareas
 		const activeEl = document.activeElement;
 		if (activeEl) {
@@ -1780,6 +1904,12 @@ function App() {
 
 	const handleKeyUp = useCallback((e: KeyboardEvent) => {
 		if (e.detail === 99) return;
+
+		if (isScreensaverActiveRef.current) {
+			e.preventDefault();
+			e.stopPropagation();
+			return;
+		}
 		const activeEl = document.activeElement;
 		if (activeEl) {
 			const tagName = activeEl.tagName.toLowerCase();
@@ -1821,6 +1951,99 @@ function App() {
 			longPressTimersRef.current = {};
 		};
 	}, [handleKeyDown, handleKeyUp]);
+
+	const resetIdleTimer = useCallback(() => {
+		lastActivityTimeRef.current = Date.now();
+		if (isScreensaverActiveRef.current) {
+			setIsScreensaverActive(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		const handleActivity = () => {
+			resetIdleTimer();
+		};
+
+		window.addEventListener('keydown', handleActivity, true);
+		window.addEventListener('keyup', handleActivity, true);
+		window.addEventListener('mousemove', handleActivity, true);
+		window.addEventListener('mousedown', handleActivity, true);
+		window.addEventListener('click', handleActivity, true);
+		window.addEventListener('touchstart', handleActivity, true);
+
+		return () => {
+			window.removeEventListener('keydown', handleActivity, true);
+			window.removeEventListener('keyup', handleActivity, true);
+			window.removeEventListener('mousemove', handleActivity, true);
+			window.removeEventListener('mousedown', handleActivity, true);
+			window.removeEventListener('click', handleActivity, true);
+			window.removeEventListener('touchstart', handleActivity, true);
+		};
+	}, [resetIdleTimer]);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			if (isLaunching || isInitializing || isMenuOpen) {
+				lastActivityTimeRef.current = Date.now();
+				return;
+			}
+			const saverTimeSetting = settings.ScreenSaverTime?.value;
+			const timeoutMs = parseInt(String(saverTimeSetting), 10);
+			
+			if (timeoutMs > 0 && !isScreensaverActiveRef.current) {
+				const elapsed = Date.now() - lastActivityTimeRef.current;
+				if (elapsed >= timeoutMs) {
+					setIsScreensaverActive(true);
+				}
+			}
+		}, 1000);
+
+		return () => clearInterval(interval);
+	}, [settings, isLaunching, isInitializing, isMenuOpen]);
+
+	const handleVideoEnded = useCallback(() => {
+		window.api.getRandomGameWithMedia('video').then((game: any) => {
+			if (game) {
+				setScreensaverGame(game);
+			}
+		});
+	}, []);
+
+	useEffect(() => {
+		if (!isScreensaverActive) {
+			setScreensaverGame(null);
+			setSlideshowGame(null);
+			return;
+		}
+
+		const type = settings.ScreenSaverType?.value || 'dim';
+		if (type === 'video') {
+			const fetchVideoGame = () => {
+				window.api.getRandomGameWithMedia('video').then((game: any) => {
+					if (game) {
+						setScreensaverGame(game);
+					} else {
+						window.api.getRandomGameWithMedia('image').then((imgGame: any) => {
+							setSlideshowGame(imgGame);
+						});
+					}
+				});
+			};
+			fetchVideoGame();
+		} else if (type === 'slide') {
+			const fetchSlideGame = () => {
+				window.api.getRandomGameWithMedia('image').then((game: any) => {
+					if (game) {
+						setSlideshowGame(game);
+					}
+				});
+			};
+			fetchSlideGame();
+			
+			const slideInterval = setInterval(fetchSlideGame, 10000);
+			return () => clearInterval(slideInterval);
+		}
+	}, [isScreensaverActive, settings]);
 
 	// ─── Start screen: render once, update progress via DOM refs to avoid flickering ───
 	const startScreenRef = useRef<HTMLDivElement>(null);
@@ -1915,6 +2138,7 @@ function App() {
 				theme={theme}
 				themeData={themeData}
 				allSystems={systems}
+				onOpenNetplayLobby={() => setIsNetplayLobbyOpen(true)}
 			/>
 			<HardwareSelectOverlay
 				isOpen={isHardwareSelectOpen}
@@ -1949,10 +2173,10 @@ function App() {
 				/>
 			)}
 
-			{isLaunching && currentGame && selectedSystem && (
+			{isLaunching && launchingGame && launchingSystem && (
 				<LaunchScreen
-					game={currentGame}
-					system={selectedSystem}
+					game={launchingGame}
+					system={launchingSystem}
 					theme={theme}
 					themeData={themeData}
 				/>
@@ -2115,15 +2339,25 @@ function App() {
 					}}
 					onLaunch={(slot) => {
 						setIsSaveStateManagerOpen(false);
+						setLaunchingGame(saveManagerGame);
+						setLaunchingSystem(saveManagerSystem);
 						setIsLaunching(true);
 						window.api
 							.launchGame(saveManagerGame, saveManagerSystem, slot)
 							.then(() => {
-								setTimeout(() => setIsLaunching(false), 5000);
+								setTimeout(() => {
+									setIsLaunching(false);
+									setLaunchingGame(null);
+									setLaunchingSystem(null);
+								}, 5000);
 							})
 							.catch((err) => {
 								console.error('Launch game failed or exited with code:', err);
-								setTimeout(() => setIsLaunching(false), 5000);
+								setTimeout(() => {
+									setIsLaunching(false);
+									setLaunchingGame(null);
+									setLaunchingSystem(null);
+								}, 5000);
 							});
 						setSaveManagerGame(null);
 						setSaveManagerSystem(null);
@@ -2131,8 +2365,40 @@ function App() {
 				/>
 			)}
 
+			{/* Netplay Lobby Overlay */}
+			<NetplayLobbyOverlay
+				isOpen={isNetplayLobbyOpen}
+				onClose={() => setIsNetplayLobbyOpen(false)}
+				onLaunchRoom={handleLaunchNetplayRoom}
+				t={t}
+			/>
+
 			{/* FPS Counter Layer */}
 			<FPSCounter visible={settings.DrawFramerate?.value === true || settings.DrawFramerate?.value === 'true'} />
+
+			{/* Network Indicator Layer */}
+			<NetworkIndicator 
+				visible={settings.ShowNetworkIndicator?.value === true || settings.ShowNetworkIndicator?.value === 'true'} 
+				offsetTop={settings.DrawFramerate?.value === true || settings.DrawFramerate?.value === 'true'} 
+			/>
+
+			{/* Screensaver Layer */}
+			<Screensaver 
+				active={isScreensaverActive} 
+				type={settings.ScreenSaverType?.value || 'dim'} 
+				screensaverGame={screensaverGame}
+				slideshowGame={slideshowGame}
+				onVideoEnded={handleVideoEnded}
+				t={t}
+			/>
+
+			{/* CSS Fade In animation helper */}
+			<style dangerouslySetInnerHTML={{__html: `
+				@keyframes fadeIn {
+					from { opacity: 0; }
+					to { opacity: 1; }
+				}
+			`}} />
 		</div>
 	);
 }
@@ -2192,6 +2458,344 @@ const FPSCounter: React.FC<{ visible: boolean }> = ({ visible }) => {
 		>
 			<span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00ff66', display: 'inline-block', boxShadow: '0 0 6px #00ff66' }} />
 			{fps} FPS
+		</div>
+	);
+};
+
+// Sleek glassmorphic Network Connection status indicator
+const NetworkIndicator: React.FC<{ visible: boolean; offsetTop: boolean }> = ({ visible, offsetTop }) => {
+	const [connType, setConnType] = React.useState<'wifi' | 'ethernet' | 'none' | 'other' | 'unknown'>('unknown');
+
+	const updateConnection = React.useCallback(async () => {
+		const conn = (navigator as any).connection;
+		if (conn && conn.type) {
+			if (conn.type === 'none') {
+				setConnType('none');
+				return;
+			} else if (conn.type === 'wifi') {
+				setConnType('wifi');
+				return;
+			} else if (conn.type === 'ethernet') {
+				setConnType('ethernet');
+				return;
+			}
+		}
+		
+		if (!navigator.onLine) {
+			setConnType('none');
+			return;
+		}
+
+		try {
+			const type = await window.api.getNetworkConnectionType();
+			setConnType(type);
+		} catch (e) {
+			setConnType('unknown');
+		}
+	}, []);
+
+	React.useEffect(() => {
+		if (!visible) return;
+
+		updateConnection();
+
+		const interval = setInterval(updateConnection, 5000);
+		
+		window.addEventListener('online', updateConnection);
+		window.addEventListener('offline', updateConnection);
+
+		return () => {
+			clearInterval(interval);
+			window.removeEventListener('online', updateConnection);
+			window.removeEventListener('offline', updateConnection);
+		};
+	}, [visible, updateConnection]);
+
+	if (!visible) return null;
+
+	const renderIcon = () => {
+		if (connType === 'wifi') {
+			return (
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+					<path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+					<path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+					<path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+					<line x1="12" y1="20" x2="12.01" y2="20"></line>
+				</svg>
+			);
+		}
+		if (connType === 'ethernet' || connType === 'other') {
+			return (
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+					<rect x="16" y="6" width="6" height="12" rx="1"></rect>
+					<rect x="2" y="9" width="14" height="6" rx="1"></rect>
+					<path d="M6 12h4"></path>
+					<path d="M22 12h-2"></path>
+				</svg>
+			);
+		}
+		return (
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.65 }}>
+				<line x1="1" y1="1" x2="23" y2="23"></line>
+				<path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+				<path d="M5 12.55a10.94 10.94 0 0 1 5.83-2.84"></path>
+				<path d="M1.42 9a16 16 0 0 1 15.3-2.58"></path>
+				<path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+				<line x1="12" y1="20" x2="12.01" y2="20"></line>
+			</svg>
+		);
+	};
+
+	const getLabel = () => {
+		if (connType === 'wifi') return 'WIFI';
+		if (connType === 'ethernet' || connType === 'other') return 'CABO';
+		return 'SEM CONEXÃO';
+	};
+
+	const getColor = () => {
+		if (connType === 'wifi' || connType === 'ethernet' || connType === 'other') return '#0099ff';
+		return '#ff3333';
+	};
+
+	return (
+		<div
+			style={{
+				position: 'fixed',
+				top: offsetTop ? '42px' : '12px',
+				right: '12px',
+				background: 'rgba(0, 0, 0, 0.75)',
+				color: getColor(),
+				fontFamily: '"Roboto Condensed", sans-serif',
+				fontSize: '11px',
+				fontWeight: 800,
+				letterSpacing: '1px',
+				padding: '4px 8px',
+				borderRadius: '4px',
+				zIndex: 999999,
+				pointerEvents: 'none',
+				boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+				border: `1px solid ${connType === 'none' ? 'rgba(255, 51, 51, 0.25)' : 'rgba(0, 153, 255, 0.25)'}`,
+				display: 'flex',
+				alignItems: 'center',
+				gap: '6px',
+				textShadow: `0 0 4px ${connType === 'none' ? 'rgba(255, 51, 51, 0.4)' : 'rgba(0, 153, 255, 0.4)'}`,
+				transition: 'top 0.3s ease',
+			}}
+		>
+			{renderIcon()}
+			<span>{getLabel()}</span>
+		</div>
+	);
+};
+
+// Premium Screensaver overlay component
+const Screensaver: React.FC<{
+	active: boolean;
+	type: string;
+	screensaverGame: Game | null;
+	slideshowGame: Game | null;
+	onVideoEnded: () => void;
+	t: (key: string) => string;
+}> = ({ active, type, screensaverGame, slideshowGame, onVideoEnded, t }) => {
+	if (!active) return null;
+
+	if (type === 'dim') {
+		return (
+			<div
+				style={{
+					position: 'fixed',
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					background: 'rgba(0, 0, 0, 0.45)',
+					backdropFilter: 'blur(1px)',
+					zIndex: 99999,
+					pointerEvents: 'none',
+				}}
+			/>
+		);
+	}
+
+	if (type === 'black' || type === 'suspend') {
+		return (
+			<div
+				style={{
+					position: 'fixed',
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					background: '#000000',
+					zIndex: 99999,
+					pointerEvents: 'none',
+				}}
+			/>
+		);
+	}
+
+	if (type === 'video' && (screensaverGame || slideshowGame)) {
+		const videoSrc = screensaverGame?.video ? `file:///${screensaverGame.video.replace(/\\/g, '/')}` : '';
+		
+		return (
+			<div
+				style={{
+					position: 'fixed',
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					background: '#000000',
+					zIndex: 99999,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					overflow: 'hidden',
+				}}
+			>
+				{screensaverGame?.video ? (
+					<video
+						src={videoSrc}
+						autoPlay
+						muted
+						onEnded={onVideoEnded}
+						style={{
+							width: '100vw',
+							height: '100vh',
+							objectFit: 'contain',
+						}}
+					/>
+				) : (
+					<img
+						src={slideshowGame?.image ? `file:///${slideshowGame.image.replace(/\\/g, '/')}` : ''}
+						style={{
+							width: '100vw',
+							height: '100vh',
+							objectFit: 'contain',
+						}}
+					/>
+				)}
+				<ScreensaverMetadataCard game={screensaverGame || slideshowGame} t={t} />
+			</div>
+		);
+	}
+
+	if (type === 'slide' && slideshowGame) {
+		const imgSrc = slideshowGame.image ? `file:///${slideshowGame.image.replace(/\\/g, '/')}` : '';
+		
+		return (
+			<div
+				style={{
+					position: 'fixed',
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					background: '#000000',
+					zIndex: 99999,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					overflow: 'hidden',
+				}}
+			>
+				<img
+					key={imgSrc}
+					src={imgSrc}
+					style={{
+						width: '100vw',
+						height: '100vh',
+						objectFit: 'contain',
+						animation: 'fadeIn 0.8s ease-in-out',
+					}}
+				/>
+				<ScreensaverMetadataCard game={slideshowGame} t={t} />
+			</div>
+		);
+	}
+
+	return null;
+};
+
+// Premium metadata HUD for screensaver
+const ScreensaverMetadataCard: React.FC<{ game: Game | null; t: (key: string) => string }> = ({ game, t }) => {
+	if (!game) return null;
+
+	const cleanSystemName = (game.system || '').toUpperCase();
+	const releaseYear = game.releasedate ? game.releasedate.substring(0, 4) : '';
+
+	return (
+		<div
+			style={{
+				position: 'absolute',
+				bottom: '40px',
+				left: '40px',
+				background: 'rgba(0, 0, 0, 0.65)',
+				backdropFilter: 'blur(20px)',
+				border: '1px solid rgba(255, 255, 255, 0.1)',
+				borderRadius: '12px',
+				padding: '20px 24px',
+				color: '#ffffff',
+				width: '380px',
+				boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+				fontFamily: '"Roboto Condensed", sans-serif',
+				display: 'flex',
+				flexDirection: 'column',
+				gap: '8px',
+				pointerEvents: 'none',
+				zIndex: 100000,
+			}}
+		>
+			<div
+				style={{
+					fontSize: '11px',
+					fontWeight: 800,
+					letterSpacing: '2px',
+					color: 'var(--theme-color, #3b82f6)',
+					textTransform: 'uppercase',
+				}}
+			>
+				{cleanSystemName}
+			</div>
+			<div
+				style={{
+					fontSize: '22px',
+					fontWeight: 900,
+					lineHeight: '1.2',
+					letterSpacing: '0.5px',
+				}}
+			>
+				{game.name.toUpperCase()}
+			</div>
+			{(game.developer || releaseYear) && (
+				<div
+					style={{
+						fontSize: '13px',
+						color: 'rgba(255, 255, 255, 0.6)',
+						fontWeight: 500,
+						marginTop: '4px',
+					}}
+				>
+					{game.developer} {releaseYear ? `(${releaseYear})` : ''}
+				</div>
+			)}
+			{game.desc && (
+				<div
+					style={{
+						fontSize: '12px',
+						color: 'rgba(255, 255, 255, 0.45)',
+						lineHeight: '1.4',
+						marginTop: '8px',
+						display: '-webkit-box',
+						WebkitLineClamp: 3,
+						WebkitBoxOrient: 'vertical',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+					}}
+				>
+					{game.desc}
+				</div>
+			)}
 		</div>
 	);
 };

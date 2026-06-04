@@ -16,7 +16,7 @@ interface ControllerInfo {
 }
 
 export class LauncherService {
-  public launch(game: Game, system: System, activeControllers: ControllerInfo[] = [], saveStateSlot?: number): Promise<void> {
+  public launch(game: Game, system: System, activeControllers: ControllerInfo[] = [], saveStateSlot?: number, netplayOptions?: any): Promise<void> {
     return new Promise((resolvePromise, reject) => {
       const retroBatPath = getRetroBatPath()
       const launcherPath = join(retroBatPath, 'emulationstation', 'emulatorLauncher.exe')
@@ -186,6 +186,38 @@ export class LauncherService {
         }
       }
 
+      // 3. Resolve Netplay arguments
+      let netplayArgs: string[] = []
+      if (netplayOptions) {
+        const mode = netplayOptions.netPlayMode === 'spectator' ? 'client' : 'client'
+        const nick = settingsParser.getSetting('global.netplay.nickname', 'string') || 'RIESCADE Player'
+        netplayArgs.push(
+          '-netplaymode', mode,
+          '-netplayip', netplayOptions.ip,
+          '-netplayport', String(netplayOptions.port),
+          '-netplaynick', `"${nick}"`
+        )
+        if (netplayOptions.session) {
+          netplayArgs.push('-netplaysession', netplayOptions.session)
+        }
+        if (netplayOptions.netPlayMode === 'spectator') {
+          netplayArgs.push('-netplayspectate')
+        }
+      } else {
+        const netplayEnabled = settingsParser.getSetting('global.netplay', 'bool') === 'true' || settingsParser.getSetting('global.netplay', 'bool') === true || settingsParser.getSetting('global.netplay', 'bool') === '1' || settingsParser.getSetting('global.netplay', 'bool') === 1
+        const netplayAutoLobby = settingsParser.getSetting('NetPlayAutomaticallyCreateLobby', 'bool') === 'true' || settingsParser.getSetting('NetPlayAutomaticallyCreateLobby', 'bool') === true || settingsParser.getSetting('NetPlayAutomaticallyCreateLobby', 'bool') === '1' || settingsParser.getSetting('NetPlayAutomaticallyCreateLobby', 'bool') === 1
+
+        if (netplayEnabled && netplayAutoLobby) {
+          const port = settingsParser.getSetting('global.netplay.port', 'string') || '55435'
+          const nick = settingsParser.getSetting('global.netplay.nickname', 'string') || 'RIESCADE Player'
+          netplayArgs.push(
+            '-netplaymode', 'host',
+            '-netplayport', port,
+            '-netplaynick', `"${nick}"`
+          )
+        }
+      }
+
       const args = [
         '-gameinfo', `"${gameXmlPath}"`,
         ...controllerArgs,
@@ -193,6 +225,7 @@ export class LauncherService {
         '-emulator', emulator,
         '-core', core,
         ...saveStateArgs,
+        ...netplayArgs,
         '-rom', `"${romPath}"`
       ]
 

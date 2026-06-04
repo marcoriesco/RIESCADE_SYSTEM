@@ -1,8 +1,8 @@
 import { XMLParser } from 'fast-xml-parser'
-import { readFileSync, writeFileSync, existsSync, readdirSync, opendirSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, readdirSync, opendirSync, mkdirSync } from 'fs'
 import { join, resolve } from 'path'
 import { System } from '../../shared/types'
-import { getConfigPath } from '../utils/paths'
+import { getConfigPath, getRiescadePath } from '../utils/paths'
 import { SettingsParser } from './SettingsParser'
 
 export class SystemsParser {
@@ -85,7 +85,11 @@ export class SystemsParser {
 
     try {
       const debugContent = resolvedSystems.map(s => `System: ${s.name}, Path: ${s.path}, Exists: ${s._pathExists}, Count: ${s.gamecount}`).join('\n')
-      writeFileSync(join(configPath, '..', '.riescade', 'src', 'debug_systems.log'), debugContent, 'utf-8')
+      const logsDir = join(getRiescadePath(), 'logs')
+      if (!existsSync(logsDir)) {
+        mkdirSync(logsDir, { recursive: true })
+      }
+      writeFileSync(join(logsDir, 'debug_systems.log'), debugContent, 'utf-8')
     } catch (e) {
       console.error('Failed to write debug_systems.log:', e)
     }

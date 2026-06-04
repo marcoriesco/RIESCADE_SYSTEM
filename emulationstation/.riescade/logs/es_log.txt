@@ -1,0 +1,451 @@
+--- RIESCADE Log Started at 2026-06-04T00:56:13.209Z ---
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\global.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\loading.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\start.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\system.css
+[21:56:13] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\global.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\loading.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\start.css
+[21:56:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[21:56:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default\assets\css\system.css
+[21:56:13] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\emulationstation\.riescade\src\src\main\theme_default
+[21:56:14] [INFO]   📂 Indexing: mess ...
+[21:56:14] [INFO]     ✅ mess: 0 games indexed
+[21:56:14] [INFO] 🔄 Re-indexed 1 system(s) with changes
+[21:56:16] [INFO] [Netplay] getLobbyList() called
+[21:56:16] [INFO] [Netplay] Using port: 55432
+[21:56:16] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
+[21:56:17] [INFO] [Netplay] WAN response status: 200 (923ms)
+[21:56:17] [INFO] [Netplay] WAN data received: 31310 bytes (1065ms)
+[21:56:17] [INFO] [Netplay] Parsed 39 WAN rooms
+[21:56:17] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 39
+[21:56:17] [INFO] [Netplay] matchLocalRoms() called with 39 rooms
+[21:56:17] [INFO] [Netplay] Opening database...
+[21:56:17] [INFO] [Netplay] Database opened successfully
+[21:56:17] [INFO] [Netplay] Room 2/39 "kf2k2mp2" -> 1 candidates
+[21:56:17] [INFO] [Netplay]   Hashing candidate 1/1: ./kf2k2mp2.zip
+[21:56:17] [INFO] [Netplay]   CRC: 432FDF53 vs room CRC: C1E5ECDC
+[21:56:17] [INFO] [Netplay] Room 3/39 "Battle Formula (Japan)" -> 1 candidates
+[21:56:17] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
+[21:56:17] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
+[21:56:17] [INFO] [Netplay] Room 5/39 "Tetris Attack (U) [!]" -> 3 candidates
+[21:56:17] [INFO] [Netplay]   Hashing candidate 1/3: ./Tetris Attack (USA) (En,Ja).zip
+[21:56:17] [INFO] [Netplay]   CRC: 6C128210 vs room CRC: 43519EC9
+[21:56:17] [INFO] [Netplay]   Hashing candidate 2/3: ./Tetris Attack (USA) (SGB Enhanced).zip
+[21:56:17] [INFO] [Netplay]   CRC: B76C769B vs room CRC: 43519EC9
+[21:56:18] [INFO] [Netplay]   Hashing candidate 3/3: ./Tetris Attack (USA, Europe) (Rev A).zip
+[21:56:18] [INFO] [Netplay]   CRC: 5EE45A4D vs room CRC: 43519EC9
+[21:56:18] [INFO] [Netplay] Room 6/39 "Pac-Man (USA) (Namco)" -> 3 candidates
+[21:56:18] [INFO] [Netplay]   Hashing candidate 1/3: ./Pac Man Party 240x320 [BR].jar
+[21:56:18] [INFO] [Netplay]   CRC: DDF4773A vs room CRC: 15D202D8
+[21:56:18] [INFO] [Netplay]   Hashing candidate 2/3: ./Pac Man (1993).prg
+[21:56:18] [INFO] [Netplay]   CRC: 145F091D vs room CRC: 15D202D8
+[21:56:18] [INFO] [Netplay]   Hashing candidate 3/3: ./Ms. Pac-Man - Ms. Pac Man 2 (Hack).zip
+[21:56:18] [INFO] [Netplay]   CRC: 0E783800 vs room CRC: 15D202D8
+[21:56:18] [INFO] [Netplay] Room 9/39 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:56:18] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:56:18] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:56:18] [INFO] [Netplay] Room 10/39 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:56:18] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:56:18] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:56:19] [INFO] [Netplay] Room 16/39 "smashtv" -> 2 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/2: ./SmashTV_v1.0_2293.lha
+[21:56:19] [INFO] [Netplay]   CRC: B3D14DF8 vs room CRC: CF2C5243
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/2: ./smashtv.zip
+[21:56:19] [INFO] [Netplay]   CRC: 8E7FE463 vs room CRC: CF2C5243
+[21:56:19] [INFO] [Netplay] Room 17/39 "sf2ce" -> 5 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./sf2ce.zip
+[21:56:19] [INFO] [Netplay]   CRC: 925A7877 vs room CRC: 60FF7935
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/3: ./sf2ces11.zip
+[21:56:19] [INFO] [Netplay]   CRC: 8632E786 vs room CRC: 60FF7935
+[21:56:19] [INFO] [Netplay]   Hashing candidate 3/3: ./sf2ce.zip
+[21:56:19] [INFO] [Netplay]   CRC: 0AAA1A3A vs room CRC: 60FF7935
+[21:56:19] [INFO] [Netplay] Room 21/39 "Zombies Ate My Neighbors (USA)" -> 29 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./Zombies Ate My Neighbors (USA).zip
+[21:56:19] [INFO] [Netplay]   CRC: 7CFC0C7C vs room CRC: 7CFC0C7C
+[21:56:19] [INFO] [Netplay] Room 25/39 "kof2002" -> 4 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./kof2002.zip
+[21:56:19] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/3: ./kof2002.zip
+[21:56:19] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:56:19] [INFO] [Netplay]   Hashing candidate 3/3: ./kof2002.zip
+[21:56:19] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:56:19] [INFO] [Netplay] Room 26/39 "tapper" -> 16 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./rbtapper.zip
+[21:56:19] [INFO] [Netplay]   CRC: 510B13DE vs room CRC: ED776316
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/3: ./tapper.zip
+[21:56:19] [INFO] [Netplay]   CRC: 070B4C81 vs room CRC: ED776316
+[21:56:19] [INFO] [Netplay]   Hashing candidate 3/3: ./Tapper (USA).dsk
+[21:56:19] [INFO] [Netplay]   CRC: E86B1B99 vs room CRC: ED776316
+[21:56:19] [INFO] [Netplay] Room 27/39 "paprium" -> 1 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/1: ./Paprium.zip
+[21:56:19] [INFO] [Netplay]   CRC: 28F16E0B vs room CRC: 6FC5E40B
+[21:56:19] [INFO] [Netplay] Room 29/39 "turfmast" -> 3 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./turfmast.zip
+[21:56:19] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/3: ./turfmast.zip
+[21:56:19] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:56:19] [INFO] [Netplay]   Hashing candidate 3/3: ./turfmast.zip
+[21:56:19] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: 3F41C322
+[21:56:19] [INFO] [Netplay] Room 32/39 "Tecmo Super Bowl (U) [!]" -> 11 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./Tecmo Super Bowl.zip
+[21:56:19] [INFO] [Netplay]   CRC: 1F7C5660 vs room CRC: 1F7C5660
+[21:56:19] [INFO] [Netplay] Room 33/39 "Super Mario World (USA)" -> 2095 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario All-Stars + Super Mario World (USA).zip
+[21:56:19] [INFO] [Netplay]   CRC: F84305B1 vs room CRC: B19ED489
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario World (USA).zip
+[21:56:19] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: B19ED489
+[21:56:19] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World 2 - Yoshi's Island (USA) (Rev 1).zip
+[21:56:19] [INFO] [Netplay]   CRC: CF98DDAA vs room CRC: B19ED489
+[21:56:19] [INFO] [Netplay] Room 38/39 "kof98" -> 6 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./kof98.zip
+[21:56:19] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/3: ./kof98.zip
+[21:56:19] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:56:19] [INFO] [Netplay]   Hashing candidate 3/3: ./kof98ae.zip
+[21:56:19] [INFO] [Netplay]   CRC: 0319CFC9 vs room CRC: 59172EBD
+[21:56:19] [INFO] [Netplay] Room 39/39 "ssriders" -> 3 candidates
+[21:56:19] [INFO] [Netplay]   Hashing candidate 1/3: ./ssridersabd.zip
+[21:56:19] [INFO] [Netplay]   CRC: 680FEB3C vs room CRC: 40A14A3D
+[21:56:19] [INFO] [Netplay]   Hashing candidate 2/3: ./ssriders.zip
+[21:56:19] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:56:19] [INFO] [Netplay]   Hashing candidate 3/3: ./ssridersabd.zip
+[21:56:19] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:56:19] [INFO] [Netplay] matchLocalRoms() completed
+[21:56:19] [INFO] [Netplay] Returning 39 rooms (17 matched locally)
+[21:56:21] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\emulationstation\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -system snes -emulator libretro -core snes9x -netplaymode client -netplayip us-east1.relay.retroarch.com -netplayport 55435 -netplaynick "RIESCADE" -netplaysession wSMXiaEQmkoFwJEW -rom "C:\tmp\RIESCADE_SYSTEM\roms\snes\Zombies Ate My Neighbors (USA).zip"
+[21:56:43] [INFO] [Netplay] getLobbyList() called
+[21:56:43] [INFO] [Netplay] Using port: 55432
+[21:56:43] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
+[21:56:43] [INFO] [Netplay] WAN response status: 200 (290ms)
+[21:56:43] [INFO] [Netplay] WAN data received: 32068 bytes (433ms)
+[21:56:43] [INFO] [Netplay] Parsed 40 WAN rooms
+[21:56:44] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 40
+[21:56:44] [INFO] [Netplay] matchLocalRoms() called with 40 rooms
+[21:56:44] [INFO] [Netplay] Opening database...
+[21:56:44] [INFO] [Netplay] Database opened successfully
+[21:56:44] [INFO] [Netplay] Room 2/40 "kf2k2mp2" -> 1 candidates
+[21:56:44] [INFO] [Netplay]   Hashing candidate 1/1: ./kf2k2mp2.zip
+[21:56:44] [INFO] [Netplay]   CRC: 432FDF53 vs room CRC: C1E5ECDC
+[21:56:44] [INFO] [Netplay] Room 6/40 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:56:44] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:56:45] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:56:45] [INFO] [Netplay] Room 7/40 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:56:45] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:56:45] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:56:45] [INFO] [Netplay] Room 10/40 "Pac-Man (USA) (Namco)" -> 3 candidates
+[21:56:45] [INFO] [Netplay]   Hashing candidate 1/3: ./Pac Man Party 240x320 [BR].jar
+[21:56:45] [INFO] [Netplay]   CRC: DDF4773A vs room CRC: 15D202D8
+[21:56:45] [INFO] [Netplay]   Hashing candidate 2/3: ./Pac Man (1993).prg
+[21:56:45] [INFO] [Netplay]   CRC: 145F091D vs room CRC: 15D202D8
+[21:56:45] [INFO] [Netplay]   Hashing candidate 3/3: ./Ms. Pac-Man - Ms. Pac Man 2 (Hack).zip
+[21:56:45] [INFO] [Netplay]   CRC: 0E783800 vs room CRC: 15D202D8
+[21:56:45] [INFO] [Netplay] Room 12/40 "Battle Formula (Japan)" -> 1 candidates
+[21:56:45] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
+[21:56:45] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
+[21:56:45] [INFO] [Netplay] Room 14/40 "Tetris Attack (U) [!]" -> 3 candidates
+[21:56:45] [INFO] [Netplay]   Hashing candidate 1/3: ./Tetris Attack (USA) (En,Ja).zip
+[21:56:45] [INFO] [Netplay]   CRC: 6C128210 vs room CRC: 43519EC9
+[21:56:45] [INFO] [Netplay]   Hashing candidate 2/3: ./Tetris Attack (USA) (SGB Enhanced).zip
+[21:56:45] [INFO] [Netplay]   CRC: B76C769B vs room CRC: 43519EC9
+[21:56:45] [INFO] [Netplay]   Hashing candidate 3/3: ./Tetris Attack (USA, Europe) (Rev A).zip
+[21:56:45] [INFO] [Netplay]   CRC: 5EE45A4D vs room CRC: 43519EC9
+[21:56:45] [INFO] [Netplay] Room 17/40 "smashtv" -> 2 candidates
+[21:56:45] [INFO] [Netplay]   Hashing candidate 1/2: ./SmashTV_v1.0_2293.lha
+[21:56:45] [INFO] [Netplay]   CRC: B3D14DF8 vs room CRC: CF2C5243
+[21:56:45] [INFO] [Netplay]   Hashing candidate 2/2: ./smashtv.zip
+[21:56:45] [INFO] [Netplay]   CRC: 8E7FE463 vs room CRC: CF2C5243
+[21:56:46] [INFO] [Netplay] Room 18/40 "sf2ce" -> 5 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./sf2ce.zip
+[21:56:46] [INFO] [Netplay]   CRC: 925A7877 vs room CRC: 60FF7935
+[21:56:46] [INFO] [Netplay]   Hashing candidate 2/3: ./sf2ces11.zip
+[21:56:46] [INFO] [Netplay]   CRC: 8632E786 vs room CRC: 60FF7935
+[21:56:46] [INFO] [Netplay]   Hashing candidate 3/3: ./sf2ce.zip
+[21:56:46] [INFO] [Netplay]   CRC: 0AAA1A3A vs room CRC: 60FF7935
+[21:56:46] [INFO] [Netplay] Room 22/40 "Zombies Ate My Neighbors (USA)" -> 29 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./Zombies Ate My Neighbors (USA).zip
+[21:56:46] [INFO] [Netplay]   CRC: 7CFC0C7C vs room CRC: 7CFC0C7C
+[21:56:46] [INFO] [Netplay] Room 26/40 "kof2002" -> 4 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./kof2002.zip
+[21:56:46] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:56:46] [INFO] [Netplay]   Hashing candidate 2/3: ./kof2002.zip
+[21:56:46] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:56:46] [INFO] [Netplay]   Hashing candidate 3/3: ./kof2002.zip
+[21:56:46] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:56:46] [INFO] [Netplay] Room 27/40 "tapper" -> 16 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./rbtapper.zip
+[21:56:46] [INFO] [Netplay]   CRC: 510B13DE vs room CRC: ED776316
+[21:56:46] [INFO] [Netplay]   Hashing candidate 2/3: ./tapper.zip
+[21:56:46] [INFO] [Netplay]   CRC: 070B4C81 vs room CRC: ED776316
+[21:56:46] [INFO] [Netplay]   Hashing candidate 3/3: ./Tapper (USA).dsk
+[21:56:46] [INFO] [Netplay]   CRC: E86B1B99 vs room CRC: ED776316
+[21:56:46] [INFO] [Netplay] Room 28/40 "paprium" -> 1 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/1: ./Paprium.zip
+[21:56:46] [INFO] [Netplay]   CRC: 28F16E0B vs room CRC: 6FC5E40B
+[21:56:46] [INFO] [Netplay] Room 30/40 "turfmast" -> 3 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./turfmast.zip
+[21:56:46] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:56:46] [INFO] [Netplay]   Hashing candidate 2/3: ./turfmast.zip
+[21:56:46] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:56:46] [INFO] [Netplay]   Hashing candidate 3/3: ./turfmast.zip
+[21:56:46] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: 3F41C322
+[21:56:46] [INFO] [Netplay] Room 33/40 "Tecmo Super Bowl (U) [!]" -> 11 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./Tecmo Super Bowl.zip
+[21:56:46] [INFO] [Netplay]   CRC: 1F7C5660 vs room CRC: 1F7C5660
+[21:56:46] [INFO] [Netplay] Room 34/40 "Super Mario World (USA)" -> 2095 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario All-Stars + Super Mario World (USA).zip
+[21:56:46] [INFO] [Netplay]   CRC: F84305B1 vs room CRC: B19ED489
+[21:56:46] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario World (USA).zip
+[21:56:46] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: B19ED489
+[21:56:46] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World 2 - Yoshi's Island (USA) (Rev 1).zip
+[21:56:46] [INFO] [Netplay]   CRC: CF98DDAA vs room CRC: B19ED489
+[21:56:46] [INFO] [Netplay] Room 39/40 "kof98" -> 6 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./kof98.zip
+[21:56:46] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:56:46] [INFO] [Netplay]   Hashing candidate 2/3: ./kof98.zip
+[21:56:46] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:56:46] [INFO] [Netplay]   Hashing candidate 3/3: ./kof98ae.zip
+[21:56:46] [INFO] [Netplay]   CRC: 0319CFC9 vs room CRC: 59172EBD
+[21:56:46] [INFO] [Netplay] Room 40/40 "ssriders" -> 3 candidates
+[21:56:46] [INFO] [Netplay]   Hashing candidate 1/3: ./ssridersabd.zip
+[21:56:46] [INFO] [Netplay]   CRC: 680FEB3C vs room CRC: 40A14A3D
+[21:56:46] [INFO] [Netplay]   Hashing candidate 2/3: ./ssriders.zip
+[21:56:46] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:56:46] [INFO] [Netplay]   Hashing candidate 3/3: ./ssridersabd.zip
+[21:56:46] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:56:46] [INFO] [Netplay] matchLocalRoms() completed
+[21:56:46] [INFO] [Netplay] Returning 40 rooms (17 matched locally)
+[21:56:49] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\emulationstation\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -system nes -emulator libretro -core fceumm -netplaymode client -netplayip us-east1.relay.retroarch.com -netplayport 55435 -netplaynick "RIESCADE" -netplaysession 6gf7Qmf1sHr/4dnA -rom "C:\tmp\RIESCADE_SYSTEM\roms\nes\Tecmo Super Bowl.zip"
+[21:57:11] [INFO] [Netplay] getLobbyList() called
+[21:57:11] [INFO] [Netplay] Using port: 55432
+[21:57:11] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
+[21:57:11] [INFO] [Netplay] WAN response status: 200 (288ms)
+[21:57:11] [INFO] [Netplay] WAN data received: 32137 bytes (430ms)
+[21:57:11] [INFO] [Netplay] Parsed 40 WAN rooms
+[21:57:12] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 40
+[21:57:12] [INFO] [Netplay] matchLocalRoms() called with 40 rooms
+[21:57:12] [INFO] [Netplay] Opening database...
+[21:57:12] [INFO] [Netplay] Database opened successfully
+[21:57:12] [INFO] [Netplay] Room 5/40 "Battle Formula (Japan)" -> 1 candidates
+[21:57:12] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
+[21:57:12] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
+[21:57:12] [INFO] [Netplay] Room 6/40 "Pac-Man (USA) (Namco)" -> 3 candidates
+[21:57:12] [INFO] [Netplay]   Hashing candidate 1/3: ./Pac Man Party 240x320 [BR].jar
+[21:57:12] [INFO] [Netplay]   CRC: DDF4773A vs room CRC: 15D202D8
+[21:57:12] [INFO] [Netplay]   Hashing candidate 2/3: ./Pac Man (1993).prg
+[21:57:12] [INFO] [Netplay]   CRC: 145F091D vs room CRC: 15D202D8
+[21:57:12] [INFO] [Netplay]   Hashing candidate 3/3: ./Ms. Pac-Man - Ms. Pac Man 2 (Hack).zip
+[21:57:12] [INFO] [Netplay]   CRC: 0E783800 vs room CRC: 15D202D8
+[21:57:12] [INFO] [Netplay] Room 7/40 "Tetris Attack (U) [!]" -> 3 candidates
+[21:57:12] [INFO] [Netplay]   Hashing candidate 1/3: ./Tetris Attack (USA) (En,Ja).zip
+[21:57:12] [INFO] [Netplay]   CRC: 6C128210 vs room CRC: 43519EC9
+[21:57:12] [INFO] [Netplay]   Hashing candidate 2/3: ./Tetris Attack (USA) (SGB Enhanced).zip
+[21:57:12] [INFO] [Netplay]   CRC: B76C769B vs room CRC: 43519EC9
+[21:57:12] [INFO] [Netplay]   Hashing candidate 3/3: ./Tetris Attack (USA, Europe) (Rev A).zip
+[21:57:12] [INFO] [Netplay]   CRC: 5EE45A4D vs room CRC: 43519EC9
+[21:57:12] [INFO] [Netplay] Room 9/40 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:57:12] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:57:12] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:57:12] [INFO] [Netplay] Room 10/40 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:57:12] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:57:13] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:57:13] [INFO] [Netplay] Room 16/40 "smashtv" -> 2 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/2: ./SmashTV_v1.0_2293.lha
+[21:57:13] [INFO] [Netplay]   CRC: B3D14DF8 vs room CRC: CF2C5243
+[21:57:13] [INFO] [Netplay]   Hashing candidate 2/2: ./smashtv.zip
+[21:57:13] [INFO] [Netplay]   CRC: 8E7FE463 vs room CRC: CF2C5243
+[21:57:13] [INFO] [Netplay] Room 17/40 "sf2ce" -> 5 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/3: ./sf2ce.zip
+[21:57:13] [INFO] [Netplay]   CRC: 925A7877 vs room CRC: 60FF7935
+[21:57:13] [INFO] [Netplay]   Hashing candidate 2/3: ./sf2ces11.zip
+[21:57:13] [INFO] [Netplay]   CRC: 8632E786 vs room CRC: 60FF7935
+[21:57:13] [INFO] [Netplay]   Hashing candidate 3/3: ./sf2ce.zip
+[21:57:13] [INFO] [Netplay]   CRC: 0AAA1A3A vs room CRC: 60FF7935
+[21:57:13] [INFO] [Netplay] Room 21/40 "Zombies Ate My Neighbors (USA)" -> 29 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/3: ./Zombies Ate My Neighbors (USA).zip
+[21:57:13] [INFO] [Netplay]   CRC: 7CFC0C7C vs room CRC: 7CFC0C7C
+[21:57:13] [INFO] [Netplay] Room 23/40 "Sonic the Hedgehog 2" -> 23 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/3: ./Sonic The Hedgehog 2 (Europe).zip
+[21:57:13] [INFO] [Netplay]   CRC: D6F2BFCA vs room CRC: F23AD4B3
+[21:57:13] [INFO] [Netplay]   Hashing candidate 2/3: ./Sonic The Hedgehog 2/Sonic The Hedgehog 2.bin
+[21:57:13] [INFO] [CRC32] Skipping large file (564MB): C:\tmp\RIESCADE_SYSTEM\roms\megadrive-msu\Sonic The Hedgehog 2\Sonic The Hedgehog 2.bin
+[21:57:13] [INFO] [Netplay]   CRC: 00000000 vs room CRC: F23AD4B3
+[21:57:13] [INFO] [Netplay]   Hashing candidate 3/3: ./Sonic The Hedgehog 2/Sonic The Hedgehog 2.cue
+[21:57:13] [INFO] [Netplay]   CRC: 78F0FCA6 vs room CRC: F23AD4B3
+[21:57:13] [INFO] [Netplay] Room 26/40 "kof2002" -> 4 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/3: ./kof2002.zip
+[21:57:13] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:57:13] [INFO] [Netplay]   Hashing candidate 2/3: ./kof2002.zip
+[21:57:13] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:57:13] [INFO] [Netplay]   Hashing candidate 3/3: ./kof2002.zip
+[21:57:13] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:57:13] [INFO] [Netplay] Room 27/40 "tapper" -> 16 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/3: ./rbtapper.zip
+[21:57:13] [INFO] [Netplay]   CRC: 510B13DE vs room CRC: ED776316
+[21:57:13] [INFO] [Netplay]   Hashing candidate 2/3: ./tapper.zip
+[21:57:13] [INFO] [Netplay]   CRC: 070B4C81 vs room CRC: ED776316
+[21:57:13] [INFO] [Netplay]   Hashing candidate 3/3: ./Tapper (USA).dsk
+[21:57:13] [INFO] [Netplay]   CRC: E86B1B99 vs room CRC: ED776316
+[21:57:13] [INFO] [Netplay] Room 28/40 "paprium" -> 1 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/1: ./Paprium.zip
+[21:57:13] [INFO] [Netplay]   CRC: 28F16E0B vs room CRC: 6FC5E40B
+[21:57:13] [INFO] [Netplay] Room 30/40 "turfmast" -> 3 candidates
+[21:57:13] [INFO] [Netplay]   Hashing candidate 1/3: ./turfmast.zip
+[21:57:13] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:57:13] [INFO] [Netplay]   Hashing candidate 2/3: ./turfmast.zip
+[21:57:13] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:57:13] [INFO] [Netplay]   Hashing candidate 3/3: ./turfmast.zip
+[21:57:13] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: 3F41C322
+[21:57:14] [INFO] [Netplay] Room 33/40 "Tecmo Super Bowl (U) [!]" -> 11 candidates
+[21:57:14] [INFO] [Netplay]   Hashing candidate 1/3: ./Tecmo Super Bowl.zip
+[21:57:14] [INFO] [Netplay]   CRC: 1F7C5660 vs room CRC: 1F7C5660
+[21:57:14] [INFO] [Netplay] Room 34/40 "Super Mario World (USA)" -> 2095 candidates
+[21:57:14] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario All-Stars + Super Mario World (USA).zip
+[21:57:14] [INFO] [Netplay]   CRC: F84305B1 vs room CRC: B19ED489
+[21:57:14] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario World (USA).zip
+[21:57:14] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: B19ED489
+[21:57:14] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World 2 - Yoshi's Island (USA) (Rev 1).zip
+[21:57:14] [INFO] [Netplay]   CRC: CF98DDAA vs room CRC: B19ED489
+[21:57:14] [INFO] [Netplay] Room 39/40 "kof98" -> 6 candidates
+[21:57:14] [INFO] [Netplay]   Hashing candidate 1/3: ./kof98.zip
+[21:57:14] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:57:14] [INFO] [Netplay]   Hashing candidate 2/3: ./kof98.zip
+[21:57:14] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:57:14] [INFO] [Netplay]   Hashing candidate 3/3: ./kof98ae.zip
+[21:57:14] [INFO] [Netplay]   CRC: 0319CFC9 vs room CRC: 59172EBD
+[21:57:14] [INFO] [Netplay] Room 40/40 "ssriders" -> 3 candidates
+[21:57:14] [INFO] [Netplay]   Hashing candidate 1/3: ./ssridersabd.zip
+[21:57:14] [INFO] [Netplay]   CRC: 680FEB3C vs room CRC: 40A14A3D
+[21:57:14] [INFO] [Netplay]   Hashing candidate 2/3: ./ssriders.zip
+[21:57:14] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:57:14] [INFO] [Netplay]   Hashing candidate 3/3: ./ssridersabd.zip
+[21:57:14] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:57:14] [INFO] [Netplay] matchLocalRoms() completed
+[21:57:14] [INFO] [Netplay] Returning 40 rooms (17 matched locally)
+[21:57:18] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\emulationstation\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -system hbmame -emulator hbmame -core  -netplaymode client -netplayip us-east1.relay.retroarch.com -netplayport 55435 -netplaynick "RIESCADE" -netplaysession UKCFYw9zwjwolk67 -rom "C:\tmp\RIESCADE_SYSTEM\roms\hbmame\sf2ce.zip"
+[21:57:33] [INFO] [Netplay] getLobbyList() called
+[21:57:33] [INFO] [Netplay] Using port: 55432
+[21:57:33] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
+[21:57:33] [INFO] [Netplay] WAN response status: 200 (289ms)
+[21:57:33] [INFO] [Netplay] WAN data received: 32900 bytes (432ms)
+[21:57:33] [INFO] [Netplay] Parsed 41 WAN rooms
+[21:57:34] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 41
+[21:57:34] [INFO] [Netplay] matchLocalRoms() called with 41 rooms
+[21:57:34] [INFO] [Netplay] Opening database...
+[21:57:34] [INFO] [Netplay] Database opened successfully
+[21:57:34] [INFO] [Netplay] Room 4/41 "Battle Formula (Japan)" -> 1 candidates
+[21:57:34] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
+[21:57:34] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
+[21:57:34] [INFO] [Netplay] Room 6/41 "Aero Fighters (USA)" -> 12 candidates
+[21:57:34] [INFO] [Netplay]   Hashing candidate 1/3: ./sonicwi2.zip
+[21:57:34] [INFO] [Netplay]   CRC: 7577E949 vs room CRC: F194D00A
+[21:57:34] [INFO] [Netplay]   Hashing candidate 2/3: ./sonicwi2.zip
+[21:57:34] [INFO] [Netplay]   CRC: 7577E949 vs room CRC: F194D00A
+[21:57:34] [INFO] [Netplay]   Hashing candidate 3/3: ./sonicwi3.zip
+[21:57:34] [INFO] [Netplay]   CRC: 6F885152 vs room CRC: F194D00A
+[21:57:34] [INFO] [Netplay] Room 7/41 "Tetris Attack (U) [!]" -> 3 candidates
+[21:57:34] [INFO] [Netplay]   Hashing candidate 1/3: ./Tetris Attack (USA) (En,Ja).zip
+[21:57:34] [INFO] [Netplay]   CRC: 6C128210 vs room CRC: 43519EC9
+[21:57:34] [INFO] [Netplay]   Hashing candidate 2/3: ./Tetris Attack (USA) (SGB Enhanced).zip
+[21:57:34] [INFO] [Netplay]   CRC: B76C769B vs room CRC: 43519EC9
+[21:57:34] [INFO] [Netplay]   Hashing candidate 3/3: ./Tetris Attack (USA, Europe) (Rev A).zip
+[21:57:34] [INFO] [Netplay]   CRC: 5EE45A4D vs room CRC: 43519EC9
+[21:57:34] [INFO] [Netplay] Room 9/41 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:57:34] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:57:35] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:57:35] [INFO] [Netplay] Room 10/41 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
+[21:57:35] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
+[21:57:35] [INFO] [Netplay] Room 13/41 "Pac-Man (USA) (Namco)" -> 3 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Pac Man Party 240x320 [BR].jar
+[21:57:35] [INFO] [Netplay]   CRC: DDF4773A vs room CRC: 15D202D8
+[21:57:35] [INFO] [Netplay]   Hashing candidate 2/3: ./Pac Man (1993).prg
+[21:57:35] [INFO] [Netplay]   CRC: 145F091D vs room CRC: 15D202D8
+[21:57:35] [INFO] [Netplay]   Hashing candidate 3/3: ./Ms. Pac-Man - Ms. Pac Man 2 (Hack).zip
+[21:57:35] [INFO] [Netplay]   CRC: 0E783800 vs room CRC: 15D202D8
+[21:57:35] [INFO] [Netplay] Room 17/41 "smashtv" -> 2 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/2: ./SmashTV_v1.0_2293.lha
+[21:57:35] [INFO] [Netplay]   CRC: B3D14DF8 vs room CRC: CF2C5243
+[21:57:35] [INFO] [Netplay]   Hashing candidate 2/2: ./smashtv.zip
+[21:57:35] [INFO] [Netplay]   CRC: 8E7FE463 vs room CRC: CF2C5243
+[21:57:35] [INFO] [Netplay] Room 18/41 "sf2ce" -> 5 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/3: ./sf2ce.zip
+[21:57:35] [INFO] [Netplay]   CRC: 925A7877 vs room CRC: 60FF7935
+[21:57:35] [INFO] [Netplay]   Hashing candidate 2/3: ./sf2ces11.zip
+[21:57:35] [INFO] [Netplay]   CRC: 8632E786 vs room CRC: 60FF7935
+[21:57:35] [INFO] [Netplay]   Hashing candidate 3/3: ./sf2ce.zip
+[21:57:35] [INFO] [Netplay]   CRC: 0AAA1A3A vs room CRC: 60FF7935
+[21:57:35] [INFO] [Netplay] Room 22/41 "Zombies Ate My Neighbors (USA)" -> 29 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Zombies Ate My Neighbors (USA).zip
+[21:57:35] [INFO] [Netplay]   CRC: 7CFC0C7C vs room CRC: 7CFC0C7C
+[21:57:35] [INFO] [Netplay] Room 24/41 "Sonic the Hedgehog 2" -> 23 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Sonic The Hedgehog 2 (Europe).zip
+[21:57:35] [INFO] [Netplay]   CRC: D6F2BFCA vs room CRC: F23AD4B3
+[21:57:35] [INFO] [Netplay]   Hashing candidate 2/3: ./Sonic The Hedgehog 2/Sonic The Hedgehog 2.bin
+[21:57:35] [INFO] [CRC32] Skipping large file (564MB): C:\tmp\RIESCADE_SYSTEM\roms\megadrive-msu\Sonic The Hedgehog 2\Sonic The Hedgehog 2.bin
+[21:57:35] [INFO] [Netplay]   CRC: 00000000 vs room CRC: F23AD4B3
+[21:57:35] [INFO] [Netplay]   Hashing candidate 3/3: ./Sonic The Hedgehog 2/Sonic The Hedgehog 2.cue
+[21:57:35] [INFO] [Netplay]   CRC: 78F0FCA6 vs room CRC: F23AD4B3
+[21:57:35] [INFO] [Netplay] Room 27/41 "kof2002" -> 4 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/3: ./kof2002.zip
+[21:57:35] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:57:35] [INFO] [Netplay]   Hashing candidate 2/3: ./kof2002.zip
+[21:57:35] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:57:35] [INFO] [Netplay]   Hashing candidate 3/3: ./kof2002.zip
+[21:57:35] [INFO] [Netplay]   CRC: DA41D6F9 vs room CRC: C1E5ECDC
+[21:57:35] [INFO] [Netplay] Room 28/41 "tapper" -> 16 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/3: ./rbtapper.zip
+[21:57:35] [INFO] [Netplay]   CRC: 510B13DE vs room CRC: ED776316
+[21:57:35] [INFO] [Netplay]   Hashing candidate 2/3: ./tapper.zip
+[21:57:35] [INFO] [Netplay]   CRC: 070B4C81 vs room CRC: ED776316
+[21:57:35] [INFO] [Netplay]   Hashing candidate 3/3: ./Tapper (USA).dsk
+[21:57:35] [INFO] [Netplay]   CRC: E86B1B99 vs room CRC: ED776316
+[21:57:35] [INFO] [Netplay] Room 29/41 "paprium" -> 1 candidates
+[21:57:35] [INFO] [Netplay]   Hashing candidate 1/1: ./Paprium.zip
+[21:57:35] [INFO] [Netplay]   CRC: 28F16E0B vs room CRC: 6FC5E40B
+[21:57:36] [INFO] [Netplay] Room 31/41 "turfmast" -> 3 candidates
+[21:57:36] [INFO] [Netplay]   Hashing candidate 1/3: ./turfmast.zip
+[21:57:36] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:57:36] [INFO] [Netplay]   Hashing candidate 2/3: ./turfmast.zip
+[21:57:36] [INFO] [Netplay]   CRC: 5A65A8CE vs room CRC: 3F41C322
+[21:57:36] [INFO] [Netplay]   Hashing candidate 3/3: ./turfmast.zip
+[21:57:36] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: 3F41C322
+[21:57:36] [INFO] [Netplay] Room 34/41 "Tecmo Super Bowl (U) [!]" -> 11 candidates
+[21:57:36] [INFO] [Netplay]   Hashing candidate 1/3: ./Tecmo Super Bowl.zip
+[21:57:36] [INFO] [Netplay]   CRC: 1F7C5660 vs room CRC: 1F7C5660
+[21:57:36] [INFO] [Netplay] Room 35/41 "Super Mario World (USA)" -> 2095 candidates
+[21:57:36] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario All-Stars + Super Mario World (USA).zip
+[21:57:36] [INFO] [Netplay]   CRC: F84305B1 vs room CRC: B19ED489
+[21:57:36] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario World (USA).zip
+[21:57:36] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: B19ED489
+[21:57:36] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World 2 - Yoshi's Island (USA) (Rev 1).zip
+[21:57:36] [INFO] [Netplay]   CRC: CF98DDAA vs room CRC: B19ED489
+[21:57:36] [INFO] [Netplay] Room 40/41 "kof98" -> 6 candidates
+[21:57:36] [INFO] [Netplay]   Hashing candidate 1/3: ./kof98.zip
+[21:57:36] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:57:36] [INFO] [Netplay]   Hashing candidate 2/3: ./kof98.zip
+[21:57:36] [INFO] [Netplay]   CRC: C823E045 vs room CRC: 59172EBD
+[21:57:36] [INFO] [Netplay]   Hashing candidate 3/3: ./kof98ae.zip
+[21:57:36] [INFO] [Netplay]   CRC: 0319CFC9 vs room CRC: 59172EBD
+[21:57:36] [INFO] [Netplay] Room 41/41 "ssriders" -> 3 candidates
+[21:57:36] [INFO] [Netplay]   Hashing candidate 1/3: ./ssridersabd.zip
+[21:57:36] [INFO] [Netplay]   CRC: 680FEB3C vs room CRC: 40A14A3D
+[21:57:36] [INFO] [Netplay]   Hashing candidate 2/3: ./ssriders.zip
+[21:57:36] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:57:36] [INFO] [Netplay]   Hashing candidate 3/3: ./ssridersabd.zip
+[21:57:36] [INFO] [Netplay]   CRC: 4160C372 vs room CRC: 40A14A3D
+[21:57:36] [INFO] [Netplay] matchLocalRoms() completed
+[21:57:36] [INFO] [Netplay] Returning 41 rooms (18 matched locally)
+[21:57:53] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\emulationstation\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -system fbneo -emulator libretro -core fbneo -netplaymode client -netplayip 177.76.50.97 -netplayport 55435 -netplaynick "RIESCADE" -rom "C:\tmp\RIESCADE_SYSTEM\roms\fbneo\sonicwi2.zip"
