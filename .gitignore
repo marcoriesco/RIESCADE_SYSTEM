@@ -60,3 +60,12 @@ records/
 # Release artifacts
 RIESCADE_SYSTEM.zip
 RIESCADE_SYSTEM.7z
+
+# Isolated Emulator Launcher Development
+emulationstation/.riescade-launcher/docs/
+emulationstation/.riescade-launcher/packages/
+emulationstation/.riescade-launcher/src/
+emulationstation/.riescade-launcher/test_env/
+emulationstation/.riescade-launcher/build.bat
+emulationstation/.riescade-launcher/nuget.exe
+emulationstation/.riescade-launcher/test.bat
