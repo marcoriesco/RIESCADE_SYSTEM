@@ -141,6 +141,28 @@ async function run() {
       fs.unlinkSync(dbFile);
       console.log('   ✓ riescade.db excluded');
     }
+
+    // Empty the logs folder in the temp release directory
+    const logsDir = path.join(esDest, '.riescade', 'logs');
+    if (fs.existsSync(logsDir)) {
+      fs.rmSync(logsDir, { recursive: true, force: true });
+    }
+    fs.mkdirSync(logsDir, { recursive: true });
+    console.log('   ✓ riescade/.riescade/logs/ emptied');
+
+    // Remove the launcher development source code folder from temp release directory
+    const launcherSrcDir = path.join(esDest, 'launcher', 'src');
+    if (fs.existsSync(launcherSrcDir)) {
+      fs.rmSync(launcherSrcDir, { recursive: true, force: true });
+      console.log('   ✓ riescade/launcher/src/ excluded');
+    }
+
+    // Remove emulatorLauncher log from temp release directory
+    const launcherLog = path.join(esDest, 'launcher', 'emulatorLauncher.log');
+    if (fs.existsSync(launcherLog)) {
+      fs.unlinkSync(launcherLog);
+      console.log('   ✓ riescade/launcher/emulatorLauncher.log excluded');
+    }
   }
 
   // --- EMPTY PLACEHOLDER FOLDERS with .keep ---

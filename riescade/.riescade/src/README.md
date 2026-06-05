@@ -1,43 +1,38 @@
-# Modern Retro Frontend
+# RIESCADE - Frontend (Electron + React)
 
-A premium, modern frontend for EmulationStation/RetroBat built with Electron, React, and TypeScript.
+Esta pasta contém o código-fonte do frontend do RIESCADE, construído com Electron, React, TypeScript e Sass.
 
-## Features
+Para obter instruções completas sobre o repositório principal e a compilação do lançador de emuladores, consulte o [README.md principal na raiz do repositório](file:///c:/tmp/RIESCADE_SYSTEM/README.md).
 
-- Fully compatible with RetroBat/ES configuration and gamelists.
-- High-performance UI with Framer Motion animations.
-- SQLite-ready architecture for fast game indexing.
-- Direct integration with `emulatorLauncher.exe`.
+---
 
-## Getting Started
+## 🛠️ Instruções de Compilação e Desenvolvimento
 
-### 1. Install Dependencies
+### Pré-requisitos
+- **Node.js** instalado (Recomendado v18 ou superior).
 
-Since PowerShell execution policies might be restricted, use CMD to install:
-
+### Instalação de Dependências
+Para instalar as dependências do projeto (execute dentro desta pasta):
 ```bash
-cmd /c npm install
+npm install
 ```
 
-### 2. Run in Development
-
+### Rodar em Desenvolvimento (Hot Reload)
+Para iniciar a aplicação em modo de desenvolvimento com hot reloading (recarregamento automático ao salvar alterações):
 ```bash
-cmd /c npm run dev
+npm run dev
 ```
 
-### 3. Deploy for Production
-
+### Compilação e Implantação local (Build & Deploy)
+Para compilar a aplicação de produção e implantá-la na estrutura de pastas correta do sistema:
 ```bash
-cmd /c npm run deploy
+npm run deploy
 ```
+Este comando executa a build do vite, empacota com o `electron-builder` na pasta local e executa o script de deploy para gerar o launcher `RIESCADE.exe` portátil no diretório raiz do repositório.
 
-## Structure
-
-- `src/main`: Electron main process (logic, parsers, services).
-- `src/renderer`: React frontend (UI, stores, components).
-- `src/shared`: Shared types and utilities.
-- `src/preload`: IPC bridge.
-
-## Relative Paths
-
-The app is designed to be placed in the `/emulationstation` folder of your RetroBat installation. It automatically resolves paths relative to its location to find ROMs and configurations.
+### Publicar Release
+Para publicar uma nova versão:
+```bash
+npm run release
+```
+*Nota: Este script requer que as variáveis de ambiente `GITHUB_TOKEN` ou `GH_TOKEN` estejam configuradas no arquivo `.env`.*

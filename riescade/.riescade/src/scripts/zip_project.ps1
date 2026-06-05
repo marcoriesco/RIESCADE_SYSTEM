@@ -42,24 +42,46 @@ foreach ($file in $rootFiles) {
     }
 }
 
-# --- EMULATIONSTATION folder (complete .riescade minus src/) ---
-$esSource = Join-Path $projectRoot 'emulationstation'
-$esDest = Join-Path $temp 'emulationstation'
+# --- RIESCADE folder (complete .riescade minus src/) ---
+$esSource = Join-Path $projectRoot 'riescade'
+$esDest = Join-Path $temp 'riescade'
 if (Test-Path $esSource) {
     Copy-Item -Path $esSource -Destination $esDest -Recurse -Force
     # Remove the development source code folder
     $srcDir = Join-Path (Join-Path $esDest '.riescade') 'src'
     if (Test-Path $srcDir) {
         Remove-Item -Path $srcDir -Recurse -Force
-        Write-Host "   [OK] emulationstation/.riescade/ (src/ excluded)"
+        Write-Host "   [OK] riescade/.riescade/ (src/ excluded)"
     } else {
-        Write-Host "   [OK] emulationstation/"
+        Write-Host "   [OK] riescade/"
     }
     # Remove the database file (each user generates their own)
     $dbFile = Join-Path (Join-Path $esDest '.riescade') 'riescade.db'
     if (Test-Path $dbFile) {
         Remove-Item -Path $dbFile -Force
         Write-Host "   [OK] riescade.db excluded"
+    }
+
+    # Empty the logs folder in the temp release directory
+    $logsDir = Join-Path (Join-Path $esDest '.riescade') 'logs'
+    if (Test-Path $logsDir) {
+        Remove-Item -Path $logsDir -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
+    Write-Host "   [OK] riescade/.riescade/logs/ (emptied)"
+
+    # Remove the launcher development source code folder from temp release directory
+    $launcherSrcDir = Join-Path (Join-Path $esDest 'launcher') 'src'
+    if (Test-Path $launcherSrcDir) {
+        Remove-Item -Path $launcherSrcDir -Recurse -Force
+        Write-Host "   [OK] riescade/launcher/src/ excluded"
+    }
+
+    # Remove emulatorLauncher log from temp release directory
+    $launcherLog = Join-Path (Join-Path $esDest 'launcher') 'emulatorLauncher.log'
+    if (Test-Path $launcherLog) {
+        Remove-Item -Path $launcherLog -Force
+        Write-Host "   [OK] riescade/launcher/emulatorLauncher.log excluded"
     }
 }
 
@@ -87,7 +109,7 @@ foreach ($folder in $extraFolders) {
 Write-Host "Creating 7z archive..." -ForegroundColor Cyan
 $7zExe = "C:\Program Files\7-Zip\7z.exe"
 if (!(Test-Path $7zExe)) {
-    $7zExe = Join-Path $projectRoot "emulationstation\7z.exe"
+    $7zExe = Join-Path $projectRoot "riescade\launcher\7z.exe"
 }
 if (!(Test-Path $7zExe)) {
     $7zExe = "7z" # Fallback to PATH
