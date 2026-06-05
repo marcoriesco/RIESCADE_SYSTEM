@@ -5,23 +5,21 @@ modern-frontend/node_modules/
 # Build artifacts
 dist/
 out/
-modern-frontend/dist/
-modern-frontend/out/
 *.exe
 *.asar
 
 # Electron deployment binaries (.riescade/)
-emulationstation/.riescade/*.dll
-emulationstation/.riescade/*.pak
-emulationstation/.riescade/*.bin
-emulationstation/.riescade/*.dat
-emulationstation/.riescade/*.html
-emulationstation/.riescade/*.json
-emulationstation/.riescade/*.ico
-emulationstation/.riescade/*.txt
-emulationstation/.riescade/locales/*.pak
-emulationstation/.riescade/resources/app.asar
-emulationstation/.riescade/src/debug_*.log
+riescade/.riescade/*.dll
+riescade/.riescade/*.pak
+riescade/.riescade/*.bin
+riescade/.riescade/*.dat
+riescade/.riescade/*.html
+riescade/.riescade/*.json
+riescade/.riescade/*.ico
+riescade/.riescade/*.txt
+riescade/.riescade/locales/*.pak
+riescade/.riescade/resources/app.asar
+riescade/.riescade/src/debug_*.log
 
 # OS generated files
 .DS_Store
@@ -62,10 +60,4 @@ RIESCADE_SYSTEM.zip
 RIESCADE_SYSTEM.7z
 
 # Isolated Emulator Launcher Development
-emulationstation/.riescade-launcher/docs/
-emulationstation/.riescade-launcher/packages/
-emulationstation/.riescade-launcher/src/
-emulationstation/.riescade-launcher/test_env/
-emulationstation/.riescade-launcher/build.bat
-emulationstation/.riescade-launcher/nuget.exe
-emulationstation/.riescade-launcher/test.bat
+riescade/launcher/src/
