@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'fs'
 import { SystemsParser } from '../parsers/SystemsParser'
 import { GamelistParser } from '../parsers/GamelistParser'
 import { SettingsParser } from '../parsers/SettingsParser'
-import { getConfigPath, getRomsPath, getRetroBatPath, getCollectionsPath } from '../utils/paths'
+import { getConfigPath, getRomsPath, getRetroBatPath, getCollectionsPath, getDatabasePath } from '../utils/paths'
 import { System, Game } from '../../shared/types'
 import { DatabaseService } from './DatabaseService'
 
@@ -35,6 +35,10 @@ export class LibraryService {
   public static isDbMode(): boolean {
     try {
       const settings = new SettingsParser()
+      const parseGamelistOnly = settings.getSetting('ParseGamelistOnly', 'bool') === true
+      if (parseGamelistOnly) {
+        return false
+      }
       const mode = settings.getSetting('LibraryMode', 'string')
       // Default to 'database' if not set
       return mode !== 'gamelist'
@@ -496,37 +500,42 @@ export class LibraryService {
     if (LibraryService.isPreloaded) return
 
     const { BrowserWindow } = require('electron')
-    const sendProgress = (p: number) => {
+    const sendProgress = (p: number, statusKey?: string) => {
       try {
         const win = BrowserWindow.getAllWindows()[0]
         if (win) {
-          win.webContents.send('systems-loading-progress', p)
+          win.webContents.send('systems-loading-progress', p, statusKey)
         }
       } catch (err) {}
     }
 
-    sendProgress(5)
-    await delay(50)
-
     const useDb = LibraryService.isDbMode()
+    const dbService = LibraryService.databaseService
+    if (useDb) {
+      dbService.open()
+    }
+    const isFirstRun = useDb && dbService.getIndexedSystemCount() === 0
+    const initialStatusKey = useDb 
+      ? (isFirstRun ? 'INDEXING_DATABASE' : 'UPDATING_DATABASE')
+      : 'LOADING_PLATFORMS'
+
+    sendProgress(5, initialStatusKey)
+    await delay(50)
 
     if (useDb) {
       // ─── DB Mode: sync systems into SQLite ───
-      const dbService = LibraryService.databaseService
-      dbService.open()
-
       // Parse all systems first
       const allSystems = this.systemsParser.parse()
-      sendProgress(10)
+      sendProgress(10, initialStatusKey)
 
       // Sync all systems (only changed ones will be re-indexed)
       const scanFn = this.scanPhysicalGames.bind(this)
       dbService.syncAll(allSystems, scanFn, (sysName, current, total) => {
         const progress = 10 + Math.round((current / total) * 40)
-        sendProgress(progress)
+        sendProgress(progress, initialStatusKey)
       })
 
-      sendProgress(50)
+      sendProgress(50, initialStatusKey)
 
       // Use SQL queries for auto-collection counts
       const displayed = this.getDisplayedSystems()
@@ -555,18 +564,21 @@ export class LibraryService {
         }
       }
 
-      sendProgress(80)
+      sendProgress(80, initialStatusKey)
     } else {
       // ─── Gamelist.xml Mode: original behavior ───
+      sendProgress(10, initialStatusKey)
       this.getDisplayedSystems()
+      sendProgress(30, initialStatusKey)
       this.calculateQuickAutoCounts()
+      sendProgress(50, initialStatusKey)
     }
 
-    sendProgress(50)
+    sendProgress(50, initialStatusKey)
     await delay(50)
 
     LibraryService.isPreloaded = true
-    sendProgress(100)
+    sendProgress(100, initialStatusKey)
   }
 
   public async preloadSystem(systemName: string, forcePhysicalScan = false): Promise<void> {
@@ -610,7 +622,12 @@ export class LibraryService {
       const { BrowserWindow } = require('electron')
       const win = BrowserWindow.getAllWindows()[0]
       if (win) {
-        win.webContents.send('systems-loading-progress', 100)
+        const useDb = LibraryService.isDbMode()
+        const isFirstRun = useDb && LibraryService.databaseService.isOpen() && LibraryService.databaseService.getIndexedSystemCount() === 0
+        const statusKey = useDb 
+          ? (isFirstRun ? 'INDEXING_DATABASE' : 'UPDATING_DATABASE')
+          : 'LOADING_PLATFORMS'
+        win.webContents.send('systems-loading-progress', 100, statusKey)
       }
     } catch (err) {}
   }
@@ -1003,7 +1020,6 @@ export class LibraryService {
       console.error('Failed to write debug_games.log:', e)
     }
 
-    const localArtEnabled = settings.getSetting('LocalArt', 'bool') === true
     const systemPath = system && system.path ? system.path : null
 
     const processedGames = games.map(g => {
@@ -1016,158 +1032,6 @@ export class LibraryService {
           }
         }
       }
-
-      if (localArtEnabled && systemPath) {
-        const lastSlash = Math.max(g.path.lastIndexOf('/'), g.path.lastIndexOf('\\'))
-        const filename = lastSlash !== -1 ? g.path.substring(lastSlash + 1) : g.path
-        const lastDot = filename.lastIndexOf('.')
-        const stem = lastDot !== -1 ? filename.substring(0, lastDot) : filename
-
-        const imageExtensions = ['.png', '.jpg', '.jpeg']
-        const videoExtensions = ['.mp4', '.avi', '.mkv']
-
-        // 1. Resolve image if not specified
-        if (!g.image || String(g.image).trim() === '') {
-          let foundPath = ''
-          for (const ext of imageExtensions) {
-            const checkPath = join(systemPath, 'images', `${stem}-image${ext}`)
-            if (existsSync(checkPath)) {
-              foundPath = checkPath.replace(/\\/g, '/')
-              break
-            }
-          }
-          if (!foundPath) {
-            for (const ext of imageExtensions) {
-              const checkPath = join(systemPath, 'images', `${stem}${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (!foundPath) {
-            for (const ext of imageExtensions) {
-              const checkPath = join(systemPath, 'media', 'fanart', `${stem}${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (foundPath) {
-            g.image = foundPath
-          }
-        }
-
-        // 2. Resolve thumbnail if not specified
-        if (!g.thumbnail || String(g.thumbnail).trim() === '') {
-          let foundPath = ''
-          for (const ext of imageExtensions) {
-            const checkPath = join(systemPath, 'images', `${stem}-thumb${ext}`)
-            if (existsSync(checkPath)) {
-              foundPath = checkPath.replace(/\\/g, '/')
-              break
-            }
-          }
-          if (!foundPath) {
-            for (const ext of imageExtensions) {
-              const checkPath = join(systemPath, 'images', `${stem}-image${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (!foundPath) {
-            for (const ext of imageExtensions) {
-              const checkPath = join(systemPath, 'images', `${stem}${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (!foundPath) {
-            for (const ext of imageExtensions) {
-              const checkPath = join(systemPath, 'media', 'cover', `${stem}${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (foundPath) {
-            g.thumbnail = foundPath
-          }
-        }
-
-        // 3. Resolve marquee if not specified
-        if (!g.marquee || String(g.marquee).trim() === '') {
-          let foundPath = ''
-          for (const ext of imageExtensions) {
-            const checkPath = join(systemPath, 'images', `${stem}-marquee${ext}`)
-            if (existsSync(checkPath)) {
-              foundPath = checkPath.replace(/\\/g, '/')
-              break
-            }
-          }
-          if (!foundPath) {
-            for (const ext of imageExtensions) {
-              const checkPath = join(systemPath, 'media', 'logo', `${stem}${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (foundPath) {
-            g.marquee = foundPath
-          }
-        }
-
-        // 4. Resolve video if not specified
-        if (!g.video || String(g.video).trim() === '') {
-          let foundPath = ''
-          for (const ext of videoExtensions) {
-            const checkPath = join(systemPath, 'images', `${stem}-video${ext}`)
-            if (existsSync(checkPath)) {
-              foundPath = checkPath.replace(/\\/g, '/')
-              break
-            }
-          }
-          if (!foundPath) {
-            for (const ext of videoExtensions) {
-              const checkPath = join(systemPath, 'videos', `${stem}-video${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (!foundPath) {
-            for (const ext of videoExtensions) {
-              const checkPath = join(systemPath, 'videos', `${stem}${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (!foundPath) {
-            for (const ext of videoExtensions) {
-              const checkPath = join(systemPath, 'media', 'video', `${stem}${ext}`)
-              if (existsSync(checkPath)) {
-                foundPath = checkPath.replace(/\\/g, '/')
-                break
-              }
-            }
-          }
-          if (foundPath) {
-            g.video = foundPath
-          }
-        }
-      }
-
       return g
     })
 
@@ -1269,7 +1133,7 @@ export class LibraryService {
     return filtered
   }
 
-  private scanPhysicalGames(systemPath: string, extensions: string[], systemName: string): Game[] {
+  public scanPhysicalGames(systemPath: string, extensions: string[], systemName: string): Game[] {
     const games: Game[] = []
     const extSet = new Set(extensions.map(e => e.toLowerCase().trim()))
 
@@ -1819,7 +1683,6 @@ export class LibraryService {
     const fs = require('fs')
     const os = require('os')
     const configPath = getConfigPath()
-    const { getDatabasePath } = require('../utils/paths')
     
     // 1. Close database connection
     try {

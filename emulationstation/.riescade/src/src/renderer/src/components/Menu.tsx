@@ -930,7 +930,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   }
 
   const getMainMenuItems = (): MenuItem[] => {
-    const isPhysicalSystem = selectedSystem && !(
+    const showReloadSystem = selectedSystem && !(
       selectedSystem.name === 'collections' ||
       selectedSystem.path?.startsWith('virtual://') ||
       ['all', 'favorites', 'recent', 'neverplayed', 'retroachievements', '2players', '4players', 'vertical', 'lightgun', 'wheel', 'trackball', 'spinner'].includes(selectedSystem.name.toLowerCase())
@@ -940,24 +940,25 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       {
         id: 'game_settings', label: t('GAME SETTINGS'), submenu: [
           { id: 'group_reload_app', label: t('TOOLS'), type: 'group' },
-          { id: 'reload_app', label: t('UPDATE GAMELIST'), type: 'action', onClick: () => {
-            if (onUpdateGamelists) {
-              onUpdateGamelists()
-            } else {
-              window.api.executeCommand('update-gamelists')
-            }
-          } },
-          ...(isPhysicalSystem ? [{
-            id: 'reload_system',
-            label: t('UPDATE GAMELIST'),
-            description: getFriendlySystemName(selectedSystem).toUpperCase(),
-            type: 'action' as const,
+          { 
+            id: 'reload_gamelist', 
+            label: t('UPDATE GAMELIST'), 
+            description: showReloadSystem 
+              ? `${t('UPDATE_GAMELIST_OF')} ${(selectedSystem.fullname || selectedSystem.name).toUpperCase()}`
+              : undefined,
+            type: 'action', 
             onClick: () => {
               if (onUpdateGamelists) {
-                onUpdateGamelists(selectedSystem.name)
+                if (showReloadSystem) {
+                  onUpdateGamelists(selectedSystem.name)
+                } else {
+                  onUpdateGamelists()
+                }
+              } else {
+                window.api.executeCommand('update-gamelists')
               }
-            }
-          }] : []),
+            } 
+          },
           { id: 'group_accounts', label: t('ACCOUNTS'), type: 'group' },
           { id: 'retroachievements_submenu', label: t('RETROACHIEVEMENTS'), submenu: [
             { id: 'cheevos_enable', label: t('RETROACHIEVEMENTS'), type: 'toggle', settingName: 'global.cheevos', settingType: 'bool' },
@@ -2217,13 +2218,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             },
             { 
               id: 'clear_caches_action', 
-              label: t('CLEAR CACHES'), 
+              label: t('CLEAR CACHE AND DATABASE'), 
               type: 'action',
               description: t("This will clear all media cache and game database."), 
               onClick: () => {
                 if (confirm(t('Are you sure you want to delete cache files?'))) {
                   window.api.clearCaches().then(() => {
-                    window.api.executeCommand('restart-frontend')
+                    window.api.executeCommand('reload-frontend')
                   }).catch((err: any) => alert(t('Error:') + ' ' + err))
                 }
               } 
@@ -2234,7 +2235,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'ignore_multidisk', label: t('IGNORE MULTI-FILE DISK CONTENT (CUE/GDI/CCD/M3U)'), type: 'toggle', settingName: 'RemoveMultiDiskContent', settingType: 'bool' },
             { id: 'enable_filtering', label: t('ENABLE GAME FILTERING'), type: 'toggle', settingName: 'ForceDisableFilters', settingType: 'bool', invert: true },
             { id: 'parse_gamelist_only', label: t('PARSE GAMELISTS ONLY'), type: 'toggle', settingName: 'ParseGamelistOnly', settingType: 'bool', description: t("Debug tool: Don't check if the ROMs actually exist. Can cause problems!") },
-            { id: 'search_local_art', label: t('SEARCH FOR LOCAL ART'), type: 'toggle', settingName: 'LocalArt', settingType: 'bool', description: t("If no image is specified in the gamelist, try to find media with the same filename to use.") },
 
             // === USER INTERFACE ===
             { id: 'group_dev_ui', label: t('USER INTERFACE'), type: 'group' },

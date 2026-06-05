@@ -169,6 +169,7 @@ function App() {
 	const [isNetplayLobbyOpen, setIsNetplayLobbyOpen] = useState(false);
 	const [hasRestoredLastSystem, setHasRestoredLastSystem] = useState(false);
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
+	const [systemsLoadingMessage, setSystemsLoadingMessage] = useState('');
 	const [isLoadingGames, setIsLoadingGames] = useState(false);
 
 	const addNotification = useCallback(
@@ -189,6 +190,20 @@ function App() {
 			return appLocales[lang]?.[key] || appLocales['en_US']?.[key] || key;
 		},
 		[settings],
+	);
+
+	// ─── Theme Translation helper for dynamic status keys ───
+	const translateThemeKey = useCallback(
+		(key: string): string => {
+			if (!theme) return key;
+			const defaultLocaleKey = theme.defaultLocale || 'en_US';
+			const lang = settings['Language']?.value || defaultLocaleKey;
+			const themeLocales = theme.locales || {};
+			const currentLocale = themeLocales[lang] || {};
+			const fallbackLocale = themeLocales[defaultLocaleKey] || themeLocales['en_US'] || {};
+			return currentLocale[key] || fallbackLocale[key] || key;
+		},
+		[theme, settings],
 	);
 
 	// ─── Audio System State & Refs ───
@@ -494,12 +509,16 @@ function App() {
 	useEffect(() => {
 		const removeProgress = window.api.on(
 			'systems-loading-progress',
-			(_: any, progress: number) => {
+			(_: any, progress: number, statusKey?: string) => {
 				setSystemsLoadingProgress(progress);
+				if (statusKey) {
+					const translated = translateThemeKey(statusKey);
+					setSystemsLoadingMessage(translated);
+				}
 			},
 		);
 		return () => removeProgress();
-	}, []);
+	}, [translateThemeKey]);
 
 	// Inject active theme's global.css into document head to prevent FOUC (Flash of Unstyled Content)
 	// and guarantee that menu styles, fonts, and icons load instantly and stay loaded.
@@ -558,30 +577,34 @@ function App() {
 						// Wait a tiny bit (100ms) to ensure React has fully rendered and painted the splash screen to the DOM
 						setTimeout(() => {
 							if (initialLoadCancelled) return;
-							window.api.preloadLibrary().then(() => {
+							// Load settings first so translations (t/translateThemeKey) use the correct language during library preloading
+							window.api.getSettings().then((initialSettings: any) => {
 								if (initialLoadCancelled) return;
-								Promise.all([
-									window.api.getSystems(),
-									window.api.getSettings(),
-									window.api.getMusicFiles(),
-									window.api.getMusicPath()
-								]).then(([s, initialSettings, files, mPath]: [System[], any, string[], string]) => {
-									setSystems(s);
-									setSettings(initialSettings);
-									setMusicFiles(files);
-									setMusicPath(mPath);
+								setSettings(initialSettings);
+								
+								window.api.preloadLibrary().then(() => {
+									if (initialLoadCancelled) return;
+									Promise.all([
+										window.api.getSystems(),
+										window.api.getMusicFiles(),
+										window.api.getMusicPath()
+									]).then(([s, files, mPath]: [System[], string[], string]) => {
+										setSystems(s);
+										setMusicFiles(files);
+										setMusicPath(mPath);
 
-									// Auto check for updates on startup if enabled
-									const isUpdatesEnabled = initialSettings['updates.enabled']?.value !== 'false' && initialSettings['updates.enabled']?.value !== false;
-									if (isUpdatesEnabled && !initialLoadCancelled) {
-										window.api.checkForUpdates().then((res: any) => {
-											if (res && res.updateAvailable && !initialLoadCancelled) {
-												addNotification(`ATUALIZAÇÃO DISPONÍVEL (v${res.version})! Abra o Menu > Updates para atualizar.`, 'info', 'general');
-											}
-										}).catch(err => {
-											console.error('Auto update check failed:', err);
-										});
-									}
+										// Auto check for updates on startup if enabled
+										const isUpdatesEnabled = initialSettings['updates.enabled']?.value !== 'false' && initialSettings['updates.enabled']?.value !== false;
+										if (isUpdatesEnabled && !initialLoadCancelled) {
+											window.api.checkForUpdates().then((res: any) => {
+												if (res && res.updateAvailable && !initialLoadCancelled) {
+													addNotification(`ATUALIZAÇÃO DISPONÍVEL (v${res.version})! Abra o Menu > Updates para atualizar.`, 'info', 'general');
+												}
+											}).catch(err => {
+												console.error('Auto update check failed:', err);
+											});
+										}
+									});
 								});
 							});
 						}, 100);
@@ -637,7 +660,7 @@ function App() {
 					}
 
 					return {
-						name: id,
+						name: id.split(' (')[0].trim(),
 						guid: guid,
 						buttons: gp!.buttons.length,
 						axes: gp!.axes.length,
@@ -2074,12 +2097,28 @@ function App() {
 		// Update percentage text
 		const pct = el.querySelector('.percentage');
 		if (pct) pct.textContent = `${systemsLoadingProgress}%`;
+		// Update status message text
+		const msgEl = el.querySelector('.loading-msg');
+		if (msgEl) {
+			if (systemsLoadingMessage) {
+				msgEl.textContent = systemsLoadingMessage;
+			}
+		} else {
+			// Fallback: if there is no .loading-msg, replace first child text node of .loading-text
+			const textEl = el.querySelector('.loading-text');
+			if (textEl && systemsLoadingMessage) {
+				const firstChild = textEl.firstChild;
+				if (firstChild && firstChild.nodeType === Node.TEXT_NODE) {
+					firstChild.textContent = systemsLoadingMessage + ' ';
+				}
+			}
+		}
 		// Show/hide loading overlay and progress container based on progress
 		const overlay = el.querySelector('.loading-overlay') as HTMLElement;
 		const progressContainer = el.querySelector('.progress-container') as HTMLElement;
 		if (overlay) overlay.style.opacity = systemsLoadingProgress > 0 ? '1' : '0';
 		if (progressContainer) progressContainer.style.opacity = systemsLoadingProgress > 0 ? '1' : '0';
-	}, [systemsLoadingProgress]);
+	}, [systemsLoadingProgress, systemsLoadingMessage]);
 
 	// ─── Rendering ───
 	if (!theme) return null;
@@ -2170,6 +2209,7 @@ function App() {
 						setIsSaveStateManagerOpen(true)
 						setIsGameOptionsOpen(false)
 					}}
+					t={t}
 				/>
 			)}
 

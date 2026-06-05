@@ -135,10 +135,11 @@ interface GameOptionsProps {
   onLaunch?: () => void
   onOpenSaveStates?: () => void
   isSaveStateManagerOpen?: boolean
+  t: (key: string) => string
 }
 
 export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({ 
-  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists, onLaunch, onOpenSaveStates, isSaveStateManagerOpen
+  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists, onLaunch, onOpenSaveStates, isSaveStateManagerOpen, t
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -270,10 +271,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const getRootItems = (currentGame: Game, gameCols: string[], sys: System, allCols: string[], currentSettings: Record<string, any>) => {
     const items: any[] = []
 
-    const currentLang = currentSettings['Language']?.value || 'en_US'
-    const isPt = currentLang.startsWith('pt')
-    const t = (en: string, pt: string) => isPt ? pt : en
-
     const isLibretro = (() => {
       const activeEmulator = currentGame.emulator || 'auto'
       if (activeEmulator !== 'auto') {
@@ -288,33 +285,33 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     })()
 
     // 1. Group: GAMES
-    items.push({ id: 'group_games', label: t('GAME', 'JOGO'), type: 'group' })
+    items.push({ id: 'group_games', label: t('GAME'), type: 'group' })
     items.push({
       id: 'launch_game',
-      label: t('LAUNCH', 'JOGAR'),
+      label: t('LAUNCH'),
       type: 'action',
       actionType: 'launch'
     })
     if (isLibretro) {
       items.push({
         id: 'save_states',
-        label: t('SAVE STATES', 'ESTADOS DE SALVAMENTO'),
+        label: t('SAVE STATES'),
         type: 'action',
         actionType: 'save_states'
       })
     }
     items.push({
       id: 'delete_game',
-      label: t('DELETE GAME', 'REMOVER JOGO'),
+      label: t('DELETE GAME'),
       type: 'action',
       actionType: 'delete'
     })
 
     // 2. Group: COLEÇÕES
-    items.push({ id: 'group_collections', label: t('COLLECTIONS', 'COLEÇÕES'), type: 'group' })
+    items.push({ id: 'group_collections', label: t('COLLECTIONS'), type: 'group' })
     items.push({ 
       id: 'favorite', 
-      label: currentGame.favorite ? t('REMOVE FROM FAVORITES', 'REMOVER DOS FAVORITOS') : t('ADD TO FAVORITES', 'FAVORITAR JOGO'), 
+      label: currentGame.favorite ? t('REMOVE FROM FAVORITES') : t('ADD TO FAVORITES'), 
       type: 'toggle', 
       value: currentGame.favorite 
     })
@@ -330,7 +327,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
     items.push({
       id: 'add_to_collection',
-      label: t('ADD TO CUSTOM COLLECTION...', 'ADICIONAR A COLEÇÃO'),
+      label: t('ADD TO CUSTOM COLLECTION...'),
       type: 'submenu',
       submenu: addColSubmenu
     })
@@ -339,7 +336,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     gameCols.forEach(col => {
       items.push({
         id: `remove_col_${col}`,
-        label: t(`REMOVE FROM ${col.toUpperCase()}`, `REMOVER DE ${col.toUpperCase()}`),
+        label: `${t('REMOVE FROM')} ${col.toUpperCase()}`,
         type: 'action',
         collectionName: col,
         actionType: 'remove'
@@ -347,10 +344,10 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     })
 
     // 3. Group: OPTIONS
-    items.push({ id: 'group_options', label: t('OPTIONS', 'OPÇÕES'), type: 'group' })
+    items.push({ id: 'group_options', label: t('OPTIONS'), type: 'group' })
     items.push({
       id: 'scrape_this_game',
-      label: t('SCRAPE', 'PROCURAR POR MÍDIAS DESTE JOGO'),
+      label: t('SCRAPE'),
       type: 'action',
       actionType: 'scrape'
     })
@@ -439,7 +436,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       },
       {
         id: 'game_smooth',
-        label: t('SMOOTH GAMES (BILINEAR FILTERING)', 'JOGOS SUAVES (FILTRO BILINEAR)'),
+        label: t('SMOOTH GAMES (BILINEAR FILTERING)'),
         type: 'toggle',
         settingName: 'smooth',
         value: getGameSettingValue('smooth', 'auto') === 'true' || getGameSettingValue('smooth', 'auto') === true
@@ -448,7 +445,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
     items.push({
       id: 'advanced_game_options',
-      label: t('ADVANCED GAME OPTIONS', 'OPÇÕES AVANÇADAS DO JOGO'),
+      label: t('ADVANCED GAME OPTIONS'),
       type: 'submenu',
       submenu: advancedSubmenu
     })
@@ -456,7 +453,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     // EDIT THIS GAME'S METADATA
     items.push({
       id: 'edit_metadata',
-      label: t("EDIT THIS GAME'S METADATA", "EDITAR METADADOS DESTE JOGO"),
+      label: t("EDIT THIS GAME'S METADATA"),
       type: 'action',
       actionType: 'edit_metadata'
     })

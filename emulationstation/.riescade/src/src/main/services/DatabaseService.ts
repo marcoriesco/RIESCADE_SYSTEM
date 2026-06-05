@@ -397,7 +397,16 @@ export class DatabaseService {
         onProgress(sys.name, i + 1, total)
       }
     }
-
+    // Orphan Cleanup: delete games and systems that are no longer in the active systems list
+    const activeNames = realSystems.map(s => s.name)
+    if (activeNames.length > 0) {
+      const placeholders = activeNames.map(() => '?').join(',')
+      db.prepare(`DELETE FROM games WHERE system NOT IN (${placeholders})`).run(...activeNames)
+      db.prepare(`DELETE FROM systems WHERE name NOT IN (${placeholders})`).run(...activeNames)
+    } else {
+      db.prepare('DELETE FROM games').run()
+      db.prepare('DELETE FROM systems').run()
+    }
     if (isFirstRun) {
       const totalGames = this.getTotalGameCount()
       console.log(`\n✅ Indexing complete: ${totalGames} games across ${realSystems.length} systems`)

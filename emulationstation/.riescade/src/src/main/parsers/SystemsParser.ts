@@ -69,7 +69,14 @@ export class SystemsParser {
       try {
         const mainWindow = BrowserWindow.getAllWindows()[0]
         if (mainWindow) {
-          mainWindow.webContents.send('systems-loading-progress', progress)
+          const { LibraryService } = require('../services/LibraryService')
+          const useDb = LibraryService.isDbMode()
+          const dbService = LibraryService.getDatabase()
+          const isFirstRun = useDb && dbService.isOpen() && dbService.getIndexedSystemCount() === 0
+          const statusKey = useDb 
+            ? (isFirstRun ? 'INDEXING_DATABASE' : 'UPDATING_DATABASE')
+            : 'LOADING_PLATFORMS'
+          mainWindow.webContents.send('systems-loading-progress', progress, statusKey)
         }
       } catch (err) {
         // Safe check in case window is not initialized yet

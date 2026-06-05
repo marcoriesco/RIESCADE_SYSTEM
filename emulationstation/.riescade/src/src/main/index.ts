@@ -17,6 +17,7 @@ import { getRetroBatPath, getConfigPath, getDefaultThemePath, getUserThemesPath,
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from './services/ScraperService'
 import { setupLogger } from './utils/logger'
+import { RomsWatcherService } from './services/RomsWatcherService'
 
 setupLogger()
 
@@ -32,6 +33,7 @@ let activeControllers: any[] = []
 let themeWatcher: FSWatcher | null = null
 let mainWindow: BrowserWindow | null = null
 let themeReloadTimeout: NodeJS.Timeout | null = null
+let romsWatcher: RomsWatcherService | null = null
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -95,6 +97,19 @@ app.whenReady().then(() => {
         LibraryService.clearCache()
       }
       await libraryService.preloadAll(forcePhysicalScan)
+
+      // Start/stop ROMs watcher dynamically based on DB mode setting
+      if (LibraryService.isDbMode()) {
+        if (!romsWatcher) {
+          romsWatcher = new RomsWatcherService(libraryService)
+          romsWatcher.start()
+        }
+      } else {
+        if (romsWatcher) {
+          romsWatcher.stop()
+          romsWatcher = null
+        }
+      }
     }
     return true
   })
@@ -461,7 +476,7 @@ app.whenReady().then(() => {
     const win = BrowserWindow.getAllWindows()[0]
     libraryService.rebuildDatabase((sysName, current, total) => {
       if (win) {
-        win.webContents.send('systems-loading-progress', Math.round((current / total) * 100))
+        win.webContents.send('systems-loading-progress', Math.round((current / total) * 100), 'INDEXING_DATABASE')
       }
     })
     return true
@@ -1611,6 +1626,10 @@ try {
 })
 
 app.on('window-all-closed', () => {
+  if (romsWatcher) {
+    romsWatcher.stop()
+    romsWatcher = null
+  }
   if (process.platform !== 'darwin') {
     app.quit()
   }
