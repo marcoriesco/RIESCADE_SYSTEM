@@ -457,6 +457,14 @@ app.whenReady().then(() => {
     return LibraryService.isDbMode() ? 'database' : 'gamelist'
   })
 
+  ipcMain.handle('get-all-media-paths', async () => {
+    const db = LibraryService.getDatabase()
+    if (db.isOpen()) {
+      return db.getAllMediaPaths()
+    }
+    return []
+  })
+
   ipcMain.handle('get-system-information', async () => {
     const os = require('os')
     const fs = require('fs')

@@ -480,7 +480,7 @@
     "type": "bool"
   },
   "DrawFramerate": {
-    "value": true,
+    "value": false,
     "type": "bool"
   },
   "ShowControllerBattery": {
@@ -552,7 +552,7 @@
     "type": "bool"
   },
   "ShowNetworkIndicator": {
-    "value": true,
+    "value": false,
     "type": "bool"
   },
   "global.netplay": {
@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "namco3xx",
+    "value": "switch",
     "type": "string"
   },
   "MaxVRAM": {
@@ -934,5 +934,13 @@
   "GunMoveTolerence": {
     "value": 0,
     "type": "float"
+  },
+  "CreateImageCache": {
+    "value": true,
+    "type": "bool"
+  },
+  "CreateThemeAssetsCache": {
+    "value": true,
+    "type": "bool"
   }
 }

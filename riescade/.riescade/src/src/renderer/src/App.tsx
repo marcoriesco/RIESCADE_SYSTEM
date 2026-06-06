@@ -82,6 +82,15 @@ const escapeFileUrl = (url: string): string => {
 	return url;
 };
 
+const preloadImage = (url: string): Promise<void> => {
+	return new Promise((resolve) => {
+		const img = new Image();
+		img.onload = () => resolve();
+		img.onerror = () => resolve();
+		img.src = url;
+	});
+};
+
 const getNotificationIcon = (category: string | undefined, type: string) => {
 	if (category === 'controller') {
 		return (
@@ -563,6 +572,106 @@ function App() {
 		};
 	}, []);
 
+	// ─── Preloading & Caching Engine ───
+	const preloadThemeAssets = useCallback(async (currentSystems = systems, currentTheme = theme) => {
+		if (!currentTheme || !currentTheme.path || !currentSystems || currentSystems.length === 0) return;
+		const themePathClean = currentTheme.path.replace(/\\/g, '/');
+		
+		console.log(`[Cache] Starting theme assets preloading for ${currentSystems.length} systems...`);
+		const promises: Promise<void>[] = [];
+		
+		currentSystems.forEach((sys: any) => {
+			const sysTheme = sys.theme || sys.name;
+			const sysName = sys.name === 'all' ? 'auto-allgames' : sysTheme;
+			
+			// Logos
+			const logoUrl = `file:///${themePathClean}/assets/logos/${sysName}.png`;
+			promises.push(preloadImage(logoUrl));
+			
+			// Arts (fanart/background)
+			const artJpgUrl = `file:///${themePathClean}/assets/arts/${sysName}.jpg`;
+			const artPngUrl = `file:///${themePathClean}/assets/arts/${sysName}.png`;
+			promises.push(preloadImage(artJpgUrl));
+			promises.push(preloadImage(artPngUrl));
+		});
+
+		await Promise.all(promises);
+		console.log('[Cache] Theme assets preloading completed!');
+	}, [systems, theme]);
+
+	const handleCreateThemeAssetsCache = useCallback(() => {
+		addNotification('INICIANDO CACHE DO TEMA...', 'info', 'general');
+		preloadThemeAssets(systems, theme).then(() => {
+			addNotification('CACHE DO TEMA CONCLUÍDO!', 'success', 'general');
+		}).catch((err) => {
+			console.error('[Cache] Theme cache failed:', err);
+			addNotification('ERRO AO CRIAR CACHE DO TEMA', 'warning', 'general');
+		});
+	}, [systems, theme, preloadThemeAssets, addNotification]);
+
+	const handleCreateImageCache = useCallback(async () => {
+		addNotification('BUSCANDO MÍDIAS NO BANCO...', 'info', 'scraper');
+		try {
+			const mediaPaths: string[] = await window.api.getAllMediaPaths();
+			if (!mediaPaths || mediaPaths.length === 0) {
+				addNotification('NENHUMA MÍDIA ENCONTRADA NO BANCO', 'warning', 'scraper');
+				return;
+			}
+
+			addNotification(`INICIANDO CACHE DE ${mediaPaths.length} IMAGENS...`, 'info', 'scraper');
+			
+			const batchSize = 40;
+			let current = 0;
+			
+			const processNextBatch = async () => {
+				const batch = mediaPaths.slice(current, current + batchSize);
+				if (batch.length === 0) {
+					addNotification('CACHE DE IMAGENS COMPLETO!', 'success', 'scraper');
+					return;
+				}
+				
+				const promises = batch.map(p => {
+					const cleanPath = p.replace(/\\/g, '/');
+					const url = cleanPath.startsWith('/') || cleanPath.match(/^[a-zA-Z]:/)
+						? `file:///${cleanPath}`
+						: `file://${cleanPath}`;
+					return preloadImage(escapeFileUrl(url));
+				});
+				
+				await Promise.all(promises);
+				current += batch.length;
+				
+				setTimeout(processNextBatch, 50);
+			};
+			
+			processNextBatch();
+		} catch (err) {
+			console.error('[Cache] Game image cache failed:', err);
+			addNotification('ERRO AO CRIAR CACHE DE IMAGENS', 'warning', 'scraper');
+		}
+	}, [addNotification]);
+
+	const preheatImageCache = useCallback(async () => {
+		try {
+			const mediaPaths: string[] = await window.api.getAllMediaPaths();
+			if (!mediaPaths || mediaPaths.length === 0) return;
+			
+			console.log(`[Cache] Silent image cache preheat: preloading first 150 media files...`);
+			const batch = mediaPaths.slice(0, 150);
+			const promises = batch.map(p => {
+				const cleanPath = p.replace(/\\/g, '/');
+				const url = cleanPath.startsWith('/') || cleanPath.match(/^[a-zA-Z]:/)
+					? `file:///${cleanPath}`
+					: `file://${cleanPath}`;
+				return preloadImage(escapeFileUrl(url));
+			});
+			await Promise.all(promises);
+			console.log('[Cache] Silent image cache preheat complete!');
+		} catch (e) {
+			console.error('[Cache] Preheat failed:', e);
+		}
+	}, []);
+
 	// ─── Initial Load ───
 	useEffect(() => {
 		let initialLoadCancelled = false;
@@ -592,6 +701,15 @@ function App() {
 										setSystems(s);
 										setMusicFiles(files);
 										setMusicPath(mPath);
+										const isThemeCacheEnabled = initialSettings.CreateThemeAssetsCache?.value !== 'false' && initialSettings.CreateThemeAssetsCache?.value !== false;
+										const isImageCacheEnabled = initialSettings.CreateImageCache?.value !== 'false' && initialSettings.CreateImageCache?.value !== false;
+
+										if (isThemeCacheEnabled) {
+											preloadThemeAssets(s, t);
+										}
+										if (isImageCacheEnabled) {
+											preheatImageCache();
+										}
 
 										// Auto check for updates on startup if enabled
 										const isUpdatesEnabled = initialSettings['updates.enabled']?.value !== 'false' && initialSettings['updates.enabled']?.value !== false;
@@ -985,6 +1103,36 @@ function App() {
 			});
 		}
 	}, [selectedCollection, selectedSystem]);
+
+	// Contextual Game Media Preloading
+	useEffect(() => {
+		if (games.length === 0) return;
+		
+		const prefetchRange = 15;
+		const start = Math.max(0, selectedGameIndex - prefetchRange);
+		const end = Math.min(games.length - 1, selectedGameIndex + prefetchRange);
+		
+		const urlsToPreload: string[] = [];
+		for (let i = start; i <= end; i++) {
+			const game = games[i];
+			if (!game) continue;
+			
+			const mediaFields = [game.marquee, game.image, game.fanart];
+			mediaFields.forEach(p => {
+				if (p) {
+					const cleanPath = p.replace(/\\/g, '/');
+					const url = cleanPath.startsWith('/') || cleanPath.match(/^[a-zA-Z]:/)
+						? `file:///${cleanPath}`
+						: `file://${cleanPath}`;
+					urlsToPreload.push(escapeFileUrl(url));
+				}
+			});
+		}
+		
+		urlsToPreload.forEach(url => {
+			preloadImage(url);
+		});
+	}, [games, selectedGameIndex]);
 
 	// End splash screen
 	useEffect(() => {
@@ -2178,6 +2326,8 @@ function App() {
 				themeData={themeData}
 				allSystems={systems}
 				onOpenNetplayLobby={() => setIsNetplayLobbyOpen(true)}
+				onCreateImageCache={handleCreateImageCache}
+				onCreateThemeAssetsCache={handleCreateThemeAssetsCache}
 			/>
 			<HardwareSelectOverlay
 				isOpen={isHardwareSelectOpen}

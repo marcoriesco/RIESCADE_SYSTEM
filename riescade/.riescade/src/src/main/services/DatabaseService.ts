@@ -900,4 +900,24 @@ export class DatabaseService {
       return null
     }
   }
+
+  /**
+   * Get all unique media paths (image, fanart, marquee) stored in the database.
+   */
+  public getAllMediaPaths(): string[] {
+    const db = this.ensureOpen()
+    try {
+      const rows = db.prepare(`
+        SELECT DISTINCT image as path FROM games WHERE image IS NOT NULL AND image != ''
+        UNION
+        SELECT DISTINCT fanart as path FROM games WHERE fanart IS NOT NULL AND fanart != ''
+        UNION
+        SELECT DISTINCT marquee as path FROM games WHERE marquee IS NOT NULL AND marquee != ''
+      `).all() as any[]
+      return rows.map(r => r.path).filter(Boolean)
+    } catch (e) {
+      console.error('Failed to get all media paths from database:', e)
+      return []
+    }
+  }
 }

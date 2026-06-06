@@ -39,6 +39,7 @@ const api = {
   getDbStats: () => ipcRenderer.invoke('get-db-stats'),
   rebuildDatabase: () => ipcRenderer.invoke('rebuild-database'),
   getLibraryMode: () => ipcRenderer.invoke('get-library-mode'),
+  getAllMediaPaths: () => ipcRenderer.invoke('get-all-media-paths'),
 
   // Theme Settings
   getThemeSettings: (themeName: string) => ipcRenderer.invoke('get-theme-settings', themeName),

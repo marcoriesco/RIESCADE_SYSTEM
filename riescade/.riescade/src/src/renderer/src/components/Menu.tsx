@@ -156,6 +156,8 @@ interface MenuProps {
   onUpdateGamelists?: (systemName?: string) => void
   settings: Record<string, any>
   onOpenNetplayLobby?: () => void
+  onCreateImageCache?: () => void
+  onCreateThemeAssetsCache?: () => void
 }
 
 const getGamepadGuid = (pad: Gamepad): string => {
@@ -182,7 +184,7 @@ const isGameSystem = (s: any) => {
   return allowedHardware.includes(hw)
 }
 
-export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists, settings: initialSettings, onOpenNetplayLobby }) => {
+export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists, settings: initialSettings, onOpenNetplayLobby, onCreateImageCache, onCreateThemeAssetsCache }) => {
   const [settings, setSettings] = useState<Record<string, any>>(initialSettings || {})
 
   useEffect(() => {
@@ -877,6 +879,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       
       if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName, newVal)
       else updateSetting(item.settingName, newVal)
+
+      if (newVal === 'true') {
+        if (item.settingName === 'CreateImageCache' && onCreateImageCache) {
+          onCreateImageCache()
+        } else if (item.settingName === 'CreateThemeAssetsCache' && onCreateThemeAssetsCache) {
+          onCreateThemeAssetsCache()
+        }
+      }
     }
   }
 
@@ -2261,11 +2271,23 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
             // === OPTIMIZATIONS ===
             { id: 'group_dev_optimizations', label: t('OPTIMIZATIONS'), type: 'group' },
-            { id: 'threaded_loading', label: t('THREADED LOADING'), type: 'toggle', settingName: 'ThreadedLoading', settingType: 'bool' },
             { id: 'async_images', label: t('ASYNC IMAGE LOADING'), type: 'toggle', settingName: 'AsyncImages', settingType: 'bool' },
-            { id: 'optimize_vram', label: t('OPTIMIZE IMAGES VRAM USE'), type: 'toggle', settingName: 'OptimizeVRAM', settingType: 'bool' },
-            { id: 'optimize_video', label: t('OPTIMIZE VIDEO VRAM USAGE'), type: 'toggle', settingName: 'OptimizeVideo', settingType: 'bool' },
-            { id: 'use_file_cache', label: t('USE FILESYSTEM CACHE'), type: 'toggle', settingName: 'UseFileCache', settingType: 'bool' }
+            {
+              id: 'create_image_cache',
+              label: t('CREATE IMAGE CACHE'),
+              type: 'toggle',
+              settingName: 'CreateImageCache',
+              settingType: 'bool',
+              description: t('Pre-generates and warms up browser cache for all game media files.')
+            },
+            {
+              id: 'create_theme_assets_cache',
+              label: t('CREATE THEME ASSETS CACHE'),
+              type: 'toggle',
+              settingName: 'CreateThemeAssetsCache',
+              settingType: 'bool',
+              description: t('Pre-loads and caches all active theme system logos and background arts.')
+            }
           ]}
         ]
       },

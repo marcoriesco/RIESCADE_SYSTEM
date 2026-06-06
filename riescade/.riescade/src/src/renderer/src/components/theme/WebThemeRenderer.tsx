@@ -34,16 +34,20 @@ const styleStringToObject = (styleString: string) => {
 
 export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false, isTransitioning = false, onReady }) => {
   const [cssMap, setCssMap] = useState<Record<string, string>>({})
-  const [cssLoaded, setCssLoaded] = useState(!isLaunchingView)
+  const [cssLoaded, setCssLoaded] = useState(false)
+
+  const isGamelistLoading = data?.['gamelist:loading'] || data?.['gamelist.loading']
+  const isViewReady = cssLoaded && !isGamelistLoading
 
   useEffect(() => {
-    if (cssLoaded && onReady) {
+    if (isViewReady && onReady) {
       onReady()
     }
-  }, [cssLoaded, onReady])
+  }, [isViewReady, onReady])
 
   useEffect(() => {
-    if (!isLaunchingView) return;
+    let cancelled = false
+    setCssLoaded(false)
 
     const parser = new DOMParser()
     const doc = parser.parseFromString(htmlContent, 'text/html')
@@ -84,6 +88,7 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         const localPath = resolved.replace('file:///', '')
         
         window.api.getFileContent(localPath).then((content: string) => {
+          if (cancelled) return
           newCssMap[href] = content
           loadedCount++
           if (loadedCount === links.length) {
@@ -91,6 +96,7 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
             setCssLoaded(true)
           }
         }).catch((err: any) => {
+          if (cancelled) return
           console.error("Failed to load CSS:", localPath, err)
           loadedCount++
           if (loadedCount === links.length) {
@@ -100,10 +106,18 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         })
       } else {
         loadedCount++
-        if (loadedCount === links.length) setCssLoaded(true)
+        if (loadedCount === links.length) {
+          if (cancelled) return
+          setCssMap(newCssMap)
+          setCssLoaded(true)
+        }
       }
     })
-  }, [htmlContent, themePath, isLaunchingView])
+
+    return () => {
+      cancelled = true
+    }
+  }, [htmlContent, themePath])
 
   const reactTree = useMemo(() => {
     // 1. Replace all variables and expressions in the raw HTML string
@@ -431,7 +445,7 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
       
       // Inline pre-fetched CSS to guarantee synchronous layout and zero FOUC
-      if (tagName === 'link' && props.rel === 'stylesheet' && isLaunchingView) {
+      if (tagName === 'link' && props.rel === 'stylesheet') {
         const originalHref = el.getAttribute('href') || ''
         if (cssMap[originalHref]) {
           return <style key={key} dangerouslySetInnerHTML={{ __html: cssMap[originalHref] }} />
@@ -453,10 +467,15 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
   if (!cssLoaded) return null; // Wait for CSS to be fully fetched before returning any DOM
 
+  const showWithOpacity = isLaunchingView ? 1 : (isViewReady ? 1 : 0)
+  const transitionStyle = isLaunchingView ? 'none' : (isViewReady ? 'opacity 0.25s ease-in-out' : 'none')
+
   return (
     <div style={{ 
       width: '100%', 
-      height: '100%'
+      height: '100%',
+      opacity: showWithOpacity,
+      transition: transitionStyle
     }}>
       {reactTree}
     </div>

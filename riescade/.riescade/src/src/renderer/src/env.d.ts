@@ -45,6 +45,7 @@ declare global {
       getDbStats: () => Promise<{ totalGames: number; indexedSystems: number; systemsInfo: any[] }>
       rebuildDatabase: () => Promise<boolean>
       getLibraryMode: () => Promise<'database' | 'gamelist'>
+      getAllMediaPaths: () => Promise<string[]>
       getMusicFiles: (subfolder?: string) => Promise<string[]>
       getMusicPath: () => Promise<string>
       startScrape: () => Promise<boolean>

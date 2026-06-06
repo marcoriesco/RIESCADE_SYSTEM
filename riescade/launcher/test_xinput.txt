@@ -1,1 +1,0 @@
-<xinput index="0" path="\\?\HID#VID_045E&PID_028E&IG_01#3&966d8b0&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}"/>
