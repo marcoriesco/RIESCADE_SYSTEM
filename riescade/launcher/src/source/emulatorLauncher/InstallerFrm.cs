@@ -52,7 +52,7 @@ namespace EmulatorLauncher
             button2.GotFocus += button2_GotFocus;
 
             _flex = new Flex(this);
-            _flex.AddControl(pictureBox1, FlexMode.Size | FlexMode.CenterHorizontal | FlexMode.KeepProportions);
+            _flex.AddControl(pictureBox1, FlexMode.Size | FlexMode.KeepProportions);
             _flex.AddControl(button1, FlexMode.Size);
             _flex.AddControl(button2, FlexMode.Size);
             _flex.AddControl(label1, FlexMode.Padding);
@@ -63,9 +63,81 @@ namespace EmulatorLauncher
             progressBar1.ForeColor = Color.FromArgb(0x9f, 0x00, 0x43);
             SendMessage(progressBar1.Handle, PBM_SETBARCOLOR, IntPtr.Zero, (IntPtr)ColorTranslator.ToWin32(Color.FromArgb(0x9f, 0x00, 0x43)));
 
+            button1.FlatAppearance.BorderSize = 0;
+            button2.FlatAppearance.BorderSize = 0;
+            button1.BackColor = Color.FromArgb(0x9f, 0x00, 0x43);
+            button2.BackColor = Color.FromArgb(32, 32, 32);
+
+            button1.SizeChanged += (s, e) => ApplyRoundCorners(button1, 4);
+            button2.SizeChanged += (s, e) => ApplyRoundCorners(button2, 4);
+
             SetupButtons(InstallerButtons.YesNo);
             SetupLayout(InstallerLayout.ButtonsAndText);
 
+            this.SizeChanged += (s, e) => PositionLogo();
+
+        }
+
+        private void ApplyRoundCorners(Control control, int radius)
+        {
+            if (control.Width <= 0 || control.Height <= 0)
+                return;
+
+            using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                int diameter = radius * 2;
+                if (diameter > control.Width) diameter = control.Width;
+                if (diameter > control.Height) diameter = control.Height;
+
+                path.AddArc(0, 0, diameter, diameter, 180, 90);
+                path.AddArc(control.Width - diameter, 0, diameter, diameter, 270, 90);
+                path.AddArc(control.Width - diameter, control.Height - diameter, diameter, diameter, 0, 90);
+                path.AddArc(0, control.Height - diameter, diameter, diameter, 90, 90);
+                path.CloseAllFigures();
+
+                var oldRegion = control.Region;
+                control.Region = new Region(path);
+                if (oldRegion != null)
+                {
+                    try { oldRegion.Dispose(); } catch { }
+                }
+            }
+        }
+
+        private void PositionLogo()
+        {
+            if (pictureBox1 == null || tableLayoutPanel2 == null || label1 == null)
+                return;
+
+            try
+            {
+                tableLayoutPanel2.PerformLayout();
+
+                int[] rowHeights = tableLayoutPanel2.GetRowHeights();
+                if (rowHeights == null || rowHeights.Length == 0)
+                    return;
+
+                int row0Height = rowHeights[0];
+                int top = tableLayoutPanel2.Top;
+
+                int fontHeight = label1.Font.Height;
+                int logoTop;
+
+                if (label1.TextAlign == ContentAlignment.BottomCenter)
+                {
+                    logoTop = top + row0Height - 30 - fontHeight - 25 - pictureBox1.Height - 100;
+                }
+                else
+                {
+                    logoTop = top + (row0Height / 2) - (fontHeight / 2) - 25 - pictureBox1.Height - 100;
+                }
+
+                if (logoTop < 5)
+                    logoTop = 5;
+
+                pictureBox1.Location = new Point((this.ClientSize.Width - pictureBox1.Width) / 2, logoTop);
+            }
+            catch { }
         }
 
         public InstallerFrm(Installer installer)
@@ -79,13 +151,13 @@ namespace EmulatorLauncher
                 if (!string.IsNullOrEmpty(installer.EmulatorSize))
                 {
                     string textToDisplay = installer.DefaultFolderName + " (" + installer.EmulatorSize + ")";
-                    label1.Text = string.Format(Properties.Resources.EmulatorNotInstalled, textToDisplay);
+                    label1.Text = string.Format(LauncherTranslator.Get("EmulatorNotInstalled", "The emulator '{0}' is not installed.\r\nInstall now?"), textToDisplay);
                 }
                 else
-                    label1.Text = string.Format(Properties.Resources.EmulatorNotInstalled, installer.DefaultFolderName);
+                    label1.Text = string.Format(LauncherTranslator.Get("EmulatorNotInstalled", "The emulator '{0}' is not installed.\r\nInstall now?"), installer.DefaultFolderName);
             }
             else
-                label1.Text = string.Format(Properties.Resources.UpdateAvailable, installer.DefaultFolderName, installer.ServerVersion, installer.GetInstalledVersion());
+                label1.Text = string.Format(LauncherTranslator.Get("UpdateAvailable", "An update is available for {0}:\r\nUpdate version: {1}\r\nInstalled version: {2}\r\nInstall now?"), installer.DefaultFolderName, installer.ServerVersion, installer.GetInstalledVersion());
 
             _url = installer.PackageUrl;
             _installFolder = installer.GetInstallFolder();
@@ -99,7 +171,7 @@ namespace EmulatorLauncher
             _url = url;
             _installFolder = installFolder;
 
-            label1.Text = string.Format(Properties.Resources.CoreNotInstalled, name);
+            label1.Text = string.Format(LauncherTranslator.Get("CoreNotInstalled", "The core '{0}' is not installed.\r\nInstall now?"), name);
 
             SetupLayout(InstallerLayout.ButtonsAndText);
         }
@@ -126,8 +198,8 @@ namespace EmulatorLauncher
             switch (buttons)
             {
                 case InstallerButtons.YesNo:                                
-                    button1.Text = Properties.Resources.Yes;            
-                    button2.Text = Properties.Resources.No;
+                    button1.Text = LauncherTranslator.Get("Yes", "Yes");            
+                    button2.Text = LauncherTranslator.Get("No", "No");
                     button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
                     button2.Visible = true;
                     tableLayoutPanel1.ColumnStyles[1].SizeType = SizeType.Percent;
@@ -138,7 +210,7 @@ namespace EmulatorLauncher
                     tableLayoutPanel1.ColumnStyles[0].Width = 50;
                     break;
                 case InstallerButtons.Ok:
-                    button1.Text = Properties.Resources.Ok;
+                    button1.Text = LauncherTranslator.Get("Ok", "OK");
                     button1.Anchor = AnchorStyles.Top;
                     button1.Focus();
                     button2.Visible = false;
@@ -170,9 +242,9 @@ namespace EmulatorLauncher
                     tableLayoutPanel2.RowStyles[2].SizeType = SizeType.Absolute;
                     tableLayoutPanel2.RowStyles[2].Height = 0;
                     tableLayoutPanel2.RowStyles[0].SizeType = SizeType.Percent;
-                    tableLayoutPanel2.RowStyles[0].Height = 47;
+                    tableLayoutPanel2.RowStyles[0].Height = 60;
                     tableLayoutPanel2.RowStyles[1].SizeType = SizeType.Percent;
-                    tableLayoutPanel2.RowStyles[1].Height = 53;
+                    tableLayoutPanel2.RowStyles[1].Height = 40;
                     break;
                 case InstallerLayout.ProgressAndText:
                     label1.TextAlign = ContentAlignment.BottomCenter;
@@ -180,11 +252,12 @@ namespace EmulatorLauncher
                     tableLayoutPanel2.RowStyles[1].SizeType = SizeType.Absolute;
                     tableLayoutPanel2.RowStyles[1].Height = 0;
                     tableLayoutPanel2.RowStyles[0].SizeType = SizeType.Percent;
-                    tableLayoutPanel2.RowStyles[0].Height = 50;
+                    tableLayoutPanel2.RowStyles[0].Height = 60;
                     tableLayoutPanel2.RowStyles[2].SizeType = SizeType.Percent;
-                    tableLayoutPanel2.RowStyles[2].Height = 50;
+                    tableLayoutPanel2.RowStyles[2].Height = 40;
                     break;
             }
+            PositionLogo();
         }
 
         private Flex _flex;
@@ -287,7 +360,7 @@ namespace EmulatorLauncher
         {
             progressBar1.Visible = false;
             progressBar1.Value = 0;
-            label1.Text = Properties.Resources.LookingForUpdates;            
+            label1.Text = LauncherTranslator.Get("LookingForUpdates", "Looking for updates...");            
             SetupLayout(InstallerLayout.Text);
 
             Show();
@@ -313,7 +386,7 @@ namespace EmulatorLauncher
                     if (emul != null && emul != currentEmulator)
                     {
                         currentEmulator = emul;
-                        label1.Text = string.Format(Properties.Resources.Updating, currentEmulator);
+                        label1.Text = string.Format(LauncherTranslator.Get("Updating", "Updating {0}..."), currentEmulator);
                         Refresh();
                     }
                 });
@@ -325,7 +398,7 @@ namespace EmulatorLauncher
 
                 SetupLayout(InstallerLayout.ButtonsAndText);
                 SetupButtons(InstallerButtons.Ok);
-                SetLabel(string.Format(Properties.Resources.ErrorOccured, ex.Message));
+                SetLabel(string.Format(LauncherTranslator.Get("ErrorOccured", "An error occured: {0}"), ex.Message));
                 return;
             }
 
@@ -338,7 +411,7 @@ namespace EmulatorLauncher
         {
             progressBar1.Visible = false;
             progressBar1.Value = 0;
-            label1.Text = string.Format(Properties.Resources.UnCompressing, Path.GetFileNameWithoutExtension(fileName));
+            label1.Text = string.Format(LauncherTranslator.Get("UnCompressing", "Uncompressing {0}..."), Path.GetFileNameWithoutExtension(fileName));
             SetupLayout(InstallerLayout.Text);
 
             Show();
@@ -366,7 +439,7 @@ namespace EmulatorLauncher
             {
                 SetupLayout(InstallerLayout.ButtonsAndText);
                 SetupButtons(InstallerButtons.Ok);
-                SetLabel(string.Format(Properties.Resources.ErrorOccured, ex.Message));
+                SetLabel(string.Format(LauncherTranslator.Get("ErrorOccured", "An error occured: {0}"), ex.Message));
 
                 Visible = false;
                 ShowDialog();
@@ -451,7 +524,7 @@ namespace EmulatorLauncher
         public void DownloadAndInstall(string url, string installFolder)
         {
             SetupLayout(InstallerLayout.ProgressAndText);
-            label1.Text = string.Format(Properties.Resources.Downloading, Path.GetFileNameWithoutExtension(url));
+            label1.Text = string.Format(LauncherTranslator.Get("Downloading", "Downloading {0}..."), Path.GetFileNameWithoutExtension(url));
 
             Show();
             Refresh();
@@ -463,7 +536,7 @@ namespace EmulatorLauncher
                     progressBar1.Value = pe.ProgressPercentage;
                     if (pe.ProgressPercentage == 100)
                     {
-                        label1.Text = Properties.Resources.Installing;
+                        label1.Text = LauncherTranslator.Get("Installing", "Installing...");
                         Refresh();
                     }
                 });
@@ -474,7 +547,7 @@ namespace EmulatorLauncher
 
                 SetupLayout(InstallerLayout.ButtonsAndText);
                 SetupButtons(InstallerButtons.Ok);
-                SetLabel(string.Format(Properties.Resources.ErrorOccured, ex.Message));
+                SetLabel(string.Format(LauncherTranslator.Get("ErrorOccured", "An error occured: {0}"), ex.Message));
                 return;
             }
 

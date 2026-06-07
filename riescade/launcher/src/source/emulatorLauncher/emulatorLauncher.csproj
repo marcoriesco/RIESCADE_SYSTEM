@@ -94,6 +94,7 @@
       <DependentUpon>InstallerFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="MameVersionDetector.cs" />
+    <Compile Include="LauncherTranslator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="SplashVideo.cs">
       <SubType>Form</SubType>

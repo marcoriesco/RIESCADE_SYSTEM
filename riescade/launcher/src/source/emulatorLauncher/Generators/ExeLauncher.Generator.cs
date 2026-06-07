@@ -1,4 +1,4 @@
-﻿using EmulatorLauncher.Common;
+using EmulatorLauncher.Common;
 using EmulatorLauncher.Common.EmulationStation;
 using EmulatorLauncher.Common.FileFormats;
 using EmulatorLauncher.PadToKeyboard;
@@ -473,7 +473,18 @@ namespace EmulatorLauncher
         // If .gameexe is used, the function to get the process name via launcher specific search is disabled
         private bool GetProcessFromFile(string rom)
         {
-            string executableFile = Path.Combine(Path.GetDirectoryName(rom), Path.GetFileNameWithoutExtension(rom) + ".gameexe");
+            if (string.IsNullOrEmpty(rom))
+                return false;
+
+            string dir = Path.GetDirectoryName(rom);
+            if (dir == null)
+                dir = rom;
+
+            string filename = Path.GetFileNameWithoutExtension(rom);
+            if (string.IsNullOrEmpty(filename))
+                filename = "";
+
+            string executableFile = Path.Combine(dir, filename + ".gameexe");
 
             if (!File.Exists(executableFile))
                 return false;

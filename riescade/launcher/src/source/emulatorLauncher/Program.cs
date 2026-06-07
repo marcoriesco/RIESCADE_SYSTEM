@@ -351,6 +351,32 @@ namespace EmulatorLauncher
             SystemConfig.ImportOverrides(SystemConfig.LoadAll(SystemConfig["system"] + "[\"" + Path.GetFileName(SystemConfig["rom"]).Replace("=","").Replace("#","") + "\"]"));
             SystemConfig.ImportOverrides(ConfigFile.FromArguments(args));
 
+            string lang = SystemConfig["Language"];
+            if (string.IsNullOrEmpty(lang))
+                lang = SystemConfig["system.language"];
+
+            if (!string.IsNullOrEmpty(lang))
+            {
+                try
+                {
+                    string cultureName = lang.Replace("_", "-");
+                    var culture = System.Globalization.CultureInfo.GetCultureInfo(cultureName);
+                    System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+                    System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+                    SimpleLogger.Instance.Info("[Startup] Set culture to " + cultureName);
+                }
+                catch (Exception ex)
+                {
+                    SimpleLogger.Instance.Error("[Startup] Error setting culture: " + ex.Message);
+                }
+
+                try
+                {
+                    LauncherTranslator.SetLanguage(lang);
+                }
+                catch { }
+            }
+
             // Log Retrobat version && emulatorlauncher version
             string rbVersionPath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "version.info");
             string emulatorlauncherExePath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "emulationstation", "emulatorlauncher.exe");

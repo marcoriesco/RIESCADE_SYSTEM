@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "cave",
+    "value": "3ds",
     "type": "string"
   },
   "MaxVRAM": {
@@ -944,7 +944,7 @@
     "type": "bool"
   },
   "SmartCache": {
-    "value": true,
+    "value": false,
     "type": "bool"
   }
 }
