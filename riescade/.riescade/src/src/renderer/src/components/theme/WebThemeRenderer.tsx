@@ -1,8 +1,126 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { resolvePath } from './utils'
 import { WebCarouselElement } from './elements/WebCarouselElement'
 import { WebGamelistElement } from './elements/WebGamelistElement'
 import { WebClockElement } from './elements/WebClockElement'
+
+const resolveRelativeCssPath = (cssDir: string, relativePath: string): string => {
+  const cssParts = cssDir.split('/')
+  const relParts = relativePath.split('/')
+  for (const part of relParts) {
+    if (part === '.') continue
+    if (part === '..') {
+      cssParts.pop()
+    } else {
+      cssParts.push(part)
+    }
+  }
+  return cssParts.join('/')
+}
+
+const SafeDecodeElement: React.FC<{
+  tagName: string
+  props: any
+  children?: React.ReactNode
+}> = ({ tagName, props, children }) => {
+  const [currentSrc, setCurrentSrc] = useState(props.src || '')
+  const [currentBg, setCurrentBg] = useState(props.style?.backgroundImage || '')
+  const [opacity, setOpacity] = useState(1)
+  
+  const lastSrc = useRef(props.src || '')
+  const lastBg = useRef(props.style?.backgroundImage || '')
+  
+  const targetSrc = props.src || ''
+  const targetBg = props.style?.backgroundImage || ''
+
+  useEffect(() => {
+    let active = true
+
+    const decodeSrc = async (src: string) => {
+      if (!src) return
+      const img = new Image()
+      img.src = src
+      try {
+        await img.decode()
+        if (active) {
+          setCurrentSrc(src)
+          setOpacity(1)
+        }
+      } catch (e) {
+        if (active) {
+          setCurrentSrc(src)
+          setOpacity(1)
+        }
+      }
+    }
+
+    const decodeBg = async (bgUrl: string) => {
+      const match = bgUrl.match(/url\(['"]?([^'")\s]+)['"]?\)/)
+      if (!match || !match[1]) {
+        setCurrentBg(bgUrl)
+        setOpacity(1)
+        return
+      }
+      const src = match[1]
+      const img = new Image()
+      img.src = src
+      try {
+        await img.decode()
+        if (active) {
+          setCurrentBg(bgUrl)
+          setOpacity(1)
+        }
+      } catch (e) {
+        if (active) {
+          setCurrentBg(bgUrl)
+          setOpacity(1)
+        }
+      }
+    }
+
+    if (targetSrc !== lastSrc.current) {
+      lastSrc.current = targetSrc
+      setOpacity(0)
+      setTimeout(() => {
+        if (active) decodeSrc(targetSrc)
+      }, 50)
+    }
+
+    if (targetBg !== lastBg.current) {
+      lastBg.current = targetBg
+      setOpacity(0)
+      setTimeout(() => {
+        if (active) decodeBg(targetBg)
+      }, 50)
+    }
+
+    return () => {
+      active = false
+    }
+  }, [targetSrc, targetBg])
+
+  const finalProps = { ...props }
+  if (targetSrc) {
+    finalProps.src = currentSrc
+  }
+  if (targetBg) {
+    finalProps.style = {
+      ...finalProps.style,
+      backgroundImage: currentBg,
+      transition: 'opacity 0.15s ease-in-out',
+      opacity: opacity
+    }
+  } else if (targetSrc) {
+    finalProps.style = {
+      ...finalProps.style,
+      transition: 'opacity 0.15s ease-in-out',
+      opacity: opacity
+    }
+  }
+
+  return React.createElement(tagName, finalProps, children)
+}
+
 
 interface Props {
   htmlContent: string
@@ -87,9 +205,30 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         const resolved = resolveLocalPath(href)
         const localPath = resolved.replace('file:///', '')
         
-        window.api.getFileContent(localPath).then((content: string) => {
+        const localPathClean = localPath.replace(/\\/g, '/').split('?')[0].split('#')[0]
+        window.api.getFileContent(localPathClean).then((content: string) => {
           if (cancelled) return
-          newCssMap[href] = content
+          
+          if (!content) {
+            loadedCount++
+            if (loadedCount === links.length) {
+              setCssMap(newCssMap)
+              setCssLoaded(true)
+            }
+            return
+          }
+          
+          const cssDir = localPathClean.substring(0, localPathClean.lastIndexOf('/'))
+          const processedContent = content.replace(/url\(['"]?([^'")\s]+)['"]?\)/g, (match, urlPath) => {
+            if (urlPath.startsWith('data:') || urlPath.startsWith('http') || urlPath.startsWith('file:///')) {
+              return match
+            }
+            const resolvedPath = resolveRelativeCssPath(cssDir, urlPath)
+            const formattedUrl = resolvedPath.startsWith('/') ? `file://${resolvedPath}` : `file:///${resolvedPath}`
+            return `url('${formattedUrl}')`
+          })
+          
+          newCssMap[href] = processedContent
           loadedCount++
           if (loadedCount === links.length) {
             setCssMap(newCssMap)
@@ -450,6 +589,15 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         if (cssMap[originalHref]) {
           return <style key={key} dangerouslySetInnerHTML={{ __html: cssMap[originalHref] }} />
         }
+      }
+
+      const hasBgImage = props.style?.backgroundImage && props.style.backgroundImage !== 'none'
+      if (tagName === 'img' || hasBgImage) {
+        return (
+          <SafeDecodeElement tagName={reactTagName} props={props} key={key}>
+            {finalChildren.length > 0 ? finalChildren : undefined}
+          </SafeDecodeElement>
+        )
       }
 
       if (voidElements.includes(tagName)) {

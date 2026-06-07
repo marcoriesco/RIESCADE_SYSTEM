@@ -1,10 +1,9 @@
 <div data-riescade-view="gamelist">
-  <link rel="stylesheet" href="./assets/css/global.css" />
   <link rel="stylesheet" href="./assets/css/gamelist.css" />
 
   <!-- Camadas de Fundo -->
   <div class="gamelist-bg-layer">
-    <div class="gamelist-bg-layer gamelist-bg-default" style="background-image: url('./assets/arts/{system:theme}.jpg')"></div>
+    <div class="gamelist-bg-layer gamelist-bg-default" style="background-image: url('./assets/arts/{system:theme}.webp')"></div>
     <img class="gamelist-bg-layer gamelist-bg-fanart" src="{game:fanart}" data-riescade-hide-on-error="true" />
     <div class="gamelist-bg-layer gamelist-overlay"></div>
     <div class="gamelist-bg-layer gamelist-overlay-right"></div>
@@ -22,7 +21,7 @@
     <div class="header-right">
       <div class="user-profile">
         <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'User'}</span>
-        <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.png'}" />
+        <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}" />
       </div>
     </div>
   </div>
@@ -34,7 +33,7 @@
         <img
           src="{system:isCollections ? '' : '{game:thumbnail}'}"
           class="gamelist-thumbnail"
-          onerror="this.src = './assets/logos/{system:theme}.png'"
+          onerror="this.src = './assets/logos/{system:theme}.webp'"
         />
       </div>
 
@@ -103,13 +102,13 @@
   <!-- GAMELIST LOADING OVERLAY -->
   <div class="gamelist-loading-screen-root" style="{gamelist:loading ? 'display: flex;' : 'display: none;'}">
 
-    <img class="gamelist-loading-bg" src="./assets/arts/{system:theme}.jpg" onerror="this.style.display='none';" />
+    <img class="gamelist-loading-bg" src="./assets/arts/{system:theme}.webp" onerror="this.style.display='none';" />
 
     <div class="gamelist-loading-overlay"></div>
 
     <div class="gamelist-loading-content">
       <div class="gamelist-loading-logo-container">
-        <img src="./assets/logos/{system:theme}.png" onerror="this.style.display='none';" />
+        <img src="./assets/logos/{system:theme}.webp" onerror="this.style.display='none';" />
       </div>
       <h1 class="gamelist-loading-title">{system:fullName}</h1>
     </div>

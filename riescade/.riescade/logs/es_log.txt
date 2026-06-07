@@ -1,282 +1,37 @@
---- RIESCADE Log Started at 2026-06-06T06:03:08.719Z ---
-[03:03:08] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[03:03:08] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[03:03:08] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[03:03:08] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[03:03:08] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[03:03:08] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[03:03:08] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[03:03:08] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[03:03:08] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[03:03:08] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[03:03:08] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[03:03:09] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[03:03:09] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[03:03:09] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[03:03:09] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[03:03:09] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[03:03:09] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[03:03:09] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[03:03:09] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[03:03:09] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[03:03:09] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[03:03:09] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[03:03:09] [INFO] ⚡ Database up-to-date, no re-indexing needed
-[03:03:09] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
-[03:03:18] [INFO] Open dev tool...
-[03:03:49] [INFO] [Netplay] getLobbyList() called
-[03:03:49] [INFO] [Netplay] Using port: 55432
-[03:03:49] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
-[03:03:53] [INFO] [Netplay] WAN response status: 200 (3648ms)
-[03:03:53] [INFO] [Netplay] WAN data received: 27679 bytes (3649ms)
-[03:03:53] [INFO] [Netplay] Parsed 35 WAN rooms
-[03:03:53] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 35
-[03:03:53] [INFO] [Netplay] matchLocalRoms() called with 35 rooms
-[03:03:53] [INFO] [Netplay] Opening database...
-[03:03:53] [INFO] [Netplay] Database opened successfully
-[03:03:53] [INFO] [Netplay] Room 1/35 "Battle Formula (Japan)" -> 1 candidates
-[03:03:53] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[03:03:53] [INFO] [Netplay] getLobbyList() called
-[03:03:53] [INFO] [Netplay] Using port: 55432
-[03:03:53] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
-[03:03:54] [INFO] [Netplay] WAN response status: 200 (1250ms)
-[03:03:54] [INFO] [Netplay] WAN data received: 27679 bytes (1250ms)
-[03:03:54] [INFO] [Netplay] Parsed 35 WAN rooms
-[03:03:54] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 35
-[03:03:54] [INFO] [Netplay] matchLocalRoms() called with 35 rooms
-[03:03:54] [INFO] [Netplay] Opening database...
-[03:03:54] [INFO] [Netplay] Database opened successfully
-[03:03:54] [INFO] [Netplay] Room 1/35 "Battle Formula (Japan)" -> 1 candidates
-[03:03:54] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[03:03:57] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[03:03:57] [INFO] [Netplay] Room 4/35 "Pac-Man (USA) (Namco)" -> 3 candidates
-[03:03:57] [INFO] [Netplay]   Hashing candidate 1/3: ./Pac Man Party 240x320 [BR].jar
-[03:03:59] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[03:03:59] [INFO] [Netplay] Room 4/35 "Pac-Man (USA) (Namco)" -> 3 candidates
-[03:03:59] [INFO] [Netplay]   Hashing candidate 1/3: ./Pac Man Party 240x320 [BR].jar
-[03:04:05] [INFO] [Netplay]   CRC: DDF4773A vs room CRC: 15D202D8
-[03:04:05] [INFO] [Netplay]   Hashing candidate 2/3: ./Pac Man (1993).prg
-[03:04:05] [INFO] [Netplay]   CRC: DDF4773A vs room CRC: 15D202D8
-[03:04:05] [INFO] [Netplay]   Hashing candidate 2/3: ./Pac Man (1993).prg
-[03:04:06] [INFO] [Netplay]   CRC: 145F091D vs room CRC: 15D202D8
-[03:04:06] [INFO] [Netplay]   Hashing candidate 3/3: ./Ms. Pac-Man - Ms. Pac Man 2 (Hack).zip
-[03:04:06] [INFO] [Netplay]   CRC: 0E783800 vs room CRC: 15D202D8
-[03:04:06] [INFO] [Netplay] Room 5/35 "Bomberman II (USA)" -> 3 candidates
-[03:04:06] [INFO] [Netplay]   Hashing candidate 1/3: ./Bomberman II.zip
-[03:04:06] [INFO] [Netplay]   CRC: CC7BCFEB vs room CRC: CC7BCFEB
-[03:04:06] [INFO] [Netplay] Room 7/35 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
-[03:04:06] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
-[03:04:07] [INFO] [Netplay]   CRC: 145F091D vs room CRC: 15D202D8
-[03:04:07] [INFO] [Netplay]   Hashing candidate 3/3: ./Ms. Pac-Man - Ms. Pac Man 2 (Hack).zip
-[03:04:07] [INFO] [Netplay]   CRC: 0E783800 vs room CRC: 15D202D8
-[03:04:07] [INFO] [Netplay] Room 5/35 "Bomberman II (USA)" -> 3 candidates
-[03:04:07] [INFO] [Netplay]   Hashing candidate 1/3: ./Bomberman II.zip
-[03:04:07] [INFO] [Netplay]   CRC: CC7BCFEB vs room CRC: CC7BCFEB
-[03:04:07] [INFO] [Netplay] Room 7/35 "冒险岛3 se换龙 时间不减龙不掉" -> 1 candidates
-[03:04:07] [INFO] [Netplay]   Hashing candidate 1/1: ./Sega Ages 2500 Series Vol. 23 Sega Memorial Selection.chd
-[03:04:29] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
-[03:04:29] [INFO] [Netplay] Room 8/35 "Pokemon Puzzle Challenge (USA, Australia)" -> 1 candidates
-[03:04:29] [INFO] [Netplay]   Hashing candidate 1/1: ./Pokemon Puzzle Challenge (U) [C][!].gbc
-[03:04:29] [INFO] [Netplay]   CRC: 966CBE9F vs room CRC: 640E6C14
-[03:04:29] [INFO] [Netplay] Room 8/35 "Pokemon Puzzle Challenge (USA, Australia)" -> 1 candidates
-[03:04:29] [INFO] [Netplay]   Hashing candidate 1/1: ./Pokemon Puzzle Challenge (U) [C][!].gbc
-[03:04:30] [INFO] [Netplay]   CRC: D06BBA96 vs room CRC: D06BBA96
-[03:04:30] [INFO] [Netplay] Room 10/35 "Donkey Kong Country (USA) (Rev 2)" -> 34 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./Donkey Kong Country (USA) (Rev 2).zip
-[03:04:30] [INFO] [Netplay]   CRC: 762AF827 vs room CRC: 762AF827
-[03:04:30] [INFO] [Netplay] Room 11/35 "720" -> 9 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./720 Degrees.zip
-[03:04:30] [INFO] [Netplay]   CRC: 9B37D149 vs room CRC: BED9ADA1
-[03:04:30] [INFO] [Netplay]   Hashing candidate 2/3: ./ContinentalCircus_v1.2_1720.lha
-[03:04:30] [INFO] [Netplay]   CRC: D06BBA96 vs room CRC: D06BBA96
-[03:04:30] [INFO] [Netplay] Room 10/35 "Donkey Kong Country (USA) (Rev 2)" -> 34 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./Donkey Kong Country (USA) (Rev 2).zip
-[03:04:30] [INFO] [Netplay]   CRC: 762AF827 vs room CRC: 762AF827
-[03:04:30] [INFO] [Netplay] Room 11/35 "720" -> 9 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./720 Degrees.zip
-[03:04:30] [INFO] [Netplay]   CRC: 9B37D149 vs room CRC: BED9ADA1
-[03:04:30] [INFO] [Netplay]   Hashing candidate 2/3: ./ContinentalCircus_v1.2_1720.lha
-[03:04:30] [INFO] [Netplay]   CRC: E84F1E22 vs room CRC: BED9ADA1
-[03:04:30] [INFO] [Netplay]   Hashing candidate 3/3: ./TimeRunners11_v1.0_2720.lha
-[03:04:30] [INFO] [Netplay]   CRC: E84F1E22 vs room CRC: BED9ADA1
-[03:04:30] [INFO] [Netplay]   Hashing candidate 3/3: ./TimeRunners11_v1.0_2720.lha
-[03:04:30] [INFO] [Netplay]   CRC: B74CA4F7 vs room CRC: BED9ADA1
-[03:04:30] [INFO] [Netplay] Room 12/35 "FIFA International Soccer (USA)" -> 11 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./FIFA International Soccer (Brazil).zip
-[03:04:30] [INFO] [Netplay]   CRC: 9BB3B5F9 vs room CRC: 56296426
-[03:04:30] [INFO] [Netplay]   Hashing candidate 2/3: ./FIFA International Soccer (Japan) (En,Ja).zip
-[03:04:30] [INFO] [Netplay]   CRC: B555E8B4 vs room CRC: 56296426
-[03:04:30] [INFO] [Netplay]   Hashing candidate 3/3: ./FIFA International Soccer.chd
-[03:04:30] [INFO] [CRC32] Skipping large file (298MB): C:\tmp\RIESCADE_SYSTEM\roms\megacd\FIFA International Soccer.chd
-[03:04:30] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 56296426
-[03:04:30] [INFO] [Netplay] Room 13/35 "Star Wars Arcade" -> 1 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/1: ./Star Wars Arcade.zip
-[03:04:30] [INFO] [Netplay]   CRC: 2F16B44A vs room CRC: 2F16B44A
-[03:04:30] [INFO] [Netplay] Room 14/35 "Zombies Ate My Neighbors (USA)" -> 29 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./Zombies Ate My Neighbors (USA).zip
-[03:04:30] [INFO] [Netplay]   CRC: 7CFC0C7C vs room CRC: 7CFC0C7C
-[03:04:30] [INFO] [Netplay] Room 17/35 "046.人间兵器(手枪、机枪子弹；人数；生命不减)" -> 7 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./BetterDeadThanAlien_v1.1_0462.lha
-[03:04:30] [INFO] [Netplay]   CRC: B74CA4F7 vs room CRC: BED9ADA1
-[03:04:30] [INFO] [Netplay] Room 12/35 "FIFA International Soccer (USA)" -> 11 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./FIFA International Soccer (Brazil).zip
-[03:04:30] [INFO] [Netplay]   CRC: 9BB3B5F9 vs room CRC: 56296426
-[03:04:30] [INFO] [Netplay]   Hashing candidate 2/3: ./FIFA International Soccer (Japan) (En,Ja).zip
-[03:04:30] [INFO] [Netplay]   CRC: B555E8B4 vs room CRC: 56296426
-[03:04:30] [INFO] [Netplay]   Hashing candidate 3/3: ./FIFA International Soccer.chd
-[03:04:30] [INFO] [CRC32] Skipping large file (298MB): C:\tmp\RIESCADE_SYSTEM\roms\megacd\FIFA International Soccer.chd
-[03:04:30] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 56296426
-[03:04:30] [INFO] [Netplay] Room 13/35 "Star Wars Arcade" -> 1 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/1: ./Star Wars Arcade.zip
-[03:04:30] [INFO] [Netplay]   CRC: 2F16B44A vs room CRC: 2F16B44A
-[03:04:30] [INFO] [Netplay] Room 14/35 "Zombies Ate My Neighbors (USA)" -> 29 candidates
-[03:04:30] [INFO] [Netplay]   Hashing candidate 1/3: ./Zombies Ate My Neighbors (USA).zip
-[03:04:30] [INFO] [Netplay]   CRC: 7CFC0C7C vs room CRC: 7CFC0C7C
-[03:04:31] [INFO] [Netplay] Room 17/35 "046.人间兵器(手枪、机枪子弹；人数；生命不减)" -> 7 candidates
-[03:04:31] [INFO] [Netplay]   Hashing candidate 1/3: ./BetterDeadThanAlien_v1.1_0462.lha
-[03:04:31] [INFO] [Netplay]   CRC: 832E6C10 vs room CRC: 3031CCF3
-[03:04:31] [INFO] [Netplay]   Hashing candidate 2/3: ./BuggyBoy_v1.2_0465.lha
-[03:04:31] [INFO] [Netplay]   CRC: 832E6C10 vs room CRC: 3031CCF3
-[03:04:31] [INFO] [Netplay]   Hashing candidate 2/3: ./BuggyBoy_v1.2_0465.lha
-[03:04:31] [INFO] [Netplay]   CRC: 8BE76265 vs room CRC: 3031CCF3
-[03:04:31] [INFO] [Netplay]   Hashing candidate 3/3: ./CodeNameIceman_v1.3_0468.lha
-[03:04:31] [INFO] [Netplay]   CRC: 8BE76265 vs room CRC: 3031CCF3
-[03:04:31] [INFO] [Netplay]   Hashing candidate 3/3: ./CodeNameIceman_v1.3_0468.lha
-[03:04:31] [INFO] [Netplay]   CRC: BACE2DAD vs room CRC: 3031CCF3
-[03:04:31] [INFO] [Netplay] Room 18/35 "penbros" -> 1 candidates
-[03:04:31] [INFO] [Netplay]   Hashing candidate 1/1: ./penbros.zip
-[03:04:31] [INFO] [Netplay]   CRC: DC9E0A96 vs room CRC: E4CD6A8B
-[03:04:31] [INFO] [Netplay] Room 21/35 "tokio" -> 2 candidates
-[03:04:31] [INFO] [Netplay]   Hashing candidate 1/2: ./AutoBahn Tokio (Japan).chd
-[03:04:31] [INFO] [Netplay]   CRC: BACE2DAD vs room CRC: 3031CCF3
-[03:04:31] [INFO] [Netplay] Room 18/35 "penbros" -> 1 candidates
-[03:04:31] [INFO] [Netplay]   Hashing candidate 1/1: ./penbros.zip
-[03:04:31] [INFO] [Netplay]   CRC: DC9E0A96 vs room CRC: E4CD6A8B
-[03:04:31] [INFO] [Netplay] Room 20/35 "tokio" -> 2 candidates
-[03:04:31] [INFO] [Netplay]   Hashing candidate 1/2: ./AutoBahn Tokio (Japan).chd
-[03:04:34] [INFO] [Netplay]   CRC: 96D4C0F8 vs room CRC: 2AFA1A20
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/2: ./tokio.zip
-[03:04:34] [INFO] [Netplay]   CRC: F70A8620 vs room CRC: 2AFA1A20
-[03:04:34] [INFO] [Netplay] Room 23/35 "Sonic The Hedgehog (USA, Europe)" -> 78 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./Sonic The Hedgehog_ Part One 240x320 [BR].jar
-[03:04:34] [INFO] [Netplay]   CRC: 96D4C0F8 vs room CRC: 2AFA1A20
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/2: ./tokio.zip
-[03:04:34] [INFO] [Netplay]   CRC: F70A8620 vs room CRC: 2AFA1A20
-[03:04:34] [INFO] [Netplay] Room 24/35 "Sonic The Hedgehog (USA, Europe)" -> 78 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./Sonic The Hedgehog_ Part One 240x320 [BR].jar
-[03:04:34] [INFO] [Netplay]   CRC: E9EE3D74 vs room CRC: F9394E97
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/3: ./roms/Sonic_the_Hedgehog_1996.zip
-[03:04:34] [INFO] [Netplay]   CRC: BBBC1B8B vs room CRC: F9394E97
-[03:04:34] [INFO] [Netplay]   Hashing candidate 3/3: ./Sonic The Hedgehog (USA, Europe).zip
-[03:04:34] [INFO] [Netplay]   CRC: B519E833 vs room CRC: F9394E97
-[03:04:34] [INFO] [Netplay] Room 24/35 "Aladdin (Europe)" -> 19 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./Aladdin (Europe).zip
-[03:04:34] [INFO] [Netplay]   CRC: C8718D40 vs room CRC: C8718D40
-[03:04:34] [INFO] [Netplay] Room 25/35 "mslugx" -> 3 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./mslugx.zip
-[03:04:34] [INFO] [Netplay]   CRC: 83E3E69D vs room CRC: 6B3E562A
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/3: ./mslugx.zip
-[03:04:34] [INFO] [Netplay]   CRC: 83E3E69D vs room CRC: 6B3E562A
-[03:04:34] [INFO] [Netplay]   Hashing candidate 3/3: ./mslugx.zip
-[03:04:34] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: 6B3E562A
-[03:04:34] [INFO] [Netplay] Room 28/35 "Super Mario Kart (Europe)" -> 8 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario Kart (USA).zip
-[03:04:34] [INFO] [Netplay]   CRC: CD80DB86 vs room CRC: 56410E5E
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario Kart (USA) (MSU1).squashfs
-[03:04:34] [INFO] [CRC32] Skipping large file (433MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Super Mario Kart (USA) (MSU1).squashfs
-[03:04:34] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 56410E5E
-[03:04:34] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario Kart Rider (Hack).zip
-[03:04:34] [INFO] [Netplay]   CRC: 828575B8 vs room CRC: 56410E5E
-[03:04:34] [INFO] [Netplay] Room 29/35 "tapper" -> 16 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./rbtapper.zip
-[03:04:34] [INFO] [Netplay]   CRC: 510B13DE vs room CRC: ED776316
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/3: ./tapper.zip
-[03:04:34] [INFO] [Netplay]   CRC: 070B4C81 vs room CRC: ED776316
-[03:04:34] [INFO] [Netplay]   Hashing candidate 3/3: ./Tapper (USA).dsk
-[03:04:34] [INFO] [Netplay]   CRC: E9EE3D74 vs room CRC: F9394E97
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/3: ./roms/Sonic_the_Hedgehog_1996.zip
-[03:04:34] [INFO] [Netplay]   CRC: BBBC1B8B vs room CRC: F9394E97
-[03:04:34] [INFO] [Netplay]   Hashing candidate 3/3: ./Sonic The Hedgehog (USA, Europe).zip
-[03:04:34] [INFO] [Netplay]   CRC: B519E833 vs room CRC: F9394E97
-[03:04:34] [INFO] [Netplay] Room 25/35 "Aladdin (Europe)" -> 19 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./Aladdin (Europe).zip
-[03:04:34] [INFO] [Netplay]   CRC: C8718D40 vs room CRC: C8718D40
-[03:04:34] [INFO] [Netplay] Room 26/35 "mslugx" -> 3 candidates
-[03:04:34] [INFO] [Netplay]   Hashing candidate 1/3: ./mslugx.zip
-[03:04:34] [INFO] [Netplay]   CRC: 83E3E69D vs room CRC: 6B3E562A
-[03:04:34] [INFO] [Netplay]   Hashing candidate 2/3: ./mslugx.zip
-[03:04:34] [INFO] [Netplay]   CRC: 83E3E69D vs room CRC: 6B3E562A
-[03:04:34] [INFO] [Netplay]   Hashing candidate 3/3: ./mslugx.zip
-[03:04:34] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: 6B3E562A
-[03:04:35] [INFO] [Netplay] Room 28/35 "Super Mario Kart (Europe)" -> 8 candidates
-[03:04:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario Kart (USA).zip
-[03:04:35] [INFO] [Netplay]   CRC: CD80DB86 vs room CRC: 56410E5E
-[03:04:35] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario Kart (USA) (MSU1).squashfs
-[03:04:35] [INFO] [CRC32] Skipping large file (433MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Super Mario Kart (USA) (MSU1).squashfs
-[03:04:35] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 56410E5E
-[03:04:35] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario Kart Rider (Hack).zip
-[03:04:35] [INFO] [Netplay]   CRC: 828575B8 vs room CRC: 56410E5E
-[03:04:35] [INFO] [Netplay] Room 29/35 "tapper" -> 16 candidates
-[03:04:35] [INFO] [Netplay]   Hashing candidate 1/3: ./rbtapper.zip
-[03:04:35] [INFO] [Netplay]   CRC: 510B13DE vs room CRC: ED776316
-[03:04:35] [INFO] [Netplay]   Hashing candidate 2/3: ./tapper.zip
-[03:04:35] [INFO] [Netplay]   CRC: 070B4C81 vs room CRC: ED776316
-[03:04:35] [INFO] [Netplay]   Hashing candidate 3/3: ./Tapper (USA).dsk
-[03:04:35] [INFO] [Netplay]   CRC: E86B1B99 vs room CRC: ED776316
-[03:04:35] [INFO] [Netplay] Room 31/35 "Tetris (USA)" -> 113 candidates
-[03:04:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Tetris Revolution 240x320 [BR].jar
-[03:04:35] [INFO] [Netplay]   CRC: E86B1B99 vs room CRC: ED776316
-[03:04:35] [INFO] [Netplay] Room 31/35 "Tetris (USA)" -> 113 candidates
-[03:04:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Tetris Revolution 240x320 [BR].jar
-[03:04:35] [INFO] [Netplay]   CRC: 51A350C4 vs room CRC: D16EA396
-[03:04:35] [INFO] [Netplay]   Hashing candidate 2/3: ./tetrisp2.zip
-[03:04:35] [INFO] [Netplay]   CRC: A8A61954 vs room CRC: D16EA396
-[03:04:35] [INFO] [Netplay]   Hashing candidate 3/3: ./tgm2.zip
-[03:04:35] [INFO] [Netplay]   CRC: 9155ECA6 vs room CRC: D16EA396
-[03:04:35] [INFO] [Netplay] Room 32/35 "Tecmo Super Bowl (U) [!]" -> 11 candidates
-[03:04:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Tecmo Super Bowl (Japan).zip
-[03:04:35] [INFO] [Netplay]   CRC: 90C6E20C vs room CRC: 1F7C5660
-[03:04:35] [INFO] [Netplay]   Hashing candidate 2/3: ./Tecmo Super Bowl II - Special Edition (Japan).zip
-[03:04:35] [INFO] [Netplay]   CRC: 32FB633D vs room CRC: 1F7C5660
-[03:04:35] [INFO] [Netplay]   Hashing candidate 3/3: ./Tecmo Super Bowl.zip
-[03:04:35] [INFO] [Netplay]   CRC: 1F7C5660 vs room CRC: 1F7C5660
-[03:04:35] [INFO] [Netplay] matchLocalRoms() completed
-[03:04:35] [INFO] [Netplay] Returning 35 rooms (20 matched locally)
-[03:04:35] [INFO] [Netplay]   CRC: 51A350C4 vs room CRC: D16EA396
-[03:04:35] [INFO] [Netplay]   Hashing candidate 2/3: ./tetrisp2.zip
-[03:04:35] [INFO] [Netplay]   CRC: A8A61954 vs room CRC: D16EA396
-[03:04:35] [INFO] [Netplay]   Hashing candidate 3/3: ./tgm2.zip
-[03:04:35] [INFO] [Netplay]   CRC: 9155ECA6 vs room CRC: D16EA396
-[03:04:35] [INFO] [Netplay] Room 32/35 "Tecmo Super Bowl (U) [!]" -> 11 candidates
-[03:04:35] [INFO] [Netplay]   Hashing candidate 1/3: ./Tecmo Super Bowl (Japan).zip
-[03:04:35] [INFO] [Netplay]   CRC: 90C6E20C vs room CRC: 1F7C5660
-[03:04:35] [INFO] [Netplay]   Hashing candidate 2/3: ./Tecmo Super Bowl II - Special Edition (Japan).zip
-[03:04:35] [INFO] [Netplay]   CRC: 32FB633D vs room CRC: 1F7C5660
-[03:04:35] [INFO] [Netplay]   Hashing candidate 3/3: ./Tecmo Super Bowl.zip
-[03:04:35] [INFO] [Netplay]   CRC: 1F7C5660 vs room CRC: 1F7C5660
-[03:04:35] [INFO] [Netplay] matchLocalRoms() completed
-[03:04:35] [INFO] [Netplay] Returning 35 rooms (20 matched locally)
-[03:05:40] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\launcher\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system xboxlivearcade -emulator xenia -core xenia-canary -rom "C:\tmp\RIESCADE_SYSTEM\roms\xbla\Alien Rage.m3u"
-[03:07:00] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[03:07:00] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[03:07:00] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[03:07:01] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[03:07:01] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[03:07:01] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[03:07:01] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[03:07:01] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[03:07:01] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[03:07:01] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[03:07:01] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[03:07:12] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[03:07:12] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[03:07:12] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[03:07:12] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[03:07:12] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[03:07:12] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[03:07:12] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[03:07:12] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[03:07:12] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[03:07:12] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[03:07:12] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[03:07:30] [INFO] Executing system command: exit-frontend
+--- RIESCADE Log Started at 2026-06-07T17:53:27.692Z ---
+[14:53:27] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[14:53:27] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[14:53:27] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[14:53:27] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[14:53:27] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[14:53:27] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[14:53:27] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[14:53:27] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[14:53:27] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[14:53:27] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[14:53:27] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[14:53:27] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[14:53:27] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[14:53:27] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[14:53:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[14:53:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[14:53:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[14:53:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[14:53:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[14:53:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[14:53:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[14:53:28] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[14:53:28] [INFO] ⚡ Database up-to-date, no re-indexing needed
+[14:53:28] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
+[14:53:36] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[14:53:36] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[14:53:36] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[14:53:36] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[14:53:36] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[14:53:36] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[14:53:36] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[14:53:36] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[14:53:36] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[14:53:36] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[14:53:36] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[14:53:41] [INFO] Executing system command: exit-frontend

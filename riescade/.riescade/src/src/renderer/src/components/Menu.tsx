@@ -879,14 +879,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       
       if (item.id.startsWith('theme_opt_')) updateThemeSetting(item.settingName, newVal)
       else updateSetting(item.settingName, newVal)
-
-      if (newVal === 'true') {
-        if (item.settingName === 'CreateImageCache' && onCreateImageCache) {
-          onCreateImageCache()
-        } else if (item.settingName === 'CreateThemeAssetsCache' && onCreateThemeAssetsCache) {
-          onCreateThemeAssetsCache()
-        }
-      }
     }
   }
 
@@ -2243,7 +2235,6 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             // === DATA MANAGEMENT ===
             { id: 'group_dev_data', label: t('DATA MANAGEMENT'), type: 'group' },
             { id: 'ignore_multidisk', label: t('IGNORE MULTI-FILE DISK CONTENT (CUE/GDI/CCD/M3U)'), type: 'toggle', settingName: 'RemoveMultiDiskContent', settingType: 'bool' },
-            { id: 'enable_filtering', label: t('ENABLE GAME FILTERING'), type: 'toggle', settingName: 'ForceDisableFilters', settingType: 'bool', invert: true },
             { id: 'parse_gamelist_only', label: t('PARSE GAMELISTS ONLY'), type: 'toggle', settingName: 'ParseGamelistOnly', settingType: 'bool', description: t("Debug tool: Don't check if the ROMs actually exist. Can cause problems!") },
 
             // === USER INTERFACE ===
@@ -2273,20 +2264,23 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             { id: 'group_dev_optimizations', label: t('OPTIMIZATIONS'), type: 'group' },
             { id: 'async_images', label: t('ASYNC IMAGE LOADING'), type: 'toggle', settingName: 'AsyncImages', settingType: 'bool' },
             {
-              id: 'create_image_cache',
-              label: t('CREATE IMAGE CACHE'),
+              id: 'smart_cache',
+              label: t('SMART CACHE (RECOMMENDED)'),
               type: 'toggle',
-              settingName: 'CreateImageCache',
+              settingName: 'SmartCache',
               settingType: 'bool',
-              description: t('Pre-generates and warms up browser cache for all game media files.')
+              description: t('Caches first 150 games, ±15 neighbors, neighboring systems, and theme assets to maintain peak performance without high resource usage.')
             },
             {
-              id: 'create_theme_assets_cache',
-              label: t('CREATE THEME ASSETS CACHE'),
-              type: 'toggle',
-              settingName: 'CreateThemeAssetsCache',
-              settingType: 'bool',
-              description: t('Pre-loads and caches all active theme system logos and background arts.')
+              id: 'generate_complete_image_cache',
+              label: t('GENERATE COMPLETE IMAGE CACHE (SLOW)'),
+              type: 'action',
+              onClick: () => {
+                if (onCreateImageCache) {
+                  onCreateImageCache()
+                }
+              },
+              description: t('This option can consume a lot of memory and perform intensive disk reads in large libraries.')
             }
           ]}
         ]

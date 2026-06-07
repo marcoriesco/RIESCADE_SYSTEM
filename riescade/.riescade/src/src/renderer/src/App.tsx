@@ -529,13 +529,14 @@ function App() {
 		return () => removeProgress();
 	}, [translateThemeKey]);
 
-	// Inject active theme's global.css into document head to prevent FOUC (Flash of Unstyled Content)
+	// Inject active theme's global.css and preload local fonts into document head to prevent FOUC (Flash of Unstyled Content)
 	// and guarantee that menu styles, fonts, and icons load instantly and stay loaded.
 	useEffect(() => {
 		if (theme?.path) {
 			const cleanThemePath = theme.path.replace(/\\/g, '/');
-			const stylesheetUrl = `file:///${cleanThemePath}/assets/css/global.css`;
 			
+			// 1. Inject Stylesheet
+			const stylesheetUrl = `file:///${cleanThemePath}/assets/css/global.css`;
 			let link = document.getElementById('active-theme-styles') as HTMLLinkElement;
 			if (!link) {
 				link = document.createElement('link');
@@ -544,6 +545,29 @@ function App() {
 				document.head.appendChild(link);
 			}
 			link.href = stylesheetUrl;
+
+			// 2. Preload Fonts to prevent lazy-loading delay (FOUT) when opening the menu
+			const fontsToPreload = [
+				'InterTight-Light.ttf',
+				'InterTight-Regular.ttf',
+				'InterTight-SemiBold.ttf',
+				'RobotoCondensed-Regular.ttf'
+			];
+
+			fontsToPreload.forEach(fontName => {
+				const fontId = `preload-font-${fontName.toLowerCase()}`;
+				let fontLink = document.getElementById(fontId) as HTMLLinkElement;
+				if (!fontLink) {
+					fontLink = document.createElement('link');
+					fontLink.id = fontId;
+					fontLink.rel = 'preload';
+					fontLink.as = 'font';
+					fontLink.type = 'font/ttf';
+					fontLink.setAttribute('crossorigin', 'anonymous');
+					document.head.appendChild(fontLink);
+				}
+				fontLink.href = `file:///${cleanThemePath}/assets/fonts/${fontName}`;
+			});
 		}
 	}, [theme?.path]);
 
@@ -585,14 +609,12 @@ function App() {
 			const sysName = sys.name === 'all' ? 'auto-allgames' : sysTheme;
 			
 			// Logos
-			const logoUrl = `file:///${themePathClean}/assets/logos/${sysName}.png`;
-			promises.push(preloadImage(logoUrl));
+			const logoWebpUrl = `file:///${themePathClean}/assets/logos/${sysName}.webp`;
+			promises.push(preloadImage(logoWebpUrl));
 			
 			// Arts (fanart/background)
-			const artJpgUrl = `file:///${themePathClean}/assets/arts/${sysName}.jpg`;
-			const artPngUrl = `file:///${themePathClean}/assets/arts/${sysName}.png`;
-			promises.push(preloadImage(artJpgUrl));
-			promises.push(preloadImage(artPngUrl));
+			const artWebpUrl = `file:///${themePathClean}/assets/arts/${sysName}.webp`;
+			promises.push(preloadImage(artWebpUrl));
 		});
 
 		await Promise.all(promises);
@@ -701,14 +723,32 @@ function App() {
 										setSystems(s);
 										setMusicFiles(files);
 										setMusicPath(mPath);
-										const isThemeCacheEnabled = initialSettings.CreateThemeAssetsCache?.value !== 'false' && initialSettings.CreateThemeAssetsCache?.value !== false;
-										const isImageCacheEnabled = initialSettings.CreateImageCache?.value !== 'false' && initialSettings.CreateImageCache?.value !== false;
+										const isSmartCacheEnabled = initialSettings.SmartCache?.value !== 'false' && initialSettings.SmartCache?.value !== false;
 
-										if (isThemeCacheEnabled) {
-											preloadThemeAssets(s, t);
-										}
-										if (isImageCacheEnabled) {
+										if (isSmartCacheEnabled) {
 											preheatImageCache();
+
+											const startupSetting = initialSettings.StartupSystem?.value || 'last';
+											let targetSystemName = '';
+											if (startupSetting === 'last') {
+												targetSystemName = initialSettings.LastSystem?.value || '';
+											} else {
+												targetSystemName = startupSetting;
+											}
+
+											let initialIdx = 0;
+											if (targetSystemName) {
+												const idx = s.findIndex(sys => sys.name === targetSystemName);
+												if (idx !== -1) {
+													initialIdx = idx;
+												}
+											}
+
+											const prevIdx = (initialIdx - 1 + s.length) % s.length;
+											const nextIdx = (initialIdx + 1) % s.length;
+											const startSystems = [s[initialIdx], s[prevIdx], s[nextIdx]].filter(Boolean);
+
+											preloadThemeAssets(startSystems, t);
 										}
 
 										// Auto check for updates on startup if enabled
@@ -1190,6 +1230,38 @@ function App() {
 		return baseSystems;
 	}, [systems, settings]);
 
+	// Adjacent system preloading to prevent black frames during carousel navigation
+	useEffect(() => {
+		if (filteredSystems.length === 0 || !theme) return;
+		
+		const isSmartCacheEnabled = settings.SmartCache?.value !== 'false' && settings.SmartCache?.value !== false;
+		if (!isSmartCacheEnabled) return;
+
+		const prevIdx = (systemIndex - 1 + filteredSystems.length) % filteredSystems.length;
+		const nextIdx = (systemIndex + 1) % filteredSystems.length;
+
+		const systemsToPreload = [
+			filteredSystems[systemIndex],
+			filteredSystems[prevIdx],
+			filteredSystems[nextIdx]
+		].filter(Boolean);
+
+		const themePathClean = theme.path.replace(/\\/g, '/');
+		
+		systemsToPreload.forEach((sys: any) => {
+			const sysTheme = sys.theme || sys.name;
+			const sysName = sys.name === 'all' ? 'auto-allgames' : sysTheme;
+			
+			// Logos
+			const logoWebpUrl = `file:///${themePathClean}/assets/logos/${sysName}.webp`;
+			preloadImage(logoWebpUrl);
+			
+			// Arts (fanart/background)
+			const artWebpUrl = `file:///${themePathClean}/assets/arts/${sysName}.webp`;
+			preloadImage(artWebpUrl);
+		});
+	}, [filteredSystems, systemIndex, theme, settings.SmartCache]);
+
 	// Restore StartupSystem / LastSystem and handle StartOnGamelist on startup
 	useEffect(() => {
 		if (filteredSystems.length > 0 && !hasRestoredLastSystem) {
@@ -1339,11 +1411,11 @@ function App() {
 					const normalizedThemePath = theme.path.replace(/\\/g, '/');
 					return {
 						...g,
-						marquee: escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`),
-						wheel: escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${g.name}.png`),
-						image: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`),
-						fanart: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`),
-						thumbnail: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.jpg`),
+						marquee: escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${g.name}.webp`),
+						wheel: escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${g.name}.webp`),
+						image: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.webp`),
+						fanart: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.webp`),
+						thumbnail: escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${g.name}.webp`),
 					};
 				}
 				return g;
@@ -1435,8 +1507,8 @@ function App() {
 				const normalizedThemePath = theme.path.replace(/\\/g, '/');
 				
 				// Standard theme paths for this collection folder using absolute file:/// URLs
-				const logoPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${activeGame.name}.png`);
-				const artPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${activeGame.name}.jpg`);
+				const logoPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/logos/collections/${activeGame.name}.webp`);
+				const artPath = escapeFileUrl(`file:///${normalizedThemePath}/assets/arts/collections/${activeGame.name}.webp`);
 
 				gameMarquee = logoPath;
 				gameWheel = logoPath;

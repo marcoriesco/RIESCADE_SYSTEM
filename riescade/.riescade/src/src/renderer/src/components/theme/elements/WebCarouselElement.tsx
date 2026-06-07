@@ -89,17 +89,17 @@ export const WebCarouselElement: React.FC<Props> = ({
 
     // Use custom marquee source if requested
     if (itemMarquee && itemMarqueeSource) {
-      return resolvePath(`${themePath}/${itemMarqueeSource.replace('./', '')}/${sysName}.png`)
+      return resolvePath(`${themePath}/${itemMarqueeSource.replace('./', '')}/${sysName}.webp`)
     }
 
     if (mediaSource === 'theme') {
-      return resolvePath(`${themePath}/assets/logos/${sysName}.png`)
+      return resolvePath(`${themePath}/assets/logos/${sysName}.webp`)
     }
     if (mediaSource.startsWith('./') || mediaSource.startsWith('../')) {
       const cleanPath = mediaSource.replace('./', '')
-      return resolvePath(`${themePath}/${cleanPath}/${sysName}.png`)
+      return resolvePath(`${themePath}/${cleanPath}/${sysName}.webp`)
     }
-    return resolvePath(itemData.image || `${themePath}/assets/logos/${sysName}.png`)
+    return resolvePath(itemData.image || `${themePath}/assets/logos/${sysName}.webp`)
   }
 
   return (
@@ -187,8 +187,8 @@ const CarouselItemNode = ({
     ? (item.isGame 
         ? resolvePath(itemData.image || itemData.marquee, { ...data, ...itemData })
         : (itemBackgroundSource 
-            ? resolvePath(`${themePath}/${itemBackgroundSource.replace('./', '')}/${sysName}.jpg`)
-            : resolvePath(`${themePath}/assets/arts/${sysName}.jpg`)))
+            ? resolvePath(`${themePath}/${itemBackgroundSource.replace('./', '')}/${sysName}.webp`)
+            : resolvePath(`${themePath}/assets/arts/${sysName}.webp`)))
     : ''
 
   return (

@@ -536,7 +536,7 @@
     "type": "bool"
   },
   "AsyncImages": {
-    "value": true,
+    "value": false,
     "type": "bool"
   },
   "OptimizeVRAM": {
@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "switch",
+    "value": "atomiswave",
     "type": "string"
   },
   "MaxVRAM": {
@@ -940,6 +940,10 @@
     "type": "bool"
   },
   "CreateThemeAssetsCache": {
+    "value": true,
+    "type": "bool"
+  },
+  "SmartCache": {
     "value": true,
     "type": "bool"
   }

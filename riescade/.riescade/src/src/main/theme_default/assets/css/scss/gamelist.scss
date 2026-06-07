@@ -52,15 +52,15 @@
 	}
 
 	.gamelist-overlay {
-		background-image: url('../overlays/overlay-gamelist-light.png');
+		background-image: url('../overlays/overlay-gamelist-light.webp');
 		z-index: 3;
 	}
 	.gamelist-overlay-right {
-		background-image: url('../overlays/OverlayRight.png');
+		background-image: url('../overlays/OverlayRight.webp');
 		z-index: 10;
 	}
 	.gamelist-overlay-bottom {
-		background-image: url('../overlays/OverlayTopRight.png');
+		background-image: url('../overlays/OverlayTopRight.webp');
 		z-index: 10;
 	}
 }
@@ -218,7 +218,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("../overlays/overlay-gamelist-hard.png");
+  background-image: url("../overlays/overlay-gamelist-hard.webp");
   background-size: 100% 100%;
   opacity: 0.8;
   z-index: 10;
