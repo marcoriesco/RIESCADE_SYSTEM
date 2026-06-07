@@ -529,13 +529,13 @@ function App() {
 		return () => removeProgress();
 	}, [translateThemeKey]);
 
-	// Inject active theme's global.css and preload local fonts into document head to prevent FOUC (Flash of Unstyled Content)
+	// Inject active theme's global.css into document head to prevent FOUC (Flash of Unstyled Content)
 	// and guarantee that menu styles, fonts, and icons load instantly and stay loaded.
 	useEffect(() => {
 		if (theme?.path) {
 			const cleanThemePath = theme.path.replace(/\\/g, '/');
 			
-			// 1. Inject Stylesheet
+			// Inject Stylesheet
 			const stylesheetUrl = `file:///${cleanThemePath}/assets/css/global.css`;
 			let link = document.getElementById('active-theme-styles') as HTMLLinkElement;
 			if (!link) {
@@ -545,29 +545,6 @@ function App() {
 				document.head.appendChild(link);
 			}
 			link.href = stylesheetUrl;
-
-			// 2. Preload Fonts to prevent lazy-loading delay (FOUT) when opening the menu
-			const fontsToPreload = [
-				'InterTight-Light.ttf',
-				'InterTight-Regular.ttf',
-				'InterTight-SemiBold.ttf',
-				'RobotoCondensed-Regular.ttf'
-			];
-
-			fontsToPreload.forEach(fontName => {
-				const fontId = `preload-font-${fontName.toLowerCase()}`;
-				let fontLink = document.getElementById(fontId) as HTMLLinkElement;
-				if (!fontLink) {
-					fontLink = document.createElement('link');
-					fontLink.id = fontId;
-					fontLink.rel = 'preload';
-					fontLink.as = 'font';
-					fontLink.type = 'font/ttf';
-					fontLink.setAttribute('crossorigin', 'anonymous');
-					document.head.appendChild(fontLink);
-				}
-				fontLink.href = `file:///${cleanThemePath}/assets/fonts/${fontName}`;
-			});
 		}
 	}, [theme?.path]);
 
