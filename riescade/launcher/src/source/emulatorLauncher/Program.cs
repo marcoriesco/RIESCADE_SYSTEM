@@ -96,6 +96,7 @@ namespace EmulatorLauncher
             { "kega-fusion", () => new KegaFusionGenerator() },
             { "kronos", () => new KronosGenerator() },
             { "libretro", () => new LibRetroGenerator() },
+            { "linuxloader", () => new LinuxloaderGenerator() },
             { "lime3ds", () => new Lime3dsGenerator() },
             { "love", () => new LoveGenerator() },
             { "m2emulator", () => new Model2Generator() },

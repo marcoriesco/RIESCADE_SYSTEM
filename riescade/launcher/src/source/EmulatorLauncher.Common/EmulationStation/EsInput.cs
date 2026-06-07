@@ -139,6 +139,7 @@ namespace EmulatorLauncher.Common.EmulationStation
 
 
     [Flags]
+    [JsonConverter(typeof(InputKeyConverter))]
     public enum InputKey
     {
         a = 1,
@@ -200,5 +201,56 @@ namespace EmulatorLauncher.Common.EmulationStation
         rightshoulder = 131072,
         righttrigger = 524288
         #endregion
+    }
+
+    public class InputKeyConverter : Newtonsoft.Json.JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(InputKey) || objectType == typeof(InputKey?);
+        }
+
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+        {
+            if (reader.TokenType == Newtonsoft.Json.JsonToken.Null)
+            {
+                return null;
+            }
+
+            if (reader.TokenType == Newtonsoft.Json.JsonToken.Integer)
+            {
+                return (InputKey)Convert.ToInt32(reader.Value);
+            }
+
+            if (reader.TokenType == Newtonsoft.Json.JsonToken.String)
+            {
+                string val = reader.Value.ToString();
+                string formatted = val.Replace(" ", ", ");
+                InputKey result;
+                if (Enum.TryParse<InputKey>(formatted, true, out result))
+                {
+                    return result;
+                }
+                
+                if (int.TryParse(val, out int intVal))
+                {
+                    return (InputKey)intVal;
+                }
+            }
+
+            return (InputKey)0;
+        }
+
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+
+            InputKey key = (InputKey)value;
+            writer.WriteValue(key.ToString().Replace(", ", " "));
+        }
     }
 }

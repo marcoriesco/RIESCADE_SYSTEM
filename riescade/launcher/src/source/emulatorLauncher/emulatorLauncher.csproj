@@ -320,6 +320,7 @@
     <Compile Include="Generators\Lime3ds.Controllers.cs">
       <DependentUpon>Lime3ds.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\Linuxloader.Generator.cs" />
     <Compile Include="Generators\Love.Generator.cs" />
     <Compile Include="Generators\MagicEngine.Generator.cs" />
     <Compile Include="Generators\MagicEngine.Controllers.cs">
