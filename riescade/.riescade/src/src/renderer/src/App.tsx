@@ -548,6 +548,23 @@ function App() {
 		}
 	}, [theme?.path]);
 
+	// ─── Font Preloading ───
+	// Force the browser to immediately load and decode local fonts from index.css.
+	// This prevents the FOUT (Flash of Unstyled Text) and delay when opening the settings menu in production builds.
+	useEffect(() => {
+		const fontSpecs = [
+			'300 12px "Inter Tight"',
+			'400 12px "Inter Tight"',
+			'600 12px "Inter Tight"',
+			'400 12px "Roboto Condensed"'
+		];
+		fontSpecs.forEach(spec => {
+			document.fonts.load(spec).catch(err => {
+				console.warn(`[Font Preload] Failed to load ${spec}:`, err);
+			});
+		});
+	}, []);
+
 	// Listen for scraper progress and finish events
 	useEffect(() => {
 		const removeScrapeProgress = window.api.on('scrape-progress', (_: any, data: any) => {
@@ -2638,6 +2655,25 @@ function App() {
 					to { opacity: 1; }
 				}
 			`}} />
+
+			{/* Font Preloader to force Chromium to load fonts immediately on boot */}
+			<div
+				style={{
+					position: 'absolute',
+					width: 0,
+					height: 0,
+					opacity: 0,
+					pointerEvents: 'none',
+					overflow: 'hidden',
+					zIndex: -9999,
+				}}
+				aria-hidden="true"
+			>
+				<span style={{ fontFamily: '"Inter Tight"', fontWeight: 300 }}>preload Inter Tight 300</span>
+				<span style={{ fontFamily: '"Inter Tight"', fontWeight: 400 }}>preload Inter Tight 400</span>
+				<span style={{ fontFamily: '"Inter Tight"', fontWeight: 600 }}>preload Inter Tight 600</span>
+				<span style={{ fontFamily: '"Roboto Condensed"', fontWeight: 400 }}>preload Roboto Condensed 400</span>
+			</div>
 		</div>
 	);
 }
