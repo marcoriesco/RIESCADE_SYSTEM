@@ -176,11 +176,31 @@ async function run() {
 
   // --- ADDITIONAL ROOT FOLDERS (sounds, decorations, cheats, system, user, emulators) ---
   const extraFolders = ['sounds', 'decorations', 'cheats', 'system', 'user', 'emulators'];
+
+  // Subfolders to exclude from release (used by external tools, not needed in production)
+  const releaseExclusions = [
+    'system/configgen',
+    'system/download',
+    'system/modules',
+    'system/resources',
+    'system/scripts',
+    'system/templates'
+  ];
+
   for (const folder of extraFolders) {
     const src = path.join(projectRoot, folder);
     if (fs.existsSync(src) && fs.statSync(src).isDirectory()) {
       copyRecursiveSync(src, path.join(tempDir, folder));
       console.log(`   ✓ ${folder}/`);
+    }
+  }
+
+  // Remove excluded subfolders from temp release directory
+  for (const exclusion of releaseExclusions) {
+    const exclusionPath = path.join(tempDir, exclusion);
+    if (fs.existsSync(exclusionPath)) {
+      fs.rmSync(exclusionPath, { recursive: true, force: true });
+      console.log(`   ✗ ${exclusion}/ excluded`);
     }
   }
 

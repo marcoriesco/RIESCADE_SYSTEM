@@ -61,3 +61,11 @@ RIESCADE_SYSTEM.7z
 
 # Isolated Emulator Launcher Development
 riescade/launcher/src/
+
+# System folders not needed in release (used by external tools: configgen, rb_gui, installer)
+system/configgen/
+system/download/
+system/modules/
+system/resources/
+system/scripts/
+system/templates/
