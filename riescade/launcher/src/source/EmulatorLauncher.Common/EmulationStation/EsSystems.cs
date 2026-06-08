@@ -82,6 +82,9 @@ namespace EmulatorLauncher.Common.EmulationStation
         public string Command { get; set; }
 
         public List<EsCore> Cores { get; set; }
+
+        [JsonProperty("source")]
+        public string Source { get; set; }
     }
 
     public class EsSystem

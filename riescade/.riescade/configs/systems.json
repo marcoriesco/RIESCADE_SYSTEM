@@ -32,9 +32,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "freej2me"
-          ]
+          "cores": ["freej2me"]
         }
       ]
     },
@@ -87,9 +85,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         }
       ]
     },
@@ -105,18 +101,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fbneo",
-            "fbalpha",
-            "fbalpha2012",
-            "fbalpha2012_neogeo"
-          ]
+          "cores": ["fbneo", "fbalpha", "fbalpha2012", "fbalpha2012_neogeo"]
         },
         {
           "name": "fbneo",
-          "cores": [
-            "arcade"
-          ]
+          "cores": ["arcade"]
         }
       ]
     },
@@ -163,10 +152,7 @@
       "emulators": [
         {
           "name": "ares",
-          "cores": [
-            "MegaLD",
-            "NecLD"
-          ]
+          "cores": ["MegaLD", "NecLD"]
         }
       ]
     },
@@ -191,15 +177,11 @@
         },
         {
           "name": "daphne",
-          "cores": [
-            "daphne"
-          ]
+          "cores": ["daphne"]
         },
         {
           "name": "singe2",
-          "cores": [
-            "singe2"
-          ]
+          "cores": ["singe2"]
         }
       ]
     },
@@ -224,9 +206,7 @@
         },
         {
           "name": "singe2",
-          "cores": [
-            "singe2"
-          ]
+          "cores": ["singe2"]
         }
       ]
     },
@@ -267,12 +247,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fbneo",
-            "fbalpha2012_cps1",
-            "fbalpha",
-            "fbalpha2012"
-          ]
+          "cores": ["fbneo", "fbalpha2012_cps1", "fbalpha", "fbalpha2012"]
         }
       ]
     },
@@ -288,12 +263,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fbneo",
-            "fbalpha2012_cps2",
-            "fbalpha",
-            "fbalpha2012"
-          ]
+          "cores": ["fbneo", "fbalpha2012_cps2", "fbalpha", "fbalpha2012"]
         }
       ]
     },
@@ -309,12 +279,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fbneo",
-            "fbalpha2012_cps3",
-            "fbalpha",
-            "fbalpha2012"
-          ]
+          "cores": ["fbneo", "fbalpha2012_cps3", "fbalpha", "fbalpha2012"]
         }
       ]
     },
@@ -330,9 +295,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "dice"
-          ]
+          "cores": ["dice"]
         }
       ]
     },
@@ -374,9 +337,7 @@
         },
         {
           "name": "mame64",
-          "cores": [
-            "neogeo"
-          ]
+          "cores": ["neogeo"]
         }
       ]
     },
@@ -393,10 +354,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "neocd",
-            "fbneo"
-          ]
+          "cores": ["neocd", "fbneo"]
         },
         {
           "name": "raine",
@@ -416,16 +374,11 @@
       "emulators": [
         {
           "name": "m2emulator",
-          "cores": [
-            "multicpu",
-            "singlecpu"
-          ]
+          "cores": ["multicpu", "singlecpu"]
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
@@ -449,9 +402,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "supermodel"
-          ]
+          "cores": ["supermodel"]
         }
       ]
     },
@@ -467,9 +418,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "flycast"
-          ]
+          "cores": ["flycast"]
         },
         {
           "name": "flycast",
@@ -493,9 +442,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "flycast"
-          ]
+          "cores": ["flycast"]
         },
         {
           "name": "flycast",
@@ -519,9 +466,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "flycast"
-          ]
+          "cores": ["flycast"]
         },
         {
           "name": "flycast",
@@ -565,11 +510,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame",
-            "mame2016",
-            "mame2014"
-          ]
+          "cores": ["mame", "mame2016", "mame2014"]
         }
       ]
     },
@@ -601,9 +542,7 @@
         },
         {
           "name": "teknoparrot",
-          "cores": [
-            "chihiro"
-          ]
+          "cores": ["chihiro"]
         }
       ]
     },
@@ -667,10 +606,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "gearsystem",
-            "genesis_plus_gx"
-          ]
+          "cores": ["gearsystem", "genesis_plus_gx"]
         },
         {
           "name": "ares",
@@ -694,9 +630,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "gearsystem"
-          ]
+          "cores": ["gearsystem"]
         }
       ]
     },
@@ -712,11 +646,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "genesis_plus_gx",
-            "picodrive",
-            "fbneo"
-          ]
+          "cores": ["genesis_plus_gx", "picodrive", "fbneo"]
         },
         {
           "name": "mednafen",
@@ -732,10 +662,7 @@
         },
         {
           "name": "kega-fusion",
-          "cores": [
-            "auto",
-            "mastersystem"
-          ]
+          "cores": ["auto", "mastersystem"]
         },
         {
           "name": "bizhawk",
@@ -777,11 +704,7 @@
         },
         {
           "name": "kega-fusion",
-          "cores": [
-            "auto",
-            "megadrive",
-            "genesis"
-          ]
+          "cores": ["auto", "megadrive", "genesis"]
         },
         {
           "name": "bizhawk",
@@ -827,11 +750,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "genesis_plus_gx",
-            "genesis_plus_gx_wide",
-            "picodrive"
-          ]
+          "cores": ["genesis_plus_gx", "genesis_plus_gx_wide", "picodrive"]
         },
         {
           "name": "ares",
@@ -839,10 +758,7 @@
         },
         {
           "name": "kega-fusion",
-          "cores": [
-            "megacd",
-            "segacd"
-          ]
+          "cores": ["megacd", "segacd"]
         },
         {
           "name": "jgenesis",
@@ -863,9 +779,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "picodrive"
-          ]
+          "cores": ["picodrive"]
         },
         {
           "name": "ares",
@@ -897,11 +811,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "kronos",
-            "mednafen_saturn",
-            "yabasanshiro"
-          ]
+          "cores": ["kronos", "mednafen_saturn", "yabasanshiro"]
         },
         {
           "name": "mednafen",
@@ -953,9 +863,7 @@
         },
         {
           "name": "mednafen",
-          "cores": [
-            "saturn"
-          ]
+          "cores": ["saturn"]
         },
         {
           "name": "mame64",
@@ -975,9 +883,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "flycast"
-          ]
+          "cores": ["flycast"]
         },
         {
           "name": "flycast",
@@ -1006,11 +912,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fceumm",
-            "nestopia",
-            "mesen"
-          ]
+          "cores": ["fceumm", "nestopia", "mesen"]
         },
         {
           "name": "mesen",
@@ -1035,11 +937,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fceumm",
-            "nestopia",
-            "mesen"
-          ]
+          "cores": ["fceumm", "nestopia", "mesen"]
         },
         {
           "name": "mednafen",
@@ -1055,10 +953,7 @@
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "NesHawk",
-            "quickerNES"
-          ]
+          "cores": ["NesHawk", "quickerNES"]
         },
         {
           "name": "jgenesis",
@@ -1091,9 +986,7 @@
         },
         {
           "name": "mednafen",
-          "cores": [
-            "snes"
-          ]
+          "cores": ["snes"]
         },
         {
           "name": "mesen",
@@ -1105,17 +998,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "SuperFamicom"
-          ]
+          "cores": ["SuperFamicom"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "BSNES",
-            "Faust",
-            "Snes9x"
-          ]
+          "cores": ["BSNES", "Faust", "Snes9x"]
         },
         {
           "name": "jgenesis",
@@ -1136,12 +1023,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "snes9x",
-            "mesen-s",
-            "bsnes",
-            "bsnes_hd_beta"
-          ]
+          "cores": ["snes9x", "mesen-s", "bsnes", "bsnes_hd_beta"]
         },
         {
           "name": "mesen",
@@ -1166,10 +1048,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bsnes",
-            "bsnes_hd_beta"
-          ]
+          "cores": ["bsnes", "bsnes_hd_beta"]
         }
       ]
     },
@@ -1186,16 +1065,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "snes9x",
-            "mesen-s"
-          ]
+          "cores": ["snes9x", "mesen-s"]
         },
         {
           "name": "ares",
-          "cores": [
-            "SuperFamicom"
-          ]
+          "cores": ["SuperFamicom"]
         }
       ]
     },
@@ -1212,16 +1086,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "snes9x",
-            "bsnes"
-          ]
+          "cores": ["snes9x", "bsnes"]
         },
         {
           "name": "ares",
-          "cores": [
-            "SuperFamicom"
-          ]
+          "cores": ["SuperFamicom"]
         }
       ]
     },
@@ -1237,15 +1106,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_vb"
-          ]
+          "cores": ["mednafen_vb"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "VirtualBoyee"
-          ]
+          "cores": ["VirtualBoyee"]
         }
       ]
     },
@@ -1280,16 +1145,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "Nintendo64"
-          ]
+          "cores": ["Nintendo64"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Ares64",
-            "Mupen64Plus"
-          ]
+          "cores": ["Ares64", "Mupen64Plus"]
         },
         {
           "name": "project64",
@@ -1335,16 +1195,11 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "mupen64plus_next",
-            "parallel_n64"
-          ]
+          "cores": ["mupen64plus_next", "parallel_n64"]
         },
         {
           "name": "ares",
-          "cores": [
-            "Nintendo64DD"
-          ]
+          "cores": ["Nintendo64DD"]
         },
         {
           "name": "project64",
@@ -1420,7 +1275,7 @@
     },
     {
       "name": "switch",
-      "fullname": "Switch",
+      "fullname": "Nintendo Switch",
       "path": "~\\..\\roms\\switch",
       "extension": ".nso .nro .nca .xci .nsp .kip",
       "command": "\"%HOME%\\emulatorLauncher.exe\" -gameinfo %GAMEINFOXML% %CONTROLLERSCONFIG% -system %SYSTEM% -emulator %EMULATOR% -core %CORE% -rom %ROM%",
@@ -1430,23 +1285,20 @@
       "emulators": [
         {
           "name": "eden",
-          "cores": []
+          "source": "https://git.eden-emu.dev/eden-ci/master/releases"
         },
         {
-          "name": "ryujinx",
-          "cores": []
+          "name": "ryujinx"
         },
         {
           "name": "citron",
-          "cores": []
+          "source": "https://github.com/citron-neo/emulator/releases"
         },
         {
-          "name": "sudachi",
-          "cores": []
+          "name": "sudachi"
         },
         {
-          "name": "yuzu",
-          "cores": []
+          "name": "yuzu"
         }
       ]
     },
@@ -1463,31 +1315,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_pce",
-            "mednafen_pce_fast",
-            "fbneo"
-          ]
+          "cores": ["mednafen_pce", "mednafen_pce_fast", "fbneo"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "pce"
-          ]
+          "cores": ["pce"]
         },
         {
           "name": "ares",
-          "cores": [
-            "PCEngine"
-          ]
+          "cores": ["PCEngine"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "HyperNyma",
-            "PCEHawk",
-            "TurboNyma"
-          ]
+          "cores": ["HyperNyma", "PCEHawk", "TurboNyma"]
         },
         {
           "name": "mesen",
@@ -1512,11 +1352,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_pce",
-            "mednafen_pce_fast",
-            "fbneo"
-          ]
+          "cores": ["mednafen_pce", "mednafen_pce_fast", "fbneo"]
         },
         {
           "name": "mednafen",
@@ -1529,9 +1365,7 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "PCEngineCD"
-          ]
+          "cores": ["PCEngineCD"]
         },
         {
           "name": "bizhawk",
@@ -1569,31 +1403,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_supergrafx",
-            "geargrafx",
-            "fbneo"
-          ]
+          "cores": ["mednafen_supergrafx", "geargrafx", "fbneo"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "pce"
-          ]
+          "cores": ["pce"]
         },
         {
           "name": "ares",
-          "cores": [
-            "SuperGrafx"
-          ]
+          "cores": ["SuperGrafx"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "HyperNyma",
-            "PCEHawk",
-            "TurboNyma"
-          ]
+          "cores": ["HyperNyma", "PCEHawk", "TurboNyma"]
         },
         {
           "name": "mesen",
@@ -1617,9 +1439,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_pcfx"
-          ]
+          "cores": ["mednafen_pcfx"]
         },
         {
           "name": "mednafen",
@@ -1653,11 +1473,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_psx_hw",
-            "swanstation",
-            "pcsx_rearmed"
-          ]
+          "cores": ["mednafen_psx_hw", "swanstation", "pcsx_rearmed"]
         },
         {
           "name": "duckstation",
@@ -1699,9 +1515,7 @@
       "emulators": [
         {
           "name": "pcsx2",
-          "cores": [
-            "pcsx2"
-          ]
+          "cores": ["pcsx2"]
         },
         {
           "name": "pcsx2-16",
@@ -1713,9 +1527,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "pcsx2"
-          ]
+          "cores": ["pcsx2"]
         }
       ]
     },
@@ -1795,11 +1607,7 @@
         },
         {
           "name": "xenia-manager",
-          "cores": [
-            "canary",
-            "mousehook",
-            "netplay"
-          ]
+          "cores": ["canary", "mousehook", "netplay"]
         }
       ]
     },
@@ -1815,9 +1623,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "opera"
-          ]
+          "cores": ["opera"]
         },
         {
           "name": "phoenix",
@@ -1838,9 +1644,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "puae"
-          ]
+          "cores": ["puae"]
         },
         {
           "name": "amigaforever",
@@ -1865,9 +1669,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "puae"
-          ]
+          "cores": ["puae"]
         },
         {
           "name": "amigaforever",
@@ -1892,9 +1694,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "puae"
-          ]
+          "cores": ["puae"]
         },
         {
           "name": "amigaforever",
@@ -1918,9 +1718,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "puae"
-          ]
+          "cores": ["puae"]
         },
         {
           "name": "amigaforever",
@@ -1944,9 +1742,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "puae"
-          ]
+          "cores": ["puae"]
         },
         {
           "name": "amigaforever",
@@ -1999,9 +1795,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "cap32"
-          ]
+          "cores": ["cap32"]
         },
         {
           "name": "capriceforever",
@@ -2049,9 +1843,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
@@ -2081,9 +1873,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
@@ -2103,9 +1893,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "atari800"
-          ]
+          "cores": ["atari800"]
         },
         {
           "name": "altirra",
@@ -2125,10 +1913,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "stella",
-            "stella2014"
-          ]
+          "cores": ["stella", "stella2014"]
         },
         {
           "name": "stella",
@@ -2136,9 +1921,7 @@
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Atari2600Hawk"
-          ]
+          "cores": ["Atari2600Hawk"]
         }
       ]
     },
@@ -2154,11 +1937,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "a5200",
-            "atari800",
-            "stella2014"
-          ]
+          "cores": ["a5200", "atari800", "stella2014"]
         },
         {
           "name": "altirra",
@@ -2178,15 +1957,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "prosystem"
-          ]
+          "cores": ["prosystem"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "A78"
-          ]
+          "cores": ["A78"]
         }
       ]
     },
@@ -2202,10 +1977,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "hatari",
-            "hatarib"
-          ]
+          "cores": ["hatari", "hatarib"]
         },
         {
           "name": "hatari",
@@ -2226,15 +1998,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "xegs"
-          ]
+          "cores": ["xegs"]
         },
         {
           "name": "altirra",
@@ -2255,9 +2023,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "virtualjaguar"
-          ]
+          "cores": ["virtualjaguar"]
         },
         {
           "name": "bigpemu",
@@ -2265,9 +2031,7 @@
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Jaguar"
-          ]
+          "cores": ["Jaguar"]
         },
         {
           "name": "phoenix",
@@ -2313,12 +2077,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "gearcoleco",
-            "jollycv",
-            "bluemsx",
-            "fbneo"
-          ]
+          "cores": ["gearcoleco", "jollycv", "bluemsx", "fbneo"]
         },
         {
           "name": "openmsx",
@@ -2326,15 +2085,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "ColecoVision"
-          ]
+          "cores": ["ColecoVision"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Coleco"
-          ]
+          "cores": ["Coleco"]
         },
         {
           "name": "mesen",
@@ -2354,9 +2109,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vice_xplus4"
-          ]
+          "cores": ["vice_xplus4"]
         }
       ]
     },
@@ -2372,9 +2125,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vice_xvic"
-          ]
+          "cores": ["vice_xvic"]
         }
       ]
     },
@@ -2390,11 +2141,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vice_x64",
-            "vice_x64sc",
-            "frodo"
-          ]
+          "cores": ["vice_x64", "vice_x64sc", "frodo"]
         }
       ]
     },
@@ -2410,9 +2157,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vice_xplus4"
-          ]
+          "cores": ["vice_xplus4"]
         }
       ]
     },
@@ -2428,9 +2173,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vice_xpet"
-          ]
+          "cores": ["vice_xpet"]
         }
       ]
     },
@@ -2446,9 +2189,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vice_x128"
-          ]
+          "cores": ["vice_x128"]
         }
       ]
     },
@@ -2464,9 +2205,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "freeintv"
-          ]
+          "cores": ["freeintv"]
         },
         {
           "name": "jzintv",
@@ -2474,9 +2213,7 @@
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "IntelliHawk"
-          ]
+          "cores": ["IntelliHawk"]
         }
       ]
     },
@@ -2493,15 +2230,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "aquarius"
-          ]
+          "cores": ["aquarius"]
         }
       ]
     },
@@ -2517,15 +2250,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "freechaf"
-          ]
+          "cores": ["freechaf"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "ChannelFHawk"
-          ]
+          "cores": ["ChannelFHawk"]
         }
       ]
     },
@@ -2541,9 +2270,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "ep128emu_core"
-          ]
+          "cores": ["ep128emu_core"]
         }
       ]
     },
@@ -2560,10 +2287,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bluemsx",
-            "fbneo"
-          ]
+          "cores": ["bluemsx", "fbneo"]
         },
         {
           "name": "openmsx",
@@ -2584,10 +2308,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bluemsx",
-            "fbneo"
-          ]
+          "cores": ["bluemsx", "fbneo"]
         },
         {
           "name": "openmsx",
@@ -2608,10 +2329,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bluemsx",
-            "fbneo"
-          ]
+          "cores": ["bluemsx", "fbneo"]
         },
         {
           "name": "openmsx",
@@ -2632,10 +2350,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bluemsx",
-            "fbneo"
-          ]
+          "cores": ["bluemsx", "fbneo"]
         },
         {
           "name": "openmsx",
@@ -2655,9 +2370,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bluemsx"
-          ]
+          "cores": ["bluemsx"]
         }
       ]
     },
@@ -2673,15 +2386,11 @@
       "emulators": [
         {
           "name": "oricutron",
-          "cores": [
-            "oricutron"
-          ]
+          "cores": ["oricutron"]
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         }
       ]
     },
@@ -2697,9 +2406,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "quasi88"
-          ]
+          "cores": ["quasi88"]
         }
       ]
     },
@@ -2715,10 +2422,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "np2kai",
-            "nekop2"
-          ]
+          "cores": ["np2kai", "nekop2"]
         }
       ]
     },
@@ -2734,9 +2438,7 @@
       "emulators": [
         {
           "name": "simcoupe",
-          "cores": [
-            "simcoupe"
-          ]
+          "cores": ["simcoupe"]
         }
       ]
     },
@@ -2752,9 +2454,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "px68k"
-          ]
+          "cores": ["px68k"]
         },
         {
           "name": "xm6pro",
@@ -2774,9 +2474,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "x1"
-          ]
+          "cores": ["x1"]
         }
       ]
     },
@@ -2792,9 +2490,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "theodore"
-          ]
+          "cores": ["theodore"]
         }
       ]
     },
@@ -2810,15 +2506,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vecx"
-          ]
+          "cores": ["vecx"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "VectrexHawk"
-          ]
+          "cores": ["VectrexHawk"]
         }
       ]
     },
@@ -2834,22 +2526,15 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "o2em",
-            "mame"
-          ]
+          "cores": ["o2em", "mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "videopac"
-          ]
+          "cores": ["videopac"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "O2Hawk"
-          ]
+          "cores": ["O2Hawk"]
         }
       ]
     },
@@ -2865,9 +2550,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "m2000"
-          ]
+          "cores": ["m2000"]
         }
       ]
     },
@@ -2884,15 +2567,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "vg5k"
-          ]
+          "cores": ["vg5k"]
         }
       ]
     },
@@ -2908,11 +2587,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            81,
-            "fuse",
-            "fbneo"
-          ]
+          "cores": [81, "fuse", "fbneo"]
         }
       ]
     },
@@ -2928,10 +2603,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fuse",
-            "fbneo"
-          ]
+          "cores": ["fuse", "fbneo"]
         },
         {
           "name": "zesarux",
@@ -2939,9 +2611,7 @@
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "ZXHawk"
-          ]
+          "cores": ["ZXHawk"]
         }
       ]
     },
@@ -2957,23 +2627,15 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_lynx",
-            "handy",
-            "holani"
-          ]
+          "cores": ["mednafen_lynx", "handy", "holani"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "lynx"
-          ]
+          "cores": ["lynx"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Handy"
-          ]
+          "cores": ["Handy"]
         }
       ]
     },
@@ -2989,29 +2651,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "genesis_plus_gx",
-            "picodrive",
-            "fbneo"
-          ]
+          "cores": ["genesis_plus_gx", "picodrive", "fbneo"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "gg"
-          ]
+          "cores": ["gg"]
         },
         {
           "name": "ares",
-          "cores": [
-            "GameGear"
-          ]
+          "cores": ["GameGear"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "SMSHawk"
-          ]
+          "cores": ["SMSHawk"]
         },
         {
           "name": "jgenesis",
@@ -3073,29 +2725,19 @@
         },
         {
           "name": "mgba",
-          "cores": [
-            "mgba"
-          ]
+          "cores": ["mgba"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "gb"
-          ]
+          "cores": ["gb"]
         },
         {
           "name": "ares",
-          "cores": [
-            "GameBoy"
-          ]
+          "cores": ["GameBoy"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Gambatte",
-            "GBHawk",
-            "SameBoy"
-          ]
+          "cores": ["Gambatte", "GBHawk", "SameBoy"]
         },
         {
           "name": "jgenesis",
@@ -3116,11 +2758,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "tgbdual",
-            "sameboy",
-            "DoubleCherryGB"
-          ]
+          "cores": ["tgbdual", "sameboy", "DoubleCherryGB"]
         }
       ]
     },
@@ -3137,12 +2775,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "gambatte",
-            "tgbdual",
-            "sameboy",
-            "DoubleCherryGB"
-          ]
+          "cores": ["gambatte", "tgbdual", "sameboy", "DoubleCherryGB"]
         },
         {
           "name": "mesen",
@@ -3150,29 +2783,19 @@
         },
         {
           "name": "mgba",
-          "cores": [
-            "mgba"
-          ]
+          "cores": ["mgba"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "gbc"
-          ]
+          "cores": ["gbc"]
         },
         {
           "name": "ares",
-          "cores": [
-            "GameBoyColor"
-          ]
+          "cores": ["GameBoyColor"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Gambatte",
-            "GBHawk",
-            "SameBoy"
-          ]
+          "cores": ["Gambatte", "GBHawk", "SameBoy"]
         },
         {
           "name": "jgenesis",
@@ -3193,11 +2816,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "tgbdual",
-            "sameboy",
-            "DoubleCherryGB"
-          ]
+          "cores": ["tgbdual", "sameboy", "DoubleCherryGB"]
         }
       ]
     },
@@ -3214,17 +2833,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mgba",
-            "mednafen_gba",
-            "gpsp"
-          ]
+          "cores": ["mgba", "mednafen_gba", "gpsp"]
         },
         {
           "name": "mgba",
-          "cores": [
-            "mgba"
-          ]
+          "cores": ["mgba"]
         },
         {
           "name": "nosgba",
@@ -3232,21 +2845,15 @@
         },
         {
           "name": "mednafen",
-          "cores": [
-            "gba"
-          ]
+          "cores": ["gba"]
         },
         {
           "name": "ares",
-          "cores": [
-            "GameBoyAdvance"
-          ]
+          "cores": ["GameBoyAdvance"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "mGBA"
-          ]
+          "cores": ["mGBA"]
         },
         {
           "name": "jgenesis",
@@ -3287,9 +2894,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "pocketcdg"
-          ]
+          "cores": ["pocketcdg"]
         }
       ]
     },
@@ -3305,9 +2910,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "pokemini"
-          ]
+          "cores": ["pokemini"]
         }
       ]
     },
@@ -3350,9 +2953,7 @@
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "melonDS"
-          ]
+          "cores": ["melonDS"]
         }
       ]
     },
@@ -3372,9 +2973,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "azahar"
-          ]
+          "cores": ["azahar"]
         },
         {
           "name": "mandarine",
@@ -3382,15 +2981,11 @@
         },
         {
           "name": "citra",
-          "cores": [
-            "citra-qt"
-          ]
+          "cores": ["citra-qt"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Encore"
-          ]
+          "cores": ["Encore"]
         }
       ]
     },
@@ -3410,9 +3005,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "ppsspp"
-          ]
+          "cores": ["ppsspp"]
         }
       ]
     },
@@ -3429,28 +3022,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_ngp",
-            "race"
-          ]
+          "cores": ["mednafen_ngp", "race"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "ngp"
-          ]
+          "cores": ["ngp"]
         },
         {
           "name": "ares",
-          "cores": [
-            "NeoGeoPocket"
-          ]
+          "cores": ["NeoGeoPocket"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "NeoPop"
-          ]
+          "cores": ["NeoPop"]
         }
       ]
     },
@@ -3467,28 +3051,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_ngp",
-            "race"
-          ]
+          "cores": ["mednafen_ngp", "race"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "ngp"
-          ]
+          "cores": ["ngp"]
         },
         {
           "name": "ares",
-          "cores": [
-            "NeoGeoPocketColor"
-          ]
+          "cores": ["NeoGeoPocketColor"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "NeoPop"
-          ]
+          "cores": ["NeoPop"]
         }
       ]
     },
@@ -3504,9 +3079,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "potator"
-          ]
+          "cores": ["potator"]
         }
       ]
     },
@@ -3523,27 +3096,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_wswan"
-          ]
+          "cores": ["mednafen_wswan"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "wswan"
-          ]
+          "cores": ["wswan"]
         },
         {
           "name": "ares",
-          "cores": [
-            "WonderSwan"
-          ]
+          "cores": ["WonderSwan"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Cygne"
-          ]
+          "cores": ["Cygne"]
         }
       ]
     },
@@ -3560,27 +3125,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_wswan"
-          ]
+          "cores": ["mednafen_wswan"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "wswan"
-          ]
+          "cores": ["wswan"]
         },
         {
           "name": "ares",
-          "cores": [
-            "WonderSwanColor"
-          ]
+          "cores": ["WonderSwanColor"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Cygne"
-          ]
+          "cores": ["Cygne"]
         }
       ]
     },
@@ -3596,9 +3153,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "scummvm"
-          ]
+          "cores": ["scummvm"]
         },
         {
           "name": "scummvm",
@@ -3651,9 +3206,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "lutro"
-          ]
+          "cores": ["lutro"]
         }
       ]
     },
@@ -3670,9 +3223,7 @@
       "emulators": [
         {
           "name": "devilutionx",
-          "cores": [
-            "devilutionx"
-          ]
+          "cores": ["devilutionx"]
         }
       ]
     },
@@ -3689,9 +3240,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "easyrpg"
-          ]
+          "cores": ["easyrpg"]
         }
       ]
     },
@@ -3708,9 +3257,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "ecwolf"
-          ]
+          "cores": ["ecwolf"]
         }
       ]
     },
@@ -3727,9 +3274,7 @@
       "emulators": [
         {
           "name": "gemrb",
-          "cores": [
-            "gemrb"
-          ]
+          "cores": ["gemrb"]
         }
       ]
     },
@@ -3746,9 +3291,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "prboom"
-          ]
+          "cores": ["prboom"]
         }
       ]
     },
@@ -3799,10 +3342,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "boom3",
-            "boom3_xp"
-          ]
+          "cores": ["boom3", "boom3_xp"]
         },
         {
           "name": "dhewm3",
@@ -3823,9 +3363,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "tyrquake"
-          ]
+          "cores": ["tyrquake"]
         },
         {
           "name": "vkquake",
@@ -3923,10 +3461,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "nxengine",
-            "doukutsu_rs"
-          ]
+          "cores": ["nxengine", "doukutsu_rs"]
         }
       ]
     },
@@ -3959,9 +3494,7 @@
       "emulators": [
         {
           "name": "ikemen",
-          "cores": [
-            "ikemen"
-          ]
+          "cores": ["ikemen"]
         }
       ]
     },
@@ -3977,9 +3510,7 @@
       "emulators": [
         {
           "name": "mugen",
-          "cores": [
-            "mugen"
-          ]
+          "cores": ["mugen"]
         }
       ]
     },
@@ -3995,10 +3526,7 @@
       "emulators": [
         {
           "name": "openbor",
-          "cores": [
-            "openbor",
-            "openbor-specific-version"
-          ]
+          "cores": ["openbor", "openbor-specific-version"]
         }
       ]
     },
@@ -4058,9 +3586,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
@@ -4084,9 +3610,7 @@
         },
         {
           "name": "teknoparrot",
-          "cores": [
-            "namco2x6"
-          ]
+          "cores": ["namco2x6"]
         }
       ]
     },
@@ -4102,9 +3626,7 @@
       "emulators": [
         {
           "name": "teknoparrot",
-          "cores": [
-            "namco3xx"
-          ]
+          "cores": ["namco3xx"]
         }
       ]
     },
@@ -4120,9 +3642,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "dosbox_pure"
-          ]
+          "cores": ["dosbox_pure"]
         },
         {
           "name": "dosbox-staging",
@@ -4303,9 +3823,7 @@
       "emulators": [
         {
           "name": "vpinball",
-          "cores": [
-            "vpinball"
-          ]
+          "cores": ["vpinball"]
         }
       ]
     },
@@ -4347,10 +3865,7 @@
         },
         {
           "name": "pinballfx",
-          "cores": [
-            "steam",
-            "nonsteam"
-          ]
+          "cores": ["steam", "nonsteam"]
         }
       ]
     },
@@ -4370,10 +3885,7 @@
         },
         {
           "name": "pinballfx",
-          "cores": [
-            "steam",
-            "nonsteam"
-          ]
+          "cores": ["steam", "nonsteam"]
         }
       ]
     },
@@ -4393,10 +3905,7 @@
         },
         {
           "name": "pinballfx",
-          "cores": [
-            "steam",
-            "nonsteam"
-          ]
+          "cores": ["steam", "nonsteam"]
         }
       ]
     },
@@ -4416,10 +3925,7 @@
         },
         {
           "name": "pinballfx",
-          "cores": [
-            "steam",
-            "nonsteam"
-          ]
+          "cores": ["steam", "nonsteam"]
         }
       ]
     },
@@ -4435,10 +3941,7 @@
       "emulators": [
         {
           "name": "zaccariapinball",
-          "cores": [
-            "steam",
-            "nonsteam"
-          ]
+          "cores": ["steam", "nonsteam"]
         }
       ]
     },
@@ -4454,10 +3957,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "retro8",
-            "fake08"
-          ]
+          "cores": ["retro8", "fake08"]
         },
         {
           "name": "pico8",
@@ -4477,15 +3977,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "tic80"
-          ]
+          "cores": ["tic80"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "TIC-80"
-          ]
+          "cores": ["TIC-80"]
         }
       ]
     },
@@ -4501,9 +3997,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "wasm4"
-          ]
+          "cores": ["wasm4"]
         }
       ]
     },
@@ -4519,16 +4013,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "same_cdi",
-            "mame"
-          ]
+          "cores": ["same_cdi", "mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "cdi"
-          ]
+          "cores": ["cdi"]
         }
       ]
     },
@@ -4561,15 +4050,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "advision"
-          ]
+          "cores": ["advision"]
         }
       ]
     },
@@ -4586,15 +4071,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "tvgames"
-          ]
+          "cores": ["tvgames"]
         }
       ]
     },
@@ -4610,16 +4091,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "sameduck",
-            "mame"
-          ]
+          "cores": ["sameduck", "mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "megaduck"
-          ]
+          "cores": ["megaduck"]
         }
       ]
     },
@@ -4635,10 +4111,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "arduous",
-            "ardens"
-          ]
+          "cores": ["arduous", "ardens"]
         }
       ]
     },
@@ -4654,15 +4127,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "uzem"
-          ]
+          "cores": ["uzem"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Uzem"
-          ]
+          "cores": ["Uzem"]
         }
       ]
     },
@@ -4678,9 +4147,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "lowresnx"
-          ]
+          "cores": ["lowresnx"]
         }
       ]
     },
@@ -4696,9 +4163,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vircon32"
-          ]
+          "cores": ["vircon32"]
         }
       ]
     },
@@ -4715,15 +4180,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "pv1000"
-          ]
+          "cores": ["pv1000"]
         }
       ]
     },
@@ -4740,9 +4201,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bk"
-          ]
+          "cores": ["bk"]
         }
       ]
     },
@@ -4759,15 +4218,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "casloopy"
-          ]
+          "cores": ["casloopy"]
         }
       ]
     },
@@ -4783,16 +4238,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "jollycv",
-            "mame"
-          ]
+          "cores": ["jollycv", "mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "crvision"
-          ]
+          "cores": ["crvision"]
         }
       ]
     },
@@ -4809,15 +4259,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "gamecom"
-          ]
+          "cores": ["gamecom"]
         }
       ]
     },
@@ -4834,15 +4280,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "gamepock"
-          ]
+          "cores": ["gamepock"]
         }
       ]
     },
@@ -4859,15 +4301,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "gp32"
-          ]
+          "cores": ["gp32"]
         }
       ]
     },
@@ -4884,15 +4322,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "pegasus"
-          ]
+          "cores": ["pegasus"]
         }
       ]
     },
@@ -4908,9 +4342,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "pd777"
-          ]
+          "cores": ["pd777"]
         }
       ]
     },
@@ -4926,16 +4358,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "emuscv",
-            "mame"
-          ]
+          "cores": ["emuscv", "mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "scv"
-          ]
+          "cores": ["scv"]
         }
       ]
     },
@@ -4952,15 +4379,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "fm7"
-          ]
+          "cores": ["fm7"]
         }
       ]
     },
@@ -4977,15 +4400,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "apfm1000"
-          ]
+          "cores": ["apfm1000"]
         }
       ]
     },
@@ -5012,9 +4431,7 @@
         },
         {
           "name": "mame64",
-          "cores": [
-            "bbcmicro"
-          ]
+          "cores": ["bbcmicro"]
         }
       ]
     },
@@ -5031,15 +4448,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "electron"
-          ]
+          "cores": ["electron"]
         }
       ]
     },
@@ -5056,15 +4469,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "adam"
-          ]
+          "cores": ["adam"]
         }
       ]
     },
@@ -5081,15 +4490,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "atom"
-          ]
+          "cores": ["atom"]
         }
       ]
     },
@@ -5106,15 +4511,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "archimedes"
-          ]
+          "cores": ["archimedes"]
         }
       ]
     },
@@ -5131,16 +4532,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "amiarcadia",
-            "mame"
-          ]
+          "cores": ["amiarcadia", "mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "arcadia"
-          ]
+          "cores": ["arcadia"]
         }
       ]
     },
@@ -5157,15 +4553,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "gmaster"
-          ]
+          "cores": ["gmaster"]
         }
       ]
     },
@@ -5182,15 +4574,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "astrocde"
-          ]
+          "cores": ["astrocde"]
         }
       ]
     },
@@ -5207,15 +4595,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "mame64"
-          ]
+          "cores": ["mame64"]
         }
       ]
     },
@@ -5232,15 +4616,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "tutor"
-          ]
+          "cores": ["tutor"]
         }
       ]
     },
@@ -5257,15 +4637,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "coco"
-          ]
+          "cores": ["coco"]
         },
         {
           "name": "xroar",
@@ -5302,21 +4678,15 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "tsugaru",
-          "cores": [
-            "tsugaru"
-          ]
+          "cores": ["tsugaru"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "fmtownsux"
-          ]
+          "cores": ["fmtownsux"]
         }
       ]
     },
@@ -5343,9 +4713,7 @@
         },
         {
           "name": "mame64",
-          "cores": [
-            "lcdgames"
-          ]
+          "cores": ["lcdgames"]
         }
       ]
     },
@@ -5362,15 +4730,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "vsmile"
-          ]
+          "cores": ["vsmile"]
         }
       ]
     },
@@ -5391,15 +4755,11 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "camplynx"
-          ]
+          "cores": ["camplynx"]
         }
       ]
     },
@@ -5416,16 +4776,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "amiarcadia",
-            "mame"
-          ]
+          "cores": ["amiarcadia", "mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "vc4000"
-          ]
+          "cores": ["vc4000"]
         }
       ]
     },
@@ -5442,15 +4797,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "supracan"
-          ]
+          "cores": ["supracan"]
         }
       ]
     },
@@ -5467,15 +4818,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "gamate"
-          ]
+          "cores": ["gamate"]
         }
       ]
     },
@@ -5491,10 +4838,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mgba",
-            "mesen-s"
-          ]
+          "cores": ["mgba", "mesen-s"]
         },
         {
           "name": "mesen",
@@ -5502,16 +4846,11 @@
         },
         {
           "name": "mgba",
-          "cores": [
-            "mgba"
-          ]
+          "cores": ["mgba"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "BSNES",
-            "Gambatte"
-          ]
+          "cores": ["BSNES", "Gambatte"]
         }
       ]
     },
@@ -5527,10 +4866,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame",
-            "mame2016"
-          ]
+          "cores": ["mame", "mame2016"]
         },
         {
           "name": "mame64",
@@ -5567,9 +4903,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "bennugd"
-          ]
+          "cores": ["bennugd"]
         }
       ]
     },
@@ -5603,9 +4937,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "cannonball"
-          ]
+          "cores": ["cannonball"]
         }
       ]
     },
@@ -5673,9 +5005,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "openlara"
-          ]
+          "cores": ["openlara"]
         }
       ]
     },
@@ -5866,9 +5196,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "dinothawr"
-          ]
+          "cores": ["dinothawr"]
         }
       ]
     },
@@ -5919,9 +5247,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "superbroswar"
-          ]
+          "cores": ["superbroswar"]
         }
       ]
     },
@@ -5938,9 +5264,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "reminiscence"
-          ]
+          "cores": ["reminiscence"]
         }
       ]
     },
@@ -5956,14 +5280,14 @@
       "emulators": []
     },
     {
-      "name": "retrobat",
-      "fullname": "RetroBat",
+      "name": "emulators",
+      "fullname": "Emulators",
       "path": "~\\..\\system\\es_menu",
       "extension": ".menu",
-      "command": "\"%HOME%\\emulatorLauncher.exe\" -system retrobat -rom %ROM%",
-      "platform": "retrobat",
-      "theme": "retrobat",
-      "hardware": "",
+      "command": "\"%HOME%\\emulatorLauncher.exe\" -system emulators -rom %ROM%",
+      "platform": "emulators",
+      "theme": "emulators",
+      "hardware": "system",
       "emulators": []
     },
     {
@@ -5974,13 +5298,11 @@
       "command": "\"%HOME%\\emulatorLauncher.exe\" -gameinfo %GAMEINFOXML% %CONTROLLERSCONFIG% -system %SYSTEM% -emulator %EMULATOR% -core %CORE% -rom %ROM%",
       "platform": "imageviewer",
       "theme": "screenshots",
-      "hardware": "",
+      "hardware": "system",
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "imageviewer"
-          ]
+          "cores": ["imageviewer"]
         }
       ]
     },
@@ -6008,9 +5330,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "opera"
-          ]
+          "cores": ["opera"]
         },
         {
           "name": "phoenix",
@@ -6030,12 +5350,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame2003_plus",
-            "mame",
-            "mame2003_midway",
-            "mame2016"
-          ]
+          "cores": ["mame2003_plus", "mame", "mame2003_midway", "mame2016"]
         },
         {
           "name": "mame64",
@@ -6132,9 +5447,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
@@ -6184,15 +5497,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "cinematronics"
-          ]
+          "cores": ["cinematronics"]
         }
       ]
     },
@@ -6208,9 +5517,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
@@ -6234,9 +5541,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame",
@@ -6263,17 +5568,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fceumm",
-            "nestopia",
-            "mesen"
-          ]
+          "cores": ["fceumm", "nestopia", "mesen"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "nes"
-          ]
+          "cores": ["nes"]
         },
         {
           "name": "mesen",
@@ -6281,16 +5580,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "Famicom"
-          ]
+          "cores": ["Famicom"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "NesHawk",
-            "quickerNES"
-          ]
+          "cores": ["NesHawk", "quickerNES"]
         },
         {
           "name": "jgenesis",
@@ -6337,29 +5631,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "genesis_plus_gx",
-            "picodrive",
-            "fbneo"
-          ]
+          "cores": ["genesis_plus_gx", "picodrive", "fbneo"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "gg"
-          ]
+          "cores": ["gg"]
         },
         {
           "name": "ares",
-          "cores": [
-            "GameGear"
-          ]
+          "cores": ["GameGear"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "SMSHawk"
-          ]
+          "cores": ["SMSHawk"]
         },
         {
           "name": "jgenesis",
@@ -6388,29 +5672,19 @@
         },
         {
           "name": "mednafen",
-          "cores": [
-            "megadrive"
-          ]
+          "cores": ["megadrive"]
         },
         {
           "name": "ares",
-          "cores": [
-            "MegaDrive"
-          ]
+          "cores": ["MegaDrive"]
         },
         {
           "name": "kega-fusion",
-          "cores": [
-            "auto",
-            "megadrive",
-            "genesis"
-          ]
+          "cores": ["auto", "megadrive", "genesis"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Genplus-gx"
-          ]
+          "cores": ["Genplus-gx"]
         },
         {
           "name": "jgenesis",
@@ -6448,16 +5722,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "Nintendo64"
-          ]
+          "cores": ["Nintendo64"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Ares64",
-            "Mupen64Plus"
-          ]
+          "cores": ["Ares64", "Mupen64Plus"]
         },
         {
           "name": "project64",
@@ -6477,15 +5746,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "tvgames"
-          ]
+          "cores": ["tvgames"]
         }
       ]
     },
@@ -6532,7 +5797,7 @@
     },
     {
       "name": "magazine",
-      "fullname": "Revistas",
+      "fullname": "Magazines",
       "path": "~\\..\\roms\\magazine",
       "extension": ".pdf",
       "command": "\"%HOME%\\emulatorLauncher.exe\" -gameinfo %GAMEINFOXML% %CONTROLLERSCONFIG% -system %SYSTEM% -emulator %EMULATOR% -core %CORE% -rom %ROM%",
@@ -6576,36 +5841,23 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "genesis_plus_gx",
-            "picodrive",
-            "fbneo"
-          ]
+          "cores": ["genesis_plus_gx", "picodrive", "fbneo"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "mastersystem"
-          ]
+          "cores": ["mastersystem"]
         },
         {
           "name": "ares",
-          "cores": [
-            "MasterSystem"
-          ]
+          "cores": ["MasterSystem"]
         },
         {
           "name": "kega-fusion",
-          "cores": [
-            "auto",
-            "mastersystem"
-          ]
+          "cores": ["auto", "mastersystem"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "SMSHawk"
-          ]
+          "cores": ["SMSHawk"]
         }
       ]
     },
@@ -6630,29 +5882,19 @@
         },
         {
           "name": "mednafen",
-          "cores": [
-            "megadrive"
-          ]
+          "cores": ["megadrive"]
         },
         {
           "name": "ares",
-          "cores": [
-            "MegaDrive"
-          ]
+          "cores": ["MegaDrive"]
         },
         {
           "name": "kega-fusion",
-          "cores": [
-            "auto",
-            "megadrive",
-            "genesis"
-          ]
+          "cores": ["auto", "megadrive", "genesis"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Genplus-gx"
-          ]
+          "cores": ["Genplus-gx"]
         }
       ]
     },
@@ -6686,16 +5928,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "Nintendo64"
-          ]
+          "cores": ["Nintendo64"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Ares64",
-            "Mupen64Plus"
-          ]
+          "cores": ["Ares64", "Mupen64Plus"]
         },
         {
           "name": "project64",
@@ -6733,16 +5970,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "Nintendo64"
-          ]
+          "cores": ["Nintendo64"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "Ares64",
-            "Mupen64Plus"
-          ]
+          "cores": ["Ares64", "Mupen64Plus"]
         },
         {
           "name": "project64",
@@ -6808,9 +6040,7 @@
         },
         {
           "name": "mame64",
-          "cores": [
-            "neogeo"
-          ]
+          "cores": ["neogeo"]
         }
       ]
     },
@@ -6842,17 +6072,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fceumm",
-            "nestopia",
-            "mesen"
-          ]
+          "cores": ["fceumm", "nestopia", "mesen"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "nes"
-          ]
+          "cores": ["nes"]
         },
         {
           "name": "mesen",
@@ -6860,16 +6084,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "Famicom"
-          ]
+          "cores": ["Famicom"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "NesHawk",
-            "QuickNes"
-          ]
+          "cores": ["NesHawk", "QuickNes"]
         }
       ]
     },
@@ -6885,17 +6104,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "fceumm",
-            "nestopia",
-            "mesen"
-          ]
+          "cores": ["fceumm", "nestopia", "mesen"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "nes"
-          ]
+          "cores": ["nes"]
         },
         {
           "name": "mesen",
@@ -6903,16 +6116,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "Famicom"
-          ]
+          "cores": ["Famicom"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "NesHawk",
-            "QuickNes"
-          ]
+          "cores": ["NesHawk", "QuickNes"]
         }
       ]
     },
@@ -6928,9 +6136,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mesen"
-          ]
+          "cores": ["mesen"]
         }
       ]
     },
@@ -6962,9 +6168,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mu"
-          ]
+          "cores": ["mu"]
         }
       ]
     },
@@ -7028,17 +6232,11 @@
       "emulators": [
         {
           "name": "pcsx2",
-          "cores": [
-            "auto",
-            "sse4",
-            "avx2"
-          ]
+          "cores": ["auto", "sse4", "avx2"]
         },
         {
           "name": "pcsx2-16",
-          "cores": [
-            "pcsx2-16"
-          ]
+          "cores": ["pcsx2-16"]
         },
         {
           "name": "play",
@@ -7046,9 +6244,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "pcsx2"
-          ]
+          "cores": ["pcsx2"]
         }
       ]
     },
@@ -7064,17 +6260,11 @@
       "emulators": [
         {
           "name": "pcsx2",
-          "cores": [
-            "auto",
-            "sse4",
-            "avx2"
-          ]
+          "cores": ["auto", "sse4", "avx2"]
         },
         {
           "name": "pcsx2-16",
-          "cores": [
-            "pcsx2-16"
-          ]
+          "cores": ["pcsx2-16"]
         },
         {
           "name": "play",
@@ -7082,9 +6272,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "pcsx2"
-          ]
+          "cores": ["pcsx2"]
         }
       ]
     },
@@ -7132,9 +6320,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "ppsspp"
-          ]
+          "cores": ["ppsspp"]
         },
         {
           "name": "ppsspp",
@@ -7154,11 +6340,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_psx_hw",
-            "swanstation",
-            "pcsx_rearmed"
-          ]
+          "cores": ["mednafen_psx_hw", "swanstation", "pcsx_rearmed"]
         },
         {
           "name": "duckstation",
@@ -7201,9 +6383,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "vitaquake3"
-          ]
+          "cores": ["vitaquake3"]
         }
       ]
     },
@@ -7219,11 +6399,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "kronos",
-            "mednafen_saturn",
-            "yabasanshiro"
-          ]
+          "cores": ["kronos", "mednafen_saturn", "yabasanshiro"]
         },
         {
           "name": "mednafen",
@@ -7264,27 +6440,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "picodrive"
-          ]
+          "cores": ["picodrive"]
         },
         {
           "name": "ares",
-          "cores": [
-            "Mega32X"
-          ]
+          "cores": ["Mega32X"]
         },
         {
           "name": "kega-fusion",
-          "cores": [
-            "sega32x"
-          ]
+          "cores": ["sega32x"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "PicoDrive"
-          ]
+          "cores": ["PicoDrive"]
         },
         {
           "name": "jgenesis",
@@ -7313,9 +6481,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "pcsx2"
-          ]
+          "cores": ["pcsx2"]
         }
       ]
     },
@@ -7341,9 +6507,7 @@
         },
         {
           "name": "mednafen",
-          "cores": [
-            "snes"
-          ]
+          "cores": ["snes"]
         },
         {
           "name": "mesen",
@@ -7355,17 +6519,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "SuperFamicom"
-          ]
+          "cores": ["SuperFamicom"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "BSNES",
-            "Faust",
-            "Snes9x"
-          ]
+          "cores": ["BSNES", "Faust", "Snes9x"]
         },
         {
           "name": "jgenesis",
@@ -7395,9 +6553,7 @@
         },
         {
           "name": "mednafen",
-          "cores": [
-            "snes"
-          ]
+          "cores": ["snes"]
         },
         {
           "name": "mesen",
@@ -7409,17 +6565,11 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "SuperFamicom"
-          ]
+          "cores": ["SuperFamicom"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "BSNES",
-            "Faust",
-            "Snes9x"
-          ]
+          "cores": ["BSNES", "Faust", "Snes9x"]
         }
       ]
     },
@@ -7435,15 +6585,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
-          "cores": [
-            "socrates"
-          ]
+          "cores": ["socrates"]
         }
       ]
     },
@@ -7459,9 +6605,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         },
         {
           "name": "mame64",
@@ -7481,10 +6625,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "stella",
-            "stella2014"
-          ]
+          "cores": ["stella", "stella2014"]
         },
         {
           "name": "stella",
@@ -7492,9 +6633,7 @@
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "A26"
-          ]
+          "cores": ["A26"]
         }
       ]
     },
@@ -7510,16 +6649,11 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mame",
-            "VeMUlator"
-          ]
+          "cores": ["mame", "VeMUlator"]
         },
         {
           "name": "mame",
-          "cores": [
-            "mame"
-          ]
+          "cores": ["mame"]
         }
       ]
     },
@@ -7567,31 +6701,19 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_pce",
-            "mednafen_pce_fast",
-            "fbneo"
-          ]
+          "cores": ["mednafen_pce", "mednafen_pce_fast", "fbneo"]
         },
         {
           "name": "mednafen",
-          "cores": [
-            "pce"
-          ]
+          "cores": ["pce"]
         },
         {
           "name": "ares",
-          "cores": [
-            "PCEngine"
-          ]
+          "cores": ["PCEngine"]
         },
         {
           "name": "bizhawk",
-          "cores": [
-            "HyperNyma",
-            "PCEHawk",
-            "TurboNyma"
-          ]
+          "cores": ["HyperNyma", "PCEHawk", "TurboNyma"]
         },
         {
           "name": "magicengine",
@@ -7611,11 +6733,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_pce",
-            "mednafen_pce_fast",
-            "fbneo"
-          ]
+          "cores": ["mednafen_pce", "mednafen_pce_fast", "fbneo"]
         },
         {
           "name": "mednafen",
@@ -7628,9 +6746,7 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "PCEngineCD"
-          ]
+          "cores": ["PCEngineCD"]
         },
         {
           "name": "bizhawk",
@@ -7717,9 +6833,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "np2kai"
-          ]
+          "cores": ["np2kai"]
         }
       ]
     },
@@ -7735,11 +6849,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mednafen_pce",
-            "mednafen_pce_fast",
-            "fbneo"
-          ]
+          "cores": ["mednafen_pce", "mednafen_pce_fast", "fbneo"]
         },
         {
           "name": "mednafen",
@@ -7752,9 +6862,7 @@
         },
         {
           "name": "ares",
-          "cores": [
-            "PCEngineCD"
-          ]
+          "cores": ["PCEngineCD"]
         },
         {
           "name": "bizhawk",
@@ -7852,9 +6960,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "dolphin"
-          ]
+          "cores": ["dolphin"]
         }
       ]
     },
@@ -7874,9 +6980,7 @@
         },
         {
           "name": "libretro",
-          "cores": [
-            "dosbox_pure"
-          ]
+          "cores": ["dosbox_pure"]
         }
       ]
     },
@@ -7892,10 +6996,7 @@
       "emulators": [
         {
           "name": "xenia",
-          "cores": [
-            "xenia-canary",
-            "xenia"
-          ]
+          "cores": ["xenia-canary", "xenia"]
         }
       ]
     },
@@ -7927,10 +7028,7 @@
       "emulators": [
         {
           "name": "libretro",
-          "cores": [
-            "mojozork",
-            "dosbox_pure"
-          ]
+          "cores": ["mojozork", "dosbox_pure"]
         }
       ]
     }

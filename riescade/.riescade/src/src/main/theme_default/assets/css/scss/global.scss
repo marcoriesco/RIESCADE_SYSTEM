@@ -76,12 +76,12 @@ body {
       display: inline;
     }
 
-    &.system-retrobat {
+    &.system-emulators {
       .fallback-title { display: none; }
-      .retrobat-title { display: inline; }
+      .emulators-title { display: inline; }
       .system-gamecount {
         .fallback-count { display: none; }
-        .retrobat-count { display: inline; }
+        .emulators-count { display: inline; }
       }
     }
     &.system-collections {

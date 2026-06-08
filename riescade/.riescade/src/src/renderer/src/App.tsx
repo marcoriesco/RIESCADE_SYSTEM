@@ -233,6 +233,8 @@ function App() {
 	const [showGamelistUpdateModal, setShowGamelistUpdateModal] = useState(false);
 	const [reloadModalSelectedIndex, setReloadModalSelectedIndex] = useState(0);
 	const [isUpdatingGamelist, setIsUpdatingGamelist] = useState(false);
+	const [showLaunchErrorModal, setShowLaunchErrorModal] = useState(false);
+	const [launchErrorMessage, setLaunchErrorMessage] = useState('');
 
 	const bgMusicRef = useRef<HTMLAudioElement | null>(null);
 	const navSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -1645,6 +1647,27 @@ function App() {
 		});
 	};
 
+	const showLaunchError = useCallback((err: any) => {
+		console.error('Launch game failed:', err);
+		
+		let rawMsg = '';
+		if (err && typeof err === 'object') {
+			rawMsg = err.message || '';
+		} else if (typeof err === 'string') {
+			rawMsg = err;
+		}
+
+		if (rawMsg) {
+			const cleanMsg = rawMsg.replace(/^Error:\s*/i, '').trim();
+			setLaunchErrorMessage(cleanMsg);
+			setShowLaunchErrorModal(true);
+		}
+
+		setIsLaunching(false);
+		setLaunchingGame(null);
+		setLaunchingSystem(null);
+	}, []);
+
 	const handleLaunchGame = useCallback((gameToLaunch: Game, systemToLaunch: System) => {
 		const saveStatesSetting = String(settings['global.savestates']?.value ?? '0');
 
@@ -1661,14 +1684,7 @@ function App() {
 						setLaunchingSystem(null);
 					}, 5000);
 				})
-				.catch((err) => {
-					console.error('Launch game failed or exited with code:', err);
-					setTimeout(() => {
-						setIsLaunching(false);
-						setLaunchingGame(null);
-						setLaunchingSystem(null);
-					}, 5000);
-				});
+				.catch(showLaunchError);
 		};
 
 		if (saveStatesSetting === '0') {
@@ -1729,14 +1745,7 @@ function App() {
 					setLaunchingSystem(null);
 				}, 5000);
 			})
-			.catch((err) => {
-				console.error('Launch Netplay game failed:', err);
-				setTimeout(() => {
-					setIsLaunching(false);
-					setLaunchingGame(null);
-					setLaunchingSystem(null);
-				}, 5000);
-			});
+			.catch(showLaunchError);
 	}, [systems]);
 
 	// Helper: Jump to a random game in the current list
@@ -1819,7 +1828,7 @@ function App() {
 	const executeShortPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal;
 		if (isOverlayActive) {
 			if (key === 'x') {
 				dispatchKeyEvent('Enter');
@@ -1885,6 +1894,7 @@ function App() {
 		isSaveStateManagerOpen,
 		isHardwareSelectOpen,
 		showGamelistUpdateModal,
+		showLaunchErrorModal,
 		selectedSystem,
 		systemIndex,
 		filteredSystems,
@@ -1900,7 +1910,7 @@ function App() {
 	const executeLongPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal;
 		if (isOverlayActive) return;
 
 		if (selectedSystem && currentGame) {
@@ -1922,6 +1932,7 @@ function App() {
 		isSaveStateManagerOpen,
 		isHardwareSelectOpen,
 		showGamelistUpdateModal,
+		showLaunchErrorModal,
 		selectedSystem,
 		currentGame,
 		toggleFavoriteGame,
@@ -1951,6 +1962,14 @@ function App() {
 
 		// Normalize key casing
 		const key = (e.key || '').toLowerCase();
+
+		if (showLaunchErrorModal) {
+			if (key === 'enter' || key === ' ' || key === 'escape' || key === 'backspace') {
+				setShowLaunchErrorModal(false);
+				setLaunchErrorMessage('');
+			}
+			return;
+		}
 
 		if (showGamelistUpdateModal) {
 			if (key === 'arrowleft' || key === 'arrowright') {
@@ -2125,6 +2144,7 @@ function App() {
 		isSaveStateManagerOpen,
 		isHardwareSelectOpen,
 		showGamelistUpdateModal,
+		showLaunchErrorModal,
 		reloadModalSelectedIndex,
 		handleFastReload,
 		selectedSystem,
@@ -2607,14 +2627,7 @@ function App() {
 									setLaunchingSystem(null);
 								}, 5000);
 							})
-							.catch((err) => {
-								console.error('Launch game failed or exited with code:', err);
-								setTimeout(() => {
-									setIsLaunching(false);
-									setLaunchingGame(null);
-									setLaunchingSystem(null);
-								}, 5000);
-							});
+							.catch(showLaunchError);
 						setSaveManagerGame(null);
 						setSaveManagerSystem(null);
 					}}
@@ -2647,6 +2660,119 @@ function App() {
 				onVideoEnded={handleVideoEnded}
 				t={t}
 			/>
+
+			{/* Launch Error Modal */}
+			{showLaunchErrorModal && (
+				<div
+					id="launch-error-overlay"
+					style={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						background: 'rgba(0, 0, 0, 0.8)',
+						backdropFilter: 'blur(18px)',
+						WebkitBackdropFilter: 'blur(18px)',
+						zIndex: 10000001,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						animation: 'fadeIn 0.3s ease-out'
+					}}
+					onClick={() => {
+						setShowLaunchErrorModal(false);
+						setLaunchErrorMessage('');
+					}}
+				>
+					<div
+						id="launch-error-modal"
+						style={{
+							background: 'linear-gradient(135deg, rgba(20, 20, 30, 0.95) 0%, rgba(30, 15, 20, 0.95) 100%)',
+							backdropFilter: 'blur(12px)',
+							WebkitBackdropFilter: 'blur(12px)',
+							border: '1px solid rgba(255, 60, 60, 0.25)',
+							borderRadius: '12px',
+							padding: '36px 40px 28px 40px',
+							width: '480px',
+							maxWidth: '90vw',
+							boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 50, 50, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+							display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'center',
+							textAlign: 'center',
+							animation: 'fadeIn 0.35s ease-out'
+						}}
+						onClick={(e) => e.stopPropagation()}
+					>
+						{/* Error Icon */}
+						<div style={{
+							width: '56px',
+							height: '56px',
+							borderRadius: '50%',
+							background: 'linear-gradient(135deg, rgba(255, 60, 60, 0.2), rgba(255, 100, 60, 0.15))',
+							border: '2px solid rgba(255, 70, 70, 0.35)',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							marginBottom: '16px'
+						}}>
+							<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff5555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+								<circle cx="12" cy="12" r="10" />
+								<line x1="12" y1="8" x2="12" y2="12" />
+								<line x1="12" y1="16" x2="12.01" y2="16" />
+							</svg>
+						</div>
+
+						{/* Title */}
+						<div style={{
+							fontSize: '1.1rem',
+							fontWeight: 800,
+							letterSpacing: '2.5px',
+							textTransform: 'uppercase',
+							color: '#ff6b6b',
+							marginBottom: '14px'
+						}}>ERRO AO INICIAR</div>
+
+						{/* Error Message */}
+						<div style={{
+							fontSize: '0.95rem',
+							lineHeight: '1.6',
+							color: 'rgba(255, 255, 255, 0.8)',
+							marginBottom: '24px',
+							padding: '0 4px',
+							wordBreak: 'break-word'
+						}}>
+							{launchErrorMessage || 'Ocorreu um erro desconhecido ao tentar iniciar o emulador.'}
+						</div>
+
+						{/* OK Button */}
+						<button
+							id="launch-error-ok-btn"
+							className="riescade-button primary selected"
+							style={{
+								padding: '10px 48px',
+								fontSize: '0.9rem',
+								fontWeight: 700,
+								letterSpacing: '1.5px',
+								textTransform: 'uppercase',
+								border: '1px solid rgba(255, 70, 70, 0.4)',
+								borderRadius: '6px',
+								background: 'linear-gradient(135deg, rgba(255, 60, 60, 0.25), rgba(255, 80, 60, 0.15))',
+								color: '#fff',
+								cursor: 'pointer',
+								transition: 'all 0.2s ease'
+							}}
+							onClick={() => {
+								setShowLaunchErrorModal(false);
+								setLaunchErrorMessage('');
+							}}
+						>
+							OK
+						</button>
+					</div>
+				</div>
+			)}
 
 			{/* CSS Fade In animation helper */}
 			<style dangerouslySetInnerHTML={{__html: `

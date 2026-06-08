@@ -32,7 +32,7 @@ export class SystemsParser {
             const sName = String(s.name || '').toLowerCase()
             let sHardware = String(s.hardware || '')
             if (!sHardware) {
-              if (['library', 'magazine', 'manuals', 'retrobat', 'screenshots', 'windows'].includes(sName)) {
+              if (['library', 'magazine', 'manuals', 'retrobat', 'emulators', 'screenshots', 'windows'].includes(sName)) {
                 sHardware = 'system'
               } else {
                 sHardware = 'console'

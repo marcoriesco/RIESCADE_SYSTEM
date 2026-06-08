@@ -125,11 +125,11 @@ namespace EmulatorLauncher
 
                 if (label1.TextAlign == ContentAlignment.BottomCenter)
                 {
-                    logoTop = top + row0Height - 30 - fontHeight - 25 - pictureBox1.Height - 100;
+                    logoTop = top + row0Height - 30 - fontHeight - 25 - pictureBox1.Height - 140;
                 }
                 else
                 {
-                    logoTop = top + (row0Height / 2) - (fontHeight / 2) - 25 - pictureBox1.Height - 100;
+                    logoTop = top + (row0Height / 2) - (fontHeight / 2) - 25 - pictureBox1.Height - 140;
                 }
 
                 if (logoTop < 5)

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'fs'
 import { SystemsParser } from '../parsers/SystemsParser'
 import { GamelistParser } from '../parsers/GamelistParser'
 import { SettingsParser } from '../parsers/SettingsParser'
-import { getConfigPath, getRomsPath, getRetroBatPath, getCollectionsPath, getDatabasePath } from '../utils/paths'
+import { getConfigPath, getRomsPath, getRetroBatPath, getCollectionsPath, getDatabasePath, getRiescadePath } from '../utils/paths'
 import { System, Game } from '../../shared/types'
 import { DatabaseService } from './DatabaseService'
 
@@ -715,6 +715,8 @@ export class LibraryService {
       const cleanColName = nameLower.startsWith('auto-') ? nameLower.substring(5) : nameLower
 
       const cached = LibraryService.cachedGames.get(nameLower)
+      const isSpecial = ['library', 'magazine', 'manuals', 'retrobat', 'emulators', 'screenshots'].includes(nameLower) || s.hardware === 'system'
+
       if (cached) {
         s.gamecount = cached.length
       } else if (s.hardware === 'auto collection') {
@@ -728,6 +730,8 @@ export class LibraryService {
           }
         }
         s.gamecount = LibraryService.quickAutoCounts.get(countKey) || 0
+      } else if (isSpecial) {
+        s.gamecount = this.getQuickGameCount(s.name)
       } else if (dbGameCounts) {
         // DB mode: use batch SQL counts
         s.gamecount = dbGameCounts.get(s.name) || 0
@@ -751,7 +755,7 @@ export class LibraryService {
         if (isAuto) return 2
         
         // 3. Real Game Systems (The rest)
-        const isSpecial = ['library', 'magazine', 'manuals', 'retrobat', 'screenshots'].includes(name) || sys.hardware === 'system'
+        const isSpecial = ['library', 'magazine', 'manuals', 'retrobat', 'emulators', 'screenshots'].includes(name) || sys.hardware === 'system'
         if (!isSpecial) return 3
 
         // 4. Special / Maintenance Systems
@@ -887,6 +891,18 @@ export class LibraryService {
       return games
     }
 
+    // Bypass database queries for special/system directories
+    const isSpecial = ['library', 'magazine', 'manuals', 'retrobat', 'emulators', 'screenshots'].includes(nameLower) || (matchedSystem && matchedSystem.hardware === 'system')
+    if (isSpecial) {
+      if (LibraryService.cachedGames.has(nameLower)) {
+        return LibraryService.cachedGames.get(nameLower)!
+      }
+      const games = this.getGamesRaw(systemName, false, false)
+      LibraryService.cachedGames.set(nameLower, games)
+      LibraryService.fullyLoadedSystems.add(nameLower)
+      return games
+    }
+
     // ─── DB Mode: load from SQLite for physical systems ───
     if (LibraryService.isDbMode() && LibraryService.databaseService.isOpen()) {
       if (LibraryService.cachedGames.has(nameLower)) {
@@ -1008,7 +1024,6 @@ export class LibraryService {
     }
 
     try {
-      const { getRiescadePath } = require('../utils/paths')
       const logsDir = join(getRiescadePath(), 'logs')
       const fs = require('fs')
       if (!fs.existsSync(logsDir)) {

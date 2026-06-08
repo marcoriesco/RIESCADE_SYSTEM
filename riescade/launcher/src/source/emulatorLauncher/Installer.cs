@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -167,6 +167,21 @@ namespace EmulatorLauncher
         {
             get
             {
+                string configSource = GetSourceFromSystemsJson(Emulator);
+                if (!string.IsNullOrEmpty(configSource))
+                {
+                    string resolvedUrl = ResolveUrlFromSource(configSource);
+                    if (!string.IsNullOrEmpty(resolvedUrl))
+                        return resolvedUrl;
+                }
+
+                if (Emulator == "citron")
+                {
+                    string githubUrl = GetCitronGithubUrl();
+                    if (!string.IsNullOrEmpty(githubUrl))
+                        return githubUrl;
+                }
+
                 if (!string.IsNullOrEmpty(ServerFileName))
                     return GetUpdateUrl(ServerFileName);
 
@@ -220,6 +235,145 @@ namespace EmulatorLauncher
 
                 return ret;
             }
+        }
+
+        private static string GetCitronGithubUrl()
+        {
+            try
+            {
+                string json = WebTools.DownloadString("https://api.github.com/repos/citron-neo/emulator/releases/latest");
+                if (string.IsNullOrEmpty(json))
+                {
+                    json = WebTools.DownloadString("https://api.github.com/repos/citron-neo/CI/releases/latest");
+                }
+
+                if (string.IsNullOrEmpty(json))
+                    return null;
+
+                var matches = Regex.Matches(json, @"""browser_download_url""\s*:\s*""([^""]+windows[^""]+\.zip)""", RegexOptions.IgnoreCase);
+                if (matches.Count > 0)
+                {
+                    return matches[0].Groups[1].Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                SimpleLogger.Instance.Error("[GetCitronGithubUrl] Failed to fetch Citron URL: " + ex.Message, ex);
+            }
+            return null;
+        }
+
+        private static string GetSourceFromSystemsJson(string emulatorName)
+        {
+            try
+            {
+                var esSystems = Program.EsSystems;
+                if (esSystems != null && esSystems.Systems != null)
+                {
+                    foreach (var system in esSystems.Systems)
+                    {
+                        if (system.Emulators != null)
+                        {
+                            var emul = system.Emulators.FirstOrDefault(e => e.Name == emulatorName);
+                            if (emul != null && !string.IsNullOrEmpty(emul.Source))
+                            {
+                                return emul.Source;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SimpleLogger.Instance.Error("[GetSourceFromSystemsJson] Error: " + ex.Message, ex);
+            }
+            return null;
+        }
+
+        private static string ResolveUrlFromSource(string sourceUrl)
+        {
+            if (string.IsNullOrEmpty(sourceUrl))
+                return null;
+
+            if (sourceUrl.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) || sourceUrl.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
+                return sourceUrl;
+
+            try
+            {
+                string apiUrl = null;
+
+                if (sourceUrl.Contains("github.com"))
+                {
+                    var match = Regex.Match(sourceUrl, @"github\.com/([^/]+)/([^/]+)");
+                    if (match.Success)
+                    {
+                        string owner = match.Groups[1].Value;
+                        string repo = match.Groups[2].Value.Replace("/releases", "").Replace(".git", "");
+                        apiUrl = string.Format("https://api.github.com/repos/{0}/{1}/releases/latest", owner, repo);
+                    }
+                }
+                else if (sourceUrl.Contains("git.eden-emu.dev"))
+                {
+                    var match = Regex.Match(sourceUrl, @"(git\.eden-emu\.dev)/([^/]+)/([^/]+)");
+                    if (match.Success)
+                    {
+                        string host = match.Groups[1].Value;
+                        string owner = match.Groups[2].Value;
+                        string repo = match.Groups[3].Value.Replace("/releases", "").Replace(".git", "");
+                        apiUrl = string.Format("https://{0}/api/v1/repos/{1}/{2}/releases", host, owner, repo);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(apiUrl))
+                {
+                    string json = WebTools.DownloadString(apiUrl);
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        var matches = Regex.Matches(json, @"""browser_download_url""\s*:\s*""([^""]+(?:windows|win64|win-x64|x64)[^""]+\.(?:zip|7z))""", RegexOptions.IgnoreCase);
+                        if (matches.Count > 0)
+                        {
+                            return matches[0].Groups[1].Value;
+                        }
+
+                        matches = Regex.Matches(json, @"""browser_download_url""\s*:\s*""([^""]+\.(?:zip|7z))""", RegexOptions.IgnoreCase);
+                        if (matches.Count > 0)
+                        {
+                            return matches[0].Groups[1].Value;
+                        }
+
+                        // Fallback: some repos (e.g., Eden on Gitea) embed download links
+                        // directly in the release body markdown instead of using assets.
+                        // Search for Windows download URLs in the body field.
+                        matches = Regex.Matches(json, @"(https?://[^\s\)\]""\\]+[Ww]indows[^\s\)\]""\\]*\.(?:zip|7z))", RegexOptions.IgnoreCase);
+                        if (matches.Count > 0)
+                        {
+                            // Prefer MSVC amd64 build for best compatibility
+                            foreach (Match m in matches)
+                            {
+                                string url = m.Groups[1].Value;
+                                if (url.IndexOf("msvc", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                                    url.IndexOf("amd64", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    return url;
+                            }
+                            // Then any amd64/x64 build
+                            foreach (Match m in matches)
+                            {
+                                string url = m.Groups[1].Value;
+                                if (url.IndexOf("amd64", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                    url.IndexOf("x64", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    return url;
+                            }
+                            return matches[0].Groups[1].Value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SimpleLogger.Instance.Error("[ResolveUrlFromSource] Failed to resolve URL from " + sourceUrl + ": " + ex.Message, ex);
+            }
+
+            return null;
         }
 
         public override string ToString()

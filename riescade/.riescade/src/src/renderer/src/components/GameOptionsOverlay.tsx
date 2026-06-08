@@ -599,6 +599,82 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
   }
 
+  // Opens a submenu for select items (same behavior as main Menu)
+  const handleSelectOpen = (item: any, index: number) => {
+    if (!item.items || item.items.length === 0) return
+    const activeIdx = item.items.findIndex((i: any) => i.value === item.value)
+
+    const optionsSubmenu: any[] = item.items.map((opt: any) => ({
+      id: `opt_${opt.value}`,
+      label: opt.label,
+      type: 'action',
+      onClick: () => {
+        const nextVal = opt.value
+        if (item.id === 'game_emulator') {
+          let emulator = 'auto'
+          let core: string | undefined = undefined
+          if (nextVal !== 'auto') {
+            if (nextVal.includes(':')) {
+              const parts = nextVal.split(':')
+              emulator = parts[0]
+              core = parts[1]
+            } else {
+              emulator = nextVal
+            }
+          }
+          const updated = { ...draftGame, emulator, core }
+          setDraftGame(updated)
+          onUpdate(updated)
+          setActiveMenuStack(prev => {
+            const rootItems = getRootItems(updated, gameCollections, system, customCollections, settings)
+            const nextStack = [...prev]
+            // Pop the options submenu
+            nextStack.pop()
+            nextStack[0] = { ...nextStack[0], items: rootItems }
+            for (let i = 1; i < nextStack.length; i++) {
+              const parentId = nextStack[i].parentItemId
+              const parentItem = nextStack[i - 1].items.find((it: any) => it.id === parentId)
+              if (parentItem && parentItem.submenu) {
+                nextStack[i] = { ...nextStack[i], items: parentItem.submenu }
+              }
+            }
+            return nextStack
+          })
+        } else if (item.settingName) {
+          const key = getGameSettingKey(item.settingName)
+          window.api.saveSetting(key, nextVal, 'string')
+          setSettings(prev => ({
+            ...prev,
+            [key]: { value: nextVal, type: 'string' }
+          }))
+          setActiveMenuStack(prev => {
+            const next = [...prev]
+            // Pop the options submenu
+            next.pop()
+            // Update the parent item's displayed value
+            if (next.length > 0) {
+              const parentItems = next[next.length - 1].items.map((it: any, idx: number) =>
+                idx === index ? { ...it, value: nextVal } : it
+              )
+              next[next.length - 1] = { ...next[next.length - 1], items: parentItems }
+            }
+            return next
+          })
+        }
+        setSelectedIndex(index)
+      }
+    }))
+
+    setActiveMenuStack(prev => {
+      const next = [...prev]
+      if (next.length > 0) {
+        next[next.length - 1] = { ...next[next.length - 1], savedSelectedIndex: index }
+      }
+      return [...next, { items: optionsSubmenu, title: item.label, parentItemId: item.id }]
+    })
+    setSelectedIndex(activeIdx !== -1 ? activeIdx : 0)
+  }
+
   const getBottomButtons = () => {
     return []
   }
@@ -698,6 +774,12 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           setSelectedIndex(prev => Math.min(prev, newRootItems.length - 1) >= targetIndex ? Math.min(prev, newRootItems.length - 1) : targetIndex)
         }
       }
+      return
+    }
+
+    // Fallback: call item's onClick if present (used by select option submenus)
+    if (item.onClick) {
+      item.onClick()
     }
   }
 
@@ -1030,6 +1112,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               setSelectedIndex(getFirstSelectableIndex(filteredItems))
             } else if (item.type === 'toggle') {
               handleToggle()
+            } else if (item.type === 'select') {
+              handleSelectOpen(item, selectedIndex)
             } else if (item.type === 'action') {
               handleAction(item)
             }
@@ -1077,7 +1161,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           const item = currentMenu[selectedIndex]
           if (item?.type === 'select') handleSelect(-1)
         }
-      } else if (e.key === 'Backspace' || e.key === 'Escape' || e.key === 'Control') {
+      } else if (e.key === 'Backspace' || e.key === 'Escape') {
         e.preventDefault()
         if (activeMenuStack.length > 1) {
           setActiveMenuStack(prev => prev.slice(0, -1))
@@ -1143,6 +1227,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 setSelectedIndex(getFirstSelectableIndex(filteredItems))
               } else if (item.type === 'toggle') {
                 handleToggle()
+              } else if (item.type === 'select') {
+                handleSelectOpen(item, index)
               } else if (item.type === 'action') {
                 handleAction(item)
               }
@@ -1167,9 +1253,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 <span className="menu-submenu-arrow">›</span>
               ) : item.type === 'select' ? (
                 <div className="menu-select">
-                  <span className="arrow">◁</span>
-                  <span className="value">{item.items?.find(i => i.value === item.value)?.label || item.value}</span>
-                  <span className="arrow">▷</span>
+                  <span className="arrow-clickable" onClick={(e) => { e.stopPropagation(); handleSelect(-1) }}>◁</span>
+                  <span className="value">{item.items?.find((i: any) => i.value === item.value)?.label || item.value}</span>
+                  <span className="arrow-clickable" onClick={(e) => { e.stopPropagation(); handleSelect(1) }}>▷</span>
                 </div>
               ) : item.type === 'info' ? (
                 <div className="menu-info" style={{ fontSize: '0.85rem', fontWeight: 600, color: index === selectedIndex ? '#fff' : '#888' }}>

@@ -3163,16 +3163,16 @@ body {
 .riescade-header .system-name .fallback-title {
   display: inline;
 }
-.riescade-header .system-name.system-retrobat .fallback-title {
+.riescade-header .system-name.system-emulators .fallback-title {
   display: none;
 }
-.riescade-header .system-name.system-retrobat .retrobat-title {
+.riescade-header .system-name.system-emulators .emulators-title {
   display: inline;
 }
-.riescade-header .system-name.system-retrobat .system-gamecount .fallback-count {
+.riescade-header .system-name.system-emulators .system-gamecount .fallback-count {
   display: none;
 }
-.riescade-header .system-name.system-retrobat .system-gamecount .retrobat-count {
+.riescade-header .system-name.system-emulators .system-gamecount .emulators-count {
   display: inline;
 }
 .riescade-header .system-name.system-collections .fallback-title {

@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { join, resolve, dirname } from 'path'
-import { writeFileSync, existsSync, mkdirSync } from 'fs'
+import { writeFileSync, existsSync, mkdirSync, readFileSync, unlinkSync } from 'fs'
 import { tmpdir } from 'os'
 import { Game, System } from '../../shared/types'
 import { getRetroBatPath } from '../utils/paths'
@@ -229,14 +229,52 @@ export class LauncherService {
         '-rom', `"${romPath}"`
       ]
 
+      const errorLogPath = join(tmpdir(), 'emulationstation.tmp', 'launch_error.log')
+      if (existsSync(errorLogPath)) {
+        try {
+          unlinkSync(errorLogPath)
+        } catch (e) {
+          console.warn('Failed to delete old launch_error.log', e)
+        }
+      }
+
       const command = `"${launcherPath}" ${args.join(' ')}`
       console.log(`Launching: ${command}`)
 
       exec(command, { cwd: retroBatPath }, (error) => {
-        if (error) {
+        if (error && error.code) {
           console.warn('Launcher exited with code:', error.code)
+          let errorMessage = 'Falha ao iniciar o emulador.'
+          if (existsSync(errorLogPath)) {
+            try {
+              errorMessage = readFileSync(errorLogPath, 'utf8').trim()
+            } catch (e) {
+              console.error('Failed to read launch_error.log', e)
+            }
+          } else {
+            const exitCode = error.code
+            if (exitCode === 200) {
+              errorMessage = 'O emulador fechou inesperadamente. Verifique as configurações ou logs.'
+            } else if (exitCode === 201) {
+              errorMessage = 'Linha de comando inválida ou erro nos argumentos passados.'
+            } else if (exitCode === 202) {
+              errorMessage = 'Configuração inválida do emulador.'
+            } else if (exitCode === 203) {
+              errorMessage = 'Emulador desconhecido ou não configurado para este sistema.'
+            } else if (exitCode === 204) {
+              errorMessage = 'O emulador não está instalado. Por favor, instale o emulador para este sistema.'
+            } else if (exitCode === 205) {
+              errorMessage = 'Falta um núcleo (core) necessário para executar o jogo.'
+            } else if (exitCode === 299) {
+              errorMessage = 'Erro customizado no emulador.'
+            } else {
+              errorMessage = `Ocorreu um erro ao iniciar o emulador (Código: ${exitCode}).`
+            }
+          }
+          reject(new Error(errorMessage))
+        } else {
+          resolvePromise()
         }
-        resolvePromise()
       })
     })
   }
