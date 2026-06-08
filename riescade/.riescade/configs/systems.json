@@ -1285,7 +1285,7 @@
       "emulators": [
         {
           "name": "eden",
-          "source": "https://git.eden-emu.dev/eden-ci/master/releases"
+          "source": "https://git.eden-emu.dev/eden-ci/master/releasess"
         },
         {
           "name": "ryujinx"

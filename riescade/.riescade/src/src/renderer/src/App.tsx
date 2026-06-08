@@ -2664,105 +2664,27 @@ function App() {
 			{/* Launch Error Modal */}
 			{showLaunchErrorModal && (
 				<div
-					id="launch-error-overlay"
-					style={{
-						position: 'fixed',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						background: 'rgba(0, 0, 0, 0.8)',
-						backdropFilter: 'blur(18px)',
-						WebkitBackdropFilter: 'blur(18px)',
-						zIndex: 10000001,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						animation: 'fadeIn 0.3s ease-out'
-					}}
+					className="riescade-overlay visible"
 					onClick={() => {
 						setShowLaunchErrorModal(false);
 						setLaunchErrorMessage('');
 					}}
 				>
 					<div
-						id="launch-error-modal"
-						style={{
-							background: 'linear-gradient(135deg, rgba(20, 20, 30, 0.95) 0%, rgba(30, 15, 20, 0.95) 100%)',
-							backdropFilter: 'blur(12px)',
-							WebkitBackdropFilter: 'blur(12px)',
-							border: '1px solid rgba(255, 60, 60, 0.25)',
-							borderRadius: '12px',
-							padding: '36px 40px 28px 40px',
-							width: '480px',
-							maxWidth: '90vw',
-							boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 50, 50, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							textAlign: 'center',
-							animation: 'fadeIn 0.35s ease-out'
-						}}
+						className="riescade-error-modal"
 						onClick={(e) => e.stopPropagation()}
 					>
-						{/* Error Icon */}
-						<div style={{
-							width: '56px',
-							height: '56px',
-							borderRadius: '50%',
-							background: 'linear-gradient(135deg, rgba(255, 60, 60, 0.2), rgba(255, 100, 60, 0.15))',
-							border: '2px solid rgba(255, 70, 70, 0.35)',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							marginBottom: '16px'
-						}}>
-							<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff5555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-								<circle cx="12" cy="12" r="10" />
-								<line x1="12" y1="8" x2="12" y2="12" />
-								<line x1="12" y1="16" x2="12.01" y2="16" />
-							</svg>
-						</div>
-
 						{/* Title */}
-						<div style={{
-							fontSize: '1.1rem',
-							fontWeight: 800,
-							letterSpacing: '2.5px',
-							textTransform: 'uppercase',
-							color: '#ff6b6b',
-							marginBottom: '14px'
-						}}>ERRO AO INICIAR</div>
+						<div className="error-title">ERRO AO INICIAR</div>
 
 						{/* Error Message */}
-						<div style={{
-							fontSize: '0.95rem',
-							lineHeight: '1.6',
-							color: 'rgba(255, 255, 255, 0.8)',
-							marginBottom: '24px',
-							padding: '0 4px',
-							wordBreak: 'break-word'
-						}}>
+						<div className="error-message">
 							{launchErrorMessage || 'Ocorreu um erro desconhecido ao tentar iniciar o emulador.'}
 						</div>
 
 						{/* OK Button */}
 						<button
-							id="launch-error-ok-btn"
 							className="riescade-button primary selected"
-							style={{
-								padding: '10px 48px',
-								fontSize: '0.9rem',
-								fontWeight: 700,
-								letterSpacing: '1.5px',
-								textTransform: 'uppercase',
-								border: '1px solid rgba(255, 70, 70, 0.4)',
-								borderRadius: '6px',
-								background: 'linear-gradient(135deg, rgba(255, 60, 60, 0.25), rgba(255, 80, 60, 0.15))',
-								color: '#fff',
-								cursor: 'pointer',
-								transition: 'all 0.2s ease'
-							}}
 							onClick={() => {
 								setShowLaunchErrorModal(false);
 								setLaunchErrorMessage('');
@@ -2773,14 +2695,6 @@ function App() {
 					</div>
 				</div>
 			)}
-
-			{/* CSS Fade In animation helper */}
-			<style dangerouslySetInnerHTML={{__html: `
-				@keyframes fadeIn {
-					from { opacity: 0; }
-					to { opacity: 1; }
-				}
-			`}} />
 
 			{/* Font Preloader to force Chromium to load fonts immediately on boot */}
 			<div
