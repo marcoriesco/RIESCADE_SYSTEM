@@ -177,7 +177,17 @@ const CarouselItemNode = ({
     isVisible = slotIndex >= -1 && slotIndex <= itemsCount
   }
 
-  const opacity = isSelected ? 1.0 : 0.8
+  const opacityMap: Record<number, number> = {
+    0: 1,
+    1: 0.4,
+    2: 0.3,
+    3: 0.2,
+    4: 0.1,
+    5: 0.02,
+    6: 0
+  }
+
+  const opacity = opacityMap[absOffset] ?? 0
   const zIndex = isSelected ? 100 : 50 - absOffset
 
   const sysTheme = itemData.theme || itemData.name
