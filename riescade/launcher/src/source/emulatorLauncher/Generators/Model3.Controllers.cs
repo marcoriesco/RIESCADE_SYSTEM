@@ -228,7 +228,7 @@ namespace EmulatorLauncher
 
                     // Get mapping in yml file
                     
-                    string model3WheelMapping = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "wheels", "model3_wheels.yml");
+                    string model3WheelMapping = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "wheels", "model3_wheels.yml");
                     if (File.Exists(model3WheelMapping))
                     {
                         ymlFile = YmlFile.Load(model3WheelMapping);
@@ -382,7 +382,7 @@ namespace EmulatorLauncher
                     .Replace("{systempath}", "system")
                     .Replace("{userpath}", "user");
 
-                m3Mapping = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result);
+                m3Mapping = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result);
 
                 if (File.Exists(m3Mapping))
                     break;

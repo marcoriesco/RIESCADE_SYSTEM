@@ -20,7 +20,7 @@ namespace EmulatorLauncher
                 return;
             }
 
-            string retrobatPath = Program.AppConfig.GetFullPath("retrobat");
+            string retrobatPath = Program.AppConfig.GetFullPath("riescade");
             bool getUninstalled = Program.SystemConfig.getOptBoolean("scanStoreUninstalled");
 
             Parallel.Invoke(

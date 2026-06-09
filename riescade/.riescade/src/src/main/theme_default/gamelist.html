@@ -5,24 +5,26 @@
   <div class="gamelist-bg-layer">
     <div class="gamelist-bg-layer gamelist-bg-default {game:fanart ? '' : 'gamelist-empty-fanart'}" style="background-image: url('{game:fanart ? {game:fanart} : './assets/arts/{system:theme}.webp'}')"></div>
     <div class="gamelist-bg-layer gamelist-overlay"></div>
-    <div class="gamelist-bg-layer gamelist-overlay-right"></div>
-    <div class="gamelist-bg-layer gamelist-overlay-bottom"></div>
   </div>
 
   <!-- HEADER GLOBAL -->
   <div class="riescade-header">
-      <div class="header-left">
-          <div class="system-name">{system:fullName}</div>
-      </div>
-      <div class="header-center centered">
-          <riescade-clock format="HH:mm" />
-      </div>
+
+    <div class="header-left">
+        <div class="system-name">{system:fullName}</div>
+    </div>
+
+    <div class="header-center centered">
+        <riescade-clock format="HH:mm" />
+    </div>
+
     <div class="header-right">
       <div class="user-profile">
         <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'User'}</span>
         <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}" />
       </div>
     </div>
+
   </div>
 
   <!-- Conteúdo da Gamelist -->

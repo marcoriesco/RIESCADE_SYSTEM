@@ -201,10 +201,10 @@ namespace EmulatorLauncher.Libretro
             config["input_exit_emulator"] = "escape";
 #endif            
             // Overwrite hotkeys with a file
-            string kbHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "user", "inputmapping", "retroarch_kb_hotkeys.yml");
+            string kbHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "user", "inputmapping", "retroarch_kb_hotkeys.yml");
 
             if (!File.Exists(kbHotkeyFile))
-                kbHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "retroarch_kb_hotkeys.yml");
+                kbHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "retroarch_kb_hotkeys.yml");
 
             if (File.Exists(kbHotkeyFile))
             {
@@ -452,10 +452,10 @@ namespace EmulatorLauncher.Libretro
                     hotkeyList = retroarchspecialsALT;
 
                 // override shortcuts from file
-                string cHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "user", "inputmapping", "retroarch_controller_hotkeys.yml");
+                string cHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "user", "inputmapping", "retroarch_controller_hotkeys.yml");
 
                 if (!File.Exists(cHotkeyFile))
-                    cHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "retroarch_controller_hotkeys.yml");
+                    cHotkeyFile = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "retroarch_controller_hotkeys.yml");
 
                 if (File.Exists(cHotkeyFile))
                 {

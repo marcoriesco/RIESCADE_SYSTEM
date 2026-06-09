@@ -376,8 +376,8 @@ namespace EmulatorLauncher
             SystemConfig.ImportOverrides(ConfigFile.FromArguments(args));
 
             // Log Retrobat version && emulatorlauncher version
-            string rbVersionPath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "version.info");
-            string emulatorlauncherExePath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "emulationstation", "emulatorlauncher.exe");
+            string rbVersionPath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "version.info");
+            string emulatorlauncherExePath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "emulationstation", "emulatorlauncher.exe");
 
             if (File.Exists(rbVersionPath))
             {
@@ -409,7 +409,7 @@ namespace EmulatorLauncher
             ImportShaderOverrides();
 
             // Check consistance of path
-            string rbPath = AppConfig.GetFullPath("retrobat");
+            string rbPath = AppConfig.GetFullPath("riescade");
 
             #region arguments
             if (args.Any(a => "-updatestores".Equals(a, StringComparison.InvariantCultureIgnoreCase)))

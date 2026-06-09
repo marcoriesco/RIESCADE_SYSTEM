@@ -111,7 +111,7 @@ namespace EmulatorLauncher
                         .Replace("{systempath}", "system")
                         .Replace("{userpath}", "user");
 
-                    namcoMapping = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result);
+                    namcoMapping = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result);
 
                     if (File.Exists(namcoMapping))
                         break;

@@ -137,8 +137,8 @@ namespace EmulatorLauncher
             { "raine", () => new RaineGenerator() },
             { "raze", () => new RazeGenerator() },
             { "redream", () => new RedreamGenerator() },
-            { "retrobat", () => new RetrobatLauncherGenerator() },
-            { "emulators", () => new RetrobatLauncherGenerator() },
+            { "riescade", () => new RiescadeLauncherGenerator() },
+            { "emulators", () => new RiescadeLauncherGenerator() },
             { "rpcs3", () => new Rpcs3Generator() },
             { "ruffle", () => new RuffleGenerator() },
             { "ryujinx", () => new RyujinxGenerator() },
@@ -378,17 +378,17 @@ namespace EmulatorLauncher
                 catch { }
             }
 
-            // Log Retrobat version && emulatorlauncher version
-            string rbVersionPath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "version.info");
-            string emulatorlauncherExePath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "emulationstation", "emulatorlauncher.exe");
+            // Log RIESCADE version && emulatorlauncher version
+            string rbVersionPath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "riescade.info");
+            string emulatorlauncherExePath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "emulationstation", "emulatorlauncher.exe");
 
             if (File.Exists(rbVersionPath))
             {
                 string rbVersion = File.ReadAllText(rbVersionPath).Trim();
-                SimpleLogger.Instance.Info("[Startup] Retrobat version : " + rbVersion);
+                SimpleLogger.Instance.Info("[Startup] RIESCADE version: " + rbVersion);
             }
             else
-                SimpleLogger.Instance.Info("[Startup] Retrobat version : not found");
+                SimpleLogger.Instance.Info("[Startup] RIESCADE version: not found");
 
             if (File.Exists(emulatorlauncherExePath))
             {
@@ -401,7 +401,7 @@ namespace EmulatorLauncher
             if (!SystemConfig.isOptSet("use_guns") && args.Any(a => a == "-lightgun") && SystemConfig["system"] != "wii")
             {
                 SystemConfig["use_guns"] = "true";
-                SimpleLogger.Instance.Info("[GUNS] Lightgun game : setting default lightun value to true.");
+                SimpleLogger.Instance.Info("[GUNS] Lightgun game: setting default lightun value to true.");
             }
 
             /* for later wheels
@@ -412,7 +412,7 @@ namespace EmulatorLauncher
             ImportShaderOverrides();
 
             // Check consistance of path
-            string rbPath = AppConfig.GetFullPath("retrobat");
+            string rbPath = AppConfig.GetFullPath("riescade");
 
             #region arguments
             if (args.Any(a => "-updatestores".Equals(a, StringComparison.InvariantCultureIgnoreCase)))

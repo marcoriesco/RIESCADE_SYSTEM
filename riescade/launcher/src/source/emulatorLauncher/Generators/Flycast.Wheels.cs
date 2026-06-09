@@ -74,7 +74,7 @@ namespace EmulatorLauncher
             YmlFile ymlFile = null;
             YmlContainer wheel1Mapping = null;
             Dictionary<string, string> wheel1buttonMap = new Dictionary<string, string>();
-            string flycastWheelMapping = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "wheels", "flycast_wheels.yml");
+            string flycastWheelMapping = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "wheels", "flycast_wheels.yml");
             if (File.Exists(flycastWheelMapping))
             {
                 ymlFile = YmlFile.Load(flycastWheelMapping);

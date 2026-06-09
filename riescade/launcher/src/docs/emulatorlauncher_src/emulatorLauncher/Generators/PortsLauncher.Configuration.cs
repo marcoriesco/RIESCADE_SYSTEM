@@ -742,7 +742,7 @@ namespace EmulatorLauncher
 
             if (!File.Exists(configFile))
             {
-                string templateFile = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "templates", "openjazz", "openjazz.cfg");
+                string templateFile = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "templates", "openjazz", "openjazz.cfg");
                 if (File.Exists(templateFile))
                     try { File.Copy(templateFile, configFile); } catch { }
             }
@@ -858,7 +858,7 @@ namespace EmulatorLauncher
             {
                 try
                 {
-                    string templateFile = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "templates", "powerbomberman", "config.ini");
+                    string templateFile = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "templates", "powerbomberman", "config.ini");
 
                     if (File.Exists(templateFile))
                     {

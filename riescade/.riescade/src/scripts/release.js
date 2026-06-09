@@ -95,6 +95,13 @@ async function run() {
   fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
   console.log(`✅ package.json version bumped to ${version}`);
 
+  // Update version in system/version.info
+  const versionInfoPath = path.join(projectRoot, 'system', 'version.info');
+  if (fs.existsSync(versionInfoPath)) {
+    fs.writeFileSync(versionInfoPath, version + '\n', 'utf8');
+    console.log(`✅ system/version.info updated to ${version}`);
+  }
+
   // 2. Build & Deploy the project (compile + electron-builder + deploy binaries)
   console.log('🛠️ Building and deploying Electron project...');
   execSync('npm run deploy', { stdio: 'inherit', cwd: path.join(__dirname, '..') });

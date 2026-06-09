@@ -383,7 +383,7 @@ namespace EmulatorLauncher
                             .Replace("{systempath}", "system")
                             .Replace("{userpath}", "user");
 
-                        flycastMapping = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result);
+                        flycastMapping = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result);
 
                         if (File.Exists(flycastMapping))
                             break;

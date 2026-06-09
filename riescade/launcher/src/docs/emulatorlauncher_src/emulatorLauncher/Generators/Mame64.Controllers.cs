@@ -106,9 +106,9 @@ namespace EmulatorLauncher
             if (SystemConfig.isOptSet("controller_layout") && !string.IsNullOrEmpty(SystemConfig["controller_layout"]))
                 layout = SystemConfig["controller_layout"];
 
-            string specificMappingPath = Path.Combine(AppConfig.GetFullPath("retrobat"), "user", "inputmapping", "mame", MappingFileName);
+            string specificMappingPath = Path.Combine(AppConfig.GetFullPath("riescade"), "user", "inputmapping", "mame", MappingFileName);
             if (!File.Exists(specificMappingPath))
-                specificMappingPath = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "mame", MappingFileName);
+                specificMappingPath = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "mame", MappingFileName);
 
             if (!File.Exists(specificMappingPath))
             {
@@ -116,7 +116,7 @@ namespace EmulatorLauncher
                 if (layout != "default")
                     defaultFile = "default_" + layout + ".xml";
 
-                specificMappingPath = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "mame", defaultFile);
+                specificMappingPath = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "mame", defaultFile);
             }
 
             if (File.Exists(specificMappingPath))

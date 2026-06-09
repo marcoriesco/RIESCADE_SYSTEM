@@ -76,7 +76,7 @@ namespace EmulatorLauncher.Libretro
             {
                 // default
                 string defaultcfgFile = Path.Combine(Program.AppConfig.GetFullPath("saves"), "mame", "cfg", "default.cfg");
-                string defaultctrlFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "lr-mame", "default.cfg");
+                string defaultctrlFile = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "lr-mame", "default.cfg");
                 if (File.Exists(defaultcfgFile))
                     DeleteDefaultInputincfgFile(defaultcfgFile, defaultctrlFile);
                 else if (File.Exists(defaultctrlFile) && !File.Exists(defaultcfgFile) && !mameAuto)
@@ -90,16 +90,16 @@ namespace EmulatorLauncher.Libretro
                 {
                     string messcfgFile = messFiles[system] + ".cfg";
                     cfgFile = Path.Combine(Program.AppConfig.GetFullPath("saves"), "mame", "cfg", messcfgFile);
-                    ctrlFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "lr-mame", messcfgFile);
+                    ctrlFile = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "lr-mame", messcfgFile);
                 }
 
                 else
                 {
                     cfgFile = Path.Combine(Program.AppConfig.GetFullPath("saves"), "mame", "cfg", romName + ".cfg");
-                    ctrlFile = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "lr-mame", romName + ".cfg");
+                    ctrlFile = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "lr-mame", romName + ".cfg");
                     if (!File.Exists(ctrlFile))
                     {
-                        string cfgDir = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "lr-mame");
+                        string cfgDir = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "lr-mame");
                         string[] cfgFiles = Directory.GetFiles(cfgDir, "*.cfg", SearchOption.TopDirectoryOnly);
                         ctrlFile = cfgFiles.Where(c => romName.StartsWith(Path.GetFileNameWithoutExtension(c))).OrderByDescending(c => Path.GetFileNameWithoutExtension(c).Length).FirstOrDefault();
                     }
@@ -658,7 +658,7 @@ namespace EmulatorLauncher.Libretro
                     .Replace("{systempath}", "system")
                     .Replace("{userpath}", "user");
 
-                coreMapping = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result);
+                coreMapping = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result);
 
                 if (File.Exists(coreMapping))
                     break;

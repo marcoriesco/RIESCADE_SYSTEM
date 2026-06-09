@@ -39,7 +39,7 @@ namespace EmulatorLauncher
                     .Replace("{systempath}", "system")
                     .Replace("{userpath}", "user");
 
-                fbneoMapping = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result);
+                fbneoMapping = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result);
 
                 if (File.Exists(fbneoMapping))
                     break;

@@ -15,7 +15,7 @@ $text-muted: rgba(255, 255, 255, 0.56);
 $font-main: "Inter Tight", sans-serif;
 $font-clock: "Inter Tight", sans-serif;
 $font-hardware: "Inter Tight", sans-serif;
-$font-shadow: 0 1px 1px #000000;
+$font-shadow: 0 0 3px #000000;
 
 :root {
   --theme-color: #{$theme-color};
@@ -42,7 +42,7 @@ body {
 /* CLOCK */
 .riescade-clock-time {
   font-family: var(--font-clock);
-  font-weight: 300;
+  font-weight: 600;
   font-size: 2.2em;
   color: var(--text-primary);
   text-shadow: var(--font-shadow);
@@ -64,7 +64,7 @@ body {
 
   .system-name {
     font-size: 2.2rem;
-    font-weight: 500;
+    font-weight: 600;
     color: #fff;
     text-align: center;
     text-shadow: var(--font-shadow);

@@ -272,7 +272,7 @@ namespace EmulatorLauncher
                 graphicPackExists = false;
             }
 
-            string graphicpackDB = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "cemuGraphicPacks.txt");
+            string graphicpackDB = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "resources", "cemuGraphicPacks.txt");
 
             if (File.Exists(graphicpackDB))
             {

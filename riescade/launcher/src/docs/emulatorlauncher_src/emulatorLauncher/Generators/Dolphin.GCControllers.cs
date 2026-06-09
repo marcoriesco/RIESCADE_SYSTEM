@@ -424,7 +424,7 @@ namespace EmulatorLauncher
             if (Program.SystemConfig[gamecubepad] == "12" || Program.SystemConfig[gamecubepad] == "13")
                 return false;
 
-            string gcjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "GCControllers.json");
+            string gcjson = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "GCControllers.json");
             if (!File.Exists(gcjson))
                 return false;
 

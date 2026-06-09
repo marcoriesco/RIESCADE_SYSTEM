@@ -34,7 +34,7 @@ namespace EmulatorLauncher
             string confFile = Path.Combine(path, "xroar.conf");
             if (!File.Exists(confFile))
             {
-                string templateConfFile = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "templates", "xroar", "xroar.conf");
+                string templateConfFile = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "templates", "xroar", "xroar.conf");
                 if (File.Exists(templateConfFile))
                     try { File.Copy(templateConfFile, confFile); } catch { }
             }

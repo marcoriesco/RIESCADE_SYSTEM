@@ -20,7 +20,7 @@ namespace EmulatorLauncher
             {
                 // Call method to get Steam executable
                 _uri = uri;
-                string steamInternalDBPath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "tools", "steamexecutables.json");
+                string steamInternalDBPath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "tools", "steamexecutables.json");
                 LauncherExe = SteamLibrary.GetSteamGameExecutableName(uri, steamInternalDBPath, out _steamID);
             }
 
@@ -50,7 +50,7 @@ namespace EmulatorLauncher
                     if (MonitorGameInstallation())
                     {
                         // Re-check for executable now that it's installed
-                        string steamInternalDBPath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "tools", "steamexecutables.json");
+                        string steamInternalDBPath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "tools", "steamexecutables.json");
                         LauncherExe = SteamLibrary.GetSteamGameExecutableName(_uri, steamInternalDBPath, out _steamID);
                     }
                     else

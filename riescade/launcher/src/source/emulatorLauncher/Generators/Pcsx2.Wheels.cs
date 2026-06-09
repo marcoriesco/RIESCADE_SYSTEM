@@ -82,7 +82,7 @@ namespace EmulatorLauncher
             YmlFile ymlFile = null;
             YmlContainer wheel1Mapping = null;
             Dictionary<string, string> wheel1buttonMap = new Dictionary<string, string>();
-            string pcsx2WheelMapping = Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "wheels", "pcsx2_wheels.yml");
+            string pcsx2WheelMapping = Path.Combine(AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "wheels", "pcsx2_wheels.yml");
             if (File.Exists(pcsx2WheelMapping))
             {
                 ymlFile = YmlFile.Load(pcsx2WheelMapping);

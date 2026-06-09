@@ -512,7 +512,7 @@ namespace EmulatorLauncher
                     .Replace("{systempath}", "system")
                     .Replace("{userpath}", "user");
 
-                ret = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result);
+                ret = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result);
 
                 if (File.Exists(ret))
                     return ret;
@@ -522,8 +522,8 @@ namespace EmulatorLauncher
 
         public static bool CheckSDL3dll()
         {
-            string sdl3Sourcepath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "tools", "SDL3.dll");
-            string sdl3Targetpath = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "emulationstation", "SDL3.dll");
+            string sdl3Sourcepath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "tools", "SDL3.dll");
+            string sdl3Targetpath = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "emulationstation", "SDL3.dll");
             if (!File.Exists(sdl3Targetpath))
                 try { File.Copy(sdl3Sourcepath, sdl3Targetpath); } catch { }
 

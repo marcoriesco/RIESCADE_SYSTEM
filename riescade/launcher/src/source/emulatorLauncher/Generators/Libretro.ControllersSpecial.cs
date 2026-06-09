@@ -24,14 +24,14 @@ namespace EmulatorLauncher.Libretro
             string guid = controller.Guid.ToString().ToLowerInvariant();
 
             // First look if the user has a specific mapping file set for the controller
-            string userMapping = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "retroarch_controller.json");
+            string userMapping = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "retroarch_controller.json");
             foreach (var path in mappingPaths)
             {
                 string result = path
                     .Replace("{systempath}", "system")
                     .Replace("{userpath}", "user");
 
-                string userMapping2 = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result, "retroarch_controller.json");
+                string userMapping2 = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result, "retroarch_controller.json");
 
                 if (File.Exists(userMapping2))
                 {
@@ -106,14 +106,14 @@ namespace EmulatorLauncher.Libretro
             // specific mapping for arcade sticks
             if (useArcadeStick)
             {
-                string stickjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "arcade_sticks.json");
+                string stickjson = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "arcade_sticks.json");
                 foreach (var path in mappingPaths)
                 {
                     string result = path
                         .Replace("{systempath}", "system")
                         .Replace("{userpath}", "user");
 
-                    string stickjson2 = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result, "arcade_sticks.json");
+                    string stickjson2 = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result, "arcade_sticks.json");
 
                     if (File.Exists(stickjson2))
                     {
@@ -192,14 +192,14 @@ namespace EmulatorLauncher.Libretro
                 bool needActivationSwitch = false;
                 bool n64_pad = Program.SystemConfig.getOptBoolean("n64_pad");
 
-                string n64json = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "n64Controllers.json");
+                string n64json = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "n64Controllers.json");
                 foreach (var path in mappingPaths)
                 {
                     string result = path
                         .Replace("{systempath}", "system")
                         .Replace("{userpath}", "user");
 
-                    string n64json2 = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result, "n64Controllers.json");
+                    string n64json2 = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result, "n64Controllers.json");
 
                     if (File.Exists(n64json2))
                     {
@@ -292,7 +292,7 @@ namespace EmulatorLauncher.Libretro
             // Specific mapping for megadrive-like controllers
             else if (mdSystems.Contains(system))
             {
-                string mdjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "mdControllers.json");
+                string mdjson = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "mdControllers.json");
                 bool needActivationSwitch = false;
                 bool md_pad = Program.SystemConfig.getOptBoolean("md_pad");
 
@@ -302,7 +302,7 @@ namespace EmulatorLauncher.Libretro
                         .Replace("{systempath}", "system")
                         .Replace("{userpath}", "user");
 
-                    string mdjson2 = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result, "mdControllers.json");
+                    string mdjson2 = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result, "mdControllers.json");
 
                     if (File.Exists(mdjson2))
                     {
@@ -394,7 +394,7 @@ namespace EmulatorLauncher.Libretro
             // Specific mapping for gamecube-like controllers
             else if (system == "gamecube" || system == "gc")
             {
-                string gcjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "GCControllers.json");
+                string gcjson = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "GCControllers.json");
                 bool needActivationSwitch = false;
                 bool gc_pad = Program.SystemConfig.getOptBoolean("gc_pad");
 
@@ -404,7 +404,7 @@ namespace EmulatorLauncher.Libretro
                         .Replace("{systempath}", "system")
                         .Replace("{userpath}", "user");
 
-                    string gcjson2 = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result, "GCControllers.json");
+                    string gcjson2 = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result, "GCControllers.json");
 
                     if (File.Exists(gcjson2))
                     {
@@ -494,7 +494,7 @@ namespace EmulatorLauncher.Libretro
             // Specific mapping for saturn-like controllers
             else if (system == "saturn")
             {
-                string saturnjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "saturnControllers.json");
+                string saturnjson = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "saturnControllers.json");
                 bool needActivationSwitch = false;
                 bool sat_pad = Program.SystemConfig.getOptBoolean("saturn_pad");
 
@@ -504,7 +504,7 @@ namespace EmulatorLauncher.Libretro
                         .Replace("{systempath}", "system")
                         .Replace("{userpath}", "user");
 
-                    string saturnjson2 = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result, "saturnControllers.json");
+                    string saturnjson2 = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result, "saturnControllers.json");
 
                     if (File.Exists(saturnjson2))
                     {
@@ -596,7 +596,7 @@ namespace EmulatorLauncher.Libretro
             // Specific mapping for megadrive-like controllers for 3DO system
             else if (system == "3do")
             {
-                string specjson = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), "system", "resources", "inputmapping", "3doControllers.json");
+                string specjson = Path.Combine(Program.AppConfig.GetFullPath("riescade"), "system", "resources", "inputmapping", "3doControllers.json");
                 bool needActivationSwitch = false;
                 bool spec_pad = Program.SystemConfig.getOptBoolean("3do_pad");
 
@@ -606,7 +606,7 @@ namespace EmulatorLauncher.Libretro
                         .Replace("{systempath}", "system")
                         .Replace("{userpath}", "user");
 
-                    string specjson2 = Path.Combine(Program.AppConfig.GetFullPath("retrobat"), result, "3doControllers.json");
+                    string specjson2 = Path.Combine(Program.AppConfig.GetFullPath("riescade"), result, "3doControllers.json");
 
                     if (File.Exists(specjson2))
                     {

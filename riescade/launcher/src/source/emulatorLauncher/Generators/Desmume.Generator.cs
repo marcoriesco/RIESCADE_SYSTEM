@@ -42,7 +42,7 @@ namespace EmulatorLauncher
                 string localPath = Program.EsSaveStates.GetSavePath(system, emulator, core);
                 string emulatorPath = Path.Combine(path, "StateSlots");
 
-                _saveStatesWatcher = new DesmumeSaveStatesMonitor(rom, emulatorPath, localPath, Path.Combine(AppConfig.GetFullPath("retrobat"), "system", "resources", "savestateicon.png"));
+                _saveStatesWatcher = new DesmumeSaveStatesMonitor(rom, emulatorPath, localPath, Path.Combine(AppConfig.GetFullPath("riescade"), "system", "resources", "savestateicon.png"));
                 _saveStatesWatcher.PrepareEmulatorRepository();
                 saveStateSlot = _saveStatesWatcher.Slot;
             }
