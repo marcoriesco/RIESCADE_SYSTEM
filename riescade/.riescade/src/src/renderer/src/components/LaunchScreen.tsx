@@ -6,14 +6,15 @@ interface LaunchScreenProps {
   system: any
   theme: any
   themeData: any
+  t: (key: string) => string
 }
 
-export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme, themeData }) => {
+export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme, themeData, t }) => {
   const logo = game?.marquee || ''
   const name = game?.name || ''
-  const [opacity, setOpacity] = useState(1)
+  const [status, setStatus] = useState<'loading' | 'running' | 'closed'>('loading')
   const [isReady, setIsReady] = useState(false)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [opacity, setOpacity] = useState(1)
 
   useEffect(() => {
     if (!theme?.isWebTheme || !theme.views?.loading) {
@@ -22,20 +23,27 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
   }, [theme])
 
   useEffect(() => {
-    if (!isReady) return
-
-    // Fade to pure black after 3.5 seconds so when the game closes quickly, it still returns to black instead of "Carregando"
-    const timerOut = setTimeout(() => {
-      setIsTransitioning(true)
-      if (!theme?.isWebTheme || !theme.views?.loading) {
-        setOpacity(0)
+    const unsubscribe = window.api.on('launcher-status', (event: any, data: { status: 'loading' | 'running' | 'closed' }) => {
+      if (data && data.status) {
+        setStatus(data.status)
       }
-    }, 3500)
+    })
 
     return () => {
-      clearTimeout(timerOut)
+      unsubscribe()
     }
-  }, [isReady, theme])
+  }, [])
+
+  useEffect(() => {
+    if (status === 'closed') {
+      const fadeOutTimer = setTimeout(() => {
+        setOpacity(0)
+      }, 1000)
+      return () => clearTimeout(fadeOutTimer)
+    } else {
+      setOpacity(1)
+    }
+  }, [status])
 
   const resolveFilePath = (path: string) => {
     if (!path) return ''
@@ -44,18 +52,22 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
     return [pathPart.replace(/#/g, '%23'), ...queryParts].join('?')
   }
 
+  const isTransitioning = status === 'running' || status === 'closed'
+
   return (
     <div
       className="launch-screen"
       style={{
-        opacity: isReady ? 1 : 0,
-        pointerEvents: isReady ? 'auto' : 'none'
+        opacity: isReady ? opacity : 0,
+        pointerEvents: isReady && opacity > 0 ? 'auto' : 'none',
+        transition: 'opacity 0.6s ease-in-out'
       }}
     >
       <div
         className="launch-screen-inner"
         style={{
-          opacity: opacity
+          opacity: 1,
+          transition: 'opacity 0.6s ease-in-out'
         }}
       >
         {theme?.isWebTheme && theme.views?.loading ? (
@@ -65,6 +77,7 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
             themePath={theme.path}
             isLaunchingView={true}
             isTransitioning={isTransitioning}
+            launchStatus={status}
             onReady={() => setIsReady(true)}
           />
         ) : (
@@ -79,7 +92,11 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
               <h1 className="launch-screen-title">{name}</h1>
             )}
             <p className="launch-screen-text">
-              LAUNCHING...
+              {status === 'closed'
+                ? t('RETURNING')
+                : status === 'running'
+                ? t('GAME_RUNNING')
+                : t('LOADING')}
             </p>
           </div>
         )}

@@ -1674,6 +1674,14 @@ function App() {
 		setLaunchingSystem(null);
 	}, []);
 
+	const cleanupLaunchState = useCallback(() => {
+		setTimeout(() => {
+			setIsLaunching(false);
+			setLaunchingGame(null);
+			setLaunchingSystem(null);
+		}, 1700);
+	}, []);
+
 	const handleLaunchGame = useCallback((gameToLaunch: Game, systemToLaunch: System) => {
 		const saveStatesSetting = String(settings['global.savestates']?.value ?? '0');
 
@@ -1683,13 +1691,7 @@ function App() {
 			setIsLaunching(true);
 			window.api
 				.launchGame(gameToLaunch, systemToLaunch)
-				.then(() => {
-					setTimeout(() => {
-						setIsLaunching(false);
-						setLaunchingGame(null);
-						setLaunchingSystem(null);
-					}, 5000);
-				})
+				.then(cleanupLaunchState)
 				.catch(showLaunchError);
 		};
 
@@ -1744,13 +1746,7 @@ function App() {
 
 		window.api
 			.launchNetplayGame(gameToLaunch, matchedSystem, netplayOptions)
-			.then(() => {
-				setTimeout(() => {
-					setIsLaunching(false);
-					setLaunchingGame(null);
-					setLaunchingSystem(null);
-				}, 5000);
-			})
+			.then(cleanupLaunchState)
 			.catch(showLaunchError);
 	}, [systems]);
 
@@ -2461,6 +2457,7 @@ function App() {
 					system={launchingSystem}
 					theme={theme}
 					themeData={themeData}
+					t={t}
 				/>
 			)}
 
@@ -2626,13 +2623,7 @@ function App() {
 						setIsLaunching(true);
 						window.api
 							.launchGame(saveManagerGame, saveManagerSystem, slot)
-							.then(() => {
-								setTimeout(() => {
-									setIsLaunching(false);
-									setLaunchingGame(null);
-									setLaunchingSystem(null);
-								}, 5000);
-							})
+							.then(cleanupLaunchState)
 							.catch(showLaunchError);
 						setSaveManagerGame(null);
 						setSaveManagerSystem(null);

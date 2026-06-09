@@ -130,6 +130,7 @@ interface Props {
   isLaunchingView?: boolean
   isTransitioning?: boolean
   onReady?: () => void
+  launchStatus?: 'loading' | 'running' | 'closed'
 }
 
 const styleStringToObject = (styleString: string) => {
@@ -150,7 +151,7 @@ const styleStringToObject = (styleString: string) => {
   }, {} as any)
 }
 
-export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false, isTransitioning = false, onReady }) => {
+export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath, menuItemsNode, isLaunchingView = false, isTransitioning = false, onReady, launchStatus = 'loading' }) => {
   const [cssMap, setCssMap] = useState<Record<string, string>>({})
   const [cssLoaded, setCssLoaded] = useState(false)
 
@@ -538,16 +539,21 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
 
         if (hasHide) {
           const existingStyle = props.style || {}
+          const shouldHide = launchStatus === 'running' || launchStatus === 'closed'
           props.style = {
             ...existingStyle,
             transition: 'opacity 0.5s ease-in-out',
-            opacity: isTransitioning ? 0 : (existingStyle.opacity !== undefined ? existingStyle.opacity : 1),
-            pointerEvents: isTransitioning ? 'none' : (existingStyle.pointerEvents || 'auto')
+            opacity: shouldHide ? 0 : (existingStyle.opacity !== undefined ? existingStyle.opacity : 1),
+            pointerEvents: shouldHide ? 'none' : (existingStyle.pointerEvents || 'auto')
           }
         }
 
-        if (keepTextVal && isTransitioning) {
-          finalChildren = [keepTextVal]
+        if (keepTextVal) {
+          if (launchStatus === 'running') {
+            finalChildren = [data['t:GAME_RUNNING'] || 'Jogo em execução...']
+          } else if (launchStatus === 'closed') {
+            finalChildren = [keepTextVal]
+          }
         }
       }
       
@@ -611,7 +617,7 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
     const bodyChildren = Array.from(doc.body.childNodes).map((child, i) => convertNode(child, `b-${i}`))
 
     return [...headChildren, ...bodyChildren]
-  }, [htmlContent, data, themePath, menuItemsNode, isLaunchingView, cssMap, isTransitioning])
+  }, [htmlContent, data, themePath, menuItemsNode, isLaunchingView, cssMap, isTransitioning, launchStatus])
 
   if (!cssLoaded) return null; // Wait for CSS to be fully fetched before returning any DOM
 

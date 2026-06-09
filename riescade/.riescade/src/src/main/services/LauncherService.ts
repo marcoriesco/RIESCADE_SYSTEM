@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
+import { writeFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, statSync, openSync, readSync, closeSync } from 'fs'
 import { join, resolve, dirname } from 'path'
-import { writeFileSync, existsSync, mkdirSync, readFileSync, unlinkSync } from 'fs'
 import { tmpdir } from 'os'
 import { Game, System } from '../../shared/types'
 import { getRetroBatPath } from '../utils/paths'
@@ -37,7 +37,13 @@ export class LauncherService {
               const menuArgs = lines.slice(1).join(' ')
               const command = `"${exePath}" ${menuArgs}`
               console.log(`Launching menu shortcut: ${command}`)
+              
+              sendLauncherStatus('loading')
+              const shortcutTimer = setTimeout(() => sendLauncherStatus('running'), 1000)
+
               exec(command, { cwd: dirname(exePath) }, (error) => {
+                clearTimeout(shortcutTimer)
+                sendLauncherStatus('closed')
                 if (error) {
                   console.warn('Menu shortcut exited with code:', error.code)
                 }
@@ -238,10 +244,55 @@ export class LauncherService {
         }
       }
 
+      const { BrowserWindow } = require('electron')
+      const sendLauncherStatus = (status: 'loading' | 'running' | 'closed') => {
+        BrowserWindow.getAllWindows().forEach((win: any) => {
+          if (!win.isDestroyed()) {
+            win.webContents.send('launcher-status', { status })
+          }
+        })
+      }
+
+      const logPath = join(retroBatPath, 'riescade', 'launcher', 'emulatorLauncher.log')
+      const initialSize = existsSync(logPath) ? statSync(logPath).size : 0
+      let currentReadPos = initialSize
+
+      sendLauncherStatus('loading')
+
+      const checkLog = () => {
+        if (!existsSync(logPath)) return
+        try {
+          const stat = statSync(logPath)
+          if (stat.size > currentReadPos) {
+            const fd = openSync(logPath, 'r')
+            const buffer = Buffer.alloc(stat.size - currentReadPos)
+            readSync(fd, buffer, 0, buffer.length, currentReadPos)
+            closeSync(fd)
+
+            currentReadPos = stat.size
+
+            const newContent = buffer.toString('utf8')
+            const lines = newContent.split(/\r?\n/)
+            for (const line of lines) {
+              if (line.includes('[Running]')) {
+                sendLauncherStatus('running')
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error reading launcher log:', e)
+        }
+      }
+
+      const logInterval = setInterval(checkLog, 150)
+
       const command = `"${launcherPath}" ${args.join(' ')}`
       console.log(`Launching: ${command}`)
 
       exec(command, { cwd: retroBatPath }, (error) => {
+        clearInterval(logInterval)
+        sendLauncherStatus('closed')
+
         if (error && error.code) {
           console.warn('Launcher exited with code:', error.code)
           let errorMessage = 'Falha ao iniciar o emulador.'

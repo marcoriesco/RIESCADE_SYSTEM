@@ -2,6 +2,8 @@
   "EMPTY_GAMELIST": "No hay juegos en este sistema.",
   "LOADING_GAMELIST": "Cargando lista de juegos",
   "LOADING": "Cargando",
+  "RETURNING": "Retornando...",
+  "GAME_RUNNING": "Juego en ejecución...",
   "LOADING_PLATFORMS": "Cargando plataformas...",
   "CONFIGURE_EMULATORS": "Configurar emuladores",
   "COLLECTIONS": "Colecciones",

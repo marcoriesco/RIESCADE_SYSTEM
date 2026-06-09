@@ -2,6 +2,8 @@
   "EMPTY_GAMELIST": "Não temos jogos neste sistema.",
   "LOADING_GAMELIST": "Carregando Lista de Jogos",
   "LOADING": "Carregando",
+  "RETURNING": "Retornando...",
+  "GAME_RUNNING": "Jogo em execução...",
   "LOADING_PLATFORMS": "Carregando plataformas...",
   "INDEXING_DATABASE": "Indexando banco de dados de sistemas (pode demorar alguns minutos) ...",
   "UPDATING_DATABASE": "Atualizando banco de dados de sistemas...",
