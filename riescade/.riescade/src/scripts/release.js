@@ -96,10 +96,10 @@ async function run() {
   console.log(`✅ package.json version bumped to ${version}`);
 
   // Update version in system/version.info
-  const versionInfoPath = path.join(projectRoot, 'system', 'version.info');
+  const versionInfoPath = path.join(projectRoot, 'system', 'riescade.info');
   if (fs.existsSync(versionInfoPath)) {
     fs.writeFileSync(versionInfoPath, version + '\n', 'utf8');
-    console.log(`✅ system/version.info updated to ${version}`);
+    console.log(`✅ system/riescade.info updated to ${version}`);
   }
 
   // 2. Build & Deploy the project (compile + electron-builder + deploy binaries)
