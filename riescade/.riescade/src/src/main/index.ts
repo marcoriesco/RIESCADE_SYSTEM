@@ -13,14 +13,19 @@ import { SassService } from './services/SassService'
 import { ScraperService } from './services/ScraperService'
 import { Game, System } from '../shared/types'
 import { watch, FSWatcher, readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs'
+import { readFile } from 'fs/promises'
 import { getRetroBatPath, getConfigPath, getDefaultThemePath, getUserThemesPath, getMusicPath } from './utils/paths'
 import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from './services/ScraperService'
 import { setupLogger } from './utils/logger'
 import { RomsWatcherService } from './services/RomsWatcherService'
 import { FeaturesService } from './services/FeaturesService'
+import { ThemeStoreService } from './services/ThemeStoreService'
 
 setupLogger()
+
+// Prevent Chromium from throttling when window is occluded during startup
+app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')
 
 const libraryService = new LibraryService()
 const launcherService = new LauncherService()
@@ -30,6 +35,7 @@ const systemService = new SystemService(libraryService)
 const sassService = new SassService()
 const scraperService = new ScraperService(libraryService)
 const featuresService = new FeaturesService()
+const themeStoreService = new ThemeStoreService()
 
 let activeControllers: any[] = []
 let themeWatcher: FSWatcher | null = null
@@ -270,6 +276,21 @@ app.whenReady().then(() => {
 
   ipcMain.handle('save-theme-setting', async (_, themeName: string, key: string, value: string) => {
     return ThemeSettingsParser.saveThemeSetting(themeName, themeService.getThemePath(themeName), key, value)
+  })
+
+  // ─── IPC: Theme Store ───
+  ipcMain.handle('get-official-themes', async () => {
+    return themeStoreService.getOfficialThemes()
+  })
+
+  ipcMain.handle('get-community-themes', async () => {
+    return themeStoreService.getCommunityThemes()
+  })
+
+  ipcMain.handle('install-theme', async (event, zipUrl: string, themeId: string) => {
+    return themeStoreService.installTheme(zipUrl, themeId, (percent, status) => {
+      event.sender.send('theme-install-progress', { percent, status })
+    })
   })
 
   // ─── IPC: System Commands ───
@@ -622,7 +643,7 @@ app.whenReady().then(() => {
   ipcMain.handle('get-file-content', async (_, filePath: string) => {
     try {
       if (existsSync(filePath)) {
-        return readFileSync(filePath, 'utf-8')
+        return await readFile(filePath, 'utf-8')
       }
       return null
     } catch (e) {

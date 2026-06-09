@@ -1,0 +1,20 @@
+[
+    {
+        "id": "riescade-theme-switch2",
+        "name": "Nintendo Switch 2 Concept",
+        "github": "https://github.com/marcoriesco/riescade-theme-switch2",
+        "version": "1.0.0",
+        "author": "marcoriesco",
+        "preview": "./preview/preview.jpg",
+        "featured": true
+    },
+    {
+        "id": "riescade-theme-default",
+        "name": "RIESCADE Default",
+        "github": "https://github.com/marcoriesco/riescade-theme-default",
+        "version": "2.7.2",
+        "author": "marcoriesco",
+        "preview": "./preview/preview.jpg",
+        "featured": true
+    }
+]

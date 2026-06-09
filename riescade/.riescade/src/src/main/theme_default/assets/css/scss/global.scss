@@ -7,6 +7,7 @@
 @use "./game_options";
 @use "./input_config";
 @use "./netplay";
+@use "./themes";
 
 
 $theme-color: #9f0043;
@@ -72,59 +73,132 @@ body {
     .custom-title {
       display: none;
     }
+
     .fallback-title {
       display: inline;
     }
 
     &.system-emulators {
-      .fallback-title { display: none; }
-      .emulators-title { display: inline; }
+      .fallback-title {
+        display: none;
+      }
+
+      .emulators-title {
+        display: inline;
+      }
+
       .system-gamecount {
-        .fallback-count { display: none; }
-        .emulators-count { display: inline; }
+        .fallback-count {
+          display: none;
+        }
+
+        .emulators-count {
+          display: inline;
+        }
       }
     }
+
     &.system-collections {
-      .fallback-title { display: none; }
-      .collections-title { display: inline; }
+      .fallback-title {
+        display: none;
+      }
+
+      .collections-title {
+        display: inline;
+      }
+
       .system-gamecount {
-        .fallback-count { display: none; }
-        .collections-count { display: inline; }
+        .fallback-count {
+          display: none;
+        }
+
+        .collections-count {
+          display: inline;
+        }
       }
     }
+
     &.system-favorites {
-      .fallback-title { display: none; }
-      .favorites-title { display: inline; }
+      .fallback-title {
+        display: none;
+      }
+
+      .favorites-title {
+        display: inline;
+      }
     }
+
     &.system-library {
-      .fallback-title { display: none; }
-      .library-title { display: inline; }
+      .fallback-title {
+        display: none;
+      }
+
+      .library-title {
+        display: inline;
+      }
+
       .system-gamecount {
-        .fallback-count { display: none; }
-        .library-count { display: inline; }
+        .fallback-count {
+          display: none;
+        }
+
+        .library-count {
+          display: inline;
+        }
       }
     }
+
     &.system-screenshots {
-      .fallback-title { display: none; }
-      .screenshots-title { display: inline; }
+      .fallback-title {
+        display: none;
+      }
+
+      .screenshots-title {
+        display: inline;
+      }
+
       .system-gamecount {
-        .fallback-count { display: none; }
-        .screenshots-count { display: inline; }
+        .fallback-count {
+          display: none;
+        }
+
+        .screenshots-count {
+          display: inline;
+        }
       }
     }
+
     &.system-magazine {
-      .fallback-title { display: none; }
-      .magazine-title { display: inline; }
+      .fallback-title {
+        display: none;
+      }
+
+      .magazine-title {
+        display: inline;
+      }
+
       .system-gamecount {
-        .fallback-count { display: none; }
-        .magazine-count { display: inline; }
+        .fallback-count {
+          display: none;
+        }
+
+        .magazine-count {
+          display: inline;
+        }
       }
     }
+
     &.system-all {
-      .fallback-title { display: none; }
-      .all-title { display: inline; }
+      .fallback-title {
+        display: none;
+      }
+
+      .all-title {
+        display: inline;
+      }
     }
   }
+
   .system-gamecount {
     font-size: 1.5rem;
     font-weight: 500;
@@ -135,6 +209,7 @@ body {
     .custom-count {
       display: none;
     }
+
     .fallback-count {
       display: inline;
     }
@@ -189,12 +264,14 @@ body {
 
     .system-meta-name {
       font-family: var(--font-hardware);
-      font-size: 2vh; /* 0.020 no ES */
+      font-size: 2vh;
+      /* 0.020 no ES */
       color: var(--text-muted);
     }
 
     .system-meta-hardware {
-      color: var(--theme-color); /* extraTextColor */
+      color: var(--theme-color);
+      /* extraTextColor */
     }
   }
 
@@ -264,7 +341,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
 }
-.hide {
-  display: none !important; 
-}
 
+.hide {
+  display: none !important;
+}

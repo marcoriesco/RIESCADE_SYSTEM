@@ -129,7 +129,7 @@ interface MenuItem {
   description?: string
   onClick?: () => void
   submenu?: MenuItem[]
-  type?: 'toggle' | 'select' | 'slider' | 'action' | 'info' | 'group' | 'input'
+  type?: 'toggle' | 'select' | 'slider' | 'action' | 'info' | 'group' | 'input' | 'theme_card'
   settingName?: string
   settingType?: 'string' | 'bool' | 'int' | 'float'
   options?: { label: string; value: any; description?: string }[]
@@ -144,6 +144,10 @@ interface MenuItem {
   tab?: number
   invert?: boolean
   allowAuto?: boolean
+  preview?: string
+  badge?: string
+  themeId?: string
+  downloadUrl?: string
 }
 
 interface MenuProps {
@@ -228,6 +232,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [installedSystems, setInstalledSystems] = useState<System[]>([])
   const [biosViewMode, setBiosViewMode] = useState<'installed' | 'all'>('installed')
   const [showScraperProgress, setShowScraperProgress] = useState(false)
+  const [themeStoreOfficial, setThemeStoreOfficial] = useState<any[]>([])
+  const [themeStoreCommunity, setThemeStoreCommunity] = useState<any[]>([])
+  const [themeStoreLoading, setThemeStoreLoading] = useState(false)
+  const [themeStoreError, setThemeStoreError] = useState<string | null>(null)
+  const [installingThemeId, setInstallingThemeId] = useState<string | null>(null)
+  // Track last active tab to detect tab switches (triggers reload)
+  const themeStoreTabRef = useRef<number | undefined>(undefined)
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [modalSelectedIndex, setModalSelectedIndex] = useState(0)
   const [showInputModal, setShowInputModal] = useState(false)
@@ -682,7 +693,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       nextStack.push(prevItem)
     }
     return nextStack
-  }, [favoriteSongsList, rawBiosData, installedSystems, biosViewMode, realSystemInfo, dynamicFeatures])
+  }, [favoriteSongsList, rawBiosData, installedSystems, biosViewMode, realSystemInfo, dynamicFeatures, themeStoreOfficial, themeStoreCommunity, themeStoreLoading, themeStoreError, installingThemeId])
 
   // Update menu when settings/themes change
   useEffect(() => {
@@ -701,7 +712,12 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     installedSystems,
     biosViewMode,
     realSystemInfo,
-    dynamicFeatures
+    dynamicFeatures,
+    themeStoreOfficial,
+    themeStoreCommunity,
+    themeStoreLoading,
+    themeStoreError,
+    installingThemeId
   ])
 
   // Helpers for checklist selection
@@ -897,6 +913,15 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       setActiveInputItem(item)
       setInputValue(String(getSetting(item.settingName!, '')))
       setShowInputModal(true)
+    } else if (item.type === 'theme_card') {
+      // Install theme from store
+      if (item.downloadUrl && item.themeId && item.badge === t('DOWNLOAD')) {
+        setInstallingThemeId(item.themeId)
+        window.api.installTheme(item.downloadUrl, item.themeId)
+          .then(() => window.api.getThemes().then(setThemes))
+          .catch((e: any) => console.error('[ThemeStore] Install failed:', e))
+          .finally(() => setInstallingThemeId(null))
+      }
     } else if (item.onClick) {
       item.onClick()
     }
@@ -911,6 +936,43 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       }
     }
   }, [selectedIndex, activeMenuStack, isOpen])
+
+  // Reset theme store data when tab changes (ensures fresh reload on each visit)
+  const themeStoreActiveTab = (currentStackItem?.parentItemId === 'ui_settings') ? currentStackItem?.activeTab : undefined
+  if (themeStoreActiveTab !== undefined && themeStoreActiveTab !== themeStoreTabRef.current) {
+    themeStoreTabRef.current = themeStoreActiveTab
+    if (themeStoreActiveTab === 1 && themeStoreOfficial.length > 0) {
+      setThemeStoreOfficial([])
+      setThemeStoreLoading(false)
+      setThemeStoreError(null)
+    } else if (themeStoreActiveTab === 2 && themeStoreCommunity.length > 0) {
+      setThemeStoreCommunity([])
+      setThemeStoreLoading(false)
+      setThemeStoreError(null)
+    }
+  }
+
+  // Fetch theme store data when ui_settings tabs 1/2 are opened (reload on each visit)
+  useEffect(() => {
+    if (!isOpen) return
+    if (currentStackItem?.parentItemId !== 'ui_settings') return
+    const activeTab = currentStackItem.activeTab
+    if (activeTab === 1 && themeStoreOfficial.length === 0 && !themeStoreLoading) {
+      setThemeStoreLoading(true)
+      setThemeStoreError(null)
+      window.api.getOfficialThemes()
+        .then(setThemeStoreOfficial)
+        .catch((e: any) => setThemeStoreError(e?.message || 'Failed to load'))
+        .finally(() => setThemeStoreLoading(false))
+    } else if (activeTab === 2 && themeStoreCommunity.length === 0 && !themeStoreLoading) {
+      setThemeStoreLoading(true)
+      setThemeStoreError(null)
+      window.api.getCommunityThemes()
+        .then(setThemeStoreCommunity)
+        .catch((e: any) => setThemeStoreError(e?.message || 'Failed to load'))
+        .finally(() => setThemeStoreLoading(false))
+    }
+  }, [isOpen, currentStackItem?.parentItemId, currentStackItem?.activeTab, themeStoreLoading])
 
   const handleToggle = (item: MenuItem) => {
     if (item.settingName) {
@@ -1686,14 +1748,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ]
       },
       {
-        id: 'ui_settings', label: t('USER INTERFACE SETTINGS'), submenu: [
-          { id: 'group_appearance', label: t('APPEARANCE'), type: 'group' },
-          { id: 'theme_set', label: t('THEME SET'), type: 'select', settingName: 'RIESCADE.ThemeSet',
+        id: 'ui_settings', label: t('USER INTERFACE SETTINGS'), tabs: ['THEMES', 'OFFICIAL THEMES', 'COMMUNITY'], submenu: [
+          // === TAB 0: THEMES (installed) ===
+          { id: 'group_appearance', label: t('APPEARANCE'), type: 'group', tab: 0 },
+          { id: 'theme_set', label: t('THEME SET'), type: 'select', settingName: 'RIESCADE.ThemeSet', tab: 0,
             options: themes.length ? themes.map(t => ({ label: t.toUpperCase(), value: t })) : [{ label: 'DEFAULT', value: 'default' }]
           },
           { 
             id: 'theme_cfg_submenu', 
-            label: t('THEME CONFIGURATION'), 
+            label: t('THEME CONFIGURATION'),
+            tab: 0,
             submenu: (() => {
               if (pendingSettings['RIESCADE.ThemeSet'] && pendingSettings['RIESCADE.ThemeSet'] !== theme?.name) {
                 return [{ id: 'theme_cfg_pending', label: t('Save changes to see new options'), type: 'info' }] as MenuItem[]
@@ -1710,8 +1774,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               })) as MenuItem[]
             })()
           },
-          { id: 'group_ui_gen', label: t('DISPLAY OPTIONS'), type: 'group' },
-          { id: 'screensaver_settings', label: t('SCREENSAVER SETTINGS'), submenu: [
+          { id: 'group_ui_gen', label: t('DISPLAY OPTIONS'), type: 'group', tab: 0 },
+          { id: 'screensaver_settings', label: t('SCREENSAVER SETTINGS'), tab: 0, submenu: [
             { id: 'screensaver_time', label: t('START SCREENSAVER AFTER'), type: 'select', settingName: 'ScreenSaverTime', options: [
               { label: t('OFF'), value: '0' }, 
               { label: t('1 MIN'), value: '60000' },
@@ -1725,7 +1789,85 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               { label: t('SLIDESHOW'), value: 'slide' },
               { label: t('SUSPEND'), value: 'suspend' },
             ]}
-          ]}
+          ]},
+
+          // === TAB 1: OFFICIAL THEMES ===
+          ...((() => {
+            if (themeStoreLoading && themeStoreOfficial.length === 0) {
+              return [{ id: 'official_loading', label: t('Loading themes...'), type: 'info', tab: 1 }] as MenuItem[]
+            }
+            if (themeStoreError && themeStoreOfficial.length === 0) {
+              return [
+                { id: 'official_error', label: themeStoreError, type: 'info', tab: 1 },
+                { id: 'official_retry', label: t('RETRY'), type: 'action', tab: 1, onClick: () => {
+                  setThemeStoreError(null)
+                  setThemeStoreLoading(true)
+                  window.api.getOfficialThemes().then(setThemeStoreOfficial).catch(e => setThemeStoreError(e?.message)).finally(() => setThemeStoreLoading(false))
+                }}
+              ] as MenuItem[]
+            }
+            if (themeStoreOfficial.length === 0) {
+              return [{ id: 'official_empty', label: t('No official themes available'), type: 'info', tab: 1 }] as MenuItem[]
+            }
+            const items: MenuItem[] = [{ id: 'group_official_themes', label: t('AVAILABLE THEMES'), type: 'group', tab: 1 }]
+            for (const theme of themeStoreOfficial) {
+              const installed = themes.some(it => it.toLowerCase() === theme.id.toLowerCase())
+              const installing = installingThemeId === theme.id
+              const branch = theme._branch || 'main'
+              const preview = (theme.github && theme.preview)
+                ? `https://raw.githubusercontent.com/${theme.github.replace('https://github.com/', '')}/${branch}/${theme.preview.replace(/^\.?\//, '')}`
+                : ''
+              items.push({
+                id: `official_theme_${theme.id}`,
+                label: theme.name,
+                description: `${theme.author || ''}${theme.version ? ' · v' + theme.version : ''}`,
+                type: 'theme_card',
+                tab: 1,
+                preview,
+                badge: installing ? t('INSTALLING...') : installed ? t('INSTALLED') : t('DOWNLOAD'),
+                themeId: theme.id,
+                downloadUrl: theme.github ? `${theme.github}/archive/refs/heads/${branch}.zip` : ''
+              })
+            }
+            return items
+          })()),
+
+          // === TAB 2: COMMUNITY ===
+          ...((() => {
+            if (themeStoreLoading && themeStoreCommunity.length === 0) {
+              return [{ id: 'community_loading', label: t('Searching GitHub...'), type: 'info', tab: 2 }] as MenuItem[]
+            }
+            if (themeStoreError && themeStoreCommunity.length === 0) {
+              return [
+                { id: 'community_error', label: themeStoreError, type: 'info', tab: 2 },
+                { id: 'community_retry', label: t('RETRY'), type: 'action', tab: 2, onClick: () => {
+                  setThemeStoreError(null)
+                  setThemeStoreLoading(true)
+                  window.api.getCommunityThemes().then(setThemeStoreCommunity).catch(e => setThemeStoreError(e?.message)).finally(() => setThemeStoreLoading(false))
+                }}
+              ] as MenuItem[]
+            }
+            if (themeStoreCommunity.length === 0) {
+              return [{ id: 'community_empty', label: t('No community themes found'), type: 'info', tab: 2 }] as MenuItem[]
+            }
+            const items: MenuItem[] = [{ id: 'group_community_themes', label: t('GITHUB THEMES'), type: 'group', tab: 2 }]
+            for (const theme of themeStoreCommunity) {
+              const installed = themes.some(it => it.toLowerCase() === theme.id.toLowerCase())
+              const installing = installingThemeId === theme.id
+              items.push({
+                id: `community_theme_${theme.id}`,
+                label: theme.name,
+                description: `${theme.author || ''}${theme.version ? ' · v' + theme.version : ''}${theme.stars ? ' · ★' + theme.stars : ''}`,
+                type: 'theme_card',
+                tab: 2,
+                preview: theme.preview || '',
+                badge: installing ? t('INSTALLING...') : installed ? t('INSTALLED') : t('DOWNLOAD'),
+                themeId: theme.id,
+                downloadUrl: theme.downloadUrl || ''
+              })
+            }
+            return items
+          })())
         ]
       },
       {
@@ -2728,6 +2870,49 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           return (
             <div key={item.id} className="riescade-menu-group">
               {item.label}
+            </div>
+          )
+        }
+        // Theme card: renders with preview thumbnail + status badge
+        if (item.type === 'theme_card') {
+          const isInstalled = item.badge === t('INSTALLED')
+          const isInstalling = item.badge === t('INSTALLING...')
+          return (
+            <div
+              key={item.id}
+              className={`riescade-menu-item theme-card-item ${index === selectedIndex ? 'selected' : ''} ${isInstalled ? 'installed' : ''}`}
+              onMouseMove={(e) => {
+                if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
+                  setLastMousePos({ x: e.clientX, y: e.clientY })
+                  if (selectedIndex !== index) setSelectedIndex(index)
+                }
+              }}
+              onClick={() => handleItemClick(item, index)}
+            >
+              <div className="theme-card-preview">
+                {item.preview ? (
+                  <img
+                    src={item.preview}
+                    alt={item.label}
+                    loading="lazy"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement
+                      img.style.display = 'none'
+                      const fallback = img.nextElementSibling as HTMLElement
+                      if (fallback) fallback.style.display = 'flex'
+                    }}
+                  />
+                ) : null}
+                <span className="theme-card-preview-fallback" style={item.preview ? { display: 'none' } : undefined}>{item.label.charAt(0)}</span>
+              </div>
+              <div className="theme-card-info">
+                <span className="theme-card-name">{item.label}</span>
+                {item.description && <span className="theme-card-meta">{item.description}</span>}
+              </div>
+              <div className={`theme-card-badge ${isInstalled ? 'badge-installed' : isInstalling ? 'badge-installing' : 'badge-download'}`}>
+                {isInstalling && <span className="theme-card-spinner" />}
+                {item.badge}
+              </div>
             </div>
           )
         }

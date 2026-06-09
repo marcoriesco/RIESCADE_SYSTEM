@@ -1,10 +1,8 @@
 {
   "name": "RIESCADE Default",
-  "version": "1.0.0",
+  "version": "2.7.2",
   "author": "Marco Riesco",
-  "description": "Exemplo do novo motor de temas baseado em web (HTML/CSS)",
-  "type": "web",
-  "defaultLocale": "pt_BR",
+  "description": "Tema padrão do RIESCADE Frontend (JS/HTML/CSS)",
   "templates": {
     "system": "system.html",
     "gamelist": "gamelist.html",
@@ -17,15 +15,42 @@
       "name": "COLOR HIGHLIGHTS",
       "type": "select",
       "options": [
-        { "value": "#9f0043", "label": "PINK" },
-        { "value": "#ffffff", "label": "WHITE" },
-        { "value": "#3377ff", "label": "BLUE" },
-        { "value": "#13eafd", "label": "LIGHT BLUE" },
-        { "value": "#fb2246", "label": "RED" },
-        { "value": "#cccccc", "label": "GRAY" },
-        { "value": "#00ffbf", "label": "GREEN" },
-        { "value": "#9133c7", "label": "PURPLE" },
-        { "value": "#ffc233", "label": "YELLOW" }
+        {
+          "value": "#9f0043",
+          "label": "PINK"
+        },
+        {
+          "value": "#ffffff",
+          "label": "WHITE"
+        },
+        {
+          "value": "#3377ff",
+          "label": "BLUE"
+        },
+        {
+          "value": "#13eafd",
+          "label": "LIGHT BLUE"
+        },
+        {
+          "value": "#fb2246",
+          "label": "RED"
+        },
+        {
+          "value": "#cccccc",
+          "label": "GRAY"
+        },
+        {
+          "value": "#00ffbf",
+          "label": "GREEN"
+        },
+        {
+          "value": "#9133c7",
+          "label": "PURPLE"
+        },
+        {
+          "value": "#ffc233",
+          "label": "YELLOW"
+        }
       ],
       "default": "9f0043"
     },
@@ -34,10 +59,22 @@
       "name": "Controller Icon",
       "type": "select",
       "options": [
-        { "value": "ps4", "label": "PS4" },
-        { "value": "xbox", "label": "XBOX" },
-        { "value": "switch", "label": "SWITCH" },
-        { "value": "arcade", "label": "ARCADE" }
+        {
+          "value": "ps4",
+          "label": "PS4"
+        },
+        {
+          "value": "xbox",
+          "label": "XBOX"
+        },
+        {
+          "value": "switch",
+          "label": "SWITCH"
+        },
+        {
+          "value": "arcade",
+          "label": "ARCADE"
+        }
       ],
       "default": "ps4"
     }

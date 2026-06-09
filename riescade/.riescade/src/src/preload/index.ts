@@ -23,6 +23,11 @@ const api = {
   getActiveTheme: () => ipcRenderer.invoke('get-active-theme'),
   loadTheme: (themeName: string) => ipcRenderer.invoke('load-theme', themeName),
 
+  // Theme Store
+  getOfficialThemes: () => ipcRenderer.invoke('get-official-themes'),
+  getCommunityThemes: () => ipcRenderer.invoke('get-community-themes'),
+  installTheme: (zipUrl: string, themeId: string) => ipcRenderer.invoke('install-theme', zipUrl, themeId),
+
   // Settings (read from ES config, write for UI prefs)
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSetting: (name: string, value: any, type: 'string' | 'bool' | 'int' | 'float') =>

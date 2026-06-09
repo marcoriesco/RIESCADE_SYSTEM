@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "ps3",
+    "value": "tg16",
     "type": "string"
   },
   "MaxVRAM": {

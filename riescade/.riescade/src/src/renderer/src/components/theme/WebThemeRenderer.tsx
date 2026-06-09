@@ -23,42 +23,50 @@ const SafeDecodeElement: React.FC<{
   props: any
   children?: React.ReactNode
 }> = ({ tagName, props, children }) => {
-  const [currentSrc, setCurrentSrc] = useState(props.src || '')
-  const [currentBg, setCurrentBg] = useState(props.style?.backgroundImage || '')
-  const [opacity, setOpacity] = useState(1)
-  
+  // Displayed values: what is currently visible (starts with initial props)
+  const [displayedSrc, setDisplayedSrc] = useState(props.src || '')
+  const [displayedBg, setDisplayedBg] = useState(props.style?.backgroundImage || '')
+  // Fade state: controls the crossfade transition
+  const [fading, setFading] = useState(false)
+
   const lastSrc = useRef(props.src || '')
   const lastBg = useRef(props.style?.backgroundImage || '')
-  
+
   const targetSrc = props.src || ''
   const targetBg = props.style?.backgroundImage || ''
 
   useEffect(() => {
     let active = true
 
-    const decodeSrc = async (src: string) => {
-      if (!src) return
+    // Crossfade for <img> src changes
+    const decodeSrc = async (newSrc: string) => {
+      if (!newSrc) {
+        if (active) {
+          setDisplayedSrc('')
+          setFading(false)
+        }
+        return
+      }
       const img = new Image()
-      img.src = src
+      img.src = newSrc
       try {
         await img.decode()
-        if (active) {
-          setCurrentSrc(src)
-          setOpacity(1)
-        }
-      } catch (e) {
-        if (active) {
-          setCurrentSrc(src)
-          setOpacity(1)
-        }
+      } catch { /* ignore decode errors */ }
+      if (active) {
+        // Swap to new image and trigger fade-in
+        setDisplayedSrc(newSrc)
+        setFading(false)
       }
     }
 
-    const decodeBg = async (bgUrl: string) => {
-      const match = bgUrl.match(/url\(['"]?([^'")\s]+)['"]?\)/)
+    // Crossfade for CSS background-image changes
+    const decodeBg = async (newBgUrl: string) => {
+      const match = newBgUrl.match(/url\(['"]?([^'")\s]+)['"]?\)/)
       if (!match || !match[1]) {
-        setCurrentBg(bgUrl)
-        setOpacity(1)
+        if (active) {
+          setDisplayedBg(newBgUrl)
+          setFading(false)
+        }
         return
       }
       const src = match[1]
@@ -66,32 +74,24 @@ const SafeDecodeElement: React.FC<{
       img.src = src
       try {
         await img.decode()
-        if (active) {
-          setCurrentBg(bgUrl)
-          setOpacity(1)
-        }
-      } catch (e) {
-        if (active) {
-          setCurrentBg(bgUrl)
-          setOpacity(1)
-        }
+      } catch { /* ignore decode errors */ }
+      if (active) {
+        setDisplayedBg(newBgUrl)
+        setFading(false)
       }
     }
 
     if (targetSrc !== lastSrc.current) {
       lastSrc.current = targetSrc
-      setOpacity(0)
-      setTimeout(() => {
-        if (active) decodeSrc(targetSrc)
-      }, 50)
+      // Start crossfade: keep old image visible, decode new one
+      setFading(true)
+      decodeSrc(targetSrc)
     }
 
     if (targetBg !== lastBg.current) {
       lastBg.current = targetBg
-      setOpacity(0)
-      setTimeout(() => {
-        if (active) decodeBg(targetBg)
-      }, 50)
+      setFading(true)
+      decodeBg(targetBg)
     }
 
     return () => {
@@ -99,22 +99,26 @@ const SafeDecodeElement: React.FC<{
     }
   }, [targetSrc, targetBg])
 
+  // Determine opacity: 1 when stable, 0.99 during crossfade to trigger CSS transition
+  // (We use a subtle opacity dip rather than 0 to avoid black frames)
+  const displayOpacity = fading ? 0.99 : 1
+
   const finalProps = { ...props }
   if (targetSrc) {
-    finalProps.src = currentSrc
+    finalProps.src = displayedSrc
   }
   if (targetBg) {
     finalProps.style = {
       ...finalProps.style,
-      backgroundImage: currentBg,
-      transition: 'opacity 0.15s ease-in-out',
-      opacity: opacity
+      backgroundImage: displayedBg,
+      transition: 'opacity 0.3s ease-in-out',
+      opacity: displayOpacity
     }
   } else if (targetSrc) {
     finalProps.style = {
       ...finalProps.style,
-      transition: 'opacity 0.15s ease-in-out',
-      opacity: opacity
+      transition: 'opacity 0.3s ease-in-out',
+      opacity: displayOpacity
     }
   }
 

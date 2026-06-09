@@ -19,6 +19,9 @@ declare global {
       getThemes: () => Promise<any>
       getActiveTheme: () => Promise<string>
       loadTheme: (themeName: string) => Promise<any>
+      getOfficialThemes: () => Promise<any[]>
+      getCommunityThemes: () => Promise<any[]>
+      installTheme: (zipUrl: string, themeId: string) => Promise<boolean>
       getSettings: () => Promise<any>
       saveSetting: (name: string, value: any, type: string) => Promise<any>
       getEmulatorFeatures: (systemName: string, emulatorName: string, coreName?: string) => Promise<any>

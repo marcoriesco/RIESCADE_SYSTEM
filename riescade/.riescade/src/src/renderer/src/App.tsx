@@ -91,6 +91,18 @@ const preloadImage = (url: string): Promise<void> => {
 	});
 };
 
+// Concurrency-limited batch image preloader to avoid saturating Chromium's decode pipeline
+const preloadImageBatch = async (urls: string[], concurrency = 5): Promise<void> => {
+	const queue = [...urls];
+	const workers = Array.from({ length: concurrency }, async () => {
+		while (queue.length > 0) {
+			const url = queue.shift();
+			if (url) await preloadImage(url);
+		}
+	});
+	await Promise.all(workers);
+};
+
 const getNotificationIcon = (category: string | undefined, type: string) => {
 	if (category === 'controller') {
 		return (
@@ -603,23 +615,19 @@ function App() {
 		if (!currentTheme || !currentTheme.path || !currentSystems || currentSystems.length === 0) return;
 		const themePathClean = currentTheme.path.replace(/\\/g, '/');
 		
+		console.time('[Perf] preloadThemeAssets');
 		console.log(`[Cache] Starting theme assets preloading for ${currentSystems.length} systems...`);
-		const promises: Promise<void>[] = [];
+		const urls: string[] = [];
 		
 		currentSystems.forEach((sys: any) => {
 			const sysTheme = sys.theme || sys.name;
 			const sysName = sys.name === 'all' ? 'auto-allgames' : sysTheme;
-			
-			// Logos
-			const logoWebpUrl = `file:///${themePathClean}/assets/logos/${sysName}.webp`;
-			promises.push(preloadImage(logoWebpUrl));
-			
-			// Arts (fanart/background)
-			const artWebpUrl = `file:///${themePathClean}/assets/arts/${sysName}.webp`;
-			promises.push(preloadImage(artWebpUrl));
+			urls.push(`file:///${themePathClean}/assets/logos/${sysName}.webp`);
+			urls.push(`file:///${themePathClean}/assets/arts/${sysName}.webp`);
 		});
 
-		await Promise.all(promises);
+		await preloadImageBatch(urls, 5);
+		console.timeEnd('[Perf] preloadThemeAssets');
 		console.log('[Cache] Theme assets preloading completed!');
 	}, [systems, theme]);
 
@@ -680,16 +688,18 @@ function App() {
 			const mediaPaths: string[] = await window.api.getAllMediaPaths();
 			if (!mediaPaths || mediaPaths.length === 0) return;
 			
+			console.time('[Perf] preheatImageCache');
 			console.log(`[Cache] Silent image cache preheat: preloading first 150 media files...`);
 			const batch = mediaPaths.slice(0, 150);
-			const promises = batch.map(p => {
+			const urls = batch.map(p => {
 				const cleanPath = p.replace(/\\/g, '/');
 				const url = cleanPath.startsWith('/') || cleanPath.match(/^[a-zA-Z]:/)
 					? `file:///${cleanPath}`
 					: `file://${cleanPath}`;
-				return preloadImage(escapeFileUrl(url));
+				return escapeFileUrl(url);
 			});
-			await Promise.all(promises);
+			await preloadImageBatch(urls, 5);
+			console.timeEnd('[Perf] preheatImageCache');
 			console.log('[Cache] Silent image cache preheat complete!');
 		} catch (e) {
 			console.error('[Cache] Preheat failed:', e);
@@ -710,62 +720,76 @@ function App() {
 						// Wait a tiny bit (100ms) to ensure React has fully rendered and painted the splash screen to the DOM
 						setTimeout(() => {
 							if (initialLoadCancelled) return;
-							// Load settings first so translations (t/translateThemeKey) use the correct language during library preloading
-							window.api.getSettings().then((initialSettings: any) => {
+							console.time('[Perf] initialLoad:parallel');
+						
+							// Run settings, library preload, systems, music in parallel
+							Promise.all([
+								window.api.getSettings(),
+								window.api.preloadLibrary().catch(err => {
+									console.error('[Perf] preloadLibrary failed:', err);
+								}),
+								window.api.getSystems(),
+								window.api.getMusicFiles(),
+								window.api.getMusicPath()
+							]).then(([initialSettings, _, s, files, mPath]: [any, any, System[], string[], string]) => {
+								console.timeEnd('[Perf] initialLoad:parallel');
 								if (initialLoadCancelled) return;
+						
 								setSettings(initialSettings);
-								
-								window.api.preloadLibrary().then(() => {
-									if (initialLoadCancelled) return;
-									Promise.all([
-										window.api.getSystems(),
-										window.api.getMusicFiles(),
-										window.api.getMusicPath()
-									]).then(([s, files, mPath]: [System[], string[], string]) => {
-										setSystems(s);
-										setMusicFiles(files);
-										setMusicPath(mPath);
-										const isSmartCacheEnabled = initialSettings.SmartCache?.value !== 'false' && initialSettings.SmartCache?.value !== false;
-
-										if (isSmartCacheEnabled) {
+								setSystems(s);
+								setMusicFiles(files);
+								setMusicPath(mPath);
+						
+								const isSmartCacheEnabled = initialSettings.SmartCache?.value !== 'false' && initialSettings.SmartCache?.value !== false;
+						
+								if (isSmartCacheEnabled) {
+									// Defer non-critical preloading to avoid competing with initial render
+									setTimeout(() => {
+										if (initialLoadCancelled) return;
+										if (typeof requestIdleCallback !== 'undefined') {
+											requestIdleCallback(() => preheatImageCache(), { timeout: 5000 });
+										} else {
 											preheatImageCache();
-
-											const startupSetting = initialSettings.StartupSystem?.value || 'last';
-											let targetSystemName = '';
-											if (startupSetting === 'last') {
-												targetSystemName = initialSettings.LastSystem?.value || '';
-											} else {
-												targetSystemName = startupSetting;
-											}
-
-											let initialIdx = 0;
-											if (targetSystemName) {
-												const idx = s.findIndex(sys => sys.name === targetSystemName);
-												if (idx !== -1) {
-													initialIdx = idx;
-												}
-											}
-
-											const prevIdx = (initialIdx - 1 + s.length) % s.length;
-											const nextIdx = (initialIdx + 1) % s.length;
-											const startSystems = [s[initialIdx], s[prevIdx], s[nextIdx]].filter(Boolean);
-
-											preloadThemeAssets(startSystems, t);
 										}
-
-										// Auto check for updates on startup if enabled
-										const isUpdatesEnabled = initialSettings['updates.enabled']?.value !== 'false' && initialSettings['updates.enabled']?.value !== false;
-										if (isUpdatesEnabled && !initialLoadCancelled) {
-											window.api.checkForUpdates().then((res: any) => {
-												if (res && res.updateAvailable && !initialLoadCancelled) {
-													addNotification(`ATUALIZAÇÃO DISPONÍVEL (v${res.version})! Abra o Menu > Updates para atualizar.`, 'info', 'general');
-												}
-											}).catch(err => {
-												console.error('Auto update check failed:', err);
-											});
+									}, 2000);
+						
+									const startupSetting = initialSettings.StartupSystem?.value || 'last';
+									let targetSystemName = '';
+									if (startupSetting === 'last') {
+										targetSystemName = initialSettings.LastSystem?.value || '';
+									} else {
+										targetSystemName = startupSetting;
+									}
+						
+									let initialIdx = 0;
+									if (targetSystemName) {
+										const idx = s.findIndex(sys => sys.name === targetSystemName);
+										if (idx !== -1) {
+											initialIdx = idx;
 										}
+									}
+						
+									const prevIdx = (initialIdx - 1 + s.length) % s.length;
+									const nextIdx = (initialIdx + 1) % s.length;
+									const startSystems = [s[initialIdx], s[prevIdx], s[nextIdx]].filter(Boolean);
+						
+									setTimeout(() => {
+										if (initialLoadCancelled) return;
+										preloadThemeAssets(startSystems, t);
+									}, 1000);
+								}
+						
+								// Auto check for updates on startup if enabled
+								const isUpdatesEnabled = initialSettings['updates.enabled']?.value !== 'false' && initialSettings['updates.enabled']?.value !== false;
+								if (isUpdatesEnabled && !initialLoadCancelled) {
+									window.api.checkForUpdates().then((res: any) => {
+										if (res && res.updateAvailable && !initialLoadCancelled) {
+											addNotification(`ATUALIZAÇÃO DISPONÍVEL (v${res.version})! Abra o Menu > Updates para atualizar.`, 'info', 'general');
+										}
+									}).catch(err => {
+										console.error('Auto update check failed:', err);
 									});
-								});
+								}
 							});
 						}, 100);
 					}
@@ -1239,29 +1263,22 @@ function App() {
 		const isSmartCacheEnabled = settings.SmartCache?.value !== 'false' && settings.SmartCache?.value !== false;
 		if (!isSmartCacheEnabled) return;
 
-		const prevIdx = (systemIndex - 1 + filteredSystems.length) % filteredSystems.length;
-		const nextIdx = (systemIndex + 1) % filteredSystems.length;
-
-		const systemsToPreload = [
-			filteredSystems[systemIndex],
-			filteredSystems[prevIdx],
-			filteredSystems[nextIdx]
-		].filter(Boolean);
-
 		const themePathClean = theme.path.replace(/\\/g, '/');
-		
-		systemsToPreload.forEach((sys: any) => {
+		const urls: string[] = [];
+
+		// Preload +/-3 neighbors around current system
+		for (let offset = -3; offset <= 3; offset++) {
+			const idx = (systemIndex + offset + filteredSystems.length) % filteredSystems.length;
+			const sys = filteredSystems[idx];
+			if (!sys) continue;
 			const sysTheme = sys.theme || sys.name;
 			const sysName = sys.name === 'all' ? 'auto-allgames' : sysTheme;
-			
-			// Logos
-			const logoWebpUrl = `file:///${themePathClean}/assets/logos/${sysName}.webp`;
-			preloadImage(logoWebpUrl);
-			
-			// Arts (fanart/background)
-			const artWebpUrl = `file:///${themePathClean}/assets/arts/${sysName}.webp`;
-			preloadImage(artWebpUrl);
-		});
+			urls.push(`file:///${themePathClean}/assets/logos/${sysName}.webp`);
+			urls.push(`file:///${themePathClean}/assets/arts/${sysName}.webp`);
+		}
+
+		// Preload with decode guarantee using concurrency limit
+		preloadImageBatch(urls, 5);
 	}, [filteredSystems, systemIndex, theme, settings.SmartCache?.value]);
 
 	// Restore StartupSystem / LastSystem and handle StartOnGamelist on startup
@@ -1391,18 +1408,21 @@ function App() {
 		}
 	}, [selectedSystem]);
 
+	// Memoize flattened settings with content-based comparison to avoid recomputing
+	// themeData when the settings object reference changes but values stay the same
+	const flattenedSettings = useMemo(() => {
+		return Object.entries(settings).reduce((acc, [k, v]: [string, any]) => {
+			acc[k] = v?.value !== undefined ? v.value : v;
+			return acc;
+		}, {} as any);
+	}, [settings]);
+
 	const themeData = useMemo(() => {
 		const activeGame = isLaunching ? launchingGame : (selectedSystem ? currentGame : null);
 		const activeSystem = isLaunching ? launchingSystem : selectedSystem;
 
 		const sys = activeSystem || currentSystem;
 		const sysFullName = getFriendlySystemName(sys);
-
-		// Flatten global settings
-		const flattenedSettings = Object.entries(settings).reduce((acc, [k, v]: [string, any]) => {
-			acc[k] = v?.value !== undefined ? v.value : v;
-			return acc;
-		}, {} as any);
 
 		const isCollectionsVal = !!(activeSystem && activeSystem.name === 'collections' && !selectedCollection);
 
@@ -1458,8 +1478,8 @@ function App() {
 			...Object.entries(theme?.settings || {}).reduce((acc, [k, v]) => ({ ...acc, [`options:${k}`]: v }), {})
 		};
 
-		// Inject theme translations
-		const lang = settings['Language']?.value || 'en_US';
+		// Inject theme translations (use flattenedSettings to avoid raw settings dependency)
+		const lang = flattenedSettings['Language'] || 'en_US';
 		const themeLocales = theme?.locales || {};
 		const defaultLocaleKey = theme?.defaultLocale || 'en_US';
 		const currentLocale = themeLocales[lang] || {};
@@ -1571,7 +1591,7 @@ function App() {
 		selectedCollection,
 		themeRevision,
 		mediaRevision,
-		settings
+		flattenedSettings  // content-based memo instead of raw settings reference
 	]);
 
 	const handleUpdateGame = (updatedGame: Game) => {

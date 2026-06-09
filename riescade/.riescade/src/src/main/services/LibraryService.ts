@@ -514,6 +514,33 @@ export class LibraryService {
     if (useDb) {
       dbService.open()
     }
+
+    // Fast path: DB already indexed, skip re-sync and just load cached data
+    const isDbAlreadyIndexed = useDb && !forcePhysicalScan && dbService.getIndexedSystemCount() > 0
+    if (isDbAlreadyIndexed) {
+      console.log('[Perf] SQLite fast path: DB already indexed, skipping sync')
+      sendProgress(10, 'LOADING_PLATFORMS')
+
+      // Only recalculate auto-collection counts from DB (fast SQL queries)
+      const displayed = this.getDisplayedSystems()
+      const displayedNames = displayed.map(s => s.name)
+      const settings = new SettingsParser()
+      const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
+      const enabledCols = autoColsString.split(',').map((c: string) => c.trim()).filter((c: string) => c !== '')
+
+      for (const col of enabledCols) {
+        let countKey = col
+        if (col.startsWith('_')) countKey = col.substring(1)
+        else if (col.startsWith('z')) countKey = col.substring(1)
+        const count = dbService.getAutoCollectionCount(countKey, displayedNames)
+        LibraryService.quickAutoCounts.set(countKey, count)
+      }
+
+      LibraryService.isPreloaded = true
+      sendProgress(100, 'READY')
+      return
+    }
+
     const isFirstRun = useDb && dbService.getIndexedSystemCount() === 0
     const initialStatusKey = useDb 
       ? (isFirstRun ? 'INDEXING_DATABASE' : 'UPDATING_DATABASE')
