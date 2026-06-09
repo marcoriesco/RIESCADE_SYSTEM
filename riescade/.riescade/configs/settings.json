@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "segastv",
+    "value": "ps2",
     "type": "string"
   },
   "MaxVRAM": {
