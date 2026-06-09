@@ -1,95 +1,130 @@
 <div data-riescade-view="system">
-  <link rel="stylesheet" href="./assets/css/system.css" />
+	<link rel="stylesheet" href="./assets/css/system.css" />
 
-  <!-- Camada de Fundo -->
-  <div class="system-fanart">
-    <img class="system-image-fanart" decoding="async" src="./assets/arts/{system:theme}.webp" />
-    <img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
-  </div>
+	<!-- FANART & OVERLAY -->
+	<div class="system-fanart" data-riescade-key="system">
+		<img class="system-image-fanart" decoding="async" src="./assets/arts/{system:theme}.webp" />
+		<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
+	</div>
 
-  <!-- HEADER GLOBAL -->
-  <div class="riescade-header">
-      <div class="header-left">
-          <div class="system-name system-{system:name}">
-              <span class="custom-title emulators-title">{t:CONFIGURE_EMULATORS}</span>
-              <span class="custom-title collections-title">{t:COLLECTIONS}</span>
-              <span class="custom-title favorites-title">{t:FAVORITES}</span>
-              <span class="custom-title library-title">{t:ACCESS_LIBRARY}</span>
-              <span class="custom-title screenshots-title">{t:ACCESS_SCREENSHOTS}</span>
-              <span class="custom-title magazine-title">{t:ACCESS_MAGAZINES}</span>
-              <span class="custom-title all-title">{t:ALL_GAMES}</span>
-              <span class="fallback-title">{system:fullName}</span>
-              
-              <span class="system-gamecount">
-                  <span class="custom-count emulators-count">({system:gamecount} {t:EMULATORS_COUNT})</span>
-                  <span class="custom-count collections-count">({system:gamecount} {t:COLLECTIONS_COUNT})</span>
-                  <span class="custom-count library-count">({system:gamecount} {t:MEDIA_COUNT})</span>
-                  <span class="custom-count screenshots-count">({system:gamecount} {t:IMAGES_COUNT})</span>
-                  <span class="custom-count magazine-count">({system:gamecount} {t:MAGAZINES_COUNT})</span>
-                  <span class="fallback-count">({system:gamecount} {t:GAMES_COUNT})</span>
-              </span>
-          </div>
-      </div>
+	<!-- HEADER GLOBAL -->
+	<div class="riescade-header">
+		<div class="header-left">
+			<div class="system-name system-{system:name}">
+				<span class="custom-title emulators-title"
+					>{t:CONFIGURE_EMULATORS}</span
+				>
+				<span class="custom-title collections-title">{t:COLLECTIONS}</span>
+				<span class="custom-title favorites-title">{t:FAVORITES}</span>
+				<span class="custom-title library-title">{t:ACCESS_LIBRARY}</span>
+				<span class="custom-title screenshots-title"
+					>{t:ACCESS_SCREENSHOTS}</span
+				>
+				<span class="custom-title magazine-title">{t:ACCESS_MAGAZINES}</span>
+				<span class="custom-title all-title">{t:ALL_GAMES}</span>
+				<span class="fallback-title">{system:fullName}</span>
 
-      <div class="header-center centered">
-          <riescade-clock format="HH:mm" />
-      </div>
-      
-      <div class="header-right">
-        <div class="user-profile">
-          <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'RIESCADE'}</span>
-          <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}" />
-        </div>
-      </div>
-  </div>
+				<span class="system-gamecount">
+					<span class="custom-count emulators-count"
+						>({system:gamecount} {t:EMULATORS_COUNT})</span
+					>
+					<span class="custom-count collections-count"
+						>({system:gamecount} {t:COLLECTIONS_COUNT})</span
+					>
+					<span class="custom-count library-count"
+						>({system:gamecount} {t:MEDIA_COUNT})</span
+					>
+					<span class="custom-count screenshots-count"
+						>({system:gamecount} {t:IMAGES_COUNT})</span
+					>
+					<span class="custom-count magazine-count"
+						>({system:gamecount} {t:MAGAZINES_COUNT})</span
+					>
+					<span class="fallback-count"
+						>({system:gamecount} {t:GAMES_COUNT})</span
+					>
+				</span>
+			</div>
+		</div>
 
+		<div class="header-center centered">
+			<riescade-clock format="HH:mm" />
+		</div>
 
-  <!-- Camada Principal: Carousel -->
-  <div class="riescade-carousel-area">
-    <riescade-system-carousel
-      type="horizontal"
-      items-count="5"
-      media-source="./assets/logos"
-      class="main-system-carousel"
-      logo-scale="0.5"
-      logo-selected-scale="1.2"
-    ></riescade-system-carousel>
-  </div>
+		<div class="header-right">
+			<div class="user-profile">
+				<span class="user-name"
+					>{global.cheevos.username ? {global.cheevos.username} :
+					'RIESCADE'}</span
+				>
+				<img
+					class="user-avatar"
+					src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}"
+				/>
+			</div>
+		</div>
+	</div>
 
-  <!-- FOOTER GLOBAL -->
-  <div class="riescade-footer">
-    <div class="system-meta">
-        <span class="system-meta-name">
-            {system:theme}
-            <span class="system-meta-hardware">[{system:hardwareType}]</span>
-        </span>
-    </div>
+	<!-- Camada Principal: Carousel -->
+	<div class="riescade-carousel-area">
+		<riescade-system-carousel
+			type="horizontal"
+			items-count="5"
+			media-source="./assets/logos"
+			class="main-system-carousel"
+			logo-scale="0.5"
+			logo-selected-scale="1.2"
+		></riescade-system-carousel>
+	</div>
 
-    <!-- Helpsystem Customizado -->
-    <div class="helpsystem centered">
-      <div class="helpsystem-html">
-        <div class="help-item">
-          <img src="./assets/helpsystem/{options:controller}/accept.svg" class="help-icon" />
-          <span class="help-label">{t:HELP_SELECT}</span>
-        </div>
-        <div class="help-item">
-          <img src="./assets/helpsystem/{options:controller}/back.svg" class="help-icon" />
-          <span class="help-label">{t:HELP_PLATFORMS}</span>
-        </div>
-        <div class="help-item">
-          <img src="./assets/helpsystem/{options:controller}/search.svg" class="help-icon" />
-          <span class="help-label">{t:HELP_SEARCH}</span>
-        </div>
-        <div class="help-item">
-          <img src="./assets/helpsystem/{options:controller}/extra.svg" class="help-icon" />
-          <span class="help-label">{t:HELP_ONLINE}</span>
-        </div>
-      </div>
-    </div>
+	<!-- FOOTER GLOBAL -->
+	<div class="riescade-footer">
+		<div class="system-meta">
+			<span class="system-meta-name">
+				{system:theme}
+				<span class="system-meta-hardware">[{system:hardwareType}]</span>
+			</span>
+		</div>
 
-    <riescade-controller-activity class="controller-activity">
-        <img src="./assets/indicators/{options:controller}.svg" class="controller-activity-icon" />
-    </riescade-controller-activity>
-  </div>
+		<!-- Helpsystem Customizado -->
+		<div class="helpsystem centered">
+			<div class="helpsystem-html">
+				<div class="help-item">
+					<img
+						src="./assets/helpsystem/{options:controller}/accept.svg"
+						class="help-icon"
+					/>
+					<span class="help-label">{t:HELP_SELECT}</span>
+				</div>
+				<div class="help-item">
+					<img
+						src="./assets/helpsystem/{options:controller}/back.svg"
+						class="help-icon"
+					/>
+					<span class="help-label">{t:HELP_PLATFORMS}</span>
+				</div>
+				<div class="help-item">
+					<img
+						src="./assets/helpsystem/{options:controller}/search.svg"
+						class="help-icon"
+					/>
+					<span class="help-label">{t:HELP_SEARCH}</span>
+				</div>
+				<div class="help-item">
+					<img
+						src="./assets/helpsystem/{options:controller}/extra.svg"
+						class="help-icon"
+					/>
+					<span class="help-label">{t:HELP_ONLINE}</span>
+				</div>
+			</div>
+		</div>
 
+		<riescade-controller-activity class="controller-activity">
+			<img
+				src="./assets/indicators/{options:controller}.svg"
+				class="controller-activity-icon"
+			/>
+		</riescade-controller-activity>
+	</div>
 </div>

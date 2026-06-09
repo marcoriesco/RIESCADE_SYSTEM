@@ -23,7 +23,8 @@
 /* CAROUSEL AREA */
 .riescade-carousel-area {
   position: absolute;
-  top: 70vh; /* Aproximadamente o centro da tela descontando header/footer */
+  top: 70vh;
+  /* Aproximadamente o centro da tela descontando header/footer */
   left: 0;
   width: 100%;
   height: 25vh;

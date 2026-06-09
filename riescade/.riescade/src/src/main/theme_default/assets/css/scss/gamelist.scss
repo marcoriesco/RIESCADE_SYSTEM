@@ -8,56 +8,24 @@
 	height: 100vh;
 }
 
-@keyframes slideInLeft {
-	0% {
-		transform: translateX(-50px);
-		opacity: 0;
-	}
-	100% {
-		transform: translateX(50px);
-		opacity: 1;
-	}
+.animate__animated.animate__fadeIn {
+	--animate-duration: 3s;
 }
 
-.gamelist-bg-layer {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
+/* 1. FANART */
+.system-fanart {
 
-	&.gamelist-bg-default {
+	.system-image-fanart,
+	.system-image-overlay {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 1;
+	}
+
+	.system-image-overlay {
 		z-index: 2;
-		background-size: 100% 100%;
-	}
-
-	&.gamelist-empty-fanart {
-		filter: saturate(0);
-		opacity: 0.1 !important;	
-	}
-
-	.gamelist-overlay,
-	.gamelist-overlay-right,
-	.gamelist-overlay-bottom {
-		background-size: 100% 100%;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-	}
-
-	.gamelist-overlay {
-		background-image: url('../overlays/overlay-system.webp');
-		z-index: 3;
-	}
-	.gamelist-overlay-right {
-		background-image: url('../overlays/OverlayRight.webp');
-		z-index: 10;
-	}
-	.gamelist-overlay-bottom {
-		background-image: url('../overlays/OverlayTopRight.webp');
-		z-index: 10;
 	}
 }
 
@@ -83,18 +51,14 @@
 	justify-content: center;
 	align-items: flex-start;
 	width: 45%;
-  	padding-bottom: 120px;
-
-	.thumbnail-container {
-		animation: slideInLeft 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-	}
+	padding-bottom: 120px;
 
 	.gamelist-thumbnail {
 		max-width: 100%;
 		max-height: 55vh;
 		object-fit: contain;
 		filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
-    	transform: rotate(-4deg);
+		transform: rotate(-4deg);
 	}
 
 	.gamelist-meta {
@@ -139,7 +103,7 @@
 		img {
 			max-width: 50% !important;
 			min-width: 50% !important;
-   			max-height: max-content !important;
+			max-height: max-content !important;
 		}
 
 		&.selected {
@@ -184,134 +148,146 @@
 
 /* GAMELIST LOADING VIEWS */
 .gamelist-loading-screen-root {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #000;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: #000;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
 }
+
 .gamelist-loading-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.5) blur(10px);
-  transform: scale(1.1);
-  z-index: 9;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	filter: brightness(0.5) blur(10px);
+	transform: scale(1.1);
+	z-index: 9;
 }
 
 .gamelist-loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url("../overlays/overlay-gamelist-hard.webp");
-  background-size: 100% 100%;
-  opacity: 0.8;
-  z-index: 10;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url("../overlays/overlay-gamelist-hard.webp");
+	background-size: 100% 100%;
+	opacity: 0.8;
+	z-index: 10;
 }
+
 .gamelist-loading-content {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  text-align: center;
+	position: relative;
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 30px;
+	text-align: center;
 }
+
 .gamelist-loading-logo-container {
-  max-width: 500px;
-  max-height: 250px;
+	max-width: 500px;
+	max-height: 250px;
 
-  img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
+	img {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+	}
 }
+
 .gamelist-loading-title {
-  color: #fff;
-  font-size: 2.5rem; 
-  letter-spacing: 2px;  
-  margin: 0;
-  font-weight: 600;
-  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
+	color: #fff;
+	font-size: 2.5rem;
+	letter-spacing: 2px;
+	margin: 0;
+	font-weight: 600;
+	text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
 }
-.gamelist-loading-text-row {
-  position: fixed;
-  left: 50px;
-  bottom: 60px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  height: auto;
-  z-index: 10;
-}
-.gamelist-loading-text {
-  color: #fff;
-  opacity: 0.8;
-  letter-spacing: 8px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.gamelist-loading-dots {
-  color: #fff;
-  font-size: 1.5rem;
-  animation: riescade-loading-pulse 1.5s infinite;
-}
-.gamelist-loading-spinner-container {
-  position: absolute;
-  bottom: 50px;
-  right: 50px;
-  width: 80px;
-  height: 80px;
-  z-index: 10;
 
-  .gamelist-loading-icon {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    animation: riescade-loading-rotate 2s linear infinite;
-  }
+.gamelist-loading-text-row {
+	position: fixed;
+	left: 50px;
+	bottom: 60px;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	height: auto;
+	z-index: 10;
+}
+
+.gamelist-loading-text {
+	color: #fff;
+	opacity: 0.8;
+	letter-spacing: 8px;
+	font-size: 1.2rem;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.gamelist-loading-dots {
+	color: #fff;
+	font-size: 1.5rem;
+	animation: riescade-loading-pulse 1.5s infinite;
+}
+
+.gamelist-loading-spinner-container {
+	position: absolute;
+	bottom: 50px;
+	right: 50px;
+	width: 80px;
+	height: 80px;
+	z-index: 10;
+
+	.gamelist-loading-icon {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		animation: riescade-loading-rotate 2s linear infinite;
+	}
 }
 
 @keyframes riescade-loading-rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 @keyframes riescade-loading-pulse {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
+
+	0%,
+	100% {
+		opacity: 0.5;
+	}
+
+	50% {
+		opacity: 1;
+	}
 }
 
 @keyframes riescade-loading-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }

@@ -1,11 +1,12 @@
 <div data-riescade-view="gamelist">
   <link rel="stylesheet" href="./assets/css/gamelist.css" />
+  <link rel="stylesheet" href="./assets/css/animate.css" />
 
-  <!-- Camadas de Fundo -->
-  <div class="gamelist-bg-layer">
-    <div class="gamelist-bg-layer gamelist-bg-default {game:fanart ? '' : 'gamelist-empty-fanart'}" style="background-image: url('{game:fanart ? {game:fanart} : './assets/arts/{system:theme}.webp'}')"></div>
-    <div class="gamelist-bg-layer gamelist-overlay"></div>
-  </div>
+ 	<!-- FANART & OVERLAY -->
+	<div class="system-fanart animate__animated animate__fadeIn" data-riescade-key="game">
+		<img class="system-image-fanart" decoding="async" src="{game:fanart ? {game:fanart} : './assets/arts/{system:theme}.webp'}" />
+		<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
+	</div>
 
   <!-- HEADER GLOBAL -->
   <div class="riescade-header">
@@ -30,7 +31,7 @@
   <!-- Conteúdo da Gamelist -->
   <div class="gamelist-main-content">
     <div class="gamelist-left-col">
-      <div class="thumbnail-container" data-riescade-key="game">
+      <div class="thumbnail-container animate__animated animate__fadeInLeft" data-riescade-key="game">
         <img
           src="{system:isCollections ? '' : '{game:thumbnail}'}"
           class="gamelist-thumbnail"
@@ -38,7 +39,7 @@
         />
       </div>
 
-      <div class="gamelist-meta {system:isCollections ? 'hide' : ''}" data-riescade-key="game">
+      <div class="gamelist-meta  animate__animated animate__fadeIn {system:isCollections ? 'hide' : ''}" data-riescade-key="game">
         <h2 class="gamelist-meta-title">{game:name}</h2>
         <div class="gamelist-meta-info">{game:releasedate ? '{game:releasedate:Y},' : ''} {game:developer ? '{game:developer}' : ''}</div>
       </div>
