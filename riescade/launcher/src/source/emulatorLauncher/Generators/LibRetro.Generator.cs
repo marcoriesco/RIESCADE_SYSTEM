@@ -30,7 +30,19 @@ namespace EmulatorLauncher.Libretro
 
         public string LogFile
         {
-            get { return Path.Combine(Path.GetDirectoryName(Program.AppConfig.GetFullPath("home")), "logs", "es_launch_stdout.log"); }
+            get
+            {
+                string home = Program.AppConfig.GetFullPath("home");
+                if (string.IsNullOrEmpty(home))
+                {
+                    string defaultHome = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    return Path.Combine(defaultHome, "logs", "es_launch_stdout.log");
+                }
+                string homeDir = Path.GetDirectoryName(home);
+                if (string.IsNullOrEmpty(homeDir))
+                    homeDir = home;
+                return Path.Combine(homeDir, "logs", "es_launch_stdout.log");
+            }
         }
 
         public override int RunAndWait(ProcessStartInfo path)

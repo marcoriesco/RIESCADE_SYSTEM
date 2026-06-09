@@ -245,6 +245,15 @@
       ]
     },
     {
+      "name": "citron-cmd",
+      "inputs": [
+        {
+          "name": "hotkey start",
+          "key": "(%{CLOSE})"
+        }
+      ]
+    },
+    {
       "name": "CorsixTH",
       "inputs": [
         {

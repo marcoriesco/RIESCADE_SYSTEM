@@ -176,6 +176,48 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [showInputModal, setShowInputModal] = useState(false)
   const [activeInputField, setActiveInputField] = useState<string>('')
   const [inputValue, setInputValue] = useState('')
+  const [gameDynamicFeatures, setGameDynamicFeatures] = useState<{ general: any[]; advanced: any[] } | null>(null)
+
+  const loadFeaturesForGameEmulator = useCallback((g: Game, currentSettings: Record<string, any>) => {
+    let resolvedEmulator = ''
+    let resolvedCore = ''
+    const activeEmulator = g.emulator || 'auto'
+    if (activeEmulator !== 'auto') {
+      if (activeEmulator.includes(':')) {
+        const parts = activeEmulator.split(':')
+        resolvedEmulator = parts[0]
+        resolvedCore = parts[1] || ''
+      } else {
+        resolvedEmulator = activeEmulator
+        resolvedCore = g.core || ''
+      }
+    } else {
+      // Fall back to system-level or default emulator
+      const sysEmulator = currentSettings[`${system.name}.emulator`]?.value || ''
+      const sysCore = currentSettings[`${system.name}.core`]?.value || ''
+      if (sysEmulator && sysEmulator !== 'auto') {
+        resolvedEmulator = sysEmulator
+        resolvedCore = sysCore || ''
+      } else if (system.emulators?.[0]) {
+        resolvedEmulator = system.emulators[0].name
+        const rawCore = system.emulators[0].cores?.[0]
+        resolvedCore = rawCore ? (typeof rawCore === 'string' ? rawCore : ((rawCore as any)?.name || String(rawCore))) : ''
+      }
+    }
+
+    if (resolvedEmulator) {
+      window.api.getEmulatorFeatures(system.name, resolvedEmulator, resolvedCore || undefined)
+        .then((result: { general: any[]; advanced: any[] }) => {
+          setGameDynamicFeatures(result)
+        })
+        .catch((err: any) => {
+          console.error('[GameOptions] Failed to load features:', err)
+          setGameDynamicFeatures({ general: [], advanced: [] })
+        })
+    } else {
+      setGameDynamicFeatures({ general: [], advanced: [] })
+    }
+  }, [system])
 
   useEffect(() => {
     if (scraperStage !== 2 || scraperMatches.length === 0) return
@@ -385,84 +427,145 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           })
           return opts
         })()
-      },
-      {
-        id: 'game_ratio',
-        label: 'GAME ASPECT RATIO',
-        type: 'select',
-        settingName: 'ratio',
-        value: getGameSettingValue('ratio', 'auto'),
-        items: [
-          { label: t('AUTO'), value: 'auto' }, 
-          { label: '4/3', value: '4/3' }, 
-          { label: '16/9', value: '16/9' },
-          { label: '16/10', value: '16/10' }, 
-          { label: '16/15', value: '16/15' },
-          { label: '21/9', value: '21/9' },
-          { label: '1/1', value: '1/1' },
-          { label: '2/1', value: '2/1' },
-          { label: '3/2', value: '3/2' },
-          { label: '3/4', value: '3/4' },
-          { label: '4/1', value: '4/1' },
-          { label: '9/16', value: '9/16' },
-          { label: '5/4', value: '5/4' },
-          { label: '6/5', value: '6/5' },
-          { label: '7/9', value: '7/9' },
-          { label: '8/3', value: '8/3' },
-          { label: '8/7', value: '8/7' },
-          { label: '19/12', value: '19/12' },
-          { label: '19/14', value: '19/14' },
-          { label: '30/17', value: '30/17' },
-          { label: '32/9', value: '32/9' },
-          { label: 'Config', value: 'config' },
-          { label: 'Square pixel', value: 'squarepixel' },
-          { label: 'Core provided', value: 'core' },
-          { label: 'Custom', value: 'custom' },
-          { label: 'FULL', value: 'full' }
-        ]
-      },
-      {
-        id: 'game_shaderset',
-        label: 'SHADER SET',
-        type: 'select',
-        settingName: 'shaderset',
-        value: getGameSettingValue('shaderset', 'auto'),
-        items: [
-          { label: 'AUTO', value: 'auto' },
-          { label: 'NONE', value: 'none' },
-          { label: 'RIESCADE', value: '[riescade]' },
-          { label: 'CRT-NEW-PIXIE', value: 'crt-new-pixie' },
-          { label: 'CRT-ROYALE', value: 'crt-royale' },
-          { label: 'CURVATURE', value: 'curvature' },
-          { label: 'ENHANCED', value: 'enhanced' },
-          { label: 'FLATTEN-GLOW', value: 'flatten-glow' },
-          { label: 'HANDHELD', value: 'handheld' },
-          { label: 'NTSC', value: 'ntsc' },
-          { label: 'RETRO', value: 'retro' },
-          { label: 'SCALEFX', value: 'scalefx' },
-          { label: 'SCANLINES', value: 'scanlines' },
-          { label: 'ZFAST', value: 'zfast' }
-        ]
-      },
-      {
-        id: 'game_bezel',
-        label: 'DECORATIONS',
-        type: 'select',
-        settingName: 'bezel',
-        value: getGameSettingValue('bezel', 'auto'),
-        items: [
-          { label: 'AUTO', value: 'auto' },
-          { label: 'NONE', value: 'none' }
-        ]
-      },
-      {
-        id: 'game_smooth',
-        label: t('SMOOTH GAMES (BILINEAR FILTERING)'),
-        type: 'toggle',
-        settingName: 'smooth',
-        value: getGameSettingValue('smooth', 'auto') === 'true' || getGameSettingValue('smooth', 'auto') === true
       }
     ]
+
+    const featureToMenuItem = (f: any) => {
+      const featureSettingName = f.value.startsWith('global.') 
+        ? f.value.replace('global.', '')
+        : f.value
+
+      const description = f.description ? (t(f.description) || f.description) : undefined
+
+      if (f.preset === 'switch') {
+        return {
+          id: `game_feat_${f.value}`,
+          label: t(f.name) || f.name,
+          type: 'toggle' as const,
+          settingName: featureSettingName,
+          description,
+          value: getGameSettingValue(featureSettingName, 'auto') === 'true' || getGameSettingValue(featureSettingName, 'auto') === true
+        }
+      } else if (f.preset === 'switchauto') {
+        return {
+          id: `game_feat_${f.value}`,
+          label: t(f.name) || f.name,
+          type: 'select' as const,
+          settingName: featureSettingName,
+          description,
+          value: getGameSettingValue(featureSettingName, 'auto'),
+          items: [
+            { label: t('AUTO'), value: 'auto' },
+            { label: t('ON'), value: 'true' },
+            { label: t('OFF'), value: 'false' }
+          ]
+        }
+      } else if (f.choices && f.choices.length > 0) {
+        return {
+          id: `game_feat_${f.value}`,
+          label: t(f.name) || f.name,
+          type: 'select' as const,
+          settingName: featureSettingName,
+          description,
+          value: getGameSettingValue(featureSettingName, 'auto'),
+          items: [
+            { label: t('AUTO'), value: 'auto' },
+            ...f.choices.map((c: any) => ({
+              label: String(t(c.name) || c.name || c.value || '').toUpperCase(),
+              value: String(c.value ?? '')
+            }))
+          ]
+        }
+      } else {
+        return {
+          id: `game_feat_${f.value}`,
+          label: t(f.name) || f.name,
+          type: 'toggle' as const,
+          settingName: featureSettingName,
+          description,
+          value: getGameSettingValue(featureSettingName, 'auto') === 'true' || getGameSettingValue(featureSettingName, 'auto') === true
+        }
+      }
+    }
+
+    // Add dynamic features from features.json
+    if (gameDynamicFeatures) {
+      const generalFeatures = gameDynamicFeatures.general || []
+      if (generalFeatures.length > 0) {
+        advancedSubmenu.push({
+          id: 'group_general_settings',
+          label: t('GENERAL SETTINGS') || 'GENERAL SETTINGS',
+          type: 'group'
+        })
+        generalFeatures.forEach((f: any) => {
+          const item = featureToMenuItem(f)
+          if (item) advancedSubmenu.push(item)
+        })
+      }
+
+      const advancedFeatures = gameDynamicFeatures.advanced || []
+      if (advancedFeatures.length > 0) {
+        advancedSubmenu.push({
+          id: 'group_advanced_settings',
+          label: t('ADVANCED SETTINGS') || 'ADVANCED SETTINGS',
+          type: 'group'
+        })
+
+        // Group advanced features by submenu
+        const submenusMap: Record<string, any[]> = {}
+        const directAdvancedFeatures: any[] = []
+
+        advancedFeatures.forEach((f: any) => {
+          if (f.submenu) {
+            const subName = f.submenu
+            if (!submenusMap[subName]) {
+              submenusMap[subName] = []
+            }
+            submenusMap[subName].push(f)
+          } else {
+            directAdvancedFeatures.push(f)
+          }
+        })
+
+        // Gather submenus in order of appearance
+        const submenuOrder: string[] = []
+        advancedFeatures.forEach((f: any) => {
+          if (f.submenu && !submenuOrder.includes(f.submenu)) {
+            submenuOrder.push(f.submenu)
+          }
+        })
+
+        submenuOrder.forEach((subName) => {
+          const subFeatures = submenusMap[subName]
+          const subItems: any[] = []
+          subFeatures.forEach((f: any) => {
+            const item = featureToMenuItem(f)
+            if (item) subItems.push(item)
+          })
+
+          if (subItems.length > 0) {
+            advancedSubmenu.push({
+              id: `game_submenu_${subName.toLowerCase().replace(/\s+/g, '_')}`,
+              label: (t(subName) || subName).toUpperCase(),
+              type: 'submenu',
+              submenu: subItems
+            })
+          }
+        })
+
+        // Direct advanced features (without submenu)
+        directAdvancedFeatures.forEach((f: any) => {
+          const item = featureToMenuItem(f)
+          if (item) advancedSubmenu.push(item)
+        })
+      }
+    } else {
+      advancedSubmenu.push({
+        id: 'game_features_loading',
+        label: t('LOADING...'),
+        type: 'info'
+      })
+    }
 
     items.push({
       id: 'advanced_game_options',
@@ -497,6 +600,10 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           setCustomCollections(customCols)
           window.api.getCollectionsForGame(game.system || system.name, game.path).then(gameCols => {
             setGameCollections(gameCols)
+
+            // Load dynamic features for the game's current emulator
+            loadFeaturesForGameEmulator(game, s)
+
             const rootItems = getRootItems(game, gameCols, system, customCols, s)
             setActiveMenuStack([{ items: rootItems, title: 'GAME OPTIONS' }])
             setSelectedIndex(getFirstSelectableIndex(rootItems))
@@ -523,9 +630,46 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
   }, [metadataSelectedIndex, showMetadataEditor, isOpen])
 
+  // Auto-scroll to selected menu item
+  useEffect(() => {
+    if (isOpen && !showMetadataEditor && scraperStage === 0) {
+      const selectedEl = document.querySelector('.riescade-menu-overlay.visible .riescade-menu-item.selected')
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+      }
+    }
+  }, [selectedIndex, activeMenuStack, isOpen, showMetadataEditor, scraperStage])
+
+  // Regenerate menu when dynamic features arrive
+  useEffect(() => {
+    if (isOpen && gameDynamicFeatures && activeMenuStack.length > 0) {
+      const rootItems = getRootItems(draftGame, gameCollections, system, customCollections, settings)
+      setActiveMenuStack(prev => {
+        const nextStack = [...prev]
+        nextStack[0] = { ...nextStack[0], items: rootItems }
+        for (let i = 1; i < nextStack.length; i++) {
+          const parentId = nextStack[i].parentItemId
+          const parentItem = nextStack[i - 1].items.find((it: any) => it.id === parentId)
+          if (parentItem && parentItem.submenu) {
+            nextStack[i] = { ...nextStack[i], items: parentItem.submenu }
+          }
+        }
+        return nextStack
+      })
+    }
+  }, [gameDynamicFeatures])
+
   const currentStackItem = activeMenuStack[activeMenuStack.length - 1]
   const currentMenu = currentStackItem ? (currentStackItem.tabs && currentStackItem.activeTab !== undefined ? currentStackItem.items.filter(item => item.tab === currentStackItem.activeTab) : currentStackItem.items) : []
   const menuTitle = currentStackItem?.title || 'GAME OPTIONS'
+
+  useEffect(() => {
+    const bottomButtonsCount = activeMenuStack.length <= 1 ? 0 : 1
+    const totalSelectables = currentMenu.length + bottomButtonsCount
+    if (totalSelectables > 0 && selectedIndex >= totalSelectables) {
+      setSelectedIndex(getFirstSelectableIndex(currentMenu))
+    }
+  }, [currentMenu.length, selectedIndex, activeMenuStack.length])
 
   const handleToggle = () => {
     const item = currentMenu[selectedIndex]
@@ -588,6 +732,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         const updated = { ...draftGame, emulator, core }
         setDraftGame(updated)
         onUpdate(updated)
+        loadFeaturesForGameEmulator(updated, settings)
         setActiveMenuStack(prev => {
           const rootItems = getRootItems(updated, gameCollections, system, customCollections, settings)
           const nextStack = [...prev]
@@ -646,6 +791,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           const updated = { ...draftGame, emulator, core }
           setDraftGame(updated)
           onUpdate(updated)
+          loadFeaturesForGameEmulator(updated, settings)
           setActiveMenuStack(prev => {
             const rootItems = getRootItems(updated, gameCollections, system, customCollections, settings)
             const nextStack = [...prev]
@@ -697,7 +843,24 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   }
 
   const getBottomButtons = () => {
-    return []
+    if (activeMenuStack.length <= 1) return []
+    const buttons: { id: string; label: string; onClick: () => void }[] = []
+    buttons.push({
+      id: 'back_btn',
+      label: t('BACK'),
+      onClick: () => {
+        if (activeMenuStack.length > 1) {
+          setActiveMenuStack(prev => prev.slice(0, -1))
+          const parentItem = activeMenuStack[activeMenuStack.length - 2]
+          const parentItems = parentItem?.items || []
+          const savedIdx = parentItem?.savedSelectedIndex
+          setSelectedIndex(savedIdx !== undefined ? savedIdx : getFirstSelectableIndex(parentItems))
+        } else {
+          onClose()
+        }
+      }
+    })
+    return buttons
   }
 
   const confirmDelete = useCallback(
@@ -1759,9 +1922,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     )
   }
 
+  const isAdvancedMenu = activeMenuStack.some(
+    item => item.parentItemId === 'advanced_game_options' || item.title === 'ADVANCED GAME OPTIONS'
+  )
+
   return (
     <>
-      <div className={`riescade-overlay riescade-menu-overlay ${showMetadataEditor ? 'game-options-metatada game-options-metadata' : 'game-options-root'} ${visible && scraperStage === 0 ? 'visible' : ''}`}>
+      <div className={`riescade-overlay riescade-menu-overlay ${showMetadataEditor ? 'game-options-metatada game-options-metadata' : (isAdvancedMenu ? 'game-options-advanced' : 'game-options-root')} ${visible && scraperStage === 0 ? 'visible' : ''}`}>
         {!showMetadataEditor && scraperStage === 0 && (
           <div className="riescade-menu-container">
             <div className="riescade-menu-header">
@@ -1770,12 +1937,20 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                   <img src={marqueeUrl} alt="Game Marquee" className="riescade-menu-marquee" />
                 </div>
               ) : (
-                <>
-                  <h2 className="riescade-menu-title">{menuTitle}</h2>
-                  <div className="riescade-menu-subtitle">{game.name}</div>
-                </>
+                <h2 className="riescade-menu-title">
+                  {menuTitle === 'GAME OPTIONS' || menuTitle === 'ADVANCED GAME OPTIONS'
+                    ? game.name.toUpperCase()
+                    : menuTitle}
+                </h2>
               )}
-              {marqueeUrl && menuTitle !== 'GAME OPTIONS' && (
+              
+              <div className="riescade-menu-subtitle">
+                {menuTitle === 'GAME OPTIONS' || menuTitle === 'ADVANCED GAME OPTIONS' || menuTitle === game.name.toUpperCase()
+                  ? (system.fullname || system.name).toUpperCase()
+                  : game.name.toUpperCase()}
+              </div>
+
+              {marqueeUrl && menuTitle !== 'GAME OPTIONS' && menuTitle !== 'ADVANCED GAME OPTIONS' && (
                 <h2 className="riescade-menu-title" style={{ marginTop: '10px' }}>{menuTitle}</h2>
               )}
 
@@ -1812,6 +1987,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                     <button
                       key={btn.id}
                       className={`riescade-button ${isSelected ? 'selected' : ''}`}
+                      onMouseMove={(e) => {
+                        if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
+                          setLastMousePos({ x: e.clientX, y: e.clientY })
+                          const targetIdx = currentMenu.length + btnIdx
+                          if (selectedIndex !== targetIdx) setSelectedIndex(targetIdx)
+                        }
+                      }}
                       onClick={(e) => {
                         e.stopPropagation()
                         btn.onClick()
@@ -1823,17 +2005,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 })}
               </div>
             )}
-
-            <div className="riescade-menu-footer">
-              {bottomButtons.length === 0 && (
-                <div className="riescade-menu-footer-actions">
-                  <div className="riescade-menu-footer-action">
-                    <span className="riescade-menu-footer-button">B</span>
-                    <span className="riescade-menu-footer-text">BACK</span>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         )}
         {showMetadataEditor && scraperStage === 0 && renderMetadataEditor()}

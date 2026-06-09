@@ -473,7 +473,7 @@ namespace EmulatorLauncher
             app.Input.Add(new PadToKeyInput() { Name = InputKey.up, Code = "KEY_UP" });
             mapping.Applications.Add(app);
 
-            _joy = new JoystickListener(Program.Controllers.Where(c => c.Config.DeviceName != "Keyboard").ToArray(), mapping);
+            _joy = new JoystickListener(Program.Controllers.Where(c => c.Config != null && c.Config.DeviceName != "Keyboard").ToArray(), mapping);
         }
 
         protected override void Dispose(bool disposing)

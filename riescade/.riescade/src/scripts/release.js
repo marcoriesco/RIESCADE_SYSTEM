@@ -182,7 +182,6 @@ async function run() {
     'system/configgen',
     'system/download',
     'system/modules',
-    'system/resources',
     'system/scripts',
     'system/templates'
   ];

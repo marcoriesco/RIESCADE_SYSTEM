@@ -382,7 +382,7 @@ function App() {
 			window.removeEventListener('keydown', handleKeyDown);
 			window.removeEventListener('riescade-play-nav-sound', handleCustomNavSound);
 		};
-	}, [theme, settings.EnableSounds]);
+	}, [theme, settings.EnableSounds?.value]);
 
 	// Background Music Player Loop Controller
 	useEffect(() => {
@@ -490,11 +490,11 @@ function App() {
 		selectedSystem, 
 		musicFiles, 
 		musicPath, 
-		settings['audio.bgmusic'], 
-		settings['audio.thememusics'], 
-		settings['audio.persystem'], 
-		settings['audio.useFavoriteMusic'], 
-		settings['audio.favoriteSongs'],
+		settings['audio.bgmusic']?.value, 
+		settings['audio.thememusics']?.value, 
+		settings['audio.persystem']?.value, 
+		settings['audio.useFavoriteMusic']?.value, 
+		settings['audio.favoriteSongs']?.value,
 		theme,
 		isInitializing,
 		playTrack
@@ -513,7 +513,13 @@ function App() {
 			
 		const targetVol = shouldDuck ? baseVol * 0.15 : baseVol;
 		bgMusicRef.current.volume = targetVol;
-	}, [selectedSystem, currentGame, settings.MusicVolume, settings.VideoLowersMusic, settings.VideoAudio]);
+	}, [
+		selectedSystem,
+		currentGame,
+		settings.MusicVolume?.value,
+		settings.VideoLowersMusic?.value,
+		settings.VideoAudio?.value
+	]);
 
 
 	// Listen for systems loading progress from the main process
@@ -1122,7 +1128,7 @@ function App() {
 		} else {
 			setIsLoadingGames(false);
 		}
-	}, [selectedSystem, systems, settings.SystemsGrouped]);
+	}, [selectedSystem, systems, settings.SystemsGrouped?.value]);
 
 	// Load games when collection selected
 	useEffect(() => {
@@ -1256,7 +1262,7 @@ function App() {
 			const artWebpUrl = `file:///${themePathClean}/assets/arts/${sysName}.webp`;
 			preloadImage(artWebpUrl);
 		});
-	}, [filteredSystems, systemIndex, theme, settings.SmartCache]);
+	}, [filteredSystems, systemIndex, theme, settings.SmartCache?.value]);
 
 	// Restore StartupSystem / LastSystem and handle StartOnGamelist on startup
 	useEffect(() => {
@@ -2256,7 +2262,7 @@ function App() {
 		}, 1000);
 
 		return () => clearInterval(interval);
-	}, [settings, isLaunching, isInitializing, isMenuOpen]);
+	}, [settings.ScreenSaverTime?.value, isLaunching, isInitializing, isMenuOpen]);
 
 	const handleVideoEnded = useCallback(() => {
 		window.api.getRandomGameWithMedia('video').then((game: any) => {
@@ -2300,7 +2306,7 @@ function App() {
 			const slideInterval = setInterval(fetchSlideGame, 10000);
 			return () => clearInterval(slideInterval);
 		}
-	}, [isScreensaverActive, settings]);
+	}, [isScreensaverActive, settings.ScreenSaverType?.value]);
 
 	// ─── Start screen: render once, update progress via DOM refs to avoid flickering ───
 	const startScreenRef = useRef<HTMLDivElement>(null);

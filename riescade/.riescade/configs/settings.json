@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "switch",
+    "value": "arcade",
     "type": "string"
   },
   "MaxVRAM": {

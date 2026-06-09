@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using EmulatorLauncher.Common;
@@ -22,7 +22,10 @@ namespace EmulatorLauncher
 
             string path = AppConfig.GetFullPath(emulator);
 
-            string exe = Path.Combine(path, "citron.exe");
+            string exe = Path.Combine(path, "citron-cmd.exe");
+            if (!File.Exists(exe))
+                exe = Path.Combine(path, "citron.exe");
+
             if (!File.Exists(exe))
                 return null;
 

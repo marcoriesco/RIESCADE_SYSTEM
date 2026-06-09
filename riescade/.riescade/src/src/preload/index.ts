@@ -27,6 +27,8 @@ const api = {
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSetting: (name: string, value: any, type: 'string' | 'bool' | 'int' | 'float') =>
     ipcRenderer.invoke('save-setting', name, value, type),
+  getEmulatorFeatures: (systemName: string, emulatorName: string, coreName?: string) =>
+    ipcRenderer.invoke('get-emulator-features', systemName, emulatorName, coreName),
   getHostname: () => ipcRenderer.invoke('get-hostname'),
   getBiosInformation: () => ipcRenderer.invoke('get-bios-information'),
   getSystemInformation: () => ipcRenderer.invoke('get-system-information'),

@@ -238,6 +238,9 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
   const [hostname, setHostname] = useState('localhost')
   const bluetoothScanTimeoutRef = useRef<any>(null)
+  const [dynamicFeatures, setDynamicFeatures] = useState<Record<string, { general: any[]; advanced: any[] }>>({})
+  const dynamicFeaturesRef = useRef(dynamicFeatures)
+  dynamicFeaturesRef.current = dynamicFeatures
 
   const pendingSettingsRef = useRef(pendingSettings)
   pendingSettingsRef.current = pendingSettings
@@ -337,6 +340,82 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     return sys.fullname || sys.name.toUpperCase()
   }
 
+  const loadFeaturesForSystem = useCallback((systemName: string, emulatorName: string, coreName?: string) => {
+    const cacheKey = `${systemName}:${emulatorName || 'auto'}:${coreName || ''}`
+    if (dynamicFeaturesRef.current[cacheKey]) return
+    // Mark as loading to prevent duplicate requests
+    setDynamicFeatures(prev => ({ ...prev, [cacheKey]: { general: [], advanced: [] } }))
+    window.api.getEmulatorFeatures(systemName, emulatorName, coreName)
+      .then((result: { general: any[]; advanced: any[] }) => {
+        setDynamicFeatures(prev => ({ ...prev, [cacheKey]: result }))
+      })
+      .catch((err: any) => {
+        console.error('[Menu] Failed to load features for', cacheKey, err)
+      })
+  }, [])
+
+  const featuresToMenuItems = (features: any[], systemName: string, prefix: string): MenuItem[] => {
+    return features.map((f: any) => {
+      const settingName = f.value.startsWith('global.') 
+        ? `${systemName}.${f.value.replace('global.', '')}`
+        : (f.value.includes('.') ? f.value : `${systemName}.${f.value}`)
+
+      // Determine type based on preset and choices
+      if (f.preset === 'switch') {
+        return {
+          id: `${prefix}_${f.value}`,
+          label: t(f.name) || f.name,
+          type: 'toggle' as const,
+          settingName,
+          settingType: 'bool' as const,
+          description: f.description ? t(f.description) || f.description : undefined
+        }
+      }
+
+      if (f.preset === 'switchauto') {
+        return {
+          id: `${prefix}_${f.value}`,
+          label: t(f.name) || f.name,
+          type: 'select' as const,
+          settingName,
+          description: f.description ? t(f.description) || f.description : undefined,
+          options: [
+            { label: t('AUTO'), value: '' },
+            { label: t('ON'), value: 'true' },
+            { label: t('OFF'), value: 'false' }
+          ]
+        }
+      }
+
+      if (f.choices && f.choices.length > 0) {
+        return {
+          id: `${prefix}_${f.value}`,
+          label: t(f.name) || f.name,
+          type: 'select' as const,
+          settingName,
+          description: f.description ? t(f.description) || f.description : undefined,
+          options: [
+            { label: t('AUTO'), value: '' },
+            ...f.choices.map((c: any) => ({
+              label: String(t(c.name) || c.name || c.value || '').toUpperCase(),
+              value: String(c.value ?? '')
+            }))
+          ]
+        }
+      }
+
+      // Default: toggle
+      return {
+        id: `${prefix}_${f.value}`,
+        label: t(f.name) || f.name,
+        type: 'toggle' as const,
+        settingName,
+        settingType: 'bool' as const,
+        description: f.description ? t(f.description) || f.description : undefined
+      }
+    })
+  }
+
   const getThemeSetting = (name: string, fallback: any = ''): any => {
     return themeSettings[name] ?? fallback
   }
@@ -421,6 +500,25 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         
         return next
       })
+
+      // Reload dynamic features for the newly selected emulator
+      if (newEmulator) {
+        const sys = allSystems.find(s => s.name === sysName)
+        const resolvedEmu = newEmulator || (sys?.emulators?.[0]?.name ?? '')
+        const resolvedCore = newCore || ''
+        if (resolvedEmu) {
+          loadFeaturesForSystem(sysName, resolvedEmu, resolvedCore || undefined)
+        }
+      } else {
+        // User selected AUTO - resolve default emulator
+        const sys = allSystems.find(s => s.name === sysName)
+        if (sys?.emulators?.[0]) {
+          const defaultEmu = sys.emulators[0].name
+          const rawCore = sys.emulators[0].cores?.[0]
+          const defaultCore = rawCore ? (typeof rawCore === 'string' ? rawCore : (rawCore?.name || String(rawCore))) : ''
+          loadFeaturesForSystem(sysName, defaultEmu, defaultCore || undefined)
+        }
+      }
       return
     }
 
@@ -584,7 +682,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       nextStack.push(prevItem)
     }
     return nextStack
-  }, [favoriteSongsList, rawBiosData, installedSystems, biosViewMode, realSystemInfo])
+  }, [favoriteSongsList, rawBiosData, installedSystems, biosViewMode, realSystemInfo, dynamicFeatures])
 
   // Update menu when settings/themes change
   useEffect(() => {
@@ -602,7 +700,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
     rawBiosData,
     installedSystems,
     biosViewMode,
-    realSystemInfo
+    realSystemInfo,
+    dynamicFeatures
   ])
 
   // Helpers for checklist selection
@@ -946,7 +1045,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             id: 'reload_gamelist', 
             label: t('UPDATE GAMELIST'), 
             description: showReloadSystem 
-              ? `${t('UPDATE_GAMELIST_OF')} ${(selectedSystem.fullname || selectedSystem.name).toUpperCase()}`
+              ? `${t('UPDATE GAMELIST OF')} ${(selectedSystem.fullname || selectedSystem.name).toUpperCase()}`
               : undefined,
             type: 'action', 
             onClick: () => {
@@ -1498,123 +1597,90 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               const systemsSource = allSystems || []
               const realSystems = systemsSource.filter(isGameSystem)
 
-              return realSystems.map(sys => ({
-                id: `sys_adv_${sys.name}`,
-                label: (sys.fullname || sys.name).toUpperCase(),
-                submenu: [
-                  {
-                    id: `sys_adv_${sys.name}_emulator`,
-                    label: t('EMULATOR'),
-                    type: 'select',
-                    settingName: `${sys.name}.emulator`,
-                    options: (() => {
-                      const opts = [{ label: t('AUTO'), value: '' }]
-                      sys.emulators?.forEach((e: any) => {
-                        if (e.cores && e.cores.length > 0) {
-                          e.cores.forEach((c: any) => {
-                            opts.push({
-                              label: `${e.name.toUpperCase()}: ${String(c).toUpperCase()}`,
-                              value: `${e.name}:${c}`
-                            })
-                          })
-                        } else {
-                          opts.push({
-                            label: e.name.toUpperCase(),
-                            value: e.name
-                          })
-                        }
-                      })
-                      return opts
-                    })()
-                  },
-                  {
-                    id: `sys_adv_${sys.name}_ratio`,
-                    label: t('GAME ASPECT RATIO'),
-                    type: 'select',
-                    settingName: `${sys.name}.ratio`,
-                    options: [
-                      { label: t('AUTO'), value: '' },
-                      { label: '4/3', value: '4/3' }, 
-                      { label: '16/9', value: '16/9' },
-                      { label: '16/10', value: '16/10' }, 
-                      { label: '16/15', value: '16/15' },
-                      { label: '21/9', value: '21/9' },
-                      { label: '1/1', value: '1/1' },
-                      { label: '2/1', value: '2/1' },
-                      { label: '3/2', value: '3/2' },
-                      { label: '3/4', value: '3/4' },
-                      { label: '4/1', value: '4/1' },
-                      { label: '9/16', value: '9/16' },
-                      { label: '5/4', value: '5/4' },
-                      { label: '6/5', value: '6/5' },
-                      { label: '7/9', value: '7/9' },
-                      { label: '8/3', value: '8/3' },
-                      { label: '8/7', value: '8/7' },
-                      { label: '19/12', value: '19/12' },
-                      { label: '19/14', value: '19/14' },
-                      { label: '30/17', value: '30/17' },
-                      { label: '32/9', value: '32/9' },
-                      { label: 'Config', value: 'config' },
-                      { label: 'Square pixel', value: 'squarepixel' },
-                      { label: 'Core provided', value: 'core' },
-                      { label: 'Custom', value: 'custom' },
-                      { label: 'FULL', value: 'full' }                    ]
-                  },
-                  {
-                    id: `sys_adv_${sys.name}_shaderset`,
-                    label: t('SHADER SET'),
-                    type: 'select',
-                    settingName: `${sys.name}.shaderset`,
-                    options: [
-                      { label: t('AUTO'), value: '' },
-                      { label: t('NONE'), value: 'none' },
-                      { label: 'RIESCADE', value: '[riescade]' },
-                      { label: 'CRT-NEW-PIXIE', value: 'crt-new-pixie' },
-                      { label: 'CRT-ROYALE', value: 'crt-royale' },
-                      { label: 'CURVATURE', value: 'curvature' },
-                      { label: 'ENHANCED', value: 'enhanced' },
-                      { label: 'FLATTEN-GLOW', value: 'flatten-glow' },
-                      { label: 'HANDHELD', value: 'handheld' },
-                      { label: 'NTSC', value: 'ntsc' },
-                      { label: 'NTSC-256PX', value: 'ntsc-256px' },
-                      { label: 'NTSC-320PX', value: 'ntsc-320px' },
-                      { label: 'NTSC-NES', value: 'ntsc-nes' },
-                      { label: 'NTSC-SVIDEO', value: 'ntsc-svideo' },
-                      { label: 'NTSC-VCR', value: 'ntsc-vcr' },
-                      { label: 'RETRO', value: 'retro' },
-                      { label: 'SCALEFX', value: 'scalefx' },
-                      { label: 'SCALEFX-AA', value: 'scalefx-aa' },
-                      { label: 'SCALEFX-HYBRID', value: 'scalefx-hybrid' },
-                      { label: 'SCALEHQ', value: 'scalehq' },
-                      { label: 'SCANLINES', value: 'scanlines' },
-                      { label: 'SINDENBORDER', value: 'sindenborder' },
-                      { label: 'TECHNICOLOR', value: 'technicolor' },
-                      { label: 'TVOUT', value: 'tvout' },
-                      { label: 'TVOUT-INTERLACING', value: 'tvout-interlacing' },
-                      { label: 'VHS', value: 'vhs' },
-                      { label: 'XBRZ-5X', value: 'xbrz-5x' },
-                      { label: 'ZFAST', value: 'zfast' }
-                    ]
-                  },
-                  {
-                    id: `sys_adv_${sys.name}_bezel`,
-                    label: t('DECORATIONS'),
-                    type: 'select',
-                    settingName: `${sys.name}.bezel`,
-                    options: [
-                      { label: t('AUTO'), value: '' },
-                      { label: t('NONE'), value: 'none' }
-                    ]
-                  },
-                  {
-                    id: `sys_adv_${sys.name}_smooth`,
-                    label: t('SMOOTH GAMES (BILINEAR FILTERING)'),
-                    type: 'toggle',
-                    settingName: `${sys.name}.smooth`,
-                    settingType: 'bool'
+              return realSystems.map(sys => {
+                // Resolve current emulator and core for this system
+                const emuSetting = getSetting(`${sys.name}.emulator`, '')
+                const coreSetting = getSetting(`${sys.name}.core`, '')
+                let resolvedEmulator = ''
+                let resolvedCore = ''
+                
+                if (emuSetting && emuSetting !== 'auto') {
+                  if (emuSetting.includes(':')) {
+                    const parts = emuSetting.split(':')
+                    resolvedEmulator = parts[0]
+                    resolvedCore = parts[1]
+                  } else {
+                    resolvedEmulator = emuSetting
+                    resolvedCore = coreSetting || ''
                   }
-                ]
-              }))
+                } else if (sys.emulators && sys.emulators.length > 0) {
+                  // Use first emulator as default
+                  resolvedEmulator = sys.emulators[0].name
+                  if (sys.emulators[0].cores && sys.emulators[0].cores.length > 0) {
+                    const firstCore = sys.emulators[0].cores[0]
+                    resolvedCore = typeof firstCore === 'string' ? firstCore : (firstCore?.name || String(firstCore))
+                  }
+                }
+
+                const cacheKey = `${sys.name}:${resolvedEmulator || 'auto'}:${resolvedCore || ''}`
+                const cached = dynamicFeatures[cacheKey]
+                
+                // Trigger loading if not cached
+                if (!cached && resolvedEmulator) {
+                  setTimeout(() => loadFeaturesForSystem(sys.name, resolvedEmulator, resolvedCore || undefined), 0)
+                }
+
+                // Build dynamic feature items
+                const dynamicItems: MenuItem[] = []
+                if (cached) {
+                  const generalItems = featuresToMenuItems(cached.general, sys.name, `sys_adv_${sys.name}_gen`)
+                  const advancedItems = featuresToMenuItems(cached.advanced, sys.name, `sys_adv_${sys.name}_adv`)
+                  
+                  if (generalItems.length > 0) {
+                    dynamicItems.push({ id: `sys_adv_${sys.name}_group_general`, label: t('GENERAL SETTINGS'), type: 'group' })
+                    dynamicItems.push(...generalItems)
+                  }
+                  if (advancedItems.length > 0) {
+                    dynamicItems.push({ id: `sys_adv_${sys.name}_group_advanced`, label: t('ADVANCED SETTINGS'), type: 'group' })
+                    dynamicItems.push(...advancedItems)
+                  }
+                } else if (resolvedEmulator) {
+                  dynamicItems.push({ id: `sys_adv_${sys.name}_loading`, label: t('LOADING...'), type: 'info' })
+                }
+
+                return {
+                  id: `sys_adv_${sys.name}`,
+                  label: (sys.fullname || sys.name).toUpperCase(),
+                  submenu: [
+                    {
+                      id: `sys_adv_${sys.name}_emulator`,
+                      label: t('EMULATOR'),
+                      type: 'select',
+                      settingName: `${sys.name}.emulator`,
+                      options: (() => {
+                        const opts = [{ label: t('AUTO'), value: '' }]
+                        sys.emulators?.forEach((e: any) => {
+                          if (e.cores && e.cores.length > 0) {
+                            e.cores.forEach((c: any) => {
+                              opts.push({
+                                label: `${e.name.toUpperCase()}: ${String(c).toUpperCase()}`,
+                                value: `${e.name}:${c}`
+                              })
+                            })
+                          } else {
+                            opts.push({
+                              label: e.name.toUpperCase(),
+                              value: e.name
+                            })
+                          }
+                        })
+                        return opts
+                      })()
+                    },
+                    ...dynamicItems
+                  ]
+                }
+              })
             })()
           }
         ]

@@ -21,6 +21,7 @@ declare global {
       loadTheme: (themeName: string) => Promise<any>
       getSettings: () => Promise<any>
       saveSetting: (name: string, value: any, type: string) => Promise<any>
+      getEmulatorFeatures: (systemName: string, emulatorName: string, coreName?: string) => Promise<any>
       getThemeSettings: (themeName: string) => Promise<any>
       saveThemeSetting: (themeName: string, key: string, value: string) => Promise<any>
       getConfiguredControllers: () => Promise<any>

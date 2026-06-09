@@ -2554,7 +2554,7 @@
 
 .riescade-metadata-input-range {
   width: 100%;
-  accent-color: var(--theme-color, #ff007f);
+  accent-color: var(--theme-color);
   cursor: pointer;
 }
 
@@ -2567,6 +2567,18 @@ textarea.riescade-metadata-input {
   min-height: 120px;
   font-family: inherit;
   resize: vertical;
+}
+
+.game-options-advanced .riescade-menu-marquee {
+  display: none !important;
+}
+.game-options-advanced .riescade-menu-subtitle {
+  font-size: 1.8rem !important;
+  font-weight: 800 !important;
+  color: var(--theme-color) !important;
+}
+.game-options-advanced .riescade-menu-title {
+  font-size: 1.5rem !important;
 }
 
 @keyframes blink {

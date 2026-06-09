@@ -18,6 +18,7 @@ import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from './services/ScraperService'
 import { setupLogger } from './utils/logger'
 import { RomsWatcherService } from './services/RomsWatcherService'
+import { FeaturesService } from './services/FeaturesService'
 
 setupLogger()
 
@@ -28,6 +29,7 @@ const settingsParser = new SettingsParser()
 const systemService = new SystemService(libraryService)
 const sassService = new SassService()
 const scraperService = new ScraperService(libraryService)
+const featuresService = new FeaturesService()
 
 let activeControllers: any[] = []
 let themeWatcher: FSWatcher | null = null
@@ -255,6 +257,10 @@ app.whenReady().then(() => {
 
   ipcMain.handle('save-setting', async (_, name: string, value: any, type: 'string' | 'bool' | 'int' | 'float') => {
     return settingsParser.saveSetting(name, value, type)
+  })
+
+  ipcMain.handle('get-emulator-features', async (_, systemName: string, emulatorName: string, coreName?: string) => {
+    return featuresService.getFeaturesFor(systemName, emulatorName, coreName)
   })
 
   // ─── IPC: Theme Settings ───

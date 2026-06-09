@@ -39,7 +39,7 @@ namespace EmulatorLauncher
             { new Installer("chihiro", "chihiro", "cxbx.exe") },
             { new Installer("chihiro-gun", "chihiro-ds", "cxbx.exe") },
             { new Installer("citra", "citra", "citra-qt.exe") },
-            { new Installer("citron", "citron", "citron.exe") },
+            { new Installer("citron", new string[] { "citron" }, new string[] { "citron-cmd.exe", "citron.exe" }) },
             { new Installer("corsixth", "corsixth", "CorsixTH.exe") },
             { new Installer("cxbx", new string[] { "cxbx-reloaded", "cxbx-r" }, "cxbx.exe") },
             { new Installer("daphne") },

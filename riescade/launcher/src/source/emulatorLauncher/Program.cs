@@ -750,7 +750,7 @@ namespace EmulatorLauncher
                             SimpleLogger.Instance.Info("[Running]  " + path.FileName);
 
                         using (new HighPerformancePowerScheme())
-                        using (var joy = new JoystickListener(Controllers.Where(c => c.Config.DeviceName != "Keyboard").ToArray(), mapping))
+                        using (var joy = new JoystickListener(Controllers.Where(c => c.Config != null && c.Config.DeviceName != "Keyboard").ToArray(), mapping))
                         {
                             int exitCode = generator.RunAndWait(path);
                             if (exitCode != 0 && !joy.ProcessKilled)
