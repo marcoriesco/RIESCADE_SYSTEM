@@ -187,7 +187,9 @@ async function run() {
   ];
 
   for (const folder of extraFolders) {
-    const src = path.join(projectRoot, folder);
+    const src = folder === 'emulators'
+      ? path.join(projectRoot, 'emulators_release')
+      : path.join(projectRoot, folder);
     if (fs.existsSync(src) && fs.statSync(src).isDirectory()) {
       copyRecursiveSync(src, path.join(tempDir, folder));
       console.log(`   ✓ ${folder}/`);

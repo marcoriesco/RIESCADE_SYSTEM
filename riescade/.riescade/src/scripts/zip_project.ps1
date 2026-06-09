@@ -98,7 +98,7 @@ foreach ($folder in $emptyFolders) {
 # --- ADDITIONAL ROOT FOLDERS (sounds, decorations, cheats, system, user, emulators) ---
 $extraFolders = @('sounds', 'decorations', 'cheats', 'system', 'user', 'emulators')
 foreach ($folder in $extraFolders) {
-    $src = Join-Path $projectRoot $folder
+    $src = if ($folder -eq 'emulators') { Join-Path $projectRoot 'emulators_release' } else { Join-Path $projectRoot $folder }
     if (Test-Path $src) {
         Copy-Item -Path $src -Destination (Join-Path $temp $folder) -Recurse -Force
         Write-Host "   [OK] $folder/"

@@ -47,6 +47,7 @@ yarn-error.log*
 roms
 bios
 emulators
+emulators_release
 saves/
 screenshots/
 records/
