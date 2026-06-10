@@ -1,4 +1,5 @@
 {
   "colors": "#9f0043",
-  "controller": "ps4"
+  "controller": "ps4",
+  "system_type": "carousel"
 }

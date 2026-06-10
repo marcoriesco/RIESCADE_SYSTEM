@@ -16,7 +16,8 @@
 .system-fanart {
 
 	.system-image-fanart,
-	.system-image-overlay {
+	.system-image-overlay,
+  	.system-image-default {
 		position: fixed;
 		inset: 0;
 		width: 100vw;
@@ -27,6 +28,11 @@
 	.system-image-overlay {
 		z-index: 2;
 	}
+	
+  	.system-image-default {
+		filter: saturate(0) !important;
+		opacity: 0.2 !important;
+  	}
 }
 
 .gamelist-main-content {

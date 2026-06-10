@@ -46,7 +46,7 @@
   filter: saturate(0) !important;
 }
 
-/* CAROUSEL AREA */
+/* GRID AREA */
 .riescade-systems-area {
   position: fixed;
   inset: 0;
@@ -72,7 +72,6 @@
 }
 .riescade-systems-area .main-systems::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
 }
 .riescade-systems-area .main-systems::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1);
@@ -93,7 +92,7 @@
   align-items: center;
   flex-grow: 1;
   padding: 30px;
-  height: 12vh;
+  height: 15vh;
   box-sizing: border-box;
 }
 .riescade-systems-area .riescade-carousel-item.selected {

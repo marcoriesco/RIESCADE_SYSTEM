@@ -102,8 +102,21 @@ export class ThemeService {
       }
     }
 
+    // Load theme settings (needed for conditional templates)
+    const settings = ThemeSettingsParser.getThemeSettings(themeName, themePath)
+
     const getTemplate = (key: string, defaultFile: string): string => {
-      const fileName = metadata.templates?.[key] || defaultFile
+      const templateDef = metadata.templates?.[key]
+      let fileName: string
+
+      // Support conditional templates: { "optionId": "system_type", "carousel": "system_carousel.html", "grid": "system_grid.html" }
+      if (templateDef && typeof templateDef === 'object' && templateDef.optionId) {
+        const optionValue = settings[templateDef.optionId] || ''
+        fileName = templateDef[optionValue] || templateDef.default || defaultFile
+      } else {
+        fileName = templateDef || defaultFile
+      }
+
       const filePath = join(themePath, fileName)
       return existsSync(filePath) ? readFileSync(filePath, 'utf8') : ''
     }
@@ -143,7 +156,7 @@ export class ThemeService {
         start: getTemplate('start', 'start.html')
       },
       options,
-      settings: ThemeSettingsParser.getThemeSettings(themeName, themePath),
+      settings,
       locales,
       defaultLocale: metadata.defaultLocale
     }

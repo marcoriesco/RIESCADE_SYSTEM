@@ -4,7 +4,12 @@
   "author": "Marco Riesco",
   "description": "Tema padrão do RIESCADE Frontend (JS/HTML/CSS)",
   "templates": {
-    "system": "system.html",
+    "system": {
+      "optionId": "system_type",
+      "carousel": "system_carousel.html",
+      "grid": "system_grid.html",
+      "default": "system_carousel.html"
+    },
     "gamelist": "gamelist.html",
     "start": "start.html",
     "loading": "loading.html"
@@ -77,6 +82,22 @@
         }
       ],
       "default": "ps4"
+    },
+    {
+      "id": "system_type",
+      "name": "Mostrar sistemas",
+      "type": "select",
+      "options": [
+        {
+          "value": "carousel",
+          "label": "CAROUSEL"
+        },
+        {
+          "value": "grid",
+          "label": "GRID"
+        }
+      ],
+      "default": "carousel"
     }
   ]
 }

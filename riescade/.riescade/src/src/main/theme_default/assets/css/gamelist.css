@@ -13,7 +13,8 @@
 
 /* 1. FANART */
 .system-fanart .system-image-fanart,
-.system-fanart .system-image-overlay {
+.system-fanart .system-image-overlay,
+.system-fanart .system-image-default {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -22,6 +23,10 @@
 }
 .system-fanart .system-image-overlay {
   z-index: 2;
+}
+.system-fanart .system-image-default {
+  filter: saturate(0) !important;
+  opacity: 0.2 !important;
 }
 
 .gamelist-main-content {

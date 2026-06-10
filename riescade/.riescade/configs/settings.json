@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "naomi2",
+    "value": "emulators",
     "type": "string"
   },
   "MaxVRAM": {

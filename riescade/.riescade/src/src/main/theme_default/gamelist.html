@@ -4,7 +4,7 @@
 
  	<!-- FANART & OVERLAY -->
 	<div class="system-fanart animate__animated animate__fadeIn" data-riescade-key="game">
-		<img class="system-image-fanart" decoding="async" src="{game:fanart ? {game:fanart} : './assets/arts/{system:theme}.webp'}" />
+		<img class="{game:fanart ? 'system-image-fanart' : 'system-image-default' }" decoding="async" src="{game:fanart ? {game:fanart} : './assets/arts/{system:theme}.webp'}" />
 		<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
 	</div>
 
