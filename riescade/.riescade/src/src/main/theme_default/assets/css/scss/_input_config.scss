@@ -7,7 +7,6 @@
 
 /* ─── RIESCADE INPUT CONFIG OVERLAY ─── */
 .input-config-overlay {
-  font-family: "Roboto Condensed", sans-serif;
   flex-direction: column;
   align-items: center !important;
   justify-content: center !important;
@@ -78,8 +77,8 @@
   border: 2.5px solid rgba(255, 255, 255, 0.4);
 
   &.active {
-    background: var(--theme-color, #3b82f6);
-    border-color: var(--theme-color, #3b82f6);
+    background: var(--theme-color);
+    border-color: var(--theme-color);
   }
 }
 
@@ -96,7 +95,7 @@
 
 .input-config-detect-title {
   font-size: 32px;
-  color: var(--theme-color, #3b82f6);
+  color: var(--theme-color);
   letter-spacing: 2px;
   margin: 0 0 10px 0;
   font-weight: 700;
@@ -104,7 +103,7 @@
 
 .input-config-detect-subtitle {
   font-size: 18px;
-  color: var(--theme-color, #3b82f6);
+  color: var(--theme-color);
   letter-spacing: 1px;
   margin: 0 0 50px 0;
   font-weight: 600;
@@ -141,7 +140,7 @@
 
 .input-config-panel-title {
   font-size: 24px;
-  color: var(--theme-color, #3b82f6);
+  color: var(--theme-color);
   letter-spacing: 2px;
   margin: 0 0 5px 0;
   font-weight: 700;
@@ -150,7 +149,7 @@
 
 .input-config-panel-subtitle {
   font-size: 18px;
-  color: var(--theme-color, #3b82f6);
+  color: var(--theme-color);
   letter-spacing: 1px;
   margin: 0 0 5px 0;
   font-weight: 600;
@@ -159,7 +158,7 @@
 
 .input-config-panel-hint {
   font-size: 14px;
-  color: var(--theme-color, #3b82f6);
+  color: var(--theme-color);
   letter-spacing: 1px;
   margin: 0 0 25px 0;
   font-weight: 600;
@@ -178,7 +177,7 @@
 .input-config-skip-fill {
   width: 0%;
   height: 100%;
-  background-color: var(--theme-color, #3b82f6);
+  background-color: var(--theme-color);
   transition: width 0.05s linear;
 }
 
@@ -205,7 +204,7 @@
   transition: background 0.15s ease, color 0.15s ease;
 
   &.active {
-    background-color: var(--theme-color, #3b82f6);
+    background-color: var(--theme-color);
     color: #fff;
     font-weight: bold;
 
@@ -275,9 +274,9 @@
 .input-config-done-btn {
   padding: 8px 24px;
   background: transparent;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid #111;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
   letter-spacing: 1px;
   font-size: 1.2em;
   text-align: center;
@@ -285,8 +284,8 @@
   transition: all 0.2s ease;
 
   &.active {
-    background-color: var(--theme-color, #3b82f6);
-    border-color: var(--theme-color, #3b82f6);
+    background-color: var(--theme-color);
+    border-color: var(--theme-color);
     color: #fff;
   }
 }

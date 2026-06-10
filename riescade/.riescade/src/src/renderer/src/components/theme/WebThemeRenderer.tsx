@@ -51,11 +51,32 @@ const SafeDecodeElement: React.FC<{
       img.src = newSrc
       try {
         await img.decode()
-      } catch { /* ignore decode errors */ }
-      if (active) {
-        // Swap to new image and trigger fade-in
-        setDisplayedSrc(newSrc)
-        setFading(false)
+        if (active) {
+          setDisplayedSrc(newSrc)
+          setFading(false)
+        }
+      } catch {
+        if (active) {
+          const onerrorStr = props['data-onerror']
+          if (onerrorStr && onerrorStr.includes('this.src')) {
+            const match = onerrorStr.match(/this\.src\s*=\s*['"]([^'"]+)['"]/)
+            if (match && match[1]) {
+              const fallbackSrc = match[1]
+              const fallbackImg = new Image()
+              fallbackImg.src = fallbackSrc
+              try {
+                await fallbackImg.decode()
+              } catch {}
+              if (active) {
+                setDisplayedSrc(fallbackSrc)
+                setFading(false)
+              }
+              return
+            }
+          }
+          setDisplayedSrc(newSrc)
+          setFading(false)
+        }
       }
     }
 
@@ -491,7 +512,19 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
           return
         }
 
-        // Skip event handler strings
+        if (name.toLowerCase() === 'onerror') {
+          // Resolve any relative src paths in the onerror script string
+          let resolvedValue = value
+          if (value.includes('this.src =')) {
+            resolvedValue = value.replace(/(this\.src\s*=\s*['"])([^'"]+)(['"])/g, (match, prefix, path, suffix) => {
+              return prefix + resolveLocalPath(path) + suffix
+            })
+          }
+          props['data-onerror'] = resolvedValue
+          return
+        }
+
+        // Skip other event handler strings
         if (name.startsWith('on')) return
 
         // Convert kebab-case attribute names to camelCase for React props
@@ -505,6 +538,33 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         if (propName === 'viewbox') propName = 'viewBox'
         props[propName] = value
       })
+
+      if (props['data-onerror']) {
+        const onerrorStr = props['data-onerror']
+        props.onError = (e: React.SyntheticEvent<HTMLElement, Event>) => {
+          const el = e.currentTarget
+          const s = onerrorStr.trim()
+          
+          if (s.includes('this.src') && s.includes('=')) {
+            const match = s.match(/this\.src\s*=\s*['"]([^'"]+)['"]/i)
+            if (match && match[1]) {
+              ;(el as HTMLImageElement).src = match[1]
+              return
+            }
+          }
+          if (s.includes('this.style.display') && s.includes('none')) {
+            el.style.display = 'none'
+            return
+          }
+          if ((s.includes('this.class') || s.includes('this.className')) && s.includes('hide')) {
+            el.className = (el.className + ' hide').trim()
+            return
+          }
+          
+          // Unrecognized fallback: hide the broken element
+          el.style.display = 'none'
+        }
+      }
 
       // Tracking CSS link loads (no longer needed, but keeping props clean)
       if (tagName === 'link' && props.rel === 'stylesheet') {

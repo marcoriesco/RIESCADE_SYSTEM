@@ -240,7 +240,7 @@
 
 .scraper-modal-container {
     background: rgba(0, 0, 0, 0.65);
-    font-family: "Roboto Condensed", sans-serif;
+    font-family: var(--font-menu);
     font-weight: 400;
     width: 20vw;
     padding: 35px;
@@ -261,7 +261,7 @@
   font-size: 1.4rem;
   font-weight: 900;
   text-align: center;
-  color: var(--theme-color, #f042b0);
+  color: var(--theme-color);
   letter-spacing: 2px;
   text-transform: uppercase;
 }
@@ -286,7 +286,7 @@
 
   &.selected {
     background: rgba(240, 66, 176, 0.1);
-    border-color: var(--theme-color, #f042b0);
+    border-color: var(--theme-color);
   }
 }
 
@@ -311,7 +311,7 @@
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.15s ease;
-  background: var(--theme-color, #f042b0);
+  background: var(--theme-color);
   color: #fff;
   box-shadow: 0 4px 12px rgba(240, 66, 176, 0.3);
 
@@ -334,6 +334,8 @@
 
 /* Stage 2 Fullscreen Redesigned Modal */
 .stage2-overlay {
+  font-family: var(--font-menu);
+  color: #fff;
   background: rgba(0, 0, 0, 0.85) !important;
   backdrop-filter: blur(20px) !important;
   z-index: 10000000 !important;
@@ -341,8 +343,6 @@
   justify-content: space-between !important;
   flex-direction: column;
   padding: 40px 60px;
-  font-family: 'Inter', sans-serif;
-  color: #fff;
   box-sizing: border-box;
   animation: scraper-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -393,7 +393,7 @@
 .scraper-db-group-title {
   font-size: 0.85rem;
   font-weight: 900;
-  color: #ff007f;
+  color: var(--theme-color);
   letter-spacing: 2px;
   margin-bottom: 12px;
   text-transform: uppercase;
@@ -414,7 +414,7 @@
   }
 
   &.selected {
-    background: #a3004f;
+    background: var(--theme-color);
 
     .match-name {
       color: #fff;
@@ -568,8 +568,8 @@
   letter-spacing: 1px;
 
   &:hover {
-    background: #ff007f;
-    border-color: #ff007f;
+    background: var(--theme-color);
+    border-color: var(--theme-color);
     box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
   }
 }
@@ -640,7 +640,7 @@
 
 .riescade-metadata-editor-title {
   margin: 0;
-  color: var(--theme-color, #ff007f);
+  color: var(--theme-color);
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -648,7 +648,7 @@
 }
 
 .riescade-metadata-editor-path {
-  color: var(--theme-color, #ff007f);
+  color: var(--theme-color);
   font-size: 0.9rem;
   margin-top: 5px;
   font-weight: bold;
@@ -678,7 +678,7 @@
   box-sizing: border-box;
 
   &.selected {
-    background: var(--theme-color, #ff007f);
+    background: var(--theme-color);
     color: #fff;
 
     .riescade-metadata-field-label {
@@ -721,7 +721,7 @@
   cursor: pointer;
 
   &.on {
-    background: var(--theme-color, #ff007f);
+    background: var(--theme-color);
   }
 
   &.selected-row {
@@ -748,7 +748,7 @@
   }
 
   &.selected-row {
-    background: var(--theme-color, #ff007f);
+    background: var(--theme-color);
   }
 }
 
@@ -789,9 +789,9 @@
   min-width: 100px;
 
   &.selected {
-    background: var(--theme-color, #ff007f);
+    background: var(--theme-color);
     color: #fff;
-    border-color: var(--theme-color, #ff007f);
+    border-color: var(--theme-color);
   }
 }
 
@@ -815,7 +815,7 @@
 }
 
 .riescade-metadata-modal-btn-save {
-  background: var(--theme-color, #ff007f);
+  background: var(--theme-color);
   color: #fff;
   border: none;
   padding: 8px 20px;
@@ -849,7 +849,7 @@
 
 .riescade-metadata-input-container {
   background: #141414;
-  border: 2px solid var(--theme-color, #ff007f);
+  border: 2px solid var(--theme-color);
   border-radius: 10px;
   width: 500px;
   padding: 25px;
@@ -863,7 +863,7 @@
 .riescade-metadata-input-title {
   font-size: 1.2rem;
   font-weight: bold;
-  color: var(--theme-color, #ff007f);
+  color: var(--theme-color);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -897,7 +897,6 @@ textarea.riescade-metadata-input {
   font-family: inherit;
   resize: vertical;
 }
-
 
 .game-options-advanced {
   .riescade-menu-marquee {

@@ -848,7 +848,7 @@
     "type": "string"
   },
   "SystemsGrouped": {
-    "value": "apple2,2ship,bennugd,bstone,bsyndrome,cavestory,cannonball,theforceengine,superbroswar,starship,sonicretro,sonic3-air,sonic-mania,soh,rtcw,reminiscence,powerbomberman,prboom,quake2,quake,quake3,raze,opengoal,openjazz,openlara,pdark,ports,corsixth,devilutionx,dinothawr,doom3,ecwolf,easyrpg,eduke32,gemrb,gzdoom,halflife,cdogs,cgenius,dusklight",
+    "value": "apple2,2ship,bennugd,bstone,bsyndrome,cavestory,cannonball,theforceengine,superbroswar,starship,sonicretro,sonic3-air,sonic-mania,soh,rtcw,reminiscence,powerbomberman,prboom,quake2,quake,quake3,raze,opengoal,openjazz,openlara,pdark,ports,corsixth,devilutionx,dinothawr,doom3,ecwolf,easyrpg,eduke32,gemrb,gzdoom,halflife,cdogs,cgenius,dusklight,ghostship",
     "type": "string"
   },
   "OptionsMenu": {
@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "emulators",
+    "value": "namco2x6",
     "type": "string"
   },
   "MaxVRAM": {

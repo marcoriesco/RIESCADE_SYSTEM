@@ -73,7 +73,8 @@ export class DatabaseService {
         theme         TEXT,
         hardware      TEXT,
         last_scan_at  INTEGER,
-        folder_mtime  INTEGER
+        folder_mtime  INTEGER,
+        file_count    INTEGER
       );
 
       CREATE TABLE IF NOT EXISTS games (
@@ -131,19 +132,31 @@ export class DatabaseService {
       CREATE INDEX IF NOT EXISTS idx_games_developer ON games(developer);
       CREATE INDEX IF NOT EXISTS idx_games_hidden ON games(hidden);
     `)
+
+    // Schema migration: Add file_count if it doesn't exist
+    try {
+      db.prepare("SELECT file_count FROM systems LIMIT 1").get()
+    } catch {
+      try {
+        db.exec("ALTER TABLE systems ADD COLUMN file_count INTEGER")
+        console.log("Database table 'systems' altered to add 'file_count' column.")
+      } catch (err) {
+        console.error("Failed to alter systems table to add file_count column:", err)
+      }
+    }
   }
 
   // ─── Sync Detection ─────────────────────────────────────────
 
   /**
    * Check if a system needs re-indexing by comparing the folder's
-   * modification time with the stored value in the database.
+   * modification time and file count with the stored values in the database.
    */
   public needsSync(systemName: string, systemPath: string): boolean {
     const db = this.ensureOpen()
 
     // System not in DB → needs first sync
-    const row = db.prepare('SELECT folder_mtime FROM systems WHERE name = ?').get(systemName) as any
+    const row = db.prepare('SELECT folder_mtime, file_count FROM systems WHERE name = ?').get(systemName) as any
     if (!row) return true
 
     // Folder doesn't exist → skip (will be filtered by SystemsParser)
@@ -151,7 +164,8 @@ export class DatabaseService {
 
     try {
       const currentMtime = statSync(systemPath).mtimeMs
-      return currentMtime !== row.folder_mtime
+      const currentFileCount = readdirSync(systemPath).length
+      return currentMtime !== (row.folder_mtime || 0) || currentFileCount !== (row.file_count || 0)
     } catch {
       return true
     }
@@ -191,6 +205,14 @@ export class DatabaseService {
     try {
       if (existsSync(system.path)) {
         folderMtime = statSync(system.path).mtimeMs
+      }
+    } catch {}
+
+    // Get current immediate file count
+    let fileCount = 0
+    try {
+      if (existsSync(system.path)) {
+        fileCount = readdirSync(system.path).length
       }
     } catch {}
 
@@ -276,9 +298,20 @@ export class DatabaseService {
       )
     `)
 
+    // Modern SQLite UPSERT instead of INSERT OR REPLACE
     const upsertSystem = db.prepare(`
-      INSERT OR REPLACE INTO systems (name, fullname, path, extension, platform, theme, hardware, last_scan_at, folder_mtime)
-      VALUES (@name, @fullname, @path, @extension, @platform, @theme, @hardware, @last_scan_at, @folder_mtime)
+      INSERT INTO systems (name, fullname, path, extension, platform, theme, hardware, last_scan_at, folder_mtime, file_count)
+      VALUES (@name, @fullname, @path, @extension, @platform, @theme, @hardware, @last_scan_at, @folder_mtime, @file_count)
+      ON CONFLICT(name) DO UPDATE SET
+        fullname = excluded.fullname,
+        path = excluded.path,
+        extension = excluded.extension,
+        platform = excluded.platform,
+        theme = excluded.theme,
+        hardware = excluded.hardware,
+        last_scan_at = excluded.last_scan_at,
+        folder_mtime = excluded.folder_mtime,
+        file_count = excluded.file_count
     `)
 
     const runTransaction = db.transaction(() => {
@@ -344,7 +377,8 @@ export class DatabaseService {
         theme: system.theme || system.name,
         hardware: system.hardware || 'console',
         last_scan_at: Date.now(),
-        folder_mtime: folderMtime
+        folder_mtime: folderMtime,
+        file_count: fileCount
       })
     })
 
@@ -397,16 +431,47 @@ export class DatabaseService {
         onProgress(sys.name, i + 1, total)
       }
     }
+
+    // Sync __systems.json config metadata
+    const configPath = getConfigPath()
+    const systemsJsonPath = join(configPath, 'systems.json')
+    let systemsJsonMtime = 0
+    try {
+      if (existsSync(systemsJsonPath)) {
+        systemsJsonMtime = statSync(systemsJsonPath).mtimeMs
+      }
+    } catch {}
+
+    db.prepare(`
+      INSERT INTO systems (name, fullname, path, extension, platform, theme, hardware, last_scan_at, folder_mtime, file_count)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(name) DO UPDATE SET
+        folder_mtime = excluded.folder_mtime,
+        last_scan_at = excluded.last_scan_at
+    `).run(
+      '__systems.json',
+      'Systems Configuration File',
+      systemsJsonPath,
+      '',
+      '',
+      '',
+      'system',
+      Date.now(),
+      systemsJsonMtime,
+      0
+    )
+
     // Orphan Cleanup: delete games and systems that are no longer in the active systems list
     const activeNames = realSystems.map(s => s.name)
     if (activeNames.length > 0) {
       const placeholders = activeNames.map(() => '?').join(',')
       db.prepare(`DELETE FROM games WHERE system NOT IN (${placeholders})`).run(...activeNames)
-      db.prepare(`DELETE FROM systems WHERE name NOT IN (${placeholders})`).run(...activeNames)
+      db.prepare(`DELETE FROM systems WHERE name NOT IN (${placeholders}, '__systems.json')`).run(...activeNames)
     } else {
       db.prepare('DELETE FROM games').run()
       db.prepare('DELETE FROM systems').run()
     }
+
     if (isFirstRun) {
       const totalGames = this.getTotalGameCount()
       console.log(`\n✅ Indexing complete: ${totalGames} games across ${realSystems.length} systems`)
@@ -918,6 +983,62 @@ export class DatabaseService {
     } catch (e) {
       console.error('Failed to get all media paths from database:', e)
       return []
+    }
+  }
+
+  /**
+   * Get sync metadata for a single system.
+   */
+  public getSystemSyncMetadata(name: string): { name: string; path: string; folder_mtime: number; file_count: number } | null {
+    const db = this.ensureOpen()
+    try {
+      const row = db.prepare('SELECT name, path, folder_mtime, file_count FROM systems WHERE name = ?').get(name) as any
+      return row ? {
+        name: row.name,
+        path: row.path,
+        folder_mtime: row.folder_mtime || 0,
+        file_count: row.file_count || 0
+      } : null
+    } catch {
+      try {
+        const row = db.prepare('SELECT name, path, folder_mtime FROM systems WHERE name = ?').get(name) as any
+        return row ? {
+          name: row.name,
+          path: row.path,
+          folder_mtime: row.folder_mtime || 0,
+          file_count: 0
+        } : null
+      } catch {
+        return null
+      }
+    }
+  }
+
+  /**
+   * Get sync metadata (mtime and file count) for all systems except __systems.json.
+   */
+  public getAllSystemsSyncMetadata(): { name: string; path: string; folder_mtime: number; file_count: number }[] {
+    const db = this.ensureOpen()
+    try {
+      const rows = db.prepare("SELECT name, path, folder_mtime, file_count FROM systems WHERE name != '__systems.json'").all() as any[]
+      return rows.map(r => ({
+        name: r.name,
+        path: r.path,
+        folder_mtime: r.folder_mtime || 0,
+        file_count: r.file_count || 0
+      }))
+    } catch {
+      try {
+        const rows = db.prepare("SELECT name, path, folder_mtime FROM systems WHERE name != '__systems.json'").all() as any[]
+        return rows.map(r => ({
+          name: r.name,
+          path: r.path,
+          folder_mtime: r.folder_mtime || 0,
+          file_count: 0
+        }))
+      } catch {
+        return []
+      }
     }
   }
 }

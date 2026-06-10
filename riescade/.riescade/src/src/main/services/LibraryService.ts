@@ -515,10 +515,77 @@ export class LibraryService {
       dbService.open()
     }
 
-    // Fast path: DB already indexed, skip re-sync and just load cached data
-    const isDbAlreadyIndexed = useDb && !forcePhysicalScan && dbService.getIndexedSystemCount() > 0
+    // Perform robust fast-path validation without parsing systems.json upfront
+    let needsSync = false
+    let changedSystemsCount = 0
+    let systemsCheckedCount = 0
+
+    if (useDb && !forcePhysicalScan && dbService.getIndexedSystemCount() > 0) {
+      console.log('[SyncCheck] Starting startup synchronization check...')
+      
+      const configPath = getConfigPath()
+      const systemsJsonPath = join(configPath, 'systems.json')
+      let currentSystemsJsonMtime = 0
+      try {
+        if (existsSync(systemsJsonPath)) {
+          currentSystemsJsonMtime = statSync(systemsJsonPath).mtimeMs
+        }
+      } catch {}
+
+      // Check systems.json modification
+      const systemsJsonRecord = dbService.getSystemSyncMetadata('__systems.json')
+      if (!systemsJsonRecord) {
+        console.log('[SyncCheck] Virtual record for systems.json not found in DB. Sync required.')
+        needsSync = true
+      } else if (currentSystemsJsonMtime !== systemsJsonRecord.folder_mtime) {
+        console.log(`[SyncCheck] systems.json was modified: DB mtime ${systemsJsonRecord.folder_mtime} vs Disk mtime ${currentSystemsJsonMtime}. Sync required.`)
+        needsSync = true
+      }
+
+      if (!needsSync) {
+        const syncMetadata = dbService.getAllSystemsSyncMetadata()
+        for (const sys of syncMetadata) {
+          if (sys.path.startsWith('virtual://') || sys.name === 'collections') continue
+          
+          systemsCheckedCount++
+          const folderExists = existsSync(sys.path)
+          if (!folderExists) {
+            console.log(`[SyncCheck] Folder for system ${sys.name} does not exist at ${sys.path}. Sync required.`)
+            needsSync = true
+            changedSystemsCount++
+            continue
+          }
+
+          let currentMtime = 0
+          let currentFileCount = 0
+          try {
+            currentMtime = statSync(sys.path).mtimeMs
+            currentFileCount = readdirSync(sys.path).length
+          } catch (err) {
+            console.error(`[SyncCheck] Failed to stat or read directory for system ${sys.name}:`, err)
+            needsSync = true
+            changedSystemsCount++
+            continue
+          }
+
+          const mtimeMatches = currentMtime === sys.folder_mtime
+          const fileCountMatches = currentFileCount === sys.file_count
+
+          if (!mtimeMatches || !fileCountMatches) {
+            console.log(`[SyncCheck] System '${sys.name}' changed: mtime matches: ${mtimeMatches} (${sys.folder_mtime} vs ${currentMtime}), fileCount matches: ${fileCountMatches} (${sys.file_count} vs ${currentFileCount})`)
+            needsSync = true
+            changedSystemsCount++
+          }
+        }
+      }
+    } else if (useDb) {
+      needsSync = true // First run or forced scan
+    }
+
+    // Fast path: DB already indexed and no modifications detected, skip re-sync and just load cached data
+    const isDbAlreadyIndexed = useDb && !forcePhysicalScan && dbService.getIndexedSystemCount() > 0 && !needsSync
     if (isDbAlreadyIndexed) {
-      console.log('[Perf] SQLite fast path: DB already indexed, skipping sync')
+      console.log(`[SyncCheck] All ${systemsCheckedCount} systems are up-to-date. SQLite fast path active.`)
       sendProgress(10, 'LOADING_PLATFORMS')
 
       // Only recalculate auto-collection counts from DB (fast SQL queries)
@@ -539,6 +606,10 @@ export class LibraryService {
       LibraryService.isPreloaded = true
       sendProgress(100, 'READY')
       return
+    }
+
+    if (useDb && changedSystemsCount > 0) {
+      console.log(`[SyncCheck] ${changedSystemsCount}/${systemsCheckedCount} system(s) require synchronization. Initiating re-indexing.`)
     }
 
     const isFirstRun = useDb && dbService.getIndexedSystemCount() === 0

@@ -122,6 +122,7 @@ namespace EmulatorLauncher
             { "pcsx2", () => new Pcsx2Generator() },
             { "pcsx2qt", () => new Pcsx2Generator() },
             { "pcsx2-16", () => new Pcsx2Generator() },
+            { "pcsx2x6", () => new Pcsx2x6Generator() },
             { "pdark", () => new PDarkGenerator() },
             { "phoenix", () => new PhoenixGenerator() },
             { "pico8", () => new Pico8Generator() },

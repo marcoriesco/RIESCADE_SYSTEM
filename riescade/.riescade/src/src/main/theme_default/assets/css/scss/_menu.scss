@@ -628,7 +628,7 @@
 }
 
 .stage2-overlay {
-    font-family: "Roboto Condensed", sans-serif !important;
+    font-family: var(--font-menu) !important;
     padding-top: 40px !important;
 }
 
@@ -711,7 +711,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--theme-color, #3b82f6) !important;
+  border-top-color: var(--theme-color) !important;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 20px auto;
@@ -743,7 +743,7 @@
   width: 100%;
   padding: 12px;
   font-size: 1.2rem;
-  border: 2px solid var(--theme-color, #3b82f6) !important;
+  border: 2px solid var(--theme-color) !important;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.5);
   color: #fff;

@@ -3598,15 +3598,15 @@
       "name": "namco2x6",
       "fullname": "Namco 246/256",
       "path": "~\\..\\roms\\namco2x6",
-      "extension": ".zip .m3u",
+      "extension": ".acgame",
       "command": "\"%HOME%\\emulatorLauncher.exe\" -gameinfo %GAMEINFOXML% %CONTROLLERSCONFIG% -system %SYSTEM% -emulator %EMULATOR% -core %CORE% -rom %ROM%",
       "platform": "arcade",
       "theme": "namco2x6",
       "hardware": "arcade",
       "emulators": [
         {
-          "name": "play",
-          "cores": []
+          "name": "pcsx2x6",
+          "source": "https://github.com/PS2Homebrew-arcade/pcsx2x6/releases"
         },
         {
           "name": "teknoparrot",
@@ -5107,6 +5107,23 @@
       "emulators": [
         {
           "name": "dusklight",
+          "cores": []
+        }
+      ]
+    },
+    {
+      "name": "ghostship",
+      "fullname": "Ghostship",
+      "path": "~\\..\\roms\\ghostship",
+      "extension": ".z64",
+      "command": "\"%HOME%\\emulatorLauncher.exe\" -gameinfo %GAMEINFOXML% %CONTROLLERSCONFIG% -system %SYSTEM% -emulator %EMULATOR% -core %CORE% -rom %ROM%",
+      "platform": "n64",
+      "theme": "ghostship",
+      "hardware": "port",
+      "group": "n64recomp",
+      "emulators": [
+        {
+          "name": "ghostship",
           "cores": []
         }
       ]

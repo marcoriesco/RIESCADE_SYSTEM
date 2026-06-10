@@ -400,6 +400,7 @@
     <Compile Include="Generators\Pcsx2.Wheels.cs">
       <DependentUpon>Pcsx2.Generator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Generators\Pcsx2x6.Generator.cs" />
     <Compile Include="Generators\Phoenix.Generator.cs" />
     <Compile Include="Generators\Phoenix.Controllers.cs">
       <DependentUpon>Phoenix.Generator.cs</DependentUpon>

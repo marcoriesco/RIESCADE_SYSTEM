@@ -34,7 +34,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 4px;
-  animation: riescadeNotificationSlideIn 0.3s ease-out forwards;
+  animation: NotificationSlideIn 0.3s ease-out forwards;
 
   &.controller.connected {
     color: var(--theme-color);
@@ -52,7 +52,7 @@
   letter-spacing: 0.2px;
 }
 
-@keyframes riescadeNotificationSlideIn {
+@keyframes NotificationSlideIn {
   from { transform: translateY(-30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }

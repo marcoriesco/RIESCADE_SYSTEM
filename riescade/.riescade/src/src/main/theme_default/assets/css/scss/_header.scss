@@ -1,0 +1,195 @@
+// HEADER
+.riescade-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 12vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2vw;
+  box-sizing: border-box;
+  z-index: 100;
+
+  .system-name {
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    text-shadow: var(--font-shadow);
+
+    .custom-title {
+      display: none;
+    }
+
+    .fallback-title {
+      display: inline;
+    }
+
+    &.system-emulators {
+      .fallback-title {
+        display: none;
+      }
+
+      .emulators-title {
+        display: inline;
+      }
+
+      .system-gamecount {
+        .fallback-count {
+          display: none;
+        }
+
+        .emulators-count {
+          display: inline;
+        }
+      }
+    }
+
+    &.system-collections {
+      .fallback-title {
+        display: none;
+      }
+
+      .collections-title {
+        display: inline;
+      }
+
+      .system-gamecount {
+        .fallback-count {
+          display: none;
+        }
+
+        .collections-count {
+          display: inline;
+        }
+      }
+    }
+
+    &.system-favorites {
+      .fallback-title {
+        display: none;
+      }
+
+      .favorites-title {
+        display: inline;
+      }
+    }
+
+    &.system-library {
+      .fallback-title {
+        display: none;
+      }
+
+      .library-title {
+        display: inline;
+      }
+
+      .system-gamecount {
+        .fallback-count {
+          display: none;
+        }
+
+        .library-count {
+          display: inline;
+        }
+      }
+    }
+
+    &.system-screenshots {
+      .fallback-title {
+        display: none;
+      }
+
+      .screenshots-title {
+        display: inline;
+      }
+
+      .system-gamecount {
+        .fallback-count {
+          display: none;
+        }
+
+        .screenshots-count {
+          display: inline;
+        }
+      }
+    }
+
+    &.system-magazine {
+      .fallback-title {
+        display: none;
+      }
+
+      .magazine-title {
+        display: inline;
+      }
+
+      .system-gamecount {
+        .fallback-count {
+          display: none;
+        }
+
+        .magazine-count {
+          display: inline;
+        }
+      }
+    }
+
+    &.system-all {
+      .fallback-title {
+        display: none;
+      }
+
+      .all-title {
+        display: inline;
+      }
+    }
+  }
+
+  .system-gamecount {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--theme-color);
+    text-align: center;
+    text-shadow: var(--font-shadow);
+
+    .custom-count {
+      display: none;
+    }
+
+    .fallback-count {
+      display: inline;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .user-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-shadow: var(--font-shadow);
+    }
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid var(--theme-color);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.6), 0 0 4px rgba(255, 255, 255, 0.4);
+      object-fit: cover;
+    }
+  }
+}
