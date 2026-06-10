@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { WebThemeRenderer } from './components/theme/WebThemeRenderer';
+import { getNextGridIndex } from './components/theme/utils';
 import { Menu } from './components/Menu';
 import { GameOptionsOverlay } from './components/GameOptionsOverlay';
 import { LaunchScreen } from './components/LaunchScreen';
@@ -2024,27 +2025,53 @@ function App() {
 			e.preventDefault();
 			if (!selectedSystem) {
 				if (filteredSystems.length === 0) return;
-				const systemHtml = theme?.views?.system || '';
-				const isVertical = systemHtml.includes('type="vertical"');
+				const systemGridEl = document.querySelector('[data-riescade-grid="system"]');
+				const isGrid = systemGridEl ? systemGridEl.getAttribute('data-riescade-mode') === 'grid' : false;
 
-				if (isVertical) {
-					if (key === 'arrowdown') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
-					if (key === 'arrowup') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
+				if (isGrid) {
+					const direction = key.replace('arrow', '') as 'up' | 'down' | 'left' | 'right';
+					const nextIndex = getNextGridIndex(
+						'[data-riescade-grid="system"]',
+						'.riescade-carousel-item',
+						systemIndex,
+						direction
+					);
+					setSystemIndex(nextIndex);
 				} else {
-					if (key === 'arrowright') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
-					if (key === 'arrowleft') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
+					const systemHtml = theme?.views?.system || '';
+					const isVertical = systemHtml.includes('type="vertical"');
+					if (isVertical) {
+						if (key === 'arrowdown') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
+						if (key === 'arrowup') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
+					} else {
+						if (key === 'arrowright') setSystemIndex((prev) => (prev + 1) % filteredSystems.length);
+						if (key === 'arrowleft') setSystemIndex((prev) => (prev - 1 + filteredSystems.length) % filteredSystems.length);
+					}
 				}
 			} else {
 				if (games.length === 0) return;
-				const gamelistHtml = theme?.views?.gamelist || '';
-				const isHorizontal = gamelistHtml.includes('type="horizontal"');
+				const gamelistGridEl = document.querySelector('[data-riescade-grid="gamelist"]');
+				const isGrid = gamelistGridEl ? gamelistGridEl.getAttribute('data-riescade-mode') === 'grid' : false;
 
-				if (isHorizontal) {
-					if (key === 'arrowright') setSelectedGameIndex((prev) => (prev + 1) % games.length);
-					if (key === 'arrowleft') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+				if (isGrid) {
+					const direction = key.replace('arrow', '') as 'up' | 'down' | 'left' | 'right';
+					const nextIndex = getNextGridIndex(
+						'[data-riescade-grid="gamelist"]',
+						'.riescade-carousel-item',
+						selectedGameIndex,
+						direction
+					);
+					setSelectedGameIndex(nextIndex);
 				} else {
-					if (key === 'arrowdown') setSelectedGameIndex((prev) => (prev + 1) % games.length);
-					if (key === 'arrowup') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+					const gamelistHtml = theme?.views?.gamelist || '';
+					const isHorizontal = gamelistHtml.includes('type="horizontal"');
+					if (isHorizontal) {
+						if (key === 'arrowright') setSelectedGameIndex((prev) => (prev + 1) % games.length);
+						if (key === 'arrowleft') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+					} else {
+						if (key === 'arrowdown') setSelectedGameIndex((prev) => (prev + 1) % games.length);
+						if (key === 'arrowup') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+					}
 				}
 			}
 			return;

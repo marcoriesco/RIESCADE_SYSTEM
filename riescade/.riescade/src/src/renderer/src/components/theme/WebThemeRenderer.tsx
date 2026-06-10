@@ -563,11 +563,11 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       
       const { key: _, ...restProps } = props
 
-      if (tagName === 'riescade-system-carousel') {
+      if (tagName === 'riescade-systems') {
         return <WebCarouselElement {...restProps} key={index} isGame={false} data={data} themePath={themePath} />
       }
 
-      if (tagName === 'riescade-game-carousel') {
+      if (tagName === 'riescade-gamelists') {
         return <WebCarouselElement {...restProps} key={index} isGame={true} data={data} themePath={themePath} />
       }
 

@@ -2,10 +2,10 @@ import React from 'react'
 import { resolvePath } from '../utils'
 
 interface Props {
-  type: string
+  type?: string
   direction?: string
   mediaSource?: string
-  itemsCount: number
+  itemsCount?: number
   data: any
   themePath: string
   isGame: boolean
@@ -20,6 +20,10 @@ interface Props {
   gap?: number
   itemWidth?: number
   itemHeight?: number
+  className?: string
+  class?: string
+  style?: React.CSSProperties
+  mode?: string
 }
 
 export const WebCarouselElement: React.FC<Props> = ({
@@ -39,7 +43,11 @@ export const WebCarouselElement: React.FC<Props> = ({
   itemBackgroundSource = './assets/arts',
   gap = 20,
   itemWidth = 385,
-  itemHeight = 385
+  itemHeight = 385,
+  className,
+  class: classProp,
+  style,
+  mode
 }) => {
   const items = isGame ? (data?.games || []) : (data?.systems || [])
   const currentItemName = isGame ? data?.path : data?.['system.name']
@@ -49,8 +57,89 @@ export const WebCarouselElement: React.FC<Props> = ({
   )
   const safeSelectedIndex = selectedIndex === -1 ? 0 : selectedIndex
 
-  const distance = 100 / itemsCount
-  const halfCount = Math.floor(itemsCount / 2)
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const isCarousel = mode === 'carousel'
+
+  React.useEffect(() => {
+    if (!isCarousel && containerRef.current) {
+      const itemsEls = containerRef.current.querySelectorAll(`.${itemClass}`);
+      const selectedEl = itemsEls[safeSelectedIndex] as HTMLElement;
+      if (selectedEl) {
+        selectedEl.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest'
+        });
+      }
+    }
+  }, [isCarousel, safeSelectedIndex, itemClass]);
+
+  const containerClass = className || classProp || ''
+
+  const getAssetPath = (itemData: any, isGameItem: boolean): string => {
+    if (isGameItem) {
+      if (mediaSource === 'thumbnail') {
+        return resolvePath(itemData?.thumbnail || itemData?.image, { ...data, ...itemData })
+      }
+      if (mediaSource === 'image') {
+        return resolvePath(itemData?.image || itemData?.marquee, { ...data, ...itemData })
+      }
+      return resolvePath(itemData?.marquee || itemData?.image || itemData?.thumbnail, { ...data, ...itemData })
+    }
+
+    const sysTheme = itemData.theme || itemData.name
+    const sysName = itemData.name === 'all' ? 'auto-allgames' : sysTheme
+
+    // Use custom marquee source if requested
+    if (itemMarquee && itemMarqueeSource) {
+      return resolvePath(`${themePath}/${itemMarqueeSource.replace('./', '')}/${sysName}.webp`)
+    }
+
+    if (mediaSource === 'theme') {
+      return resolvePath(`${themePath}/assets/logos/${sysName}.webp`)
+    }
+    if (mediaSource && (mediaSource.startsWith('./') || mediaSource.startsWith('../'))) {
+      const cleanPath = mediaSource.replace('./', '')
+      return resolvePath(`${themePath}/${cleanPath}/${sysName}.webp`)
+    }
+    return resolvePath(itemData.image || `${themePath}/assets/logos/${sysName}.webp`)
+  }
+
+  // Render Grid (Free/Grid Mode)
+  if (!isCarousel) {
+    return (
+      <div 
+        ref={containerRef}
+        className={containerClass} 
+        style={style}
+        data-riescade-grid={isGame ? 'gamelist' : 'system'}
+        data-riescade-mode="grid"
+      >
+        {items.map((item: any, idx: number) => {
+          const isSelected = idx === safeSelectedIndex
+          const assetPath = getAssetPath(item, isGame)
+          const key = isGame
+            ? `${item.system || 'game'}-${item.path || 'path'}-${idx}`
+            : `${item.name || 'sys'}-${idx}`
+          return (
+            <GridItemNode
+              key={key}
+              item={{ data: item, isSelected, isGame, originalIndex: idx }}
+              assetPath={assetPath}
+              itemClass={itemClass}
+              themePath={themePath}
+              data={data}
+            />
+          )
+        })}
+      </div>
+    )
+  }
+
+  // Render Carousel Mode
+  const carouselItemsCount = itemsCount || 5
+  const distance = 100 / carouselItemsCount
+  const halfCount = Math.floor(carouselItemsCount / 2)
   
   // Default selected slot is center
   const activeSlot = itemsCountSelected !== undefined ? itemsCountSelected : halfCount + 1
@@ -65,7 +154,7 @@ export const WebCarouselElement: React.FC<Props> = ({
       else if (diff < -items.length / 2) diff += items.length
 
       // Render if close enough to viewport
-      if (Math.abs(diff) <= itemsCount) {
+      if (Math.abs(diff) <= carouselItemsCount) {
         itemsToShow.push({
           data: item,
           offset: diff,
@@ -79,29 +168,6 @@ export const WebCarouselElement: React.FC<Props> = ({
 
   const isVertical = direction === 'vertical'
 
-  const getAssetPath = (itemData: any, isGameItem: boolean): string => {
-    if (isGameItem) {
-      return resolvePath(itemData?.marquee || itemData?.image, { ...data, ...itemData })
-    }
-
-    const sysTheme = itemData.theme || itemData.name
-    const sysName = itemData.name === 'all' ? 'auto-allgames' : sysTheme
-
-    // Use custom marquee source if requested
-    if (itemMarquee && itemMarqueeSource) {
-      return resolvePath(`${themePath}/${itemMarqueeSource.replace('./', '')}/${sysName}.webp`)
-    }
-
-    if (mediaSource === 'theme') {
-      return resolvePath(`${themePath}/assets/logos/${sysName}.webp`)
-    }
-    if (mediaSource.startsWith('./') || mediaSource.startsWith('../')) {
-      const cleanPath = mediaSource.replace('./', '')
-      return resolvePath(`${themePath}/${cleanPath}/${sysName}.webp`)
-    }
-    return resolvePath(itemData.image || `${themePath}/assets/logos/${sysName}.webp`)
-  }
-
   return (
     <div style={{
       position: 'relative',
@@ -109,8 +175,13 @@ export const WebCarouselElement: React.FC<Props> = ({
       height: '100%',
       margin: '0 auto',
       overflow: 'visible',
-      perspective: '1500px'
-    }}>
+      perspective: '1500px',
+      ...style
+    }} 
+    className={containerClass}
+    data-riescade-grid={isGame ? 'gamelist' : 'system'}
+    data-riescade-mode="carousel"
+    >
       {itemsToShow.map((item) => {
         const itemData = item.data
         const assetPath = getAssetPath(itemData, item.isGame)
@@ -130,7 +201,7 @@ export const WebCarouselElement: React.FC<Props> = ({
             activeSlot={activeSlot}
             isCentered={itemsCountSelected === undefined}
             distance={distance}
-            itemsCount={itemsCount}
+            itemsCount={carouselItemsCount}
             gap={gap}
             itemWidth={itemWidth}
             itemHeight={itemHeight}
@@ -140,6 +211,33 @@ export const WebCarouselElement: React.FC<Props> = ({
           />
         )
       })}
+    </div>
+  )
+}
+
+const GridItemNode = ({ 
+  item, assetPath, itemClass, themePath, data 
+}: any) => {
+  const [imageFailed, setImageFailed] = React.useState(false)
+  const { data: itemData, isSelected } = item
+
+  return (
+    <div
+      className={`${itemClass} ${isSelected ? 'selected' : ''}`}
+      data-riescade-name={itemData.name}
+      data-riescade-type={item.isGame ? data?.['system.hardwareType'] : itemData.hardware}
+    >
+      {!imageFailed ? (
+        <img
+          src={assetPath}
+          alt={itemData.name}
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <span className="riescade-carousel-text">
+          {itemData.fullname || itemData.name}
+        </span>
+      )}
     </div>
   )
 }
@@ -171,7 +269,6 @@ const CarouselItemNode = ({
   } else {
     // Percentage-based Slot logic (Switch Theme)
     const slotIndex = (activeSlot - 1) + offset
-    // posValue = `calc(${slotIndex * sizePct}% + ${gap / 2}px)`
     posValue = `${slotIndex * sizePct}%`
     transform = `translate(0, -50%) scale(${isSelected ? logoSelectedScale : logoScale})`
     isVisible = slotIndex >= -1 && slotIndex <= itemsCount
@@ -271,3 +368,4 @@ const CarouselItemNode = ({
     </div>
   )
 }
+
