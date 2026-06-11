@@ -21,6 +21,7 @@ import { setupLogger } from './utils/logger'
 import { RomsWatcherService } from './services/RomsWatcherService'
 import { FeaturesService } from './services/FeaturesService'
 import { ThemeStoreService } from './services/ThemeStoreService'
+import { lookup as dnsLookup } from 'dns/promises'
 
 setupLogger()
 
@@ -1462,47 +1463,149 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('check-for-updates', async () => {
-    try {
-      const response = await fetch('https://api.github.com/repos/marcoriesco/RIESCADE_SYSTEM/releases/latest', {
-        headers: {
-          'User-Agent': 'RIESCADE-Updater'
+    interface DiagnosticAttempt {
+      attempt: number
+      success: boolean
+      dnsIp: string
+      dnsFamily: string
+      dnsError?: string
+      responseTimeMs: number
+      httpStatus?: number
+      errorName?: string
+      errorMessage?: string
+      errorCode?: string
+      errorCause?: string
+    }
+
+    const getDnsDiagnostics = async (hostname: string): Promise<{ ip: string; family: string; error?: string }> => {
+      try {
+        const result = await dnsLookup(hostname)
+        return { ip: result.address, family: result.family === 6 ? 'IPv6' : 'IPv4' }
+      } catch (err: any) {
+        return { ip: 'Unknown', family: 'Unknown', error: err.code || err.message }
+      }
+    }
+
+    const attempts: DiagnosticAttempt[] = []
+    let responseData: any = null
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const dnsInfo = await getDnsDiagnostics('raw.githubusercontent.com')
+      const startTime = Date.now()
+      let success = false
+      let httpStatus: number | undefined
+      let errorName: string | undefined
+      let errorMessage: string | undefined
+      let errorCode: string | undefined
+      let errorCause: string | undefined
+
+      try {
+        const response = await fetch('https://raw.githubusercontent.com/marcoriesco/RIESCADE_SYSTEM/main/updater.json', {
+          headers: {
+            'User-Agent': 'RIESCADE-Updater'
+          },
+          signal: AbortSignal.timeout(5000)
+        })
+
+        httpStatus = response.status
+        if (!response.ok) {
+          throw new Error(`GitHub raw content returned status ${response.status}`)
         }
+        responseData = await response.json()
+        success = true
+      } catch (err: any) {
+        errorName = err.name
+        errorMessage = err.message
+        errorCode = err.code || err.cause?.code
+        errorCause = err.cause ? String(err.cause) : undefined
+      }
+
+      const endTime = Date.now()
+      const responseTimeMs = endTime - startTime
+
+      attempts.push({
+        attempt,
+        success,
+        dnsIp: dnsInfo.ip,
+        dnsFamily: dnsInfo.family,
+        dnsError: dnsInfo.error,
+        responseTimeMs,
+        httpStatus,
+        errorName,
+        errorMessage,
+        errorCode,
+        errorCause
       })
-      if (!response.ok) {
-        throw new Error(`GitHub API returned status ${response.status}`)
-      }
-      const release = await response.json()
-      const releaseTag = release.tag_name || ''
-      const currentVersion = app.getVersion()
 
-      const cleanTag = releaseTag.replace(/^v/, '')
-      const cleanApp = currentVersion.replace(/^v/, '')
+      console.warn(
+        `[check-for-updates] Attempt ${attempt}: ` +
+        `Success=${success}, ` +
+        `DNS=${dnsInfo.ip} (${dnsInfo.family})` + (dnsInfo.error ? ` [DNS Error: ${dnsInfo.error}]` : '') + `, ` +
+        `Time=${responseTimeMs}ms` + (httpStatus ? `, HTTP=${httpStatus}` : '') +
+        (errorMessage ? `, Error: ${errorName} (${errorMessage})` : '')
+      )
 
-      const compareSemver = (v1: string, v2: string): number => {
-        const a = v1.split('.').map(Number)
-        const b = v2.split('.').map(Number)
-        for (let i = 0; i < 3; i++) {
-          const na = a[i] || 0
-          const nb = b[i] || 0
-          if (na > nb) return 1
-          if (na < nb) return -1
-        }
-        return 0
+      if (success) {
+        break
       }
 
-      const updateAvailable = compareSemver(cleanTag, cleanApp) > 0
-      const zipAsset = release.assets?.find((a: any) => a.name.endsWith('.7z')) || release.assets?.find((a: any) => a.name.endsWith('.zip'))
-      const zipUrl = zipAsset ? zipAsset.browser_download_url : null
+      if (attempt < 3) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+
+    if (!responseData) {
+      const dnsFail = attempts.some(a => a.dnsError)
+      const isTimeout = attempts.some(a => a.errorName === 'TimeoutError' || a.errorCode === 'UND_ERR_CONNECT_TIMEOUT' || a.errorCause?.includes('timeout') || a.errorMessage?.includes('timeout'))
+      const isRateLimit = attempts.some(a => a.httpStatus === 403 || a.httpStatus === 429)
+
+      let friendlyMsg = 'Não foi possível conectar ao GitHub. Verifique VPN, firewall ou conexão com a internet.'
+      if (dnsFail) {
+        friendlyMsg = 'Não foi possível resolver o endereço do GitHub. Verifique sua conexão com a internet ou servidor DNS.'
+      } else if (isRateLimit) {
+        friendlyMsg = 'O limite de requisições ao GitHub foi excedido ou o serviço está temporariamente indisponível.'
+      } else if (isTimeout) {
+        friendlyMsg = 'A conexão com o GitHub expirou. Verifique VPN, firewall ou instabilidade na sua rede.'
+      }
 
       return {
-        updateAvailable,
-        version: cleanTag,
-        releaseNotes: release.body || '',
-        zipUrl
+        updateAvailable: false,
+        version: '',
+        releaseNotes: '',
+        zipUrl: null,
+        error: true,
+        errorMsg: friendlyMsg,
+        diagnostics: attempts
       }
-    } catch (e: any) {
-      console.error('check-for-updates error:', e)
-      throw e
+    }
+
+    const releaseVersion = responseData.version || ''
+    const currentVersion = app.getVersion()
+
+    const cleanTag = releaseVersion.replace(/^v/, '')
+    const cleanApp = currentVersion.replace(/^v/, '')
+
+    const compareSemver = (v1: string, v2: string): number => {
+      const a = v1.split('.').map(Number)
+      const b = v2.split('.').map(Number)
+      for (let i = 0; i < 3; i++) {
+        const na = a[i] || 0
+        const nb = b[i] || 0
+        if (na > nb) return 1
+        if (na < nb) return -1
+      }
+      return 0
+    }
+
+    const updateAvailable = compareSemver(cleanTag, cleanApp) > 0
+    const zipUrl = responseData.zipUrl || null
+
+    return {
+      updateAvailable,
+      version: cleanTag,
+      releaseNotes: responseData.releaseNotes || '',
+      zipUrl,
+      diagnostics: attempts
     }
   })
   ipcMain.handle('download-and-install-update', async (event, zipUrl: string) => {
@@ -1622,6 +1725,20 @@ try {
 
       app.quit()
     } catch (e: any) {
+      const isNetworkError =
+        e.name === 'TimeoutError' ||
+        e.message?.includes('fetch failed') ||
+        e.code === 'UND_ERR_CONNECT_TIMEOUT' ||
+        e.cause?.code === 'UND_ERR_CONNECT_TIMEOUT' ||
+        e.cause?.message?.includes('timeout') ||
+        e.cause?.code === 'ENOTFOUND' ||
+        e.cause?.code === 'EAI_AGAIN';
+
+      if (isNetworkError) {
+        console.warn('download-and-install-update: Network error or offline. Could not download update zip.')
+        throw new Error('Failed to download update file. Please check your internet connection.')
+      }
+
       console.error('download-and-install-update error:', e)
       throw e
     }

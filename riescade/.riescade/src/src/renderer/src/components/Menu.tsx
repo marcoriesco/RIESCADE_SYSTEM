@@ -2345,6 +2345,13 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             setModalSelectedIndex(0)
             window.api.checkForUpdates()
               .then((res: any) => {
+                if (res && res.error) {
+                  setUpdateState({
+                    status: 'error',
+                    errorMsg: res.errorMsg || t('Failed to check for updates.')
+                  })
+                  return
+                }
                 if (res.updateAvailable) {
                   setUpdateState({
                     status: 'available',

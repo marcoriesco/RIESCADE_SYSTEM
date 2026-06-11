@@ -32,7 +32,7 @@ declare global {
       getBluetoothDevices: () => Promise<any[]>
       executeCommand: (command: string, data?: any) => void
       getVersion: () => Promise<{ app: string; }>
-      checkForUpdates: () => Promise<{ updateAvailable: boolean; version: string; releaseNotes: string; zipUrl: string | null }>
+      checkForUpdates: () => Promise<{ updateAvailable: boolean; version: string; releaseNotes: string; zipUrl: string | null; error?: boolean; errorMsg?: string; diagnostics?: any[] }>
       downloadAndInstallUpdate: (zipUrl: string) => Promise<boolean>
       getSystemInformation: () => Promise<Record<string, string>>
       getCollectionsForGame: (systemName: string, gamePath: string) => Promise<string[]>

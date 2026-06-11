@@ -1,74 +1,33 @@
---- RIESCADE Log Started at 2026-06-10T21:47:55.956Z ---
-[18:47:55] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[18:47:55] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[18:47:55] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[18:47:56] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[18:47:56] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[18:47:56] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[18:47:56] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[18:47:56] [INFO] [SyncCheck] Starting startup synchronization check...
-[18:47:56] [INFO] [SyncCheck] System 'namco2x6' changed: mtime matches: false (1781126780906.3855 vs 1781127771687.4968), fileCount matches: false (30 vs 31)
-[18:47:56] [INFO] [SyncCheck] 1/308 system(s) require synchronization. Initiating re-indexing.
-[18:47:56] [INFO]   📂 Indexing: namco2x6 ...
-[18:47:56] [INFO]     ✅ namco2x6: 26 games indexed
-[18:47:56] [INFO] 🔄 Re-indexed 1 system(s) with changes
-[18:47:57] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
-[18:48:07] [ERROR] check-for-updates error: {}
-[18:48:07] [ERROR] Error occurred in handler for 'check-for-updates': {}
-[18:48:33] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\launcher\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system namco2x6 -emulator pcsx2x6 -core  -rom "C:\tmp\RIESCADE_SYSTEM\roms\namco2x6\Battle Gear 3.acgame"
-[18:59:05] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[18:59:05] [INFO] Sending systems-updated event to UI...
-[18:59:05] [INFO] [SyncCheck] Starting startup synchronization check...
-[18:59:05] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[18:59:07] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[18:59:07] [INFO] Sending systems-updated event to UI...
-[18:59:07] [INFO] [SyncCheck] Starting startup synchronization check...
-[18:59:07] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[18:59:13] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[18:59:13] [INFO] Sending systems-updated event to UI...
-[18:59:13] [INFO] [SyncCheck] Starting startup synchronization check...
-[18:59:13] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[18:59:14] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[18:59:14] [INFO] Sending systems-updated event to UI...
-[18:59:14] [INFO] [SyncCheck] Starting startup synchronization check...
-[18:59:15] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[18:59:23] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[18:59:23] [INFO] Sending systems-updated event to UI...
-[18:59:23] [INFO] [SyncCheck] Starting startup synchronization check...
-[18:59:23] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[18:59:29] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[18:59:30] [INFO] Sending systems-updated event to UI...
-[18:59:30] [INFO] [SyncCheck] Starting startup synchronization check...
-[18:59:30] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[19:00:00] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[19:00:00] [INFO] Sending systems-updated event to UI...
-[19:00:00] [INFO] [SyncCheck] Starting startup synchronization check...
-[19:00:00] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[19:00:02] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[19:00:02] [INFO] Sending systems-updated event to UI...
-[19:00:02] [INFO] [SyncCheck] Starting startup synchronization check...
-[19:00:02] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[19:01:00] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[19:01:00] [INFO] Sending systems-updated event to UI...
-[19:01:00] [INFO] [SyncCheck] Starting startup synchronization check...
-[19:01:00] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[19:01:33] [INFO] 🔄 Watcher triggering database sync for: namco2x6
-[19:01:33] [INFO] Sending systems-updated event to UI...
-[19:01:33] [INFO] [SyncCheck] Starting startup synchronization check...
-[19:01:33] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[19:01:45] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\launcher\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system namco2x6 -emulator pcsx2x6 -core  -rom "C:\tmp\RIESCADE_SYSTEM\roms\namco2x6\Bloody Roar 3.acgame"
+--- RIESCADE Log Started at 2026-06-11T01:27:25.747Z ---
+[22:27:25] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[22:27:25] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[22:27:25] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[22:27:25] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[22:27:25] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[22:27:25] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[22:27:25] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[22:27:25] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[22:27:25] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[22:27:25] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[22:27:25] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[22:27:25] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[22:27:25] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[22:27:25] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[22:27:26] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[22:27:26] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[22:27:26] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[22:27:26] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[22:27:26] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[22:27:26] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[22:27:26] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[22:27:26] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[22:27:26] [INFO] [SyncCheck] Starting startup synchronization check...
+[22:27:26] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
+[22:27:26] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
+[22:27:31] [WARN] [check-for-updates] Attempt 1: Success=false, DNS=4.228.31.149 (IPv4), Time=5287ms, Error: TimeoutError (The operation was aborted due to timeout)
+[22:27:38] [WARN] [check-for-updates] Attempt 2: Success=false, DNS=4.228.31.149 (IPv4), Time=5116ms, Error: TimeoutError (The operation was aborted due to timeout)
+[22:27:45] [WARN] [check-for-updates] Attempt 3: Success=false, DNS=4.228.31.149 (IPv4), Time=5087ms, Error: TimeoutError (The operation was aborted due to timeout)
+[22:27:51] [WARN] [check-for-updates] Attempt 1: Success=false, DNS=4.228.31.149 (IPv4), Time=5050ms, Error: TimeoutError (The operation was aborted due to timeout)
+[22:27:57] [WARN] [check-for-updates] Attempt 2: Success=false, DNS=4.228.31.149 (IPv4), Time=5024ms, Error: TimeoutError (The operation was aborted due to timeout)
+[22:28:03] [WARN] [check-for-updates] Attempt 3: Success=false, DNS=4.228.31.149 (IPv4), Time=5004ms, Error: TimeoutError (The operation was aborted due to timeout)
+[22:28:16] [INFO] Executing system command: exit-frontend

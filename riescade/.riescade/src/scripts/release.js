@@ -223,6 +223,17 @@ async function run() {
   const sevenZipSizeMB = (fs.statSync(zipPath).size / (1024 * 1024)).toFixed(1);
   console.log(`✅ 7z package created (${sevenZipSizeMB} MB)`);
 
+  // Create updater.json file for the update checker to query
+  console.log('📝 Creating updater.json file...');
+  const updaterJsonPath = path.join(projectRoot, 'updater.json');
+  const updaterContent = {
+    version: version,
+    releaseNotes: `Automated release for RIESCADE v${version}`,
+    zipUrl: `https://github.com/marcoriesco/RIESCADE_SYSTEM/releases/download/v${version}/RIESCADE_SYSTEM.7z`
+  };
+  fs.writeFileSync(updaterJsonPath, JSON.stringify(updaterContent, null, 2) + '\n', 'utf8');
+  console.log('✅ updater.json created/updated.');
+
   // 4. Git Commit, Tag & Push
   console.log('🐙 Staging and committing version changes...');
   execSync('git add -A', { stdio: 'inherit', cwd: projectRoot });

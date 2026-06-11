@@ -912,7 +912,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "namco2x6",
+    "value": "cps3",
     "type": "string"
   },
   "MaxVRAM": {
