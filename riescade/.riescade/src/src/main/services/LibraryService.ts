@@ -504,6 +504,7 @@ export class LibraryService {
       try {
         const win = BrowserWindow.getAllWindows()[0]
         if (win) {
+          console.log(`[StartLoader:Backend] sendProgress(${p}, '${statusKey}')`)
           win.webContents.send('systems-loading-progress', p, statusKey)
         }
       } catch (err) {}
@@ -585,16 +586,19 @@ export class LibraryService {
     // Fast path: DB already indexed and no modifications detected, skip re-sync and just load cached data
     const isDbAlreadyIndexed = useDb && !forcePhysicalScan && dbService.getIndexedSystemCount() > 0 && !needsSync
     if (isDbAlreadyIndexed) {
+      LibraryService.isPreloaded = true
       console.log(`[SyncCheck] All ${systemsCheckedCount} systems are up-to-date. SQLite fast path active.`)
       sendProgress(10, 'LOADING_PLATFORMS')
 
       // Only recalculate auto-collection counts from DB (fast SQL queries)
       const displayed = this.getDisplayedSystems()
+      sendProgress(30, 'LOADING_PLATFORMS')
       const displayedNames = displayed.map(s => s.name)
       const settings = new SettingsParser()
       const autoColsString = settings.getSetting('CollectionSystemsAuto', 'string') || ''
       const enabledCols = autoColsString.split(',').map((c: string) => c.trim()).filter((c: string) => c !== '')
 
+      sendProgress(60, 'LOADING_PLATFORMS')
       for (const col of enabledCols) {
         let countKey = col
         if (col.startsWith('_')) countKey = col.substring(1)
@@ -603,7 +607,8 @@ export class LibraryService {
         LibraryService.quickAutoCounts.set(countKey, count)
       }
 
-      LibraryService.isPreloaded = true
+      sendProgress(80, 'LOADING_PLATFORMS')
+      await delay(50)
       sendProgress(100, 'READY')
       return
     }
@@ -672,7 +677,6 @@ export class LibraryService {
       sendProgress(50, initialStatusKey)
     }
 
-    sendProgress(50, initialStatusKey)
     await delay(50)
 
     LibraryService.isPreloaded = true

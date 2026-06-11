@@ -512,7 +512,7 @@
     "type": "bool"
   },
   "vrr_runloop_enable": {
-    "value": true,
+    "value": false,
     "type": "bool"
   },
   "ScrapeNames": {
@@ -855,14 +855,6 @@
     "value": "full",
     "type": "string"
   },
-  "DrawStats": {
-    "value": "fps_only",
-    "type": "string"
-  },
-  "input_menu_toggle_gamepad_combo": {
-    "value": 2,
-    "type": "string"
-  },
   "global.videomode": {
     "value": "auto",
     "type": "string"
@@ -912,7 +904,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "cps3",
+    "value": "switch",
     "type": "string"
   },
   "MaxVRAM": {
@@ -946,5 +938,9 @@
   "SmartCache": {
     "value": false,
     "type": "bool"
+  },
+  "neshd.hd_packs": {
+    "value": "true",
+    "type": "string"
   }
 }

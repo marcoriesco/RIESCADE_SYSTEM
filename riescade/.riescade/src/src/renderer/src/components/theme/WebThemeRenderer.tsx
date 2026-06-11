@@ -544,25 +544,56 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         props.onError = (e: React.SyntheticEvent<HTMLElement, Event>) => {
           const el = e.currentTarget
           const s = onerrorStr.trim()
-          
+          let handled = false
+
+          // Handle this.onerror = null (prevent infinite loops)
+          // (no action needed, React already handles single-fire)
+
+          // Handle this.src = '...'
           if (s.includes('this.src') && s.includes('=')) {
             const match = s.match(/this\.src\s*=\s*['"]([^'"]+)['"]/i)
             if (match && match[1]) {
               ;(el as HTMLImageElement).src = match[1]
-              return
+              handled = true
             }
           }
+
+          // Handle this.className = '...'
+          if (s.includes('this.className') && s.includes('=')) {
+            const match = s.match(/this\.className\s*=\s*['"]([^'"]+)['"]/i)
+            if (match && match[1]) {
+              el.className = match[1]
+              handled = true
+            }
+          }
+
+          // Handle this.style.display = 'none'
           if (s.includes('this.style.display') && s.includes('none')) {
             el.style.display = 'none'
-            return
+            handled = true
           }
+
+          // Handle this.class (legacy, non-standard but used in themes)
+          if (!s.includes('this.className') && s.includes('this.class') && s.includes('=')) {
+            const match = s.match(/this\.class\s*=\s*['"]([^'"]+)['"]/i)
+            if (match && match[1]) {
+              el.className = match[1]
+              handled = true
+            }
+          }
+
+          // Handle adding 'hide' class
           if ((s.includes('this.class') || s.includes('this.className')) && s.includes('hide')) {
-            el.className = (el.className + ' hide').trim()
-            return
+            if (!handled) {
+              el.className = (el.className + ' hide').trim()
+              handled = true
+            }
           }
           
           // Unrecognized fallback: hide the broken element
-          el.style.display = 'none'
+          if (!handled) {
+            el.style.display = 'none'
+          }
         }
       }
 

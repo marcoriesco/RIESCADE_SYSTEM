@@ -62,32 +62,11 @@ export class SystemsParser {
     const showEmpty = settings.getSetting('LoadEmptySystems', 'bool')
 
     // Resolve all system paths and count games first
-    const { BrowserWindow } = require('electron')
-    let resolvedCount = 0
     const resolvedSystems = systems.map(s => {
       const fullPath = this.resolveRomPath(s.path)
       const pathExists = existsSync(fullPath)
       const count = pathExists ? this.countGames(fullPath) : 0
       
-      resolvedCount++
-      const progress = Math.round((resolvedCount / systems.length) * 20)
-      
-      try {
-        const mainWindow = BrowserWindow.getAllWindows()[0]
-        if (mainWindow) {
-          const { LibraryService } = require('../services/LibraryService')
-          const useDb = LibraryService.isDbMode()
-          const dbService = LibraryService.getDatabase()
-          const isFirstRun = useDb && dbService.isOpen() && dbService.getIndexedSystemCount() === 0
-          const statusKey = useDb 
-            ? (isFirstRun ? 'INDEXING_DATABASE' : 'UPDATING_DATABASE')
-            : 'LOADING_PLATFORMS'
-          mainWindow.webContents.send('systems-loading-progress', progress, statusKey)
-        }
-      } catch (err) {
-        // Safe check in case window is not initialized yet
-      }
-
       return {
         ...s,
         path: fullPath,

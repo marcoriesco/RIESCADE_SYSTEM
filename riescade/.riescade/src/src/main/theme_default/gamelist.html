@@ -4,7 +4,7 @@
 
  	<!-- FANART & OVERLAY -->
 	<div class="system-fanart animate__animated animate__fadeIn" data-riescade-key="game">
-		<img class="{game:fanart ? 'system-image-fanart' : 'system-image-default' }" decoding="async" src="{game:fanart ? {game:fanart} : './assets/arts/{system:theme}.webp'}" />
+		<img class="{game:fanart ? 'system-image-fanart' : 'system-image-default' }" decoding="async" src="{game:fanart}" onerror="this.onerror=null; this.src = './assets/arts/{system:theme}.webp'; this.className = 'system-image-default'" />
 		<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
 	</div>
 
@@ -22,8 +22,9 @@
     <div class="header-right">
       <div class="user-profile">
         <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'User'}</span>
-        <img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}" />
-      </div>
+				<div class="user-avatar-container">
+					<img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}"/>
+				</div>      </div>
     </div>
 
   </div>

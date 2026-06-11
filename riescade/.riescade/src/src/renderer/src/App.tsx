@@ -176,6 +176,7 @@ function App() {
 	const [isGameOptionsOpen, setIsGameOptionsOpen] = useState(false);
 	const [isHardwareSelectOpen, setIsHardwareSelectOpen] = useState(false);
 	const [isInitializing, setIsInitializing] = useState(true);
+	const [showSplash, setShowSplash] = useState(true);
 	const [enterPressTimer, setEnterPressTimer] = useState<NodeJS.Timeout | null>(
 		null,
 	);
@@ -537,17 +538,31 @@ function App() {
 
 	// Listen for systems loading progress from the main process
 	useEffect(() => {
+		console.log('[StartLoader] Progress listener registered');
 		const removeProgress = window.api.on(
 			'systems-loading-progress',
 			(_: any, progress: number, statusKey?: string) => {
-				setSystemsLoadingProgress(progress);
+				console.log(`[StartLoader] IPC received: progress=${progress}, statusKey=${statusKey}`);
+				setSystemsLoadingProgress(prev => {
+					// Only update progress if it is greater than the previous value, or if it is 100 (ready)
+					// NEVER allow progress to go backwards
+					if (progress === 100 || progress > prev) {
+						console.log(`[StartLoader] Progress updated: ${prev} -> ${progress}`);
+						return progress;
+					}
+					console.log(`[StartLoader] Progress BLOCKED: ${progress} <= ${prev}, keeping ${prev}`);
+					return prev;
+				});
 				if (statusKey) {
 					const translated = translateThemeKey(statusKey);
 					setSystemsLoadingMessage(translated);
 				}
 			},
 		);
-		return () => removeProgress();
+		return () => {
+			console.log('[StartLoader] Progress listener REMOVED (cleanup)');
+			removeProgress();
+		};
 	}, [translateThemeKey]);
 
 	// Inject active theme's global.css into document head to prevent FOUC (Flash of Unstyled Content)
@@ -721,22 +736,31 @@ function App() {
 						// Wait a tiny bit (100ms) to ensure React has fully rendered and painted the splash screen to the DOM
 						setTimeout(() => {
 							if (initialLoadCancelled) return;
-							console.time('[Perf] initialLoad:parallel');
+							console.time('[Perf] initialLoad:sequence');
 						
-							// Run settings, library preload, systems, music in parallel
-							Promise.all([
-								window.api.getSettings(),
-								window.api.preloadLibrary().catch(err => {
-									console.error('[Perf] preloadLibrary failed:', err);
-								}),
-								window.api.getSystems(),
-								window.api.getMusicFiles(),
-								window.api.getMusicPath()
-							]).then(([initialSettings, _, s, files, mPath]: [any, any, System[], string[], string]) => {
-								console.timeEnd('[Perf] initialLoad:parallel');
+							// 1. Run library preload first to index database/gamelists and send startup progress
+							window.api.preloadLibrary().catch(err => {
+								console.error('[Perf] preloadLibrary failed:', err);
+							}).then(() => {
+								if (initialLoadCancelled) return;
+
+								// 2. Once library is preloaded, fetch systems, settings, and music
+								return Promise.all([
+									window.api.getSettings(),
+									window.api.getSystems(),
+									window.api.getMusicFiles(),
+									window.api.getMusicPath()
+								]);
+							}).then((result) => {
+								if (!result || initialLoadCancelled) return;
+								const [initialSettings, s, files, mPath] = result;
+								console.timeEnd('[Perf] initialLoad:sequence');
 								if (initialLoadCancelled) return;
 						
 								setSettings(initialSettings);
+								console.log('[StartLoader] Startup sequence complete, forcing progress to 100');
+								setSystemsLoadingProgress(100);
+								setSystemsLoadingMessage(translateThemeKey('READY'));
 								setSystems(s);
 								setMusicFiles(files);
 								setMusicPath(mPath);
@@ -1201,13 +1225,23 @@ function App() {
 		});
 	}, [games, selectedGameIndex]);
 
-	// End splash screen
+	// End splash screen: when progress reaches 100% and data is loaded,
+	// immediately start rendering the system view and keep splash overlay visible
+	// for 500ms to let the system view mount underneath before removing it.
 	useEffect(() => {
-		if (systems.length > 0 && theme) {
-			const timer = setTimeout(() => setIsInitializing(false), 500);
+		console.log(`[StartLoader] Splash check: progress=${systemsLoadingProgress}, systems=${systems.length}, theme=${!!theme}`);
+		if (systemsLoadingProgress === 100 && systems.length > 0 && theme) {
+			console.log('[StartLoader] ✅ Progress reached 100%! Starting system view render...');
+			// Allow the system view to start rendering immediately
+			setIsInitializing(false);
+			// Keep splash overlay visible for 500ms while system view mounts
+			const timer = setTimeout(() => {
+				console.log('[StartLoader] Removing splash overlay, system view is mounted');
+				setShowSplash(false);
+			}, 500);
 			return () => clearTimeout(timer);
 		}
-	}, [systems.length, theme]);
+	}, [systemsLoadingProgress, systems.length, theme]);
 
 	const filteredSystems = useMemo(() => {
 		const visibleSetting = settings.VisibleSystems?.value || '';
@@ -2351,9 +2385,14 @@ function App() {
 		}
 	}, [isScreensaverActive, settings.ScreenSaverType?.value]);
 
-	// ─── Start screen: render once, update progress via DOM refs to avoid flickering ───
+	// ─── Start screen: render ONCE, update progress via DOM refs to avoid flickering ───
+	// Uses a ref guard to prevent re-computation when settings change, which would
+	// re-inject the HTML via dangerouslySetInnerHTML and reset the progress bar to 0%.
 	const startScreenRef = useRef<HTMLDivElement>(null);
+	const startHtmlComputedRef = useRef<string | null>(null);
 	const startHtmlOnce = useMemo(() => {
+		// Once computed, never recompute — prevents settings changes from wiping DOM progress
+		if (startHtmlComputedRef.current !== null) return startHtmlComputedRef.current;
 		if (!theme?.views?.start) return null;
 		const normalizedPath = theme.path.replace(/\\/g, '/');
 		// Resolve translations for {t:KEY} tags
@@ -2363,12 +2402,14 @@ function App() {
 		const currentLocale = themeLocales[lang] || {};
 		const fallbackLocale = themeLocales[defaultLocaleKey] || themeLocales['en_US'] || {};
 		const merged = { ...fallbackLocale, ...currentLocale };
-		return theme.views.start
+		const html = theme.views.start
 			.replace(/src="\.\/"/g, `src="file:///${normalizedPath}/"`)
 			.replace(/src="\.\//g, `src="file:///${normalizedPath}/`)
 			.replace(/href="\.\//g, `href="file:///${normalizedPath}/`)
 			.replace(/{systems-loading}/g, '0')
 			.replace(/\{t:(\w+)\}/g, (_match: string, key: string) => merged[key] || fallbackLocale[key] || key);
+		startHtmlComputedRef.current = html;
+		return html;
 	}, [theme?.views?.start, theme?.path, theme?.locales, theme?.defaultLocale, settings['Language']?.value]);
 
 	useEffect(() => {
@@ -2406,24 +2447,13 @@ function App() {
 	// ─── Rendering ───
 	if (!theme) return null;
 
-	if (isInitializing && startHtmlOnce) {
-		return (
-			<div 
-				ref={startScreenRef}
-				style={{
-					width: '100vw',
-					height: '100vh',
-					background: '#000',
-					overflow: 'hidden',
-					['--theme-color' as any]: themeData['options:colors'] || themeData['colors'] || '#3b82f6',
-				}} 
-				dangerouslySetInnerHTML={{ __html: startHtmlOnce }} 
-			/>
-		);
-	}
+	// Splash screen is no longer a mutually exclusive early return.
+	// It is rendered as a fixed overlay AFTER the app-root below, so the system
+	// view can mount underneath while the splash is still visible.
 
 
 	return (
+		<>
 		<div
 			className="app-root"
 			style={{
@@ -2759,6 +2789,27 @@ function App() {
 				<span style={{ fontFamily: '"Roboto Condensed"', fontWeight: 400 }}>preload Roboto Condensed 400</span>
 			</div>
 		</div>
+
+			{/* Splash screen overlay — rendered on top of app-root so the system view can
+			   mount underneath. Removed once the system view is fully mounted. */}
+			{showSplash && startHtmlOnce && (
+				<div 
+					ref={startScreenRef}
+					style={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						width: '100vw',
+						height: '100vh',
+						background: '#000',
+						overflow: 'hidden',
+						zIndex: 99999,
+						['--theme-color' as any]: themeData['options:colors'] || themeData['colors'] || '#3b82f6',
+					}} 
+					dangerouslySetInnerHTML={{ __html: startHtmlOnce }} 
+				/>
+			)}
+		</>
 	);
 }
 
