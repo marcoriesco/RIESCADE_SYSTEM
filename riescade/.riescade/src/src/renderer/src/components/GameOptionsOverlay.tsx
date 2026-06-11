@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Game, System } from '../../../shared/types'
+import { GameMediaOverlay } from './GameMediaOverlay'
 
 const escapeFileUrl = (url: string): string => {
   if (url.startsWith('file://')) {
@@ -136,10 +137,15 @@ interface GameOptionsProps {
   onOpenSaveStates?: () => void
   isSaveStateManagerOpen?: boolean
   t: (key: string) => string
+  isFilteredRelated?: boolean
+  onFilterRelated?: (genre: string | null) => void
+  allSystems?: System[]
+  onLaunchNetplay?: (netplayOptions: any) => void
 }
 
 export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({ 
-  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists, onLaunch, onOpenSaveStates, isSaveStateManagerOpen, t
+  isOpen, onClose, game, system, theme, themeData, onUpdate, addNotification, onUpdateGamelists, onLaunch, onOpenSaveStates, isSaveStateManagerOpen, t,
+  isFilteredRelated = false, onFilterRelated, allSystems = [], onLaunchNetplay
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -148,6 +154,22 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [gameCollections, setGameCollections] = useState<string[]>([])
   const [activeMenuStack, setActiveMenuStack] = useState<{ items: any[]; title: string; tabs?: string[]; activeTab?: number; parentItemId?: string; savedSelectedIndex?: number }[]>([])
   const [settings, setSettings] = useState<Record<string, any>>({})
+  const [netplayPublic, setNetplayPublic] = useState(true)
+  const [netplayPassword, setNetplayPassword] = useState('')
+  const [netplaySpectatorPassword, setNetplaySpectatorPassword] = useState('')
+
+  const updateNetplayMenuItemValue = (id: string, value: string) => {
+    setActiveMenuStack(prev => {
+      const next = [...prev]
+      const current = next[next.length - 1]
+      if (current) {
+        current.items = current.items.map(it => 
+          it.id === id ? { ...it, value } : it
+        )
+      }
+      return next
+    })
+  }
 
   // Single game scraper states
   const [scraperStage, setScraperStage] = useState<0 | 1 | 2>(0) // 0: closed, 1: database checklist, 2: matches
@@ -177,6 +199,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [activeInputField, setActiveInputField] = useState<string>('')
   const [inputValue, setInputValue] = useState('')
   const [gameDynamicFeatures, setGameDynamicFeatures] = useState<{ general: any[]; advanced: any[] } | null>(null)
+  const [isMediaViewerOpen, setIsMediaViewerOpen] = useState(false)
 
   const loadFeaturesForGameEmulator = useCallback((g: Game, currentSettings: Record<string, any>) => {
     let resolvedEmulator = ''
@@ -342,6 +365,25 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         actionType: 'save_states'
       })
     }
+    const netplayEnabled = (() => {
+      const val = currentSettings['global.netplay']?.value
+      return val === true || val === 'true' || val === '1' || val === 1 || String(val).toLowerCase() === 'on'
+    })()
+
+    if (isLibretro && netplayEnabled) {
+      items.push({
+        id: 'netplay_game',
+        label: t('START ONLINE GAME'),
+        type: 'action',
+        actionType: 'netplay_game'
+      })
+    }
+    items.push({
+      id: 'related_games',
+      label: isFilteredRelated ? t('CLEAR RELATED GAMES') : t('RELATED GAMES'),
+      type: 'action',
+      actionType: 'related_games'
+    })
     items.push({
       id: 'delete_game',
       label: t('DELETE GAME'),
@@ -385,7 +427,16 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       })
     })
 
-    // 3. Group: OPTIONS
+    // 3. Group: MEDIA
+    items.push({ id: 'group_media', label: t('MEDIA'), type: 'group' })
+    items.push({
+      id: 'media_video',
+      label: t('VIEW GAME MEDIA'),
+      type: 'action',
+      actionType: 'view_media'
+    })
+
+    // 4. Group: OPTIONS
     items.push({ id: 'group_options', label: t('OPTIONS'), type: 'group' })
     items.push({
       id: 'scrape_this_game',
@@ -393,7 +444,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       type: 'action',
       actionType: 'scrape'
     })
-
 
     const getGameSettingValue = (settingName: string, fallback: any) => {
       const key = getGameSettingKey(settingName)
@@ -593,6 +643,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       setShowMetadataEditor(false)
       setMetadataSelectedIndex(0)
       setShowInputModal(false)
+      setNetplayPublic(true)
+      setNetplayPassword('')
+      setNetplaySpectatorPassword('')
       
       window.api.getSettings().then(s => {
         setSettings(s)
@@ -673,6 +726,21 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
   const handleToggle = () => {
     const item = currentMenu[selectedIndex]
+    if (item.id === 'netplay_public') {
+      const nextVal = !netplayPublic
+      setNetplayPublic(nextVal)
+      setActiveMenuStack(prev => {
+        const next = [...prev]
+        const current = next[next.length - 1]
+        if (current) {
+          current.items = current.items.map(it => 
+            it.id === 'netplay_public' ? { ...it, value: nextVal } : it
+          )
+        }
+        return next
+      })
+      return
+    }
     if (item.id === 'favorite') {
       const nextFav = !draftGame.favorite
       const updated = { ...draftGame, favorite: nextFav }
@@ -893,6 +961,80 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   )
 
   const handleAction = async (item: any) => {
+    if (item.actionType === 'netplay_game') {
+      const netplaySubmenu = [
+        { id: 'group_netplay_launch', label: t('INICIAR JOGO'), type: 'group' },
+        {
+          id: 'host_netplay_game',
+          label: t('ORGANIZAR JOGO EM REDE'),
+          type: 'action',
+          actionType: 'host_netplay'
+        },
+        { id: 'group_netplay_options', label: t('OPÇÕES'), type: 'group' },
+        {
+          id: 'netplay_public',
+          label: t('ANUNCIAR PUBLICAMENTE O JOGO'),
+          type: 'toggle',
+          value: netplayPublic
+        },
+        {
+          id: 'netplay_password',
+          label: t('SENHA DO JOGADOR'),
+          type: 'action',
+          actionType: 'netplay_password',
+          showArrow: true,
+          value: netplayPassword
+        },
+        {
+          id: 'netplay_spectator_password',
+          label: t('SENHA DE ESPECTADOR'),
+          type: 'action',
+          actionType: 'netplay_spectator_password',
+          showArrow: true,
+          value: netplaySpectatorPassword
+        }
+      ]
+
+      setActiveMenuStack(prev => {
+        const next = [...prev]
+        if (next.length > 0) {
+          next[next.length - 1] = { ...next[next.length - 1], savedSelectedIndex: selectedIndex }
+        }
+        return [...next, { items: netplaySubmenu, title: t('START ONLINE GAME') }]
+      })
+      setSelectedIndex(getFirstSelectableIndex(netplaySubmenu))
+      return
+    }
+
+    if (item.actionType === 'host_netplay') {
+      onClose()
+      const port = settings['global.netplay.port']?.value || '55435'
+      if (onLaunchNetplay) {
+        onLaunchNetplay({
+          netPlayMode: 'host',
+          port: port,
+          password: netplayPassword,
+          spectatorPassword: netplaySpectatorPassword,
+          public: netplayPublic
+        })
+      }
+      return
+    }
+
+    if (item.actionType === 'netplay_password') {
+      setActiveInputField('netplay_password')
+      setInputValue(netplayPassword)
+      setShowInputModal(true)
+      return
+    }
+
+    if (item.actionType === 'netplay_spectator_password') {
+      setActiveInputField('netplay_spectator_password')
+      setInputValue(netplaySpectatorPassword)
+      setShowInputModal(true)
+      return
+    }
+
     if (item.actionType === 'launch') {
       onClose()
       if (onLaunch) onLaunch()
@@ -922,6 +1064,23 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     if (item.actionType === 'delete') {
       setDeleteModalSelectedIndex(1) // default to 'NÃO' for safety
       setShowDeleteConfirmModal(true)
+      return
+    }
+
+    if (item.actionType === 'view_media') {
+      setIsMediaViewerOpen(true)
+      return
+    }
+
+    if (item.actionType === 'related_games') {
+      if (onFilterRelated) {
+        if (isFilteredRelated) {
+          onFilterRelated(null)
+        } else {
+          onFilterRelated(game.genre || null)
+        }
+      }
+      onClose()
       return
     }
 
@@ -1121,22 +1280,32 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!isOpen) return
+      if (isMediaViewerOpen) return
 
-      if (showMetadataEditor) {
-        if (showInputModal) {
-          if (e.key === 'Enter') {
-            e.preventDefault()
-            e.stopPropagation()
+      if (showInputModal) {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          e.stopPropagation()
+          if (activeInputField === 'netplay_password') {
+            setNetplayPassword(inputValue)
+            updateNetplayMenuItemValue('netplay_password', inputValue)
+          } else if (activeInputField === 'netplay_spectator_password') {
+            setNetplaySpectatorPassword(inputValue)
+            updateNetplayMenuItemValue('netplay_spectator_password', inputValue)
+          } else {
             const savedVal = activeInputField === 'releasedate' ? parseDateForDb(inputValue) : inputValue
             setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
-            setShowInputModal(false)
-          } else if (e.key === 'Escape') {
-            e.preventDefault()
-            e.stopPropagation()
-            setShowInputModal(false)
           }
-          return
+          setShowInputModal(false)
+        } else if (e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
+          setShowInputModal(false)
         }
+        return
+      }
+
+      if (showMetadataEditor) {
 
         e.preventDefault()
         e.stopPropagation()
@@ -1433,7 +1602,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 <div className={`riescade-switch ${item.value ? 'on' : ''}`}>
                   <div className="thumb toggle-thumb" />
                 </div>
-              ) : item.type === 'submenu' ? (
+              ) : item.type === 'submenu' || item.showArrow ? (
                 <span className="menu-submenu-arrow">›</span>
               ) : item.type === 'select' ? (
                 <div className="menu-select">
@@ -1753,7 +1922,9 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const renderInputModal = () => {
     if (!showInputModal) return null
     const field = fields.find(f => f.key === activeInputField)
-    const label = field ? field.label : ''
+    let label = field ? field.label : ''
+    if (activeInputField === 'netplay_password') label = t('SENHA DO JOGADOR')
+    if (activeInputField === 'netplay_spectator_password') label = t('SENHA DE ESPECTADOR')
     const isMultiline = activeInputField === 'desc'
     const isRating = activeInputField === 'rating'
 
@@ -1802,8 +1973,16 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           <div className="riescade-metadata-modal-buttons">
             <button
               onClick={() => {
-                const savedVal = activeInputField === 'releasedate' ? parseDateForDb(inputValue) : inputValue
-                setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
+                if (activeInputField === 'netplay_password') {
+                  setNetplayPassword(inputValue)
+                  updateNetplayMenuItemValue('netplay_password', inputValue)
+                } else if (activeInputField === 'netplay_spectator_password') {
+                  setNetplaySpectatorPassword(inputValue)
+                  updateNetplayMenuItemValue('netplay_spectator_password', inputValue)
+                } else {
+                  const savedVal = activeInputField === 'releasedate' ? parseDateForDb(inputValue) : inputValue
+                  setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
+                }
                 setShowInputModal(false)
               }}
               className="riescade-button"
@@ -1932,7 +2111,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         {!showMetadataEditor && scraperStage === 0 && (
           <div className="riescade-menu-container">
             <div className="riescade-menu-header">
-              {marqueeUrl ? (
+              {marqueeUrl && menuTitle !== 'JOGOS EM REDE' && menuTitle !== t('START ONLINE GAME') ? (
                 <div className="riescade-menu-marquee-container">
                   <img src={marqueeUrl} alt="Game Marquee" className="riescade-menu-marquee" />
                 </div>
@@ -1945,12 +2124,14 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               )}
               
               <div className="riescade-menu-subtitle">
-                {menuTitle === 'GAME OPTIONS' || menuTitle === 'ADVANCED GAME OPTIONS' || menuTitle === game.name.toUpperCase()
-                  ? (system.fullname || system.name).toUpperCase()
-                  : game.name.toUpperCase()}
+                {menuTitle === 'JOGOS EM REDE' || menuTitle === t('START ONLINE GAME')
+                  ? game.name
+                  : (menuTitle === 'GAME OPTIONS' || menuTitle === 'ADVANCED GAME OPTIONS' || menuTitle === game.name.toUpperCase()
+                      ? (system.fullname || system.name).toUpperCase()
+                      : game.name.toUpperCase())}
               </div>
 
-              {marqueeUrl && menuTitle !== 'GAME OPTIONS' && menuTitle !== 'ADVANCED GAME OPTIONS' && (
+              {marqueeUrl && menuTitle !== 'GAME OPTIONS' && menuTitle !== 'ADVANCED GAME OPTIONS' && menuTitle !== 'JOGOS EM REDE' && menuTitle !== t('START ONLINE GAME') && (
                 <h2 className="riescade-menu-title" style={{ marginTop: '10px' }}>{menuTitle}</h2>
               )}
 
@@ -2037,6 +2218,19 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           </div>
         </div>
       )}
+
+      {isMediaViewerOpen && (
+        <GameMediaOverlay
+          isOpen={isMediaViewerOpen}
+          onClose={() => setIsMediaViewerOpen(false)}
+          game={game}
+          system={system}
+          allSystems={allSystems}
+          t={t}
+        />
+      )}
+
+      {showInputModal && !showMetadataEditor && renderInputModal()}
     </>
   )
 }

@@ -911,3 +911,91 @@ textarea.riescade-metadata-input {
     font-size: 1.5rem !important;
   }
 }
+
+/* ─── RIESCADE GAME MEDIA VIEWER OVERLAYS ─── */
+.riescade-menu-overlay.game-media-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  z-index: 20000 !important;
+
+  &.visible {
+    opacity: 1;
+    .riescade-menu-container {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .riescade-menu-container {
+    width: 65vw !important;
+    height: 85vh !important;
+  }
+
+  .game-media-content-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+
+  .game-media-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .game-media-item {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+
+    &.pdf {
+      width: 100%;
+      height: 100%;
+      background: white;
+    }
+  }
+
+  .pdf-viewer-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: #ccc;
+    font-family: var(--font-menu);
+    text-align: center;
+    padding: 40px;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    max-width: 80%;
+
+    .pdf-icon {
+      font-size: 3rem;
+    }
+
+    .pdf-path {
+      font-size: 0.95rem;
+      opacity: 0.7;
+      word-break: break-all;
+    }
+
+    .pdf-help-text {
+      font-size: 0.85rem;
+      color: var(--theme-color);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+  }
+}

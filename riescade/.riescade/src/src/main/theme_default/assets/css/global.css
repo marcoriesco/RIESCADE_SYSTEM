@@ -154,12 +154,12 @@
   width: 4em;
   height: 4em;
   border-radius: 20px;
-  overflow: hidden;
   margin: 0;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 .riescade-header .user-profile .user-avatar {
   background-color: rgba(255, 255, 255, 0.1);
@@ -169,6 +169,17 @@
   object-fit: contain;
   box-sizing: border-box;
   padding: 0.35em;
+}
+.riescade-header .user-profile .user-online {
+  background: linear-gradient(90deg, #00ffc4 0%, #00ffbc 16.667%, #00ffb3 33.333%, #00f6aa 50%, #00e5a1 66.667%, #00d398 83.333%, #00c08f 100%);
+  width: 15px;
+  height: 15px;
+  display: block;
+  border-radius: 100%;
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  animation-iteration-count: infinite;
 }
 
 /* FOOER */
@@ -2800,6 +2811,84 @@ textarea.riescade-metadata-input {
   font-size: 1.5rem !important;
 }
 
+/* ─── RIESCADE GAME MEDIA VIEWER OVERLAYS ─── */
+.riescade-menu-overlay.game-media-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  z-index: 20000 !important;
+}
+.riescade-menu-overlay.game-media-overlay.visible {
+  opacity: 1;
+}
+.riescade-menu-overlay.game-media-overlay.visible .riescade-menu-container {
+  transform: scale(1);
+  opacity: 1;
+}
+.riescade-menu-overlay.game-media-overlay .riescade-menu-container {
+  width: 65vw !important;
+  height: 85vh !important;
+}
+.riescade-menu-overlay.game-media-overlay .game-media-content-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+.riescade-menu-overlay.game-media-overlay .game-media-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.riescade-menu-overlay.game-media-overlay .game-media-item {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+}
+.riescade-menu-overlay.game-media-overlay .game-media-item.pdf {
+  width: 100%;
+  height: 100%;
+  background: white;
+}
+.riescade-menu-overlay.game-media-overlay .pdf-viewer-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #ccc;
+  font-family: var(--font-menu);
+  text-align: center;
+  padding: 40px;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  max-width: 80%;
+}
+.riescade-menu-overlay.game-media-overlay .pdf-viewer-fallback .pdf-icon {
+  font-size: 3rem;
+}
+.riescade-menu-overlay.game-media-overlay .pdf-viewer-fallback .pdf-path {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  word-break: break-all;
+}
+.riescade-menu-overlay.game-media-overlay .pdf-viewer-fallback .pdf-help-text {
+  font-size: 0.85rem;
+  color: var(--theme-color);
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
 @keyframes blink {
   0% {
     opacity: 0.3;
@@ -3484,6 +3573,127 @@ textarea.riescade-metadata-input {
   display: inline-block;
 }
 
+.riescade-menu-overlay.search-overlay {
+  background: rgba(0, 0, 0, 0.85) !important;
+  font-family: var(--font-menu);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  z-index: 15000 !important;
+}
+.riescade-menu-overlay.search-overlay.visible {
+  opacity: 1;
+}
+.riescade-menu-overlay.search-overlay.visible .search-container {
+  transform: scale(1);
+  opacity: 1;
+}
+.riescade-menu-overlay.search-overlay .search-container {
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #111;
+  border-radius: 4px;
+  padding: 35px;
+  width: 480px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: scale(0.9);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.riescade-menu-overlay.search-overlay .search-header {
+  text-align: center;
+  margin-bottom: 25px;
+  width: 100%;
+}
+.riescade-menu-overlay.search-overlay .search-title {
+  margin: 0;
+  color: var(--theme-color);
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.riescade-menu-overlay.search-overlay .search-input-wrapper {
+  width: 100%;
+  margin-bottom: 20px;
+  position: relative;
+}
+.riescade-menu-overlay.search-overlay .search-input {
+  font-family: var(--font-menu);
+  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
+  border: 2px solid #333;
+  border-radius: 4px;
+  padding: 12px 16px;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+.riescade-menu-overlay.search-overlay .search-input:focus, .riescade-menu-overlay.search-overlay .search-input.selected {
+  border-color: var(--theme-color);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 15px rgba(240, 66, 176, 0.25);
+}
+.riescade-menu-overlay.search-overlay .search-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 400;
+}
+.riescade-menu-overlay.search-overlay .search-no-results {
+  color: #f87171;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 5px 0 20px 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: pulse 1.5s infinite alternate;
+}
+@keyframes pulse {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.riescade-menu-overlay.search-overlay .search-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+.riescade-menu-overlay.search-overlay .search-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #333;
+  outline: none;
+  background: rgba(255, 255, 255, 0.02);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.riescade-menu-overlay.search-overlay .search-btn.selected {
+  background: var(--theme-color);
+  border-color: var(--theme-color);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(240, 66, 176, 0.2);
+}
+
 :root {
   --theme-color: #9f0043;
   --text-primary: #ffffff;
@@ -3491,6 +3701,7 @@ textarea.riescade-metadata-input {
   --font-main: Inter Tight, sans-serif;
   --font-menu: Roboto Condensed, sans-serif;
   --font-shadow: 0 0 3px #000000;
+  --border-default: 1px solid #111;
 }
 
 body {

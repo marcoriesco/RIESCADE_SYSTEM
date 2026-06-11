@@ -900,7 +900,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "mastersystem",
+    "value": "arcade",
     "type": "string"
   },
   "MaxVRAM": {

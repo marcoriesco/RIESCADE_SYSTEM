@@ -186,12 +186,12 @@
       width: 4em;
       height: 4em;
       border-radius: 20px;
-      overflow: hidden;
       margin: 0;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
     .user-avatar {
@@ -202,6 +202,18 @@
       object-fit: contain;
       box-sizing: border-box;
       padding: 0.35em;
+    }
+
+    .user-online {
+      background: linear-gradient(90deg, #00ffc4 0.000%, #00ffbc 16.667%, #00ffb3 33.333%, #00f6aa 50.000%, #00e5a1 66.667%, #00d398 83.333%, #00c08f 100.000%);
+      width: 15px;
+      height: 15px;
+      display: block;
+      border-radius: 100%;
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      animation-iteration-count: infinite;
     }
   }
 }

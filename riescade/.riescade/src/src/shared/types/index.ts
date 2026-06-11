@@ -56,4 +56,7 @@ export interface Game {
   arcadesystem?: string
   languages?: string
   region?: string
+  wheel?: string
+  boxart?: string
+  cartridge?: string
 }

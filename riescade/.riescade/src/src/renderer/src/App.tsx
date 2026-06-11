@@ -7,6 +7,7 @@ import { LaunchScreen } from './components/LaunchScreen';
 import { HardwareSelectOverlay } from './components/HardwareSelectOverlay';
 import { SaveStateManagerOverlay } from './components/SaveStateManagerOverlay';
 import { NetplayLobbyOverlay } from './components/NetplayLobbyOverlay';
+import { SearchOverlay } from './components/SearchOverlay';
 
 // Simple types inline - no need for separate store
 interface System {
@@ -194,6 +195,23 @@ function App() {
 	const [systemsLoadingProgress, setSystemsLoadingProgress] = useState(0);
 	const [systemsLoadingMessage, setSystemsLoadingMessage] = useState('');
 	const [isLoadingGames, setIsLoadingGames] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
+	const [relatedGenreFilter, setRelatedGenreFilter] = useState<string | null>(null);
+
+	const filteredGames = useMemo(() => {
+		let list = games;
+		if (relatedGenreFilter) {
+			const targetGenre = relatedGenreFilter.toLowerCase();
+			list = list.filter(g => (g.genre || '').toLowerCase() === targetGenre);
+		}
+		if (!searchQuery || !selectedSystem) return list;
+		const query = searchQuery.toLowerCase();
+		return list.filter(g => 
+			(g.name || '').toLowerCase().includes(query) ||
+			(g.desc || '').toLowerCase().includes(query)
+		);
+	}, [games, searchQuery, selectedSystem, relatedGenreFilter]);
 
 	const addNotification = useCallback(
 		(message: string, type: 'info' | 'success' | 'warning' = 'info', category: 'controller' | 'scraper' | 'general' = 'general') => {
@@ -265,7 +283,7 @@ function App() {
 	const longPressHandledRef = useRef<Record<string, boolean>>({});
 	const gamepadButtonsStateRef = useRef<Record<number, boolean>>({});
 
-	const currentGame = games[selectedGameIndex];
+	const currentGame = filteredGames[selectedGameIndex];
 
 	const shuffleArray = <T,>(array: T[]): T[] => {
 		const arr = [...array];
@@ -1144,6 +1162,7 @@ function App() {
 			setGames([]);
 			setSelectedGameIndex(0);
 			setSelectedCollection(null);
+			setRelatedGenreFilter(null);
 			window.api.getGames(selectedSystem.name).then((masterGames: Game[]) => {
 				const groupedSetting = settings.SystemsGrouped?.value || '';
 				const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
@@ -1211,15 +1230,15 @@ function App() {
 
 	// Contextual Game Media Preloading
 	useEffect(() => {
-		if (games.length === 0) return;
+		if (filteredGames.length === 0) return;
 		
 		const prefetchRange = 15;
 		const start = Math.max(0, selectedGameIndex - prefetchRange);
-		const end = Math.min(games.length - 1, selectedGameIndex + prefetchRange);
+		const end = Math.min(filteredGames.length - 1, selectedGameIndex + prefetchRange);
 		
 		const urlsToPreload: string[] = [];
 		for (let i = start; i <= end; i++) {
-			const game = games[i];
+			const game = filteredGames[i];
 			if (!game) continue;
 			
 			const mediaFields = [game.marquee, game.image, game.fanart];
@@ -1237,7 +1256,7 @@ function App() {
 		urlsToPreload.forEach(url => {
 			preloadImage(url);
 		});
-	}, [games, selectedGameIndex]);
+	}, [filteredGames, selectedGameIndex]);
 
 	// End splash screen: when progress reaches 100% and data is loaded,
 	// immediately start rendering the system view and keep splash overlay visible
@@ -1302,8 +1321,34 @@ function App() {
 			baseSystems = baseSystems.filter(s => s.name !== 'collections');
 		}
 
+		if (searchQuery && !selectedSystem) {
+			const query = searchQuery.toLowerCase();
+			baseSystems = baseSystems.filter(s => 
+				(s.fullname || '').toLowerCase().includes(query) ||
+				s.name.toLowerCase().includes(query)
+			);
+		}
+
 		return baseSystems;
-	}, [systems, settings]);
+	}, [systems, settings, searchQuery, selectedSystem]);
+
+	// Prevent out of bounds systemIndex when filtered systems list shrinks
+	useEffect(() => {
+		if (systemIndex >= filteredSystems.length && filteredSystems.length > 0) {
+			setSystemIndex(filteredSystems.length - 1);
+		} else if (filteredSystems.length === 0) {
+			setSystemIndex(0);
+		}
+	}, [filteredSystems.length, systemIndex]);
+
+	// Prevent out of bounds selectedGameIndex when filtered games list shrinks
+	useEffect(() => {
+		if (selectedGameIndex >= filteredGames.length && filteredGames.length > 0) {
+			setSelectedGameIndex(filteredGames.length - 1);
+		} else if (filteredGames.length === 0) {
+			setSelectedGameIndex(0);
+		}
+	}, [filteredGames.length, selectedGameIndex]);
 
 	// Adjacent system preloading to prevent black frames during carousel navigation
 	useEffect(() => {
@@ -1477,7 +1522,7 @@ function App() {
 
 		// Pre-populate collection folder media in the games array for carousel elements!
 		const resolvedGames = (isCollectionsVal && theme?.path)
-			? games.map(g => {
+			? filteredGames.map(g => {
 				if (g.isCollectionFolder) {
 					const normalizedThemePath = theme.path.replace(/\\/g, '/');
 					return {
@@ -1491,7 +1536,7 @@ function App() {
 				}
 				return g;
 			})
-			: games;
+			: filteredGames;
 
 		const baseData: any = {
 			...flattenedSettings,
@@ -1508,11 +1553,11 @@ function App() {
 			'system.fullName': sysFullName,
 			'system.name': sys?.name || 'all',
 			'system.theme': sys?.theme || sys?.name || 'auto-allgames',
-			'system.gamecount': (activeSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
+			'system.gamecount': (activeSystem && !isLoadingGames) ? filteredGames.length : (sys?.gamecount || 0),
 			'system.hardwareType': sys?.hardware || 'console',
 			'system:fullName': sysFullName,
 			'system:name': sys?.name || 'all',
-			'system:gamecount': (activeSystem && !isLoadingGames) ? games.length : (sys?.gamecount || 0),
+			'system:gamecount': (activeSystem && !isLoadingGames) ? filteredGames.length : (sys?.gamecount || 0),
 			'system:theme': sys?.theme || sys?.name || 'auto-allgames',
 			'system:hardwareType': sys?.hardware || 'console',
 			'global:time': new Date().toLocaleTimeString([], {
@@ -1627,7 +1672,8 @@ function App() {
 		return baseData;
 	}, [
 		systems,
-		games,
+		filteredSystems,
+		filteredGames,
 		selectedSystem,
 		currentSystem,
 		currentGame,
@@ -1795,37 +1841,64 @@ function App() {
 			return;
 		}
 
-		const gameToLaunch = {
-			id: room.localGame.id,
-			name: room.localGame.name,
-			path: room.localGame.path,
-			system: room.localGame.system
-		} as Game;
+		window.api.getGames(room.localGame.system).then((allGames: Game[]) => {
+			const fullGame = allGames.find(g => g.id === room.localGame.id || g.path === room.localGame.path);
+			const gameToLaunch = fullGame || ({
+				id: room.localGame.id,
+				name: room.localGame.name,
+				path: room.localGame.path,
+				system: room.localGame.system
+			} as Game);
 
-		setLaunchingGame(gameToLaunch);
-		setLaunchingSystem(matchedSystem);
-		setIsLaunching(true);
-		
-		const netplayOptions = {
-			netPlayMode: mode,
-			ip: room.host_method === 3 ? room.mitm_ip : room.ip,
-			port: room.host_method === 3 ? room.mitm_port : room.port,
-			session: room.host_method === 3 ? room.mitm_session : ''
-		};
+			setLaunchingGame(gameToLaunch);
+			setLaunchingSystem(matchedSystem);
+			setIsLaunching(true);
 
-		window.api
-			.launchNetplayGame(gameToLaunch, matchedSystem, netplayOptions)
-			.then(cleanupLaunchState)
-			.catch(showLaunchError);
-	}, [systems]);
+			const netplayOptions = {
+				netPlayMode: mode,
+				ip: room.host_method === 3 ? room.mitm_ip : room.ip,
+				port: room.host_method === 3 ? room.mitm_port : room.port,
+				session: room.host_method === 3 ? room.mitm_session : ''
+			};
+
+			window.api
+				.launchNetplayGame(gameToLaunch, matchedSystem, netplayOptions)
+				.then(cleanupLaunchState)
+				.catch(showLaunchError);
+		}).catch((err) => {
+			console.error('Failed to get full game info for netplay launch:', err);
+			const gameToLaunch = {
+				id: room.localGame.id,
+				name: room.localGame.name,
+				path: room.localGame.path,
+				system: room.localGame.system
+			} as Game;
+
+			setLaunchingGame(gameToLaunch);
+			setLaunchingSystem(matchedSystem);
+			setIsLaunching(true);
+
+			const netplayOptions = {
+				netPlayMode: mode,
+				ip: room.host_method === 3 ? room.mitm_ip : room.ip,
+				port: room.host_method === 3 ? room.mitm_port : room.port,
+				session: room.host_method === 3 ? room.mitm_session : ''
+			};
+
+			window.api
+				.launchNetplayGame(gameToLaunch, matchedSystem, netplayOptions)
+				.then(cleanupLaunchState)
+				.catch(showLaunchError);
+		});
+	}, [systems, cleanupLaunchState, showLaunchError]);
 
 	// Helper: Jump to a random game in the current list
 	const jumpToRandomGame = useCallback(() => {
-		if (games.length > 0) {
-			const randomIndex = Math.floor(Math.random() * games.length);
+		if (filteredGames.length > 0) {
+			const randomIndex = Math.floor(Math.random() * filteredGames.length);
 			setSelectedGameIndex(randomIndex);
 		}
-	}, [games]);
+	}, [filteredGames]);
 
 	// Helper: Toggle favorite status of the current game
 	const toggleFavoriteGame = useCallback(() => {
@@ -1899,7 +1972,7 @@ function App() {
 	const executeShortPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal || isSearchOpen;
 		if (isOverlayActive) {
 			if (key === 'x') {
 				dispatchKeyEvent('Enter');
@@ -1915,8 +1988,8 @@ function App() {
 				if (filteredSystems[systemIndex]) {
 					setSelectedSystem(filteredSystems[systemIndex]);
 				}
-			} else if (key === 'backspace') {
-				setIsHardwareSelectOpen((prev) => !prev);
+			} else if (key === 's' || key === 'backspace') {
+				setIsSearchOpen(true);
 			} else if (key === 'enter') {
 				setIsMenuOpen((prev) => !prev);
 			} else if (key === 'q') {
@@ -1924,6 +1997,8 @@ function App() {
 				if (netplayEnabled) {
 					setIsNetplayLobbyOpen(true);
 				}
+			} else if (key === 'z' || key === 'w' || key === 'escape') {
+				setIsHardwareSelectOpen((prev) => !prev);
 			}
 		} else {
 			// Gamelist view
@@ -1938,21 +2013,20 @@ function App() {
 			} else if (key === 'z' || key === 'w' || key === 'escape') {
 				if (selectedCollection) {
 					setSelectedCollection(null);
+					setRelatedGenreFilter(null);
 					window.api.getGames(selectedSystem.name).then((g: Game[]) => {
 						setGames(g);
 						setSelectedGameIndex(0);
 					});
 				} else {
 					setSelectedSystem(null);
+					setSearchQuery('');
+					setRelatedGenreFilter(null);
 				}
 			} else if (key === 'q' || key === 'a') {
 				jumpToRandomGame();
-			} else if (key === 's') {
-				addNotification('PESQUISA INDISPONÍVEL NESTA VERSÃO', 'info', 'general');
-			} else if (key === 'backspace') {
-				if (currentGame) {
-					setIsGameOptionsOpen((prev) => !prev);
-				}
+			} else if (key === 's' || key === 'backspace') {
+				setIsSearchOpen(true);
 			} else if (key === 'enter') {
 				setIsMenuOpen((prev) => !prev);
 			}
@@ -1966,9 +2040,11 @@ function App() {
 		isHardwareSelectOpen,
 		showGamelistUpdateModal,
 		showLaunchErrorModal,
+		isSearchOpen,
 		selectedSystem,
 		systemIndex,
 		filteredSystems,
+		filteredGames,
 		currentGame,
 		selectedCollection,
 		jumpToRandomGame,
@@ -1981,7 +2057,7 @@ function App() {
 	const executeLongPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal || isSearchOpen;
 		if (isOverlayActive) return;
 
 		if (selectedSystem && currentGame) {
@@ -2004,6 +2080,7 @@ function App() {
 		isHardwareSelectOpen,
 		showGamelistUpdateModal,
 		showLaunchErrorModal,
+		isSearchOpen,
 		selectedSystem,
 		currentGame,
 		toggleFavoriteGame,
@@ -2065,7 +2142,7 @@ function App() {
 			return;
 		}
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || isSearchOpen;
 
 		// Navigation keys handled immediately on keydown
 		if (key === 'arrowup' || key === 'arrowdown' || key === 'arrowleft' || key === 'arrowright') {
@@ -2097,7 +2174,7 @@ function App() {
 					}
 				}
 			} else {
-				if (games.length === 0) return;
+				if (filteredGames.length === 0) return;
 				const gamelistGridEl = document.querySelector('[data-riescade-grid="gamelist"]');
 				const isGrid = gamelistGridEl ? gamelistGridEl.getAttribute('data-riescade-mode') === 'grid' : false;
 
@@ -2114,11 +2191,11 @@ function App() {
 					const gamelistHtml = theme?.views?.gamelist || '';
 					const isHorizontal = gamelistHtml.includes('type="horizontal"');
 					if (isHorizontal) {
-						if (key === 'arrowright') setSelectedGameIndex((prev) => (prev + 1) % games.length);
-						if (key === 'arrowleft') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+						if (key === 'arrowright') setSelectedGameIndex((prev) => (prev + 1) % filteredGames.length);
+						if (key === 'arrowleft') setSelectedGameIndex((prev) => (prev - 1 + filteredGames.length) % filteredGames.length);
 					} else {
-						if (key === 'arrowdown') setSelectedGameIndex((prev) => (prev + 1) % games.length);
-						if (key === 'arrowup') setSelectedGameIndex((prev) => (prev - 1 + games.length) % games.length);
+						if (key === 'arrowdown') setSelectedGameIndex((prev) => (prev + 1) % filteredGames.length);
+						if (key === 'arrowup') setSelectedGameIndex((prev) => (prev - 1 + filteredGames.length) % filteredGames.length);
 					}
 				}
 			}
@@ -2143,18 +2220,18 @@ function App() {
 					prev = (prev - 1 + filteredSystems.length) % filteredSystems.length;
 				}
 			} else {
-				if (games.length === 0) return;
-				const currentLetter = (games[selectedGameIndex]?.name?.[0] || '').toUpperCase();
-				let prev = (selectedGameIndex - 1 + games.length) % games.length;
+				if (filteredGames.length === 0) return;
+				const currentLetter = (filteredGames[selectedGameIndex]?.name?.[0] || '').toUpperCase();
+				let prev = (selectedGameIndex - 1 + filteredGames.length) % filteredGames.length;
 				while (prev !== selectedGameIndex) {
-					const prevLetter = (games[prev]?.name?.[0] || '').toUpperCase();
+					const prevLetter = (filteredGames[prev]?.name?.[0] || '').toUpperCase();
 					if (prevLetter !== currentLetter) {
 						let first = prev;
-						while (first > 0 && (games[first - 1]?.name?.[0] || '').toUpperCase() === prevLetter) first--;
+						while (first > 0 && (filteredGames[first - 1]?.name?.[0] || '').toUpperCase() === prevLetter) first--;
 						setSelectedGameIndex(first);
 						break;
 					}
-					prev = (prev - 1 + games.length) % games.length;
+					prev = (prev - 1 + filteredGames.length) % filteredGames.length;
 				}
 			}
 			return;
@@ -2175,15 +2252,15 @@ function App() {
 					next = (next + 1) % filteredSystems.length;
 				}
 			} else {
-				if (games.length === 0) return;
-				const currentLetter = (games[selectedGameIndex]?.name?.[0] || '').toUpperCase();
-				let next = (selectedGameIndex + 1) % games.length;
+				if (filteredGames.length === 0) return;
+				const currentLetter = (filteredGames[selectedGameIndex]?.name?.[0] || '').toUpperCase();
+				let next = (selectedGameIndex + 1) % filteredGames.length;
 				while (next !== selectedGameIndex) {
-					if ((games[next]?.name?.[0] || '').toUpperCase() !== currentLetter) {
+					if ((filteredGames[next]?.name?.[0] || '').toUpperCase() !== currentLetter) {
 						setSelectedGameIndex(next);
 						break;
 					}
-					next = (next + 1) % games.length;
+					next = (next + 1) % filteredGames.length;
 				}
 			}
 			return;
@@ -2242,13 +2319,14 @@ function App() {
 		isHardwareSelectOpen,
 		showGamelistUpdateModal,
 		showLaunchErrorModal,
+		isSearchOpen,
 		reloadModalSelectedIndex,
 		handleFastReload,
 		selectedSystem,
 		systemIndex,
 		filteredSystems,
 		theme,
-		games,
+		filteredGames,
 		selectedGameIndex,
 		swapSystem,
 		toggleScreenReader,
@@ -2286,14 +2364,14 @@ function App() {
 			delete wasOverlayActiveOnKeyDownRef.current[key];
 
 			if (!longPressHandledRef.current[key]) {
-				const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen;
+				const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || isSearchOpen;
 				if (wasOverlayActive && !isOverlayActive) {
 					return;
 				}
 				executeShortPressAction(key);
 			}
 		}
-	}, [executeShortPressAction, isMenuOpen, isGameOptionsOpen, isSaveStateManagerOpen, isHardwareSelectOpen]);
+	}, [executeShortPressAction, isMenuOpen, isGameOptionsOpen, isSaveStateManagerOpen, isHardwareSelectOpen, isSearchOpen]);
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
@@ -2532,6 +2610,15 @@ function App() {
 					addNotification={addNotification}
 					onUpdateGamelists={handleUpdateGamelists}
 					onLaunch={() => handleLaunchGame(currentGame, selectedSystem)}
+					onLaunchNetplay={(options) => {
+						setLaunchingGame(currentGame);
+						setLaunchingSystem(selectedSystem);
+						setIsLaunching(true);
+						window.api
+							.launchNetplayGame(currentGame, selectedSystem, options)
+							.then(cleanupLaunchState)
+							.catch(showLaunchError);
+					}}
 					onOpenSaveStates={() => {
 						setSaveManagerGame(currentGame)
 						setSaveManagerSystem(selectedSystem)
@@ -2539,6 +2626,9 @@ function App() {
 						setIsGameOptionsOpen(false)
 					}}
 					t={t}
+					isFilteredRelated={!!relatedGenreFilter}
+					onFilterRelated={(genre) => setRelatedGenreFilter(genre)}
+					allSystems={systems}
 				/>
 			)}
 
@@ -2728,6 +2818,17 @@ function App() {
 				onClose={() => setIsNetplayLobbyOpen(false)}
 				onLaunchRoom={handleLaunchNetplayRoom}
 				t={t}
+			/>
+
+			{/* Search Overlay */}
+			<SearchOverlay
+				isOpen={isSearchOpen}
+				onClose={() => setIsSearchOpen(false)}
+				searchQuery={searchQuery}
+				onSearch={(query) => setSearchQuery(query)}
+				onClear={() => setSearchQuery('')}
+				isGamelist={!!selectedSystem}
+				hasResults={!!selectedSystem ? filteredGames.length > 0 : filteredSystems.length > 0}
 			/>
 
 			{/* FPS Counter Layer */}

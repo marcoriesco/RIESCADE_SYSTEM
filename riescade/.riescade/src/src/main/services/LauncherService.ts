@@ -195,19 +195,27 @@ export class LauncherService {
       // 3. Resolve Netplay arguments
       let netplayArgs: string[] = []
       if (netplayOptions) {
-        const mode = netplayOptions.netPlayMode === 'spectator' ? 'client' : 'client'
+        const mode = netplayOptions.netPlayMode === 'host' ? 'host' : (netplayOptions.netPlayMode === 'spectator' ? 'client' : 'client')
         const nick = settingsParser.getSetting('global.netplay.nickname', 'string') || 'RIESCADE Player'
         netplayArgs.push(
           '-netplaymode', mode,
-          '-netplayip', netplayOptions.ip,
           '-netplayport', String(netplayOptions.port),
           '-netplaynick', `"${nick}"`
         )
+        if (netplayOptions.ip && mode !== 'host') {
+          netplayArgs.push('-netplayip', netplayOptions.ip)
+        }
         if (netplayOptions.session) {
           netplayArgs.push('-netplaysession', netplayOptions.session)
         }
         if (netplayOptions.netPlayMode === 'spectator') {
           netplayArgs.push('-netplayspectate')
+        }
+        if (netplayOptions.password) {
+          netplayArgs.push('-netplaypassword', netplayOptions.password)
+        }
+        if (netplayOptions.spectatorPassword) {
+          netplayArgs.push('-netplayspectatepassword', netplayOptions.spectatorPassword)
         }
       } else {
         const netplayEnabled = settingsParser.getSetting('global.netplay', 'bool') === 'true' || settingsParser.getSetting('global.netplay', 'bool') === true || settingsParser.getSetting('global.netplay', 'bool') === '1' || settingsParser.getSetting('global.netplay', 'bool') === 1

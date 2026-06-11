@@ -24,7 +24,9 @@
         <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'User'}</span>
 				<div class="user-avatar-container">
 					<img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}"/>
-				</div>      </div>
+					<span class="{global.netplay ? 'user-online animate__animated animate__pulse' : 'hide'}"></span>
+				</div>      
+      </div>
     </div>
 
   </div>
