@@ -217,10 +217,11 @@ function App() {
 
 	// ─── Theme Translation helper for dynamic status keys ───
 	const translateThemeKey = useCallback(
-		(key: string): string => {
+		(key: string, customSettings?: any): string => {
 			if (!theme) return key;
 			const defaultLocaleKey = theme.defaultLocale || 'en_US';
-			const lang = settings['Language']?.value || defaultLocaleKey;
+			const activeSettings = customSettings || settings;
+			const lang = activeSettings['Language']?.value || defaultLocaleKey;
 			const themeLocales = theme.locales || {};
 			const currentLocale = themeLocales[lang] || {};
 			const fallbackLocale = themeLocales[defaultLocaleKey] || themeLocales['en_US'] || {};
@@ -760,7 +761,16 @@ function App() {
 								setSettings(initialSettings);
 								console.log('[StartLoader] Startup sequence complete, forcing progress to 100');
 								setSystemsLoadingProgress(100);
-								setSystemsLoadingMessage(translateThemeKey('READY'));
+								const getTranslation = (key: string) => {
+									if (!t) return key;
+									const defaultLocaleKey = t.defaultLocale || 'en_US';
+									const lang = initialSettings['Language']?.value || defaultLocaleKey;
+									const themeLocales = t.locales || {};
+									const currentLocale = themeLocales[lang] || {};
+									const fallbackLocale = themeLocales[defaultLocaleKey] || themeLocales['en_US'] || {};
+									return currentLocale[key] || fallbackLocale[key] || key;
+								};
+								setSystemsLoadingMessage(getTranslation('READY'));
 								setSystems(s);
 								setMusicFiles(files);
 								setMusicPath(mPath);
@@ -822,7 +832,11 @@ function App() {
 			}
 		};
 
-		window.api.getActiveTheme().then((themeName: string) => {
+		Promise.all([
+			window.api.getActiveTheme(),
+			window.api.getSettings()
+		]).then(([themeName, initialSettings]) => {
+			setSettings(initialSettings);
 			loadTheme(themeName, true);
 		});
 

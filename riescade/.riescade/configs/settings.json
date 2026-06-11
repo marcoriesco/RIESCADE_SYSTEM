@@ -819,10 +819,6 @@
     "value": "stable",
     "type": "string"
   },
-  "video_driver": {
-    "value": "vulkan",
-    "type": "string"
-  },
   "wii.emulatedwiimotes": {
     "value": 1,
     "type": "string"
@@ -904,7 +900,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "pcfx",
+    "value": "mastersystem",
     "type": "string"
   },
   "MaxVRAM": {
