@@ -904,7 +904,7 @@
     "type": "string"
   },
   "LastSystem": {
-    "value": "switch",
+    "value": "pcfx",
     "type": "string"
   },
   "MaxVRAM": {

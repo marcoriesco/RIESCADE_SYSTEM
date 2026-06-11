@@ -1,6 +1,6 @@
 {
   "name": "riescade",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "RIESCADE Frontend",
   "main": "./out/main/index.js",
   "author": "Marco Riesco",
