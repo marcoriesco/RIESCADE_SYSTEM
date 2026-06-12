@@ -23,7 +23,7 @@ export function getRetroBatPath(): string {
 }
 
 export function getConfigPath(): string {
-  return join(getRetroBatPath(), 'riescade', '.riescade', 'configs')
+  return join(getRetroBatPath(), 'riescade', '.emulationstation')
 }
 
 export function getCollectionsPath(): string {
@@ -51,7 +51,7 @@ export function getEmulatorsPath(): string {
  * In production: it's inside app resources (extraResources).
  * In development: it's in the source tree (src/main/theme_default).
  * Note: __dirname in dev points to out/main/ (compiled), so we use process.cwd()
- * which points to the project root (emulationstation/.riescade/src/).
+ * which points to the project root (riescade/.riescade/src/).
  */
 export function getDefaultThemePath(): string {
   return join(app.getAppPath(), 'src', 'main', 'theme_default')
@@ -59,15 +59,15 @@ export function getDefaultThemePath(): string {
 
 /**
  * Returns the path to the user themes directory.
- * This is always outside the app bundle: emulationstation/.riescade/themes/
+ * This is always outside the app bundle: riescade/.riescade/themes/
  */
 export function getUserThemesPath(): string {
-  return join(getRiescadePath(), 'themes')
+  return join(getRetroBatPath(), 'riescade', 'themes')
 }
 
 /**
  * Returns the path to the SQLite database used for ROM indexing.
- * Located at: emulationstation/.riescade/riescade.db
+ * Located at: riescade/.riescade/riescade.db
  */
 export function getDatabasePath(): string {
   return join(getRiescadePath(), 'riescade.db')

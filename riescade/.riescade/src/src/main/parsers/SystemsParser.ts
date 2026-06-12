@@ -1,8 +1,9 @@
-import { readFileSync, existsSync, opendirSync, writeFileSync, mkdirSync } from 'fs'
+import { readFileSync, existsSync, opendirSync, writeFileSync, mkdirSync, readdirSync } from 'fs'
 import { join, resolve } from 'path'
 import { System } from '../../shared/types'
 import { getConfigPath, getRiescadePath, getRetroBatPath } from '../utils/paths'
 import { SettingsParser } from './SettingsParser'
+import { XMLParser } from 'fast-xml-parser'
 
 export class SystemsParser {
   private static cachedSystems: System[] | null = null
@@ -19,43 +20,92 @@ export class SystemsParser {
     }
 
     const configPath = getConfigPath()
-    const systemsJsonPath = join(configPath, 'systems.json')
+    const mainSystemsPath = join(configPath, 'es_systems.cfg')
     
-    let systems: System[] = []
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+      parseAttributeValue: true,
+      ignoreDeclaration: true
+    })
 
-    if (existsSync(systemsJsonPath)) {
+    const parseSystemFile = (filePath: string): System[] => {
+      if (!existsSync(filePath)) return []
       try {
-        const content = readFileSync(systemsJsonPath, 'utf-8')
-        const data = JSON.parse(content)
-        if (data && Array.isArray(data.systems)) {
-          systems = data.systems.map((s: any) => {
-            const sName = String(s.name || '').toLowerCase()
-            let sHardware = String(s.hardware || '')
-            if (!sHardware) {
-              if (['library', 'magazine', 'manuals', 'retrobat', 'emulators', 'screenshots', 'windows'].includes(sName)) {
-                sHardware = 'system'
-              } else {
-                sHardware = 'console'
-              }
-            }
+        const content = readFileSync(filePath, 'utf-8')
+        const xmlObj = parser.parse(content)
+        const systemList = xmlObj.systemList?.system
+        if (!systemList) return []
+        const list = Array.isArray(systemList) ? systemList : [systemList]
+        
+        return list.map((s: any) => {
+          const parseEmulators = (emulators: any) => {
+            if (!emulators || !emulators.emulator) return []
+            const emuList = Array.isArray(emulators.emulator) ? emulators.emulator : [emulators.emulator]
+            return emuList.map((e: any) => ({
+              name: String(e['@_name'] || ''),
+              cores: e.cores?.core ? (Array.isArray(e.cores.core) ? e.cores.core : [e.cores.core]).map((c: any) => String(c)) : []
+            }))
+          }
 
-            return {
-              name: String(s.name),
-              fullname: String(s.fullname || s.name),
-              path: String(s.path),
-              extension: String(s.extension || ''),
-              command: String(s.command || ''),
-              platform: String(s.platform || ''),
-              theme: String(s.theme || s.name),
-              hardware: sHardware,
-              group: s.group ? String(s.group) : undefined,
-              emulators: s.emulators || []
+          const sName = String(s.name || '').toLowerCase()
+          let sHardware = String(s.hardware || '')
+          if (!sHardware) {
+            if (['library', 'magazine', 'manuals', 'retrobat', 'emulators', 'screenshots', 'windows'].includes(sName)) {
+              sHardware = 'system'
+            } else {
+              sHardware = 'console'
             }
-          })
-        }
+          }
+
+          return {
+            name: String(s.name || ''),
+            fullname: String(s.fullname || s.name || ''),
+            path: String(s.path || ''),
+            extension: String(s.extension || ''),
+            command: String(s.command || ''),
+            platform: String(s.platform || ''),
+            theme: String(s.theme || s.name || ''),
+            hardware: sHardware,
+            group: s.group ? String(s.group) : undefined,
+            emulators: parseEmulators(s.emulators)
+          }
+        })
       } catch (err) {
-        console.error('Error parsing systems.json:', err)
+        console.error(`Error parsing system file ${filePath}:`, err)
+        return []
       }
+    }
+
+    let systems: System[] = []
+    const systemMap = new Map<string, System>()
+
+    if (existsSync(mainSystemsPath)) {
+      const mainSystems = parseSystemFile(mainSystemsPath)
+      mainSystems.forEach(sys => {
+        if (sys.name) {
+          systemMap.set(sys.name.toLowerCase(), sys)
+        }
+      })
+
+      // Load overrides (es_systems_*.cfg)
+      try {
+        const files = readdirSync(configPath)
+        files.forEach(f => {
+          if (f.startsWith('es_systems_') && f.endsWith('.cfg')) {
+            const overrideSystems = parseSystemFile(join(configPath, f))
+            overrideSystems.forEach(sys => {
+              if (sys.name) {
+                systemMap.set(sys.name.toLowerCase(), sys)
+              }
+            })
+          }
+        })
+      } catch (err) {
+        console.error('Error reading overrides in configs directory:', err)
+      }
+
+      systems = Array.from(systemMap.values())
     }
 
     const settings = new SettingsParser()

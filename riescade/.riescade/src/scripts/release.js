@@ -157,18 +157,13 @@ async function run() {
     fs.mkdirSync(logsDir, { recursive: true });
     console.log('   ✓ riescade/.riescade/logs/ emptied');
 
-    // Remove the launcher development source code folder from temp release directory
-    const launcherSrcDir = path.join(esDest, 'launcher', 'src');
-    if (fs.existsSync(launcherSrcDir)) {
-      fs.rmSync(launcherSrcDir, { recursive: true, force: true });
-      console.log('   ✓ riescade/launcher/src/ excluded');
-    }
-
-    // Remove emulatorLauncher log from temp release directory
-    const launcherLog = path.join(esDest, 'launcher', 'emulatorLauncher.log');
-    if (fs.existsSync(launcherLog)) {
-      fs.unlinkSync(launcherLog);
-      console.log('   ✓ riescade/launcher/emulatorLauncher.log excluded');
+    // Remove any log files from the temp release directory
+    for (const child of fs.readdirSync(esDest)) {
+      if (child.endsWith('.log') || child.endsWith('.log.old')) {
+        const logPath = path.join(esDest, child);
+        fs.unlinkSync(logPath);
+        console.log(`   ✓ ${child} excluded`);
+      }
     }
   }
 
@@ -213,7 +208,7 @@ async function run() {
   }
 
   // --- Compress using local 7z.exe ---
-  const sevenZipPath = path.join(projectRoot, 'riescade', 'launcher', '7z.exe');
+  const sevenZipPath = path.join(projectRoot, 'riescade', '7z.exe');
   console.log('🤐 Compressing with 7-Zip (7z format)...');
   execSync(`"${sevenZipPath}" a -t7z -mx=9 -ms=on "${zipPath}" "${tempDir}\\*"`, { stdio: 'inherit' });
 

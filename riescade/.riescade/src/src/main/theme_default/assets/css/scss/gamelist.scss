@@ -56,15 +56,20 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: flex-start;
-	width: 45%;
-	padding-bottom: 120px;
+	width: 50%;
+	height: 100vh;
+	// padding-bottom: 120px;
 
-	.gamelist-thumbnail {
-		max-width: 100%;
-		max-height: 55vh;
-		object-fit: contain;
-		filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
-		transform: rotate(-4deg);
+	.gamelist-thumbnail-container {
+		width: 100%;
+
+		.gamelist-thumbnail {
+			max-width: 50%;
+			max-height: 50vh;
+			object-fit: contain;
+			filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+			transform: rotate(-4deg);
+		}
 	}
 
 	.gamelist-meta {

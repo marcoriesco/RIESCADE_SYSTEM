@@ -182,7 +182,7 @@ function App() {
 		null,
 	);
 	const [notifications, setNotifications] = useState<
-		{ id: string; message: string; type: 'info' | 'success' | 'warning'; category?: 'controller' | 'scraper' | 'general' }[]
+		{ id: string; message: React.ReactNode; type: 'info' | 'success' | 'warning'; category?: 'controller' | 'scraper' | 'general' }[]
 	>([]);
 	const [themeRevision, setThemeRevision] = useState(0);
 	const [mediaRevision, setMediaRevision] = useState(0);
@@ -214,12 +214,12 @@ function App() {
 	}, [games, searchQuery, selectedSystem, relatedGenreFilter]);
 
 	const addNotification = useCallback(
-		(message: string, type: 'info' | 'success' | 'warning' = 'info', category: 'controller' | 'scraper' | 'general' = 'general') => {
+		(message: React.ReactNode, type: 'info' | 'success' | 'warning' = 'info', category: 'controller' | 'scraper' | 'general' = 'general') => {
 			const id = Math.random().toString(36).substring(2, 9);
 			setNotifications((prev) => [...prev, { id, message, type, category }]);
 			setTimeout(() => {
 				setNotifications((prev) => prev.filter((n) => n.id !== id));
-			}, 3000);
+			}, 5000);
 		},
 		[],
 	);
@@ -913,7 +913,7 @@ function App() {
 				const isConnected = event.type === 'gamepadconnected';
 				const gpName = event.gamepad.id.split('(')[0].trim();
 				addNotification(
-					`${gpName} ${isConnected ? 'connected' : 'disconnected'}`,
+					<>{gpName} {isConnected ? <span className="controller-status">connected</span> : 'disconnected'}</>,
 					isConnected ? 'success' : 'warning',
 					'controller'
 				);

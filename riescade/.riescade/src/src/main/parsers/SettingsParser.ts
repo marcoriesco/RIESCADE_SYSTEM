@@ -1,12 +1,13 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
 import { getConfigPath } from '../utils/paths'
+import { XMLParser } from 'fast-xml-parser'
 
 export class SettingsParser {
   constructor() {}
 
   private getSettingsPath(): string {
-    return join(getConfigPath(), 'settings.json')
+    return join(getConfigPath(), 'es_settings.cfg')
   }
 
   public getAllSettings(): any {
@@ -15,7 +16,38 @@ export class SettingsParser {
 
     try {
       const content = readFileSync(settingsPath, 'utf-8')
-      return JSON.parse(content)
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '@_',
+        parseAttributeValue: true,
+        ignoreDeclaration: true
+      })
+      const xmlObj = parser.parse(content)
+      const config = xmlObj.config || {}
+      const settings: any = {}
+
+      const types: ('bool' | 'string' | 'int' | 'float')[] = ['bool', 'string', 'int', 'float']
+      for (const type of types) {
+        const elements = config[type]
+        if (elements) {
+          const list = Array.isArray(elements) ? elements : [elements]
+          list.forEach((s: any) => {
+            const name = s['@_name']
+            let value = s['@_value']
+            if (value !== undefined) {
+              if (type === 'bool') {
+                value = value === true || String(value) === 'true'
+              } else if (type === 'int') {
+                value = parseInt(value, 10)
+              } else if (type === 'float') {
+                value = parseFloat(value)
+              }
+              settings[name] = { value, type }
+            }
+          })
+        }
+      }
+      return settings
     } catch (error) {
       console.error('Error parsing all settings:', error)
       return {}
@@ -33,16 +65,7 @@ export class SettingsParser {
 
   public saveSetting(name: string, value: any, type: 'string' | 'bool' | 'int' | 'float'): void {
     const settingsPath = this.getSettingsPath()
-    let settings: any = {}
-
-    if (existsSync(settingsPath)) {
-      try {
-        const content = readFileSync(settingsPath, 'utf-8')
-        settings = JSON.parse(content)
-      } catch (e) {
-        console.error('Error reading settings for save:', e)
-      }
-    }
+    const settings = this.getAllSettings()
 
     // Add new (only if value is not null, undefined, empty, or string "null", and is not a redundant "auto")
     const isRedundantAuto = String(value).toLowerCase() === 'auto' &&
@@ -69,7 +92,15 @@ export class SettingsParser {
     }
 
     try {
-      writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8')
+      // Serialize settings to XML format
+      let xmlContent = '<?xml version="1.0"?>\n<config>\n'
+      for (const [key, item] of Object.entries(settings) as [string, any][]) {
+        const valueEscaped = String(item.value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        xmlContent += `\t<${item.type} name="${key}" value="${valueEscaped}" />\n`
+      }
+      xmlContent += '</config>\n'
+
+      writeFileSync(settingsPath, xmlContent, 'utf-8')
 
       // Clear systems cache on settings change that might affect system configuration
       const affectingSettings = [

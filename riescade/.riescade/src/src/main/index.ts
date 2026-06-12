@@ -308,27 +308,47 @@ app.whenReady().then(() => {
   })
 
   ipcMain.handle('save-input-config', async (_, { deviceName, deviceGUID, mappings }) => {
-    const configPath = join(getConfigPath(), 'input.json')
-    const lastConfigPath = join(getConfigPath(), 'last_input.json')
+    const configPath = join(getConfigPath(), 'es_input.cfg')
+    const lastConfigPath = join(getConfigPath(), 'es_last_input.cfg')
 
-    let data: any = { inputConfigs: [] }
+    let existingConfigs: any[] = []
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+      parseAttributeValue: true,
+      ignoreDeclaration: true
+    })
+
     if (existsSync(configPath)) {
       try {
         const content = readFileSync(configPath, 'utf-8')
-        data = JSON.parse(content)
-        if (!data.inputConfigs) data.inputConfigs = []
+        const xmlObj = parser.parse(content)
+        const inputConfigRaw = xmlObj.inputList?.inputConfig
+        if (inputConfigRaw) {
+          existingConfigs = Array.isArray(inputConfigRaw) ? inputConfigRaw : [inputConfigRaw]
+        }
       } catch (err) {
-        console.error('Failed to parse input.json:', err)
+        console.error('Failed to parse es_input.cfg:', err)
       }
     }
 
     // Filter out existing mapping with the same GUID or Name
-    data.inputConfigs = data.inputConfigs.filter(
-      (cfg: any) => cfg.deviceGUID !== deviceGUID && cfg.deviceName !== deviceName
+    existingConfigs = existingConfigs.filter(
+      (cfg: any) => cfg['@_deviceGUID'] !== deviceGUID && cfg['@_deviceName'] !== deviceName
     )
 
-    // Construct the new mapping config
-    const newInputConfig = {
+    // Helper to serialize an inputConfig to XML
+    const serializeInputConfig = (cfg: any): string => {
+      let xml = `\t<inputConfig type="${cfg.type}" deviceName="${cfg.deviceName}" deviceGUID="${cfg.deviceGUID}">\n`
+      cfg.inputs.forEach((input: any) => {
+        xml += `\t\t<input name="${input.name}" type="${input.type}" id="${input.id}" value="${input.value}" />\n`
+      })
+      xml += `\t</inputConfig>\n`
+      return xml
+    }
+
+    // New configured controller structure
+    const newInputConfigObj = {
       type: 'joystick',
       deviceName,
       deviceGUID,
@@ -340,37 +360,61 @@ app.whenReady().then(() => {
       }))
     }
 
-    data.inputConfigs.push(newInputConfig)
-
-    // Build the JSON content
     try {
-      writeFileSync(configPath, JSON.stringify(data, null, 2), 'utf-8')
+      // Build the XML content for es_input.cfg
+      let xmlContent = '<?xml version="1.0"?>\n<inputList>\n'
+      existingConfigs.forEach((cfg: any) => {
+        const type = cfg['@_type'] || 'joystick'
+        const devName = cfg['@_deviceName'] || ''
+        const devGUID = cfg['@_deviceGUID'] || ''
+        xmlContent += `\t<inputConfig type="${type}" deviceName="${devName}" deviceGUID="${devGUID}">\n`
+        const inputsRaw = cfg.input ? (Array.isArray(cfg.input) ? cfg.input : [cfg.input]) : []
+        inputsRaw.forEach((input: any) => {
+          xmlContent += `\t\t<input name="${input['@_name']}" type="${input['@_type']}" id="${input['@_id']}" value="${input['@_value']}" />\n`
+        })
+        xmlContent += `\t</inputConfig>\n`
+      })
 
-      // Also write to last_input.json containing ONLY the last configured controller
-      const lastDataObj = {
-        inputConfigs: [newInputConfig]
-      }
-      writeFileSync(lastConfigPath, JSON.stringify(lastDataObj, null, 2), 'utf-8')
+      // Append new controller
+      xmlContent += serializeInputConfig(newInputConfigObj)
+      xmlContent += '</inputList>\n'
+
+      writeFileSync(configPath, xmlContent, 'utf-8')
+
+      // Build and write es_last_input.cfg containing ONLY the last configured controller
+      let lastXmlContent = '<?xml version="1.0"?>\n<inputList>\n'
+      lastXmlContent += serializeInputConfig(newInputConfigObj)
+      lastXmlContent += '</inputList>\n'
+      
+      writeFileSync(lastConfigPath, lastXmlContent, 'utf-8')
       
       console.log('Successfully saved controller config for:', deviceName)
       return true
     } catch (err) {
-      console.error('Failed to write input.json:', err)
+      console.error('Failed to write es_input.cfg / es_last_input.cfg:', err)
       return false
     }
   })
 
   ipcMain.handle('get-configured-controllers', async () => {
-    const configPath = join(getConfigPath(), 'input.json')
+    const configPath = join(getConfigPath(), 'es_input.cfg')
     if (!existsSync(configPath)) return []
     try {
       const content = readFileSync(configPath, 'utf-8')
-      const data = JSON.parse(content)
-      const configs = data.inputConfigs || []
-      return configs.map((cfg: any) => ({
-        name: cfg.deviceName,
-        guid: cfg.deviceGUID,
-        type: cfg.type
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '@_',
+        parseAttributeValue: true,
+        ignoreDeclaration: true
+      })
+      const xmlObj = parser.parse(content)
+      const inputConfigRaw = xmlObj.inputList?.inputConfig
+      if (!inputConfigRaw) return []
+      const arr = Array.isArray(inputConfigRaw) ? inputConfigRaw : [inputConfigRaw]
+      return arr.map((cfg: any) => ({
+        name: cfg['@_deviceName'],
+        guid: cfg['@_deviceGUID'],
+        type: cfg['@_type']
       }))
     } catch (err) {
       console.error('Failed to read configured controllers:', err)

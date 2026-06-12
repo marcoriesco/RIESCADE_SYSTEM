@@ -70,18 +70,11 @@ if (Test-Path $esSource) {
     New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
     Write-Host "   [OK] riescade/.riescade/logs/ (emptied)"
 
-    # Remove the launcher development source code folder from temp release directory
-    $launcherSrcDir = Join-Path (Join-Path $esDest 'launcher') 'src'
-    if (Test-Path $launcherSrcDir) {
-        Remove-Item -Path $launcherSrcDir -Recurse -Force
-        Write-Host "   [OK] riescade/launcher/src/ excluded"
-    }
-
-    # Remove emulatorLauncher log from temp release directory
-    $launcherLog = Join-Path (Join-Path $esDest 'launcher') 'emulatorLauncher.log'
-    if (Test-Path $launcherLog) {
-        Remove-Item -Path $launcherLog -Force
-        Write-Host "   [OK] riescade/launcher/emulatorLauncher.log excluded"
+    # Remove emulatorLauncher logs from temp release directory
+    if (Test-Path $esDest) {
+        Get-ChildItem -Path $esDest -Filter "*.log" -ErrorAction SilentlyContinue | Remove-Item -Force
+        Get-ChildItem -Path $esDest -Filter "*.log.old" -ErrorAction SilentlyContinue | Remove-Item -Force
+        Write-Host "   [OK] emulatorLauncher logs excluded"
     }
 }
 
@@ -109,7 +102,7 @@ foreach ($folder in $extraFolders) {
 Write-Host "Creating 7z archive..." -ForegroundColor Cyan
 $7zExe = "C:\Program Files\7-Zip\7z.exe"
 if (!(Test-Path $7zExe)) {
-    $7zExe = Join-Path $projectRoot "riescade\launcher\7z.exe"
+    $7zExe = Join-Path $projectRoot "riescade\7z.exe"
 }
 if (!(Test-Path $7zExe)) {
     $7zExe = "7z" # Fallback to PATH

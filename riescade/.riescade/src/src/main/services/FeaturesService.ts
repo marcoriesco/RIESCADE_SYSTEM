@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 import { getConfigPath } from '../utils/paths'
+import { XMLParser } from 'fast-xml-parser'
 
 export interface FeatureChoice {
   name: string
@@ -31,18 +32,120 @@ export class FeaturesService {
   private loadFeatures(): any {
     if (this.featuresData) return this.featuresData
 
-    const filePath = join(getConfigPath(), 'features.json')
+    const filePath = join(getConfigPath(), 'es_features.cfg')
     if (!existsSync(filePath)) {
-      console.warn(`[FeaturesService] features.json not found at ${filePath}`)
+      console.warn(`[FeaturesService] es_features.cfg not found at ${filePath}`)
       return null
     }
 
     try {
       const content = readFileSync(filePath, 'utf-8')
-      this.featuresData = JSON.parse(content)
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '@_',
+        parseAttributeValue: true,
+        ignoreDeclaration: true
+      })
+      const xmlObj = parser.parse(content)
+      const features = xmlObj.features || {}
+
+      const cleanFeatureList = (list: any) => {
+        if (!list) return undefined
+        const arr = Array.isArray(list) ? list : [list]
+        return arr.map(f => {
+          const cleaned: any = {
+            name: f['@_name'],
+            value: f['@_value'],
+            description: f['@_description'],
+            preset: f['@_preset'],
+            submenu: f['@_submenu'],
+            group: f['@_group'],
+            order: f['@_order']
+          }
+          if (f.choice) {
+            const choices = Array.isArray(f.choice) ? f.choice : [f.choice]
+            cleaned.choices = choices.map((c: any) => ({
+              name: c['@_name'],
+              value: String(c['@_value'])
+            }))
+          }
+          return cleaned
+        })
+      }
+
+      const cleanSharedFeatureList = (list: any) => {
+        if (!list) return undefined
+        const arr = Array.isArray(list) ? list : [list]
+        return arr.map((sf: any) => ({
+          name: sf['@_name'],
+          value: sf['@_value'],
+          group: sf['@_group'],
+          submenu: sf['@_submenu'],
+          order: sf['@_order']
+        }))
+      }
+
+      const cleanSharedFeatures = (sf: any) => {
+        if (!sf) return undefined
+        return {
+          featuresList: cleanFeatureList(sf.feature)
+        }
+      }
+
+      const cleanGlobalFeatures = (gf: any) => {
+        if (!gf) return undefined
+        return {
+          featuresList: cleanFeatureList(gf.feature),
+          sharedFeatures: cleanSharedFeatureList(gf.sharedFeature)
+        }
+      }
+
+      const cleanEmulators = (emulators: any) => {
+        if (!emulators) return undefined
+        const arr = Array.isArray(emulators) ? emulators : [emulators]
+        return arr.map(emu => {
+          const cleanSystems = (systems: any) => {
+            if (!systems) return undefined
+            const sArr = Array.isArray(systems) ? systems : [systems]
+            return sArr.map((s: any) => ({
+              name: s['@_name'],
+              features: s['@_features'],
+              sharedFeatures: cleanSharedFeatureList(s.sharedFeature),
+              featuresList: cleanFeatureList(s.feature)
+            }))
+          }
+
+          const cleanCores = (cores: any) => {
+            if (!cores) return undefined
+            const cArr = Array.isArray(cores) ? cores : [cores]
+            return cArr.map((c: any) => ({
+              name: c['@_name'],
+              features: c['@_features'],
+              sharedFeatures: cleanSharedFeatureList(c.sharedFeature),
+              featuresList: cleanFeatureList(c.feature),
+              systems: cleanSystems(c.system)
+            }))
+          }
+
+          return {
+            name: emu['@_name'],
+            features: emu['@_features'],
+            sharedFeatures: cleanSharedFeatureList(emu.sharedFeature),
+            featuresList: cleanFeatureList(emu.feature),
+            systems: cleanSystems(emu.system),
+            cores: cleanCores(emu.core)
+          }
+        })
+      }
+
+      this.featuresData = {
+        sharedFeatures: cleanSharedFeatures(features.sharedFeatures),
+        globalFeatures: cleanGlobalFeatures(features.globalFeatures),
+        emulators: cleanEmulators(features.emulator)
+      }
       return this.featuresData
     } catch (e) {
-      console.error('[FeaturesService] Error parsing features.json:', e)
+      console.error('[FeaturesService] Error parsing es_features.cfg:', e)
       return null
     }
   }

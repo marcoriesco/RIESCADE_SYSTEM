@@ -525,7 +525,7 @@ export class LibraryService {
       console.log('[SyncCheck] Starting startup synchronization check...')
       
       const configPath = getConfigPath()
-      const systemsJsonPath = join(configPath, 'systems.json')
+      const systemsJsonPath = join(configPath, 'es_systems.cfg')
       let currentSystemsJsonMtime = 0
       try {
         if (existsSync(systemsJsonPath)) {
@@ -533,13 +533,13 @@ export class LibraryService {
         }
       } catch {}
 
-      // Check systems.json modification
-      const systemsJsonRecord = dbService.getSystemSyncMetadata('__systems.json')
+      // Check es_systems.cfg modification
+      const systemsJsonRecord = dbService.getSystemSyncMetadata('__es_systems.cfg')
       if (!systemsJsonRecord) {
-        console.log('[SyncCheck] Virtual record for systems.json not found in DB. Sync required.')
+        console.log('[SyncCheck] Virtual record for es_systems.cfg not found in DB. Sync required.')
         needsSync = true
       } else if (currentSystemsJsonMtime !== systemsJsonRecord.folder_mtime) {
-        console.log(`[SyncCheck] systems.json was modified: DB mtime ${systemsJsonRecord.folder_mtime} vs Disk mtime ${currentSystemsJsonMtime}. Sync required.`)
+        console.log(`[SyncCheck] es_systems.cfg was modified: DB mtime ${systemsJsonRecord.folder_mtime} vs Disk mtime ${currentSystemsJsonMtime}. Sync required.`)
         needsSync = true
       }
 

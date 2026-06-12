@@ -1108,7 +1108,7 @@
 }
 
 .riescade-notification {
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.75);
   color: #c0c0c0;
   padding: 10px 18px;
   border: 1px solid #111;
@@ -1117,15 +1117,21 @@
   align-items: center;
   gap: 12px;
   pointer-events: auto;
-  min-width: 280px;
   text-transform: none;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 4px;
   animation: NotificationSlideIn 0.3s ease-out forwards;
 }
-.riescade-notification.controller.connected {
+.riescade-notification.controller.connected .riescade-notification-icon {
   color: var(--theme-color);
+}
+.riescade-notification.controller.connected .riescade-notification-message {
+  color: #fff;
+}
+.riescade-notification.controller.connected .controller-status {
+  color: var(--theme-color);
+  font-weight: 900;
 }
 
 .riescade-notification-icon {
@@ -1135,7 +1141,7 @@
 
 .riescade-notification-message {
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   letter-spacing: 0.2px;
 }
 

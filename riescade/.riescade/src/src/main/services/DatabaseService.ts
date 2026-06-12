@@ -432,9 +432,9 @@ export class DatabaseService {
       }
     }
 
-    // Sync __systems.json config metadata
+    // Sync __es_systems.cfg config metadata
     const configPath = getConfigPath()
-    const systemsJsonPath = join(configPath, 'systems.json')
+    const systemsJsonPath = join(configPath, 'es_systems.cfg')
     let systemsJsonMtime = 0
     try {
       if (existsSync(systemsJsonPath)) {
@@ -449,7 +449,7 @@ export class DatabaseService {
         folder_mtime = excluded.folder_mtime,
         last_scan_at = excluded.last_scan_at
     `).run(
-      '__systems.json',
+      '__es_systems.cfg',
       'Systems Configuration File',
       systemsJsonPath,
       '',
@@ -466,7 +466,7 @@ export class DatabaseService {
     if (activeNames.length > 0) {
       const placeholders = activeNames.map(() => '?').join(',')
       db.prepare(`DELETE FROM games WHERE system NOT IN (${placeholders})`).run(...activeNames)
-      db.prepare(`DELETE FROM systems WHERE name NOT IN (${placeholders}, '__systems.json')`).run(...activeNames)
+      db.prepare(`DELETE FROM systems WHERE name NOT IN (${placeholders}, '__es_systems.cfg')`).run(...activeNames)
     } else {
       db.prepare('DELETE FROM games').run()
       db.prepare('DELETE FROM systems').run()
@@ -1015,12 +1015,12 @@ export class DatabaseService {
   }
 
   /**
-   * Get sync metadata (mtime and file count) for all systems except __systems.json.
+   * Get sync metadata (mtime and file count) for all systems except __es_systems.cfg.
    */
   public getAllSystemsSyncMetadata(): { name: string; path: string; folder_mtime: number; file_count: number }[] {
     const db = this.ensureOpen()
     try {
-      const rows = db.prepare("SELECT name, path, folder_mtime, file_count FROM systems WHERE name != '__systems.json'").all() as any[]
+      const rows = db.prepare("SELECT name, path, folder_mtime, file_count FROM systems WHERE name != '__es_systems.cfg'").all() as any[]
       return rows.map(r => ({
         name: r.name,
         path: r.path,
@@ -1029,7 +1029,7 @@ export class DatabaseService {
       }))
     } catch {
       try {
-        const rows = db.prepare("SELECT name, path, folder_mtime FROM systems WHERE name != '__systems.json'").all() as any[]
+        const rows = db.prepare("SELECT name, path, folder_mtime FROM systems WHERE name != '__es_systems.cfg'").all() as any[]
         return rows.map(r => ({
           name: r.name,
           path: r.path,

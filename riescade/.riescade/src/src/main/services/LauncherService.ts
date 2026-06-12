@@ -19,7 +19,7 @@ export class LauncherService {
   public launch(game: Game, system: System, activeControllers: ControllerInfo[] = [], saveStateSlot?: number, netplayOptions?: any): Promise<void> {
     return new Promise((resolvePromise, reject) => {
       const retroBatPath = getRetroBatPath()
-      const launcherPath = join(retroBatPath, 'riescade', 'launcher', 'emulatorLauncher.exe')
+      const launcherPath = join(retroBatPath, 'riescade', 'emulatorLauncher.exe')
       
       // Resolve Rom Path relative to system.path instead of hardcoding roms directory
       const romPath = resolve(system.path, game.path)
