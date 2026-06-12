@@ -629,7 +629,7 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       let finalChildren = children
 
       if (isLaunchingView) {
-        const hasHide = el.hasAttribute('hideloadingelement') || el.hasAttribute('hideLoadingElement')
+        const hasHide = el.hasAttribute('hideloadingelement') || el.hasAttribute('hideLoadingElement') || el.hasAttribute('keeploadingelement') || el.hasAttribute('keepLoadingElement')
         const keepTextVal = el.getAttribute('keeploadingelementtext') || el.getAttribute('keepLoadingElementText')
 
         if (hasHide) {

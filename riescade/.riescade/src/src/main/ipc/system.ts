@@ -54,15 +54,26 @@ export function registerSystemIpc(context: IpcContext): void {
 
         // Escape double quotes inside command argument for powershell
         const escapedScript = script.replace(/"/g, '\\"')
-        const psOutput = execSync(`powershell -NoProfile -Command "${escapedScript}"`, { encoding: 'utf8' }).trim()
-        const parsed = JSON.parse(psOutput)
+        
+        // Query asynchronously to avoid blocking the Electron main thread during startup
+        const psOutput = await new Promise<string>((resolve, reject) => {
+          exec(`powershell -NoProfile -Command "${escapedScript}"`, { encoding: 'utf8' }, (error, stdout) => {
+            if (error) {
+              reject(error)
+            } else {
+              resolve(stdout)
+            }
+          })
+        })
+
+        const parsed = JSON.parse(psOutput.trim())
 
         let cpuSpeedStr = 'N/A'
         const speedMhz = parseInt(parsed.cpuSpeed, 10)
         if (!isNaN(speedMhz) && speedMhz > 0) {
           cpuSpeedStr = `${(speedMhz / 1000).toFixed(1)} GHz`
         } else {
-          cpuSpeedStr = `${(cpus[0].speed / 1000).toFixed(1)} GHz`
+          cpuSpeedStr = cpus.length > 0 ? `${(cpus[0].speed / 1000).toFixed(1)} GHz` : 'N/A'
         }
 
         const gpuModelStr = parsed.gpuModel || 'Unknown GPU'

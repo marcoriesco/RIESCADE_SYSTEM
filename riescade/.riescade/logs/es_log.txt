@@ -1,32 +1,33 @@
---- RIESCADE Log Started at 2026-06-12T04:35:13.175Z ---
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[01:35:13] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[01:35:13] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[01:35:13] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[01:35:13] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[01:35:13] [INFO] [SyncCheck] Starting startup synchronization check...
-[01:35:13] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[01:35:13] [INFO] [StartLoader:Backend] sendProgress(10, 'LOADING_PLATFORMS')
-[01:35:13] [INFO] [StartLoader:Backend] sendProgress(30, 'LOADING_PLATFORMS')
-[01:35:13] [INFO] [StartLoader:Backend] sendProgress(60, 'LOADING_PLATFORMS')
-[01:35:13] [INFO] [StartLoader:Backend] sendProgress(80, 'LOADING_PLATFORMS')
-[01:35:13] [INFO] [StartLoader:Backend] sendProgress(100, 'READY')
-[01:35:13] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
-[01:35:14] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=2606:50c0:8000::154 (IPv6), Time=562ms, HTTP=200
+--- RIESCADE Log Started at 2026-06-12T04:50:34.164Z ---
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[01:50:34] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[01:50:34] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[01:50:34] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[01:50:34] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[01:50:34] [INFO] [SyncCheck] Starting startup synchronization check...
+[01:50:34] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
+[01:50:34] [INFO] [StartLoader:Backend] sendProgress(10, 'LOADING_PLATFORMS')
+[01:50:34] [INFO] [StartLoader:Backend] sendProgress(30, 'LOADING_PLATFORMS')
+[01:50:34] [INFO] [StartLoader:Backend] sendProgress(60, 'LOADING_PLATFORMS')
+[01:50:34] [INFO] [StartLoader:Backend] sendProgress(80, 'LOADING_PLATFORMS')
+[01:50:34] [INFO] [StartLoader:Backend] sendProgress(100, 'READY')
+[01:50:34] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
+[01:50:35] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=2606:50c0:8000::154 (IPv6), Time=560ms, HTTP=200
+[01:50:41] [INFO] Executing system command: exit-frontend

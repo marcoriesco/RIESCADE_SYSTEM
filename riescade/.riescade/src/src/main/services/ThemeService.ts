@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+import { join, dirname, resolve } from 'path'
 import { SettingsParser } from '../parsers/SettingsParser'
 import { ThemeSettingsParser } from '../parsers/ThemeSettingsParser'
 import { getDefaultThemePath, getUserThemesPath } from '../utils/paths'
@@ -143,6 +143,35 @@ export class ThemeService {
       }
     }
 
+    let startHtml = getTemplate('start', 'start.html')
+    // Inline CSS link tags in start.html to prevent FOUC during startup
+    const linkRegex = /<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*\/?>|<link\s+[^>]*href=["']([^"']+)["'][^>]*rel=["']stylesheet["'][^>]*\/?>/gi
+    startHtml = startHtml.replace(linkRegex, (match, href1, href2) => {
+      const href = href1 || href2
+      if (href) {
+        const cssPath = join(themePath, href)
+        if (existsSync(cssPath)) {
+          try {
+            const cssContent = readFileSync(cssPath, 'utf8')
+            // Resolve relative url(...) inside the CSS to absolute paths
+            const cssDir = dirname(cssPath)
+            const processedCss = cssContent.replace(/url\(['"]?([^'")\s]+)['"]?\)/g, (m, urlPath) => {
+              if (urlPath.startsWith('data:') || urlPath.startsWith('http') || urlPath.startsWith('file:///')) {
+                return m
+              }
+              const resolvedPath = resolve(cssDir, urlPath).replace(/\\/g, '/')
+              const formattedUrl = resolvedPath.startsWith('/') ? `file://${resolvedPath}` : `file:///${resolvedPath}`
+              return `url('${formattedUrl}')`
+            })
+            return `<style>${processedCss}</style>`
+          } catch (e) {
+            console.error(`Failed to inline CSS ${cssPath}:`, e)
+          }
+        }
+      }
+      return match
+    })
+
     return {
       name: themeName,
       displayName: metadata.name || themeName,
@@ -153,7 +182,7 @@ export class ThemeService {
         system: getTemplate('system', 'system.html'),
         gamelist: getTemplate('gamelist', 'gamelist.html'),
         loading: getTemplate('loading', 'loading.html'),
-        start: getTemplate('start', 'start.html')
+        start: startHtml
       },
       options,
       settings,

@@ -262,30 +262,20 @@ export class LauncherService {
       }
 
       const logPath = join(retroBatPath, 'riescade', 'emulatorLauncher.log')
-      const initialSize = existsSync(logPath) ? statSync(logPath).size : 0
-      let currentReadPos = initialSize
+      let hasSentRunning = false
 
       sendLauncherStatus('loading')
 
       const checkLog = () => {
+        if (hasSentRunning) return
         if (!existsSync(logPath)) return
         try {
-          const stat = statSync(logPath)
-          if (stat.size > currentReadPos) {
-            const fd = openSync(logPath, 'r')
-            const buffer = Buffer.alloc(stat.size - currentReadPos)
-            readSync(fd, buffer, 0, buffer.length, currentReadPos)
-            closeSync(fd)
-
-            currentReadPos = stat.size
-
-            const newContent = buffer.toString('utf8')
-            const lines = newContent.split(/\r?\n/)
-            for (const line of lines) {
-              if (line.includes('[Running]')) {
-                sendLauncherStatus('running')
-              }
-            }
+          const content = readFileSync(logPath, 'utf8')
+          const sections = content.split(/[-]{10,}/)
+          const lastSection = sections[sections.length - 1] || ''
+          if (lastSection.includes('[Running]')) {
+            sendLauncherStatus('running')
+            hasSentRunning = true
           }
         } catch (e) {
           console.error('Error reading launcher log:', e)
