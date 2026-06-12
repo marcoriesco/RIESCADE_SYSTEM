@@ -724,5 +724,14 @@
   "minimal": "mínimo",
   "riescade-play-nav-sound": "riescade-play-nav-som",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "Use esta opção quando estiver usando um comando reconhecido como teclado (ipac, etc.).",
-  "video": "vídeo"
+  "video": "vídeo",
+  "Failed to launch emulator.": "Falha ao iniciar o emulador.",
+  "The emulator closed unexpectedly. Check settings or logs.": "O emulador fechou inesperadamente. Verifique as configurações ou logs.",
+  "Invalid command line or error in passed arguments.": "Linha de comando inválida ou erro nos argumentos passados.",
+  "Invalid emulator configuration.": "Configuração inválida do emulador.",
+  "Unknown emulator or not configured for this system.": "Emulador desconhecido ou não configurado para este sistema.",
+  "The emulator is not installed. Please install the emulator for this system.": "O emulador não está instalado. Por favor, instale o emulador para este sistema.",
+  "A required core to run the game is missing.": "Falta um núcleo (core) necessário para executar o jogo.",
+  "Custom error in emulator.": "Erro customizado no emulador.",
+  "An error occurred while launching the emulator": "Ocorreu um erro ao iniciar o emulador"
 }

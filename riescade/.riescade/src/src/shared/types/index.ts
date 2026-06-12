@@ -15,6 +15,7 @@ export interface System {
 export interface Emulator {
   name: string
   cores: string[]
+  command?: string
 }
 
 export interface Game {

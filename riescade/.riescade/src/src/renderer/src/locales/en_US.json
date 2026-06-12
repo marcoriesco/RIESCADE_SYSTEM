@@ -731,5 +731,14 @@
   "minimal": "minimal",
   "riescade-play-nav-sound": "riescade-play-nav-sound",
   "use this option when using a pad recognized as keyboard (ipac, etc.)": "use this option when using a pad recognized as keyboard (ipac, etc.)",
-  "video": "video"
+  "video": "video",
+  "Failed to launch emulator.": "Failed to launch emulator.",
+  "The emulator closed unexpectedly. Check settings or logs.": "The emulator closed unexpectedly. Check settings or logs.",
+  "Invalid command line or error in passed arguments.": "Invalid command line or error in passed arguments.",
+  "Invalid emulator configuration.": "Invalid emulator configuration.",
+  "Unknown emulator or not configured for this system.": "Unknown emulator or not configured for this system.",
+  "The emulator is not installed. Please install the emulator for this system.": "The emulator is not installed. Please install the emulator for this system.",
+  "A required core to run the game is missing.": "A required core to run the game is missing.",
+  "Custom error in emulator.": "Custom error in emulator.",
+  "An error occurred while launching the emulator": "An error occurred while launching the emulator"
 }

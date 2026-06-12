@@ -435,18 +435,33 @@ export class DatabaseService {
     // Sync __es_systems.cfg config metadata
     const configPath = getConfigPath()
     const systemsJsonPath = join(configPath, 'es_systems.cfg')
-    let systemsJsonMtime = 0
+    let combinedMtime = 0
+    let esSystemsFileCount = 0
     try {
       if (existsSync(systemsJsonPath)) {
-        systemsJsonMtime = statSync(systemsJsonPath).mtimeMs
+        combinedMtime += Math.round(statSync(systemsJsonPath).mtimeMs)
+        esSystemsFileCount++
       }
-    } catch {}
+      if (existsSync(configPath)) {
+        const files = readdirSync(configPath)
+        files.forEach(f => {
+          if (f.startsWith('es_systems_') && f.endsWith('.cfg')) {
+            const fPath = join(configPath, f)
+            combinedMtime += Math.round(statSync(fPath).mtimeMs)
+            esSystemsFileCount++
+          }
+        })
+      }
+    } catch (err) {
+      console.error('Error calculating es_systems config mtime:', err)
+    }
 
     db.prepare(`
       INSERT INTO systems (name, fullname, path, extension, platform, theme, hardware, last_scan_at, folder_mtime, file_count)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(name) DO UPDATE SET
         folder_mtime = excluded.folder_mtime,
+        file_count = excluded.file_count,
         last_scan_at = excluded.last_scan_at
     `).run(
       '__es_systems.cfg',
@@ -457,8 +472,8 @@ export class DatabaseService {
       '',
       'system',
       Date.now(),
-      systemsJsonMtime,
-      0
+      combinedMtime,
+      esSystemsFileCount
     )
 
     // Orphan Cleanup: delete games and systems that are no longer in the active systems list

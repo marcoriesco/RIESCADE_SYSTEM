@@ -18,6 +18,15 @@ interface ControllerInfo {
 export class LauncherService {
   public launch(game: Game, system: System, activeControllers: ControllerInfo[] = [], saveStateSlot?: number, netplayOptions?: any): Promise<void> {
     return new Promise((resolvePromise, reject) => {
+      const { BrowserWindow } = require('electron')
+      const sendLauncherStatus = (status: 'loading' | 'running' | 'closed') => {
+        BrowserWindow.getAllWindows().forEach((win: any) => {
+          if (!win.isDestroyed()) {
+            win.webContents.send('launcher-status', { status })
+          }
+        })
+      }
+
       const retroBatPath = getRetroBatPath()
       const launcherPath = join(retroBatPath, 'riescade', 'emulatorLauncher.exe')
       
@@ -122,6 +131,78 @@ export class LauncherService {
         }
       }
 
+      const selectedEmulator = system.emulators?.find(e => e.name === emulator)
+      if (selectedEmulator && selectedEmulator.command) {
+        // Parse command line arguments respecting double quotes first
+        const parseCommandArgs = (cmdLine: string): string[] => {
+          const args: string[] = []
+          let current = ''
+          let inQuotes = false
+          for (let i = 0; i < cmdLine.length; i++) {
+            const char = cmdLine[i]
+            if (char === '"') {
+              inQuotes = !inQuotes
+            } else if (char === ' ' && !inQuotes) {
+              if (current.length > 0) {
+                args.push(current)
+                current = ''
+              }
+            } else {
+              current += char
+            }
+          }
+          if (current.length > 0) {
+            args.push(current)
+          }
+          return args
+        }
+
+        const rawArgs = parseCommandArgs(selectedEmulator.command)
+        
+        // Perform placeholder replacements on each argument individually
+        const replacePlaceholders = (str: string): string => {
+          return str
+            .replace(/%HOME%/g, join(retroBatPath, 'riescade'))
+            .replace(/%ROM%/g, romPath)
+            .replace(/%SYSTEM%/g, system.name)
+            .replace(/%EMULATOR%/g, emulator)
+            .replace(/%CORE%/g, core)
+        }
+
+        const processedArgs = rawArgs.map(arg => replacePlaceholders(arg))
+        const rawExePath = processedArgs[0] || ''
+        const exeArgs = processedArgs.slice(1)
+
+        const resolvedExePath = resolve(retroBatPath, rawExePath)
+        const execCwd = dirname(resolvedExePath)
+
+        console.log(`Launching Custom Emulator Executable: ${resolvedExePath} with args:`, exeArgs)
+        
+        sendLauncherStatus('loading')
+        const runTimer = setTimeout(() => sendLauncherStatus('running'), 1000)
+
+        const { spawn } = require('child_process')
+        const child = spawn(resolvedExePath, exeArgs, { cwd: execCwd })
+
+        child.on('error', (err) => {
+          clearTimeout(runTimer)
+          sendLauncherStatus('closed')
+          console.error('Failed to spawn custom emulator:', err)
+          reject(new Error(err.message || 'Failed to launch emulator.'))
+        })
+
+        child.on('exit', (code) => {
+          clearTimeout(runTimer)
+          sendLauncherStatus('closed')
+          if (code !== 0 && code !== null) {
+            console.warn(`Custom emulator exited with code: ${code}`)
+            reject(new Error(`Emulator exited with code ${code}`))
+          } else {
+            resolvePromise()
+          }
+        })
+        return
+      }
 
       let controllerArgs: string[] = []
       
@@ -252,14 +333,6 @@ export class LauncherService {
         }
       }
 
-      const { BrowserWindow } = require('electron')
-      const sendLauncherStatus = (status: 'loading' | 'running' | 'closed') => {
-        BrowserWindow.getAllWindows().forEach((win: any) => {
-          if (!win.isDestroyed()) {
-            win.webContents.send('launcher-status', { status })
-          }
-        })
-      }
 
       const logPath = join(retroBatPath, 'riescade', 'emulatorLauncher.log')
       let hasSentRunning = false
@@ -293,7 +366,7 @@ export class LauncherService {
 
         if (error && error.code) {
           console.warn('Launcher exited with code:', error.code)
-          let errorMessage = 'Falha ao iniciar o emulador.'
+          let errorMessage = 'Failed to launch emulator.'
           if (existsSync(errorLogPath)) {
             try {
               errorMessage = readFileSync(errorLogPath, 'utf8').trim()
@@ -303,21 +376,21 @@ export class LauncherService {
           } else {
             const exitCode = error.code
             if (exitCode === 200) {
-              errorMessage = 'O emulador fechou inesperadamente. Verifique as configurações ou logs.'
+              errorMessage = 'The emulator closed unexpectedly. Check settings or logs.'
             } else if (exitCode === 201) {
-              errorMessage = 'Linha de comando inválida ou erro nos argumentos passados.'
+              errorMessage = 'Invalid command line or error in passed arguments.'
             } else if (exitCode === 202) {
-              errorMessage = 'Configuração inválida do emulador.'
+              errorMessage = 'Invalid emulator configuration.'
             } else if (exitCode === 203) {
-              errorMessage = 'Emulador desconhecido ou não configurado para este sistema.'
+              errorMessage = 'Unknown emulator or not configured for this system.'
             } else if (exitCode === 204) {
-              errorMessage = 'O emulador não está instalado. Por favor, instale o emulador para este sistema.'
+              errorMessage = 'The emulator is not installed. Please install the emulator for this system.'
             } else if (exitCode === 205) {
-              errorMessage = 'Falta um núcleo (core) necessário para executar o jogo.'
+              errorMessage = 'A required core to run the game is missing.'
             } else if (exitCode === 299) {
-              errorMessage = 'Erro customizado no emulador.'
+              errorMessage = 'Custom error in emulator.'
             } else {
-              errorMessage = `Ocorreu um erro ao iniciar o emulador (Código: ${exitCode}).`
+              errorMessage = `An error occurred while launching the emulator (Code: ${exitCode}).`
             }
           }
           reject(new Error(errorMessage))

@@ -44,7 +44,8 @@ export class SystemsParser {
             const emuList = Array.isArray(emulators.emulator) ? emulators.emulator : [emulators.emulator]
             return emuList.map((e: any) => ({
               name: String(e['@_name'] || ''),
-              cores: e.cores?.core ? (Array.isArray(e.cores.core) ? e.cores.core : [e.cores.core]).map((c: any) => String(c)) : []
+              cores: e.cores?.core ? (Array.isArray(e.cores.core) ? e.cores.core : [e.cores.core]).map((c: any) => String(c)) : [],
+              command: e['@_command'] ? String(e['@_command']) : undefined
             }))
           }
 

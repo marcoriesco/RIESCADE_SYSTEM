@@ -527,19 +527,34 @@ export class LibraryService {
       const configPath = getConfigPath()
       const systemsJsonPath = join(configPath, 'es_systems.cfg')
       let currentSystemsJsonMtime = 0
+      let currentEsSystemsFileCount = 0
       try {
         if (existsSync(systemsJsonPath)) {
-          currentSystemsJsonMtime = statSync(systemsJsonPath).mtimeMs
+          currentSystemsJsonMtime += Math.round(statSync(systemsJsonPath).mtimeMs)
+          currentEsSystemsFileCount++
+        }
+        if (existsSync(configPath)) {
+          const files = readdirSync(configPath)
+          files.forEach(f => {
+            if (f.startsWith('es_systems_') && f.endsWith('.cfg')) {
+              const fPath = join(configPath, f)
+              currentSystemsJsonMtime += Math.round(statSync(fPath).mtimeMs)
+              currentEsSystemsFileCount++
+            }
+          })
         }
       } catch {}
 
-      // Check es_systems.cfg modification
+      // Check es_systems.cfg and overrides modification
       const systemsJsonRecord = dbService.getSystemSyncMetadata('__es_systems.cfg')
       if (!systemsJsonRecord) {
         console.log('[SyncCheck] Virtual record for es_systems.cfg not found in DB. Sync required.')
         needsSync = true
-      } else if (currentSystemsJsonMtime !== systemsJsonRecord.folder_mtime) {
-        console.log(`[SyncCheck] es_systems.cfg was modified: DB mtime ${systemsJsonRecord.folder_mtime} vs Disk mtime ${currentSystemsJsonMtime}. Sync required.`)
+      } else if (
+        currentSystemsJsonMtime !== systemsJsonRecord.folder_mtime ||
+        currentEsSystemsFileCount !== systemsJsonRecord.file_count
+      ) {
+        console.log(`[SyncCheck] es_systems.cfg or overrides modified: DB mtime ${systemsJsonRecord.folder_mtime} vs Disk mtime ${currentSystemsJsonMtime}, DB file count ${systemsJsonRecord.file_count} vs Disk file count ${currentEsSystemsFileCount}. Sync required.`)
         needsSync = true
       }
 

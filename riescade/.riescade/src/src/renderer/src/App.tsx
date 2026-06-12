@@ -1416,7 +1416,7 @@ function App() {
 		}
 
 		const mapping: Record<string, string> = {
-			'collections': 'Coleçõs',
+			'collections': 'Coleções',
 			'all': 'Todos os jogos',
 			'favorites': 'Favoritos',
 			'recent': 'Últimos jogados',
@@ -1779,15 +1779,33 @@ function App() {
 		}
 
 		if (rawMsg) {
-			const cleanMsg = rawMsg.replace(/^Error:\s*/i, '').trim();
-			setLaunchErrorMessage(cleanMsg);
+			let cleanMsg = rawMsg;
+			// Remove Electron's IPC invoke prefix
+			cleanMsg = cleanMsg.replace(/^Error:\s*Error\s*invoking\s*remote\s*method\s*'[^']+'::?\s*/i, '');
+			cleanMsg = cleanMsg.replace(/^Error\s*invoking\s*remote\s*method\s*'[^']+'::?\s*/i, '');
+			cleanMsg = cleanMsg.replace(/^Error:\s*/i, '');
+			cleanMsg = cleanMsg.trim();
+
+			// Translate message
+			let translatedMsg = cleanMsg;
+			const codeMatch = cleanMsg.match(/(.*)\(Code:\s*(\d+)\)/i);
+			if (codeMatch) {
+				const basePhrase = codeMatch[1].trim();
+				const code = codeMatch[2];
+				const translatedBase = t(basePhrase);
+				translatedMsg = `${translatedBase} (Code: ${code})`;
+			} else {
+				translatedMsg = t(cleanMsg);
+			}
+
+			setLaunchErrorMessage(translatedMsg);
 			setShowLaunchErrorModal(true);
 		}
 
 		setIsLaunching(false);
 		setLaunchingGame(null);
 		setLaunchingSystem(null);
-	}, []);
+	}, [t]);
 
 	const cleanupLaunchState = useCallback(() => {
 		setTimeout(() => {
