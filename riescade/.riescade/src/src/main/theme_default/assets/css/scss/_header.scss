@@ -27,12 +27,12 @@
       display: inline;
     }
 
-    &.system-emulators {
+    &.system-retrobat {
       .fallback-title {
         display: none;
       }
 
-      .emulators-title {
+      .retrobat-title {
         display: inline;
       }
 
@@ -41,7 +41,7 @@
           display: none;
         }
 
-        .emulators-count {
+        .retrobat-count {
           display: inline;
         }
       }

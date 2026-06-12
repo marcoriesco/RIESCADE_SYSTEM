@@ -261,7 +261,7 @@ export class LauncherService {
         })
       }
 
-      const logPath = join(retroBatPath, 'riescade', 'launcher', 'emulatorLauncher.log')
+      const logPath = join(retroBatPath, 'riescade', 'emulatorLauncher.log')
       const initialSize = existsSync(logPath) ? statSync(logPath).size : 0
       let currentReadPos = initialSize
 
