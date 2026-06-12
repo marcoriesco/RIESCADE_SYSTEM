@@ -733,7 +733,7 @@ function App() {
 					: `file://${cleanPath}`;
 				return escapeFileUrl(url);
 			});
-			await preloadImageBatch(urls, 5);
+			await preloadImageBatch(urls, 50);
 			console.timeEnd('[Perf] preheatImageCache');
 			console.log('[Cache] Silent image cache preheat complete!');
 		} catch (e) {

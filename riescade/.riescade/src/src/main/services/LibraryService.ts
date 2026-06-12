@@ -689,12 +689,38 @@ export class LibraryService {
     // Clear only this system's cache
     LibraryService.cachedGames.delete(nameLower)
     
-    // Preload games for only this specific system
-    try {
-      const games = this.getGamesRaw(systemName, forcePhysicalScan)
-      LibraryService.cachedGames.set(nameLower, games)
-    } catch (err) {
-      console.error(`Failed to preload games for ${systemName}:`, err)
+    const useDb = LibraryService.isDbMode()
+    const dbService = LibraryService.databaseService
+
+    if (useDb) {
+      dbService.open()
+      const systems = this.systemsParser.parse()
+      const systemObj = systems.find(s => s.name.toLowerCase() === nameLower)
+      if (systemObj) {
+        try {
+          const scanFn = this.scanPhysicalGames.bind(this)
+          dbService.syncSystem(systemObj, scanFn, true)
+        } catch (err) {
+          console.error(`Failed to sync system database for ${systemName}:`, err)
+        }
+      }
+
+      try {
+        const settings = new SettingsParser()
+        const showHidden = settings.getSetting('ShowHidden', 'bool') === true
+        const games = dbService.getGamesBySystem(systemName, showHidden)
+        LibraryService.cachedGames.set(nameLower, games)
+      } catch (err) {
+        console.error(`Failed to load games from DB after update for ${systemName}:`, err)
+      }
+    } else {
+      // Preload games for only this specific system (XML Mode)
+      try {
+        const games = this.getGamesRaw(systemName, forcePhysicalScan)
+        LibraryService.cachedGames.set(nameLower, games)
+      } catch (err) {
+        console.error(`Failed to preload games for ${systemName}:`, err)
+      }
     }
     
     // Re-resolve and update all auto-collections based on the new cached games
