@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* ========================================================
    GAMELIST VIEW LAYOUT
    ======================================================== */
@@ -12,23 +13,51 @@
 }
 
 /* 1. FANART */
-.system-fanart .system-image-fanart,
-.system-fanart .system-image-overlay,
-.system-fanart .system-image-default {
+.gamelist-image-fanart,
+.gamelist-image-overlay,
+.gamelist-image-default {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   z-index: 1;
 }
-.system-fanart .system-image-overlay {
-  z-index: 2;
+
+.gamelist-image-overlay {
+  z-index: 3;
 }
-.system-fanart .system-image-default {
+
+.gamelist-image-default {
   filter: saturate(0) !important;
   opacity: 0.2 !important;
 }
 
+.gameplay-video-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  /* Configuração da animação de atraso */
+  opacity: 0; /* Começa invisível enquanto aguarda o delay */
+  animation-name: fadeInVideo;
+  animation-duration: 0.5s; /* Tempo de transição suave do fade-in */
+  animation-fill-mode: forwards; /* Mantém o vídeo visível ao término da animação */
+}
+.gameplay-video-container .gamelist-video {
+  width: 100%;
+  height: 100%;
+}
+
+/* Keyframes para fazer o vídeo aparecer */
+@keyframes fadeInVideo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 .gamelist-main-content {
   position: absolute;
   top: 0;

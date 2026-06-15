@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { WebThemeRenderer } from './theme/WebThemeRenderer'
 import { InputConfigOverlay } from './InputConfigOverlay'
 import { ScraperProgressModal } from './ScraperProgressModal'
+import { VirtualKeyboard } from './VirtualKeyboard'
+
 
 const localeModules = import.meta.glob('../locales/*.json', { eager: true })
 const locales: Record<string, any> = {}
@@ -212,6 +214,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [pendingSettings, setPendingSettings] = useState<Record<string, any>>({})
   const [themeSettings, setThemeSettings] = useState<Record<string, string>>({})
   const [themes, setThemes] = useState<string[]>([])
+  const [decorations, setDecorations] = useState<string[]>([])
+  const [shaders, setShaders] = useState<string[]>([])
   const [connectedGamepads, setConnectedGamepads] = useState<Gamepad[]>([])
   const [configuredControllers, setConfiguredControllers] = useState<any[]>([])
   const [bluetoothDevices, setBluetoothDevices] = useState<{ name: string; id: string }[]>([])
@@ -242,6 +246,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [modalSelectedIndex, setModalSelectedIndex] = useState(0)
   const [showInputModal, setShowInputModal] = useState(false)
+  const [showOSK, setShowOSK] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [activeInputItem, setActiveInputItem] = useState<MenuItem | null>(null)
   const [customCollections, setCustomCollections] = useState<string[]>([])
@@ -616,6 +621,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       }).catch(console.error)
       window.api.getSystemInformation?.().then(setRealSystemInfo).catch(console.error)
       window.api.getThemes().then(setThemes)
+      window.api.getDecorations().then(setDecorations).catch(console.error)
+      window.api.getShaders?.().then(setShaders).catch(console.error)
       window.api.getCustomCollections().then(setCustomCollections)
       window.api.getHostname?.().then(setHostname).catch(() => {})
       window.api.getConfiguredControllers?.().then(setConfiguredControllers).catch(console.error)
@@ -911,8 +918,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       handleToggle(item)
     } else if (item.type === 'input') {
       setActiveInputItem(item)
-      setInputValue(String(getSetting(item.settingName!, '')))
-      setShowInputModal(true)
+      const val = String(getSetting(item.settingName!, ''))
+      setInputValue(val)
+      const useOSK = getSetting('UseOSK') !== 'false' && getSetting('UseOSK') !== false
+      if (useOSK) {
+        setShowOSK(true)
+      } else {
+        setShowInputModal(true)
+      }
     } else if (item.type === 'theme_card') {
       // Install theme from store
       if (item.downloadUrl && item.themeId && item.badge === t('DOWNLOAD')) {
@@ -1227,36 +1240,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           },
           { id: 'group_display', label: t('DISPLAY CONFIGURATION'), type: 'group' },
           { id: 'shaders', label: t('SHADER SET'), type: 'select', settingName: 'global.shaderset', options: [
-            { label: t('NONE'), value: 'none' }, 
-            { label: 'RIESCADE', value: '[riescade]' },
-            { label: 'CRT-NEW-PIXIE', value: 'crt-new-pixie' },
-            { label: 'CRT-ROYALE', value: 'crt-royale' },
-            { label: 'CURVATURE', value: 'curvature' },
-            { label: 'ENHANCED', value: 'enhanced' },
-            { label: 'FLATTEN-GLOW', value: 'flatten-glow' },
-            { label: 'HANDHELD', value: 'handheld' },
-            { label: 'NTSC', value: 'ntsc' },
-            { label: 'NTSC-256PX', value: 'ntsc-256px' },
-            { label: 'NTSC-320PX', value: 'ntsc-320px' },
-            { label: 'NTSC-NES', value: 'ntsc-nes' },
-            { label: 'NTSC-SVIDEO', value: 'ntsc-svideo' },
-            { label: 'NTSC-VCR', value: 'ntsc-vcr' },
-            { label: 'RETRO', value: 'retro' }, 
-            { label: 'SCALEFX', value: 'scalefx' },
-            { label: 'SCALEFX-AA', value: 'scalefx-aa' },
-            { label: 'SCALEFX-HYBRID', value: 'scalefx-hybrid' },
-            { label: 'SCALEHQ', value: 'scalehq' },
-            { label: 'SCANLINES', value: 'scanlines' },
-            { label: 'SINDENBORDER', value: 'sindenborder' },
-            { label: 'TECHNICOLOR', value: 'technicolor' },
-            { label: 'TVOUT', value: 'tvout' },
-            { label: 'TVOUT-INTERLACING', value: 'tvout-interlacing' },
-            { label: 'VHS', value: 'vhs' },
-            { label: 'XBRZ-5X', value: 'xbrz-5x' },
-            { label: 'ZFAST', value: 'zfast' }
+            { label: t('NONE'), value: 'none' },
+            ...shaders.map(sh => {
+              let label = sh.toUpperCase()
+              return { label, value: sh }
+            })
           ]},
           { id: 'decorations', label: t('DECORATIONS'), type: 'select', settingName: 'global.bezel', options: [
-            { label: t('NONE'), value: 'none' }, { label: t('AUTO'), value: 'auto' }
+            { label: t('NONE'), value: 'none' },
+            { label: t('AUTO'), value: 'auto' },
+            ...decorations.map(dec => ({ label: dec.toUpperCase(), value: dec }))
           ]},
           { id: 'tattoo_submenu', label: t('TATTOO'), submenu: [
             { id: 'global_tattoo', label: t('SHOW TATTOO OVER BEZEL'), type: 'toggle', settingName: 'global.tattoo', settingType: 'bool', description: t('Show a control image overlaid on top of the bezel.') },
@@ -2707,8 +2700,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             handleToggle(item)
           } else if (item.type === 'input') {
             setActiveInputItem(item)
-            setInputValue(String(getSetting(item.settingName!, '')))
-            setShowInputModal(true)
+            const val = String(getSetting(item.settingName!, ''))
+            setInputValue(val)
+            const useOSK = getSetting('UseOSK') !== 'false' && getSetting('UseOSK') !== false
+            if (useOSK) {
+              setShowOSK(true)
+            } else {
+              setShowInputModal(true)
+            }
           } else if (item.onClick) {
             item.onClick()
           }
@@ -3108,6 +3107,18 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         </div>
       )}
       
+      <VirtualKeyboard
+        isOpen={showOSK}
+        onClose={() => setShowOSK(false)}
+        title={activeInputItem?.label || ''}
+        value={inputValue}
+        onConfirm={(val) => {
+          updateSetting(activeInputItem!.settingName!, val)
+          setShowOSK(false)
+        }}
+        isPassword={activeInputItem?.isPassword}
+      />
+
       {showInputModal && (
         <div className="riescade-overlay riescade-modal-overlay visible">
           <div className="riescade-modal-container">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { VirtualKeyboard } from './VirtualKeyboard'
 
 interface SearchOverlayProps {
   isOpen: boolean
@@ -8,6 +9,7 @@ interface SearchOverlayProps {
   onClear: () => void
   isGamelist: boolean
   hasResults: boolean
+  settings?: any
 }
 
 export const SearchOverlay: React.FC<SearchOverlayProps> = ({
@@ -17,8 +19,26 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
   onSearch,
   onClear,
   isGamelist,
-  hasResults
+  hasResults,
+  settings
 }) => {
+  const useOSK = settings?.UseOSK?.value !== 'false' && settings?.UseOSK?.value !== false
+
+  if (useOSK && isOpen) {
+    return (
+      <VirtualKeyboard
+        isOpen={isOpen}
+        onClose={onClose}
+        title={isGamelist ? 'BUSCAR JOGOS' : 'BUSCAR SISTEMAS'}
+        value={searchQuery}
+        onConfirm={(val) => {
+          onSearch(val)
+          onClose()
+        }}
+      />
+    )
+  }
+
   const [activeRow, setActiveRow] = useState<number>(0) // 0: Input, 1: Buttons
   const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>(0) // 0: OK, 1: CANCELAR, 2: LIMPAR
   const [tempQuery, setTempQuery] = useState<string>('')

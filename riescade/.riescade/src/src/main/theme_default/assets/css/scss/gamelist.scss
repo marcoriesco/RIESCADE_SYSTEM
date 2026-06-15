@@ -13,26 +13,52 @@
 }
 
 /* 1. FANART */
-.system-fanart {
+.gamelist-image-fanart,
+.gamelist-image-overlay,
+.gamelist-image-default {
+	position: fixed;
+	inset: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1;
+}
 
-	.system-image-fanart,
-	.system-image-overlay,
-  	.system-image-default {
-		position: fixed;
-		inset: 0;
-		width: 100vw;
-		height: 100vh;
-		z-index: 1;
-	}
+.gamelist-image-overlay {
+	z-index: 3;
+}
 
-	.system-image-overlay {
-		z-index: 2;
+.gamelist-image-default {
+	filter: saturate(0) !important;
+	opacity: 0.2 !important;
+}
+
+.gameplay-video-container {
+	position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+
+	/* Configuração da animação de atraso */
+	opacity: 0; /* Começa invisível enquanto aguarda o delay */
+	animation-name: fadeInVideo;
+	animation-duration: 0.5s; /* Tempo de transição suave do fade-in */
+	animation-fill-mode: forwards; /* Mantém o vídeo visível ao término da animação */
+
+	.gamelist-video {
+		width: 100%;
+		height: 100%;
 	}
-	
-  	.system-image-default {
-		filter: saturate(0) !important;
-		opacity: 0.2 !important;
-  	}
+}
+
+/* Keyframes para fazer o vídeo aparecer */
+@keyframes fadeInVideo {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }
 
 .gamelist-main-content {

@@ -1,5 +1,8 @@
 {
   "colors": "#9f0043",
   "controller": "ps4",
-  "system_type": "carousel"
+  "system_type": "carousel",
+  "gamelist_type": "carousel",
+  "gamelist_video": "false",
+  "gamelist_video_delay": "5"
 }

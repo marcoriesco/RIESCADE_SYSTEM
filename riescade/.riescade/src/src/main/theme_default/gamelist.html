@@ -3,10 +3,14 @@
   <link rel="stylesheet" href="./assets/css/animate.css" />
 
  	<!-- FANART & OVERLAY -->
-	<div class="system-fanart animate__animated animate__fadeIn" data-riescade-key="game">
-		<img class="{game:fanart ? 'system-image-fanart' : 'system-image-default' }" decoding="async" src="{game:fanart}" onerror="this.onerror=null; this.src = './assets/arts/{system:theme}.webp'; this.className = 'system-image-default'" />
-		<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
-	</div>
+  <img class="{game:fanart ? 'gamelist-image-fanart' : 'gamelist-image-default' } animate__animated animate__fadeIn" decoding="async" src="{game:fanart}" onerror="this.onerror=null; this.src = './assets/arts/{system:theme}.webp'; this.className = 'gamelist-image-default'" data-riescade-key="game" />
+	<img class="gamelist-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
+	
+  <!-- VIDEO AUTOPLAY -->
+  <div class="gameplay-video-container {options:gamelist_video ? '' : 'hide'}" style="animation-delay: {options:gamelist_video_delay}s;" data-riescade-key="game">
+    <video class="gamelist-video" src="{options:gamelist_video ? '{game:video}' : ''}" loop autoplay disablepictureinpicture disableremoteplayback></video>
+  </div>
+
 
   <!-- HEADER GLOBAL -->
   <div class="riescade-header">

@@ -2847,6 +2847,7 @@ function App() {
 				onClear={() => setSearchQuery('')}
 				isGamelist={!!selectedSystem}
 				hasResults={!!selectedSystem ? filteredGames.length > 0 : filteredSystems.length > 0}
+				settings={settings}
 			/>
 
 			{/* FPS Counter Layer */}

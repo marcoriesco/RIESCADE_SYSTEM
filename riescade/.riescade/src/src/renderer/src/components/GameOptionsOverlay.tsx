@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { Game, System } from '../../../shared/types'
 import { GameMediaOverlay } from './GameMediaOverlay'
+import { VirtualKeyboard } from './VirtualKeyboard'
+
 
 const escapeFileUrl = (url: string): string => {
   if (url.startsWith('file://')) {
@@ -35,20 +37,39 @@ const getStarsString = (ratingVal: any): string => {
 const formatDateForDisplay = (dateStr?: string, fallback = ''): string => {
   if (!dateStr) return fallback
   const clean = dateStr.trim()
-  const matchYmd = clean.match(/^(\d{4})(\d{2})(\d{2})(?:T\d+)?$/)
+  
+  // 1. Matches YYYYMMDDT000000 or YYYYMMDD
+  const matchYmd = clean.match(/^(\d{4})(\d{2})(\d{2})/)
   if (matchYmd) {
     return `${matchYmd[3]}/${matchYmd[2]}/${matchYmd[1]}`
   }
-  const matchHyphen = clean.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  
+  // 2. Matches YYYY-MM-DD
+  const matchHyphen = clean.match(/^(\d{4})-(\d{2})-(\d{2})/)
   if (matchHyphen) {
     return `${matchHyphen[3]}/${matchHyphen[2]}/${matchHyphen[1]}`
   }
+  
+  // 3. Matches DD/MM/YYYY
+  const matchDmy = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/)
+  if (matchDmy) {
+    return `${matchDmy[1].padStart(2, '0')}/${matchDmy[2].padStart(2, '0')}/${matchDmy[3]}`
+  }
+
+  // 4. Matches just YYYY
+  const matchYear = clean.match(/^(\d{4})/)
+  if (matchYear) {
+    return `01/01/${matchYear[1]}`
+  }
+  
   return clean
 }
 
 const parseDateForDb = (dateStr?: string): string => {
   if (!dateStr) return ''
   const clean = dateStr.trim()
+  
+  // 1. Matches DD/MM/YYYY
   const matchDmy = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
   if (matchDmy) {
     const d = matchDmy[1].padStart(2, '0')
@@ -56,17 +77,28 @@ const parseDateForDb = (dateStr?: string): string => {
     const y = matchDmy[3]
     return `${y}${m}${d}T000000`
   }
-  const matchYmd = clean.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  
+  // 2. Matches YYYY-MM-DD
+  const matchYmd = clean.match(/^(\d{4})-(\d{2})-(\d{2})/)
   if (matchYmd) {
     const y = matchYmd[1]
     const m = matchYmd[2]
     const d = matchYmd[3]
     return `${y}${m}${d}T000000`
   }
-  const matchYear = clean.match(/^(\d{4})$/)
+  
+  // 3. Matches YYYYMMDD
+  const matchRaw = clean.match(/^(\d{4})(\d{2})(\d{2})/)
+  if (matchRaw) {
+    return `${matchRaw[1]}${matchRaw[2]}${matchRaw[3]}T000000`
+  }
+  
+  // 4. Matches just YYYY
+  const matchYear = clean.match(/^(\d{4})/)
   if (matchYear) {
     return `${matchYear[1]}0101T000000`
   }
+  
   return clean
 }
 
@@ -196,6 +228,22 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const [draftMetadata, setDraftMetadata] = useState<Game>(game)
   const [metadataSelectedIndex, setMetadataSelectedIndex] = useState(0)
   const [showInputModal, setShowInputModal] = useState(false)
+  const [showOSK, setShowOSK] = useState(false)
+  
+  // Scraper options & navigation states
+  const [activeSection, setActiveSection] = useState<'matches' | 'checkboxes' | 'buttons'>('matches')
+  const [focusedCheckboxIndex, setFocusedCheckboxIndex] = useState(0)
+  const [focusedButtonIndex, setFocusedButtonIndex] = useState(0)
+  const [scraperQuery, setScraperQuery] = useState(game.name)
+  const [scrapeOptions, setScrapeOptions] = useState({
+    title: true,
+    desc: true,
+    fanart: true,
+    logo: true,
+    cover: true,
+    video: true
+  })
+
   const [activeInputField, setActiveInputField] = useState<string>('')
   const [inputValue, setInputValue] = useState('')
   const [gameDynamicFeatures, setGameDynamicFeatures] = useState<{ general: any[]; advanced: any[] } | null>(null)
@@ -639,6 +687,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     if (isOpen) {
       setDraftGame(game)
       setDraftMetadata(game)
+      setScraperQuery(game.name)
       setScraperStage(0)
       setShowMetadataEditor(false)
       setMetadataSelectedIndex(0)
@@ -781,7 +830,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const handleSelect = (direction: 1 | -1) => {
     const item = currentMenu[selectedIndex]
     if (item.type === 'select' && item.items) {
-      const currentIdx = item.items.findIndex(i => i.value === item.value)
+      const currentIdx = item.items.findIndex((i: any) => i.value === item.value)
       const nextIdx = (currentIdx + direction + item.items.length) % item.items.length
       const nextVal = item.items[nextIdx].value
 
@@ -1128,7 +1177,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
 
-  const triggerScraperSearch = async () => {
+  const triggerScraperSearch = async (customQuery?: string) => {
+    const queryToUse = customQuery || scraperQuery || game.name
     const selectedDbs = Object.entries(scraperDbs)
       .filter(([_, active]) => active)
       .map(([name]) => name)
@@ -1142,10 +1192,13 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     setScraperStage(2)
     setScraperMatches([])
     setScraperMatchSelectedIndex(0)
+    setActiveSection('matches')
+    setFocusedCheckboxIndex(0)
+    setFocusedButtonIndex(0)
     setTempMediaUrls({}) // Clear cached temporary media from previous searches
 
     try {
-      const results = await window.api.searchGameMedia(system.name, game.name, selectedDbs, game.path)
+      const results = await window.api.searchGameMedia(system.name, queryToUse, selectedDbs, game.path)
       setScraperMatches(results || [])
     } catch (err: any) {
       console.error(err)
@@ -1167,7 +1220,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     onClose()
 
     try {
-      const updated = await window.api.downloadGameMedia(system.name, game.path, selectedMatch)
+      const updated = await window.api.downloadGameMedia(system.name, game.path, selectedMatch, scrapeOptions)
       if (updated) {
         if (showMetadataEditor) {
           setDraftMetadata(updated)
@@ -1243,14 +1296,74 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
         return
       }
-      if (e.key === 'ArrowDown') {
-        setScraperMatchSelectedIndex(prev => (prev + 1) % scraperMatches.length)
-      } else if (e.key === 'ArrowUp') {
-        setScraperMatchSelectedIndex(prev => (prev - 1 + scraperMatches.length) % scraperMatches.length)
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        triggerScraperDownload()
-      } else if (e.key === 'Escape' || e.key === 'Backspace') {
-        setScraperStage(1)
+
+      const checkboxKeys = ['title', 'desc', 'fanart', 'logo', 'cover', 'video'] as const
+
+      if (activeSection === 'matches') {
+        if (e.key === 'ArrowDown') {
+          setScraperMatchSelectedIndex(prev => (prev + 1) % scraperMatches.length)
+        } else if (e.key === 'ArrowUp') {
+          setScraperMatchSelectedIndex(prev => (prev - 1 + scraperMatches.length) % scraperMatches.length)
+        } else if (e.key === 'ArrowRight') {
+          setActiveSection('checkboxes')
+          setFocusedCheckboxIndex(0)
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          triggerScraperDownload()
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          setScraperStage(1)
+        }
+      } else if (activeSection === 'checkboxes') {
+        if (e.key === 'ArrowDown') {
+          if (focusedCheckboxIndex < 5) {
+            setFocusedCheckboxIndex(prev => prev + 1)
+          } else {
+            setActiveSection('buttons')
+            setFocusedButtonIndex(0)
+          }
+        } else if (e.key === 'ArrowUp') {
+          if (focusedCheckboxIndex > 0) {
+            setFocusedCheckboxIndex(prev => prev - 1)
+          } else {
+            setActiveSection('matches')
+          }
+        } else if (e.key === 'ArrowLeft') {
+          setActiveSection('matches')
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          const keyToToggle = checkboxKeys[focusedCheckboxIndex]
+          setScrapeOptions(prev => ({ ...prev, [keyToToggle]: !prev[keyToToggle] }))
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          setActiveSection('matches')
+        }
+      } else if (activeSection === 'buttons') {
+        if (e.key === 'ArrowLeft') {
+          setFocusedButtonIndex(prev => (prev - 1 + 3) % 3)
+        } else if (e.key === 'ArrowRight') {
+          setFocusedButtonIndex(prev => (prev + 1) % 3)
+        } else if (e.key === 'ArrowUp') {
+          if (focusedButtonIndex === 0) {
+            setActiveSection('matches')
+          } else {
+            setActiveSection('checkboxes')
+            setFocusedCheckboxIndex(5)
+          }
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          if (focusedButtonIndex === 0) {
+            triggerScraperDownload()
+          } else if (focusedButtonIndex === 1) {
+            setActiveInputField('scraper_search_query')
+            setInputValue(scraperQuery)
+            const useOSK = settings.UseOSK?.value !== 'false' && settings.UseOSK?.value !== false
+            if (useOSK) {
+              setShowOSK(true)
+            } else {
+              setShowInputModal(true)
+            }
+          } else if (focusedButtonIndex === 2) {
+            setScraperStage(1)
+          }
+        } else if (e.key === 'Escape' || e.key === 'Backspace') {
+          setActiveSection('matches')
+        }
       }
     }
   }
@@ -1281,6 +1394,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     (e: KeyboardEvent) => {
       if (!isOpen) return
       if (isMediaViewerOpen) return
+      if (showOSK) return
 
       if (showInputModal) {
         if (e.key === 'Enter') {
@@ -1356,8 +1470,14 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             } else {
               setActiveInputField(field.key)
               const rawVal = (draftMetadata[field.key as keyof Game] as string) || ''
-              setInputValue(field.key === 'releasedate' ? formatDateForDisplay(rawVal) : rawVal)
-              setShowInputModal(true)
+              const val = field.key === 'releasedate' ? formatDateForDisplay(rawVal) : rawVal
+              setInputValue(val)
+              const useOSK = settings.UseOSK?.value !== 'false' && settings.UseOSK?.value !== false
+              if (useOSK) {
+                setShowOSK(true)
+              } else {
+                setShowInputModal(true)
+              }
             }
           } else {
             const btnIdx = metadataSelectedIndex - totalFields
@@ -1448,7 +1568,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           if (item) {
             if (item.type === 'submenu') {
               const submenuItems = item.submenu!
-              const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
+              const filteredItems = item.tabs ? submenuItems.filter((si: any) => si.tab === 0) : submenuItems
               setActiveMenuStack(prev => {
                 const next = [...prev]
                 if (next.length > 0) {
@@ -1535,6 +1655,15 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
+  useEffect(() => {
+    if (scraperStage === 2) {
+      const selectedEl = document.querySelector('.scraper-match-item.selected')
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      }
+    }
+  }, [scraperMatchSelectedIndex, scraperStage, activeSection])
+
   const bottomButtons = getBottomButtons()
 
   const menuItemsNode = (
@@ -1563,7 +1692,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               if (scraperStage !== 0) return
               if (item.type === 'submenu') {
                 const submenuItems = item.submenu!
-                const filteredItems = item.tabs ? submenuItems.filter(si => si.tab === 0) : submenuItems
+                const filteredItems = item.tabs ? submenuItems.filter((si: any) => si.tab === 0) : submenuItems
                 setActiveMenuStack(prev => {
                   const next = [...prev]
                   if (next.length > 0) {
@@ -1656,7 +1785,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           <div className="scraper-modal-buttons">
             <button 
               className={`riescade-button ${scraperDbSelectedIndex === dbKeys.length ? 'selected' : ''}`}
-              onClick={triggerScraperSearch}
+              onClick={() => triggerScraperSearch()}
             >
               BUSCAR
             </button>
@@ -1771,7 +1900,82 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     }
 
     return (
-      <div className="riescade-overlay scraper-modal-overlay stage2-overlay game-options-scraper visible">
+      <div 
+        className="riescade-overlay scraper-modal-overlay stage2-overlay game-options-scraper visible"
+        data-active-section={activeSection}
+      >
+        <style>{`
+          .stage2-overlay .scraper-matches-section {
+            width: 35% !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          .stage2-overlay .scraper-checkboxes-section {
+            width: 25%;
+            display: flex;
+            flex-direction: column;
+            padding-right: 15px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          .stage2-overlay .scraper-checkboxes-title {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: var(--theme-color);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+          }
+          .stage2-overlay .scraper-checkboxes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+          .stage2-overlay .scraper-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: all 0.12s ease;
+            user-select: none;
+          }
+          .stage2-overlay .scraper-checkbox-item.focused .scraper-checkbox-label {
+            color: #fff;
+            font-weight: 800;
+          }
+          .stage2-overlay .scraper-checkbox-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--theme-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--theme-color);
+            background: rgba(0, 0, 0, 0.3);
+            transition: all 0.1s ease;
+          }
+          .stage2-overlay .scraper-checkbox-box.checked {
+            border-color: var(--theme-color);
+            background: rgba(255, 0, 85, 0.1);
+          }
+          .stage2-overlay .scraper-checkbox-label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #eee;
+            letter-spacing: 0.5px;
+          }
+          .stage2-overlay .scraper-details-section {
+            width: 40% !important;
+          }
+          .stage2-overlay[data-active-section="checkboxes"] .scraper-checkbox-item.focused {
+            outline: 3px solid var(--theme-color);
+          }
+        `}</style>
+
         <div className="scraper-header">
           <div className="rom-filename">{getRomFileName(game.path).toUpperCase()}</div>
           <div className="system-fullname">{(system.fullname || system.name).toUpperCase()}</div>
@@ -1779,7 +1983,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
         <div className="scraper-stage2-main-content">
           {/* Left Column: Matches List grouped by DB */}
-          <div className="scraper-matches-section">
+          <div className="scraper-matches-section custom-scrollbar">
             {Object.entries(matchesByDb).map(([dbName, items]) => (
               <div key={dbName} className="scraper-db-group">
                 <div className="scraper-db-group-title">{dbName.toUpperCase()}</div>
@@ -1796,7 +2000,10 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                       <div
                         key={globalIndex}
                         className={`scraper-match-item ${isSelected ? 'selected' : ''}`}
-                        onClick={() => setScraperMatchSelectedIndex(globalIndex)}
+                        onClick={() => {
+                          setScraperMatchSelectedIndex(globalIndex)
+                          setActiveSection('matches')
+                        }}
                       >
                         <span className="match-name">{match.name || 'Sem nome'}</span>
                         <div className="match-icons">
@@ -1840,6 +2047,40 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Middle Column: Options Checklist */}
+          <div className="scraper-checkboxes-section">
+            <div className="scraper-checkboxes-title">CONTEÚDO PARA BAIXAR</div>
+            <div className="scraper-checkboxes-list">
+              {[
+                { key: 'title', label: 'TÍTULO' },
+                { key: 'desc', label: 'DESCRIÇÃO' },
+                { key: 'fanart', label: 'FANART' },
+                { key: 'logo', label: 'LOGO' },
+                { key: 'cover', label: 'COVER' },
+                { key: 'video', label: 'VÍDEO' }
+              ].map((item, index) => {
+                const isFocused = activeSection === 'checkboxes' && focusedCheckboxIndex === index
+                const isChecked = scrapeOptions[item.key as keyof typeof scrapeOptions]
+                return (
+                  <div
+                    key={item.key}
+                    className={`scraper-checkbox-item ${isFocused ? 'focused' : ''}`}
+                    onClick={() => {
+                      setFocusedCheckboxIndex(index)
+                      setActiveSection('checkboxes')
+                      setScrapeOptions(prev => ({ ...prev, [item.key]: !prev[item.key as keyof typeof scrapeOptions] }))
+                    }}
+                  >
+                    <span className={`scraper-checkbox-box ${isChecked ? 'checked' : ''}`}>
+                      {isChecked && '✔'}
+                    </span>
+                    <span className="scraper-checkbox-label">{item.label}</span>
+                  </div>
+                )
+              })}
+            </div>
           </div>
 
           {/* Right Column: Media Preview & Metadata Grid */}
@@ -1912,8 +2153,45 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
         {/* Footer actions center bottom */}
         <div className="scraper-footer-buttons">
-          <button className="riescade-button" onClick={triggerScraperDownload}>ENTRADA</button>
-          <button className="riescade-button" onClick={() => setScraperStage(0)}>CANCELAR</button>
+          <button 
+            className={`riescade-button ${activeSection === 'buttons' && focusedButtonIndex === 0 ? 'selected' : ''}`} 
+            onClick={triggerScraperDownload}
+            onMouseEnter={() => {
+              setActiveSection('buttons')
+              setFocusedButtonIndex(0)
+            }}
+          >
+            BAIXAR
+          </button>
+          <button 
+            className={`riescade-button ${activeSection === 'buttons' && focusedButtonIndex === 1 ? 'selected' : ''}`} 
+            onClick={() => {
+              setActiveInputField('scraper_search_query')
+              setInputValue(scraperQuery)
+              const useOSK = settings.UseOSK?.value !== 'false' && settings.UseOSK?.value !== false
+              if (useOSK) {
+                setShowOSK(true)
+              } else {
+                setShowInputModal(true)
+              }
+            }}
+            onMouseEnter={() => {
+              setActiveSection('buttons')
+              setFocusedButtonIndex(1)
+            }}
+          >
+            ENTRADA
+          </button>
+          <button 
+            className={`riescade-button ${activeSection === 'buttons' && focusedButtonIndex === 2 ? 'selected' : ''}`} 
+            onClick={() => setScraperStage(1)}
+            onMouseEnter={() => {
+              setActiveSection('buttons')
+              setFocusedButtonIndex(2)
+            }}
+          >
+            CANCELAR
+          </button>
         </div>
       </div>
     )
@@ -2037,8 +2315,14 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                     } else {
                       setActiveInputField(field.key)
                       const rawVal = (draftMetadata[field.key as keyof Game] as string) || ''
-                      setInputValue(field.key === 'releasedate' ? formatDateForDisplay(rawVal) : rawVal)
-                      setShowInputModal(true)
+                      const val = field.key === 'releasedate' ? formatDateForDisplay(rawVal) : rawVal
+                      setInputValue(val)
+                      const useOSK = settings.UseOSK?.value !== 'false' && settings.UseOSK?.value !== false
+                      if (useOSK) {
+                        setShowOSK(true)
+                      } else {
+                        setShowInputModal(true)
+                      }
                     }
                   }}
                 >
@@ -2231,6 +2515,30 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       )}
 
       {showInputModal && !showMetadataEditor && renderInputModal()}
+
+      <VirtualKeyboard
+        isOpen={showOSK}
+        onClose={() => setShowOSK(false)}
+        title={activeInputField === 'scraper_search_query' ? 'BUSCAR JOGOS' : (fields.find(f => f.key === activeInputField)?.label || '')}
+        value={inputValue}
+        onConfirm={(val) => {
+          if (activeInputField === 'scraper_search_query') {
+            setScraperQuery(val)
+            triggerScraperSearch(val)
+          } else if (activeInputField === 'netplay_password') {
+            setNetplayPassword(val)
+            updateNetplayMenuItemValue('netplay_password', val)
+          } else if (activeInputField === 'netplay_spectator_password') {
+            setNetplaySpectatorPassword(val)
+            updateNetplayMenuItemValue('netplay_spectator_password', val)
+          } else {
+            const savedVal = activeInputField === 'releasedate' ? parseDateForDb(val) : val
+            setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
+          }
+          setShowOSK(false)
+        }}
+        isPassword={activeInputField === 'netplay_password' || activeInputField === 'netplay_spectator_password'}
+      />
     </>
   )
 }

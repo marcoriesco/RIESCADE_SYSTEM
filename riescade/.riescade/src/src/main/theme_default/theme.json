@@ -16,6 +16,11 @@
   },
   "options": [
     {
+      "id": "geral_group",
+      "name": "OPÇÕES GERAIS",
+      "type": "group"
+    },
+    {
       "id": "colors",
       "name": "COLOR HIGHLIGHTS",
       "type": "select",
@@ -84,8 +89,13 @@
       "default": "ps4"
     },
     {
+      "id": "system_group",
+      "name": "OPÇÕES DA SYSTEM",
+      "type": "group"
+    },
+    {
       "id": "system_type",
-      "name": "Mostrar sistemas",
+      "name": "Tipo de navegação",
       "type": "select",
       "options": [
         {
@@ -98,6 +108,65 @@
         }
       ],
       "default": "carousel"
+    },
+    {
+      "id": "gamelist_group",
+      "name": "OPÇÕES DA GAMELIST",
+      "type": "group"
+    },
+    {
+      "id": "gamelist_type",
+      "name": "Tipo de navegação",
+      "type": "select",
+      "options": [
+        {
+          "value": "carousel",
+          "label": "CAROUSEL"
+        },
+        {
+          "value": "grid",
+          "label": "GRID"
+        }
+      ],
+      "default": "carousel"
+    },
+    {
+      "id": "gamelist_video",
+      "name": "VÍDEO GAMEPLAY",
+      "type": "toggle",
+      "default": true
+    },
+    {
+      "id": "gamelist_video_delay",
+      "name": "VIDEO ATRASO",
+      "type": "select",
+      "options": [
+        {
+          "value": "0",
+          "label": "NENHUM"
+        },
+        {
+          "value": "2",
+          "label": "2 segundos"
+        },
+        {
+          "value": "3",
+          "label": "3 segundos"
+        },
+        {
+          "value": "4",
+          "label": "4 segundos"
+        },
+        {
+          "value": "5",
+          "label": "5 segundos"
+        },
+        {
+          "value": "10",
+          "label": "10 segundos"
+        }
+      ],
+      "default": "3"
     }
   ]
 }

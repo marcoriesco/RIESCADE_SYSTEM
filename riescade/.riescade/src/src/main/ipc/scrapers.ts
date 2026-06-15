@@ -1,10 +1,10 @@
 import { ipcMain, app } from 'electron'
-import { existsSync, writeFileSync, mkdirSync } from 'fs'
+import { existsSync, writeFileSync, mkdirSync, readFileSync } from 'fs'
 import { join, dirname, extname, basename } from 'path'
 import * as crypto from 'crypto'
 import { getConfigPath } from '../utils/paths'
 import { SYSTEM_TO_SCREENSCRAPER_PLATFORM } from '../services/ScraperService'
-import { Game } from '../shared/types'
+import { Game } from '../../shared/types'
 import { IpcContext } from './index'
 
 export function registerScrapersIpc(context: IpcContext): void {
@@ -71,7 +71,7 @@ export function registerScrapersIpc(context: IpcContext): void {
       cleanedName = cleanedName.replace(/\s+/g, ' ').trim()
       if (!cleanedName) cleanedName = gameName
 
-      let url = `https://api.screenscraper.fr/api2/jeuInfos.php?devid=${devid}&devpassword=${devpassword}&softname=${softname}&output=json&recherche=${encodeURIComponent(cleanedName)}`
+      let url = `https://api.screenscraper.fr/api2/jeuRecherche.php?devid=${devid}&devpassword=${devpassword}&softname=${softname}&output=json&recherche=${encodeURIComponent(cleanedName)}`
       if (systemId > 0) {
         url += `&systemeid=${systemId}`
       }
@@ -386,9 +386,9 @@ export function registerScrapersIpc(context: IpcContext): void {
       const pubFile = join(configPath, 'scrapers', 'gamesdb_publishers.json')
       const genFile = join(configPath, 'scrapers', 'gamesdb_genres.json')
 
-      if (existsSync(devFile)) devMap = JSON.parse(fs.readFileSync(devFile, 'utf-8'))?.data?.developers || {}
-      if (existsSync(pubFile)) pubMap = JSON.parse(fs.readFileSync(pubFile, 'utf-8'))?.data?.publishers || {}
-      if (existsSync(genFile)) genMap = JSON.parse(fs.readFileSync(genFile, 'utf-8'))?.data?.genres || {}
+      if (existsSync(devFile)) devMap = JSON.parse(readFileSync(devFile, 'utf-8'))?.data?.developers || {}
+      if (existsSync(pubFile)) pubMap = JSON.parse(readFileSync(pubFile, 'utf-8'))?.data?.publishers || {}
+      if (existsSync(genFile)) genMap = JSON.parse(readFileSync(genFile, 'utf-8'))?.data?.genres || {}
     } catch (err) {
       console.error('Failed to parse TheGamesDB JSON maps:', err)
     }
@@ -446,16 +446,13 @@ export function registerScrapersIpc(context: IpcContext): void {
     return results
   }
 
-  async function queryHfsDB(gameName: string, hfsUser: string, hfsPass: string): Promise<any[]> {
-    if (!hfsUser || !hfsPass) {
-      throw new Error('CREDENCIAIS_AUSENTES: HfsDB username ou password ausentes.')
-    }
+  async function queryHfsDB(gameName: string): Promise<any[]> {
+    const hfsUser = 'riescade'
+    const hfsPass = 'ZbrSya@eu8iBNyR'
 
-    const basicAuth = Buffer.from(`${hfsUser}:${hfsPass}`).toString('base64');
     const tokenResponse = await fetch('https://db.hfsplay.fr/api/v1/auth/token', {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${basicAuth}`,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: `username=${encodeURIComponent(hfsUser)}&password=${encodeURIComponent(hfsPass)}`
@@ -670,10 +667,8 @@ export function registerScrapersIpc(context: IpcContext): void {
               })
           )
         } else if (db === 'HfsDB') {
-          const hfsUser = settingsParser.getSetting('HfsDBUser', 'string') || 'riescade'
-          const hfsPass = settingsParser.getSetting('HfsDBPass', 'string') || 'ZbrSya@eu8iBNyR'
           promises.push(
-            queryHfsDB(gameName, hfsUser, hfsPass)
+            queryHfsDB(gameName)
               .catch(err => {
                 console.error('HfsDB failed:', err)
                 return []
@@ -696,7 +691,7 @@ export function registerScrapersIpc(context: IpcContext): void {
     }
   })
 
-  ipcMain.handle('download-game-media', async (_, systemName: string, gamePath: string, matchData: any) => {
+  ipcMain.handle('download-game-media', async (_, systemName: string, gamePath: string, matchData: any, options?: any) => {
     try {
       const systems = libraryService.getSystems()
       const system = systems.find(s => s.name === systemName)
@@ -712,32 +707,41 @@ export function registerScrapersIpc(context: IpcContext): void {
 
       const updatedFields: Partial<Game> = {}
 
-      if (matchData.media?.image) {
+      const dlOptions = options || {
+        title: true,
+        desc: true,
+        fanart: true,
+        cover: true,
+        logo: true,
+        video: true
+      }
+
+      if (matchData.media?.image && dlOptions.fanart) {
         const destPathWithoutExt = join(mediaFolder, 'fanart', romNameNoExt)
         const ext = await downloadFile(matchData.media.image, destPathWithoutExt, 'png')
         updatedFields.image = `./media/fanart/${romNameNoExt}.${ext}`
       }
 
-      if (matchData.media?.thumbnail) {
+      if (matchData.media?.thumbnail && dlOptions.cover) {
         const destPathWithoutExt = join(mediaFolder, 'cover', romNameNoExt)
         const ext = await downloadFile(matchData.media.thumbnail, destPathWithoutExt, 'png')
         updatedFields.thumbnail = `./media/cover/${romNameNoExt}.${ext}`
       }
 
-      if (matchData.media?.marquee) {
+      if (matchData.media?.marquee && dlOptions.logo) {
         const destPathWithoutExt = join(mediaFolder, 'logo', romNameNoExt)
         const ext = await downloadFile(matchData.media.marquee, destPathWithoutExt, 'png')
         updatedFields.marquee = `./media/logo/${romNameNoExt}.${ext}`
       }
 
-      if (matchData.media?.video) {
+      if (matchData.media?.video && dlOptions.video) {
         const destPathWithoutExt = join(mediaFolder, 'video', romNameNoExt)
         const ext = await downloadFile(matchData.media.video, destPathWithoutExt, 'mp4')
         updatedFields.video = `./media/video/${romNameNoExt}.${ext}`
       }
 
-      if (matchData.name) updatedFields.name = matchData.name
-      if (matchData.desc) updatedFields.desc = matchData.desc
+      if (matchData.name && dlOptions.title) updatedFields.name = matchData.name
+      if (matchData.desc && dlOptions.desc) updatedFields.desc = matchData.desc
       if (matchData.developer) updatedFields.developer = matchData.developer
       if (matchData.publisher) updatedFields.publisher = matchData.publisher
       if (matchData.genre) updatedFields.genre = matchData.genre

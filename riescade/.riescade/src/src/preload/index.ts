@@ -69,8 +69,10 @@ const api = {
   startScrape: () => ipcRenderer.invoke('start-scrape'),
   cancelScrape: () => ipcRenderer.invoke('cancel-scrape'),
   searchGameMedia: (systemName: string, gameName: string, databases: string[], gamePath?: string) => ipcRenderer.invoke('search-game-media', systemName, gameName, databases, gamePath),
-  downloadGameMedia: (systemName: string, gamePath: string, matchData: any) => ipcRenderer.invoke('download-game-media', systemName, gamePath, matchData),
+  downloadGameMedia: (systemName: string, gamePath: string, matchData: any, options?: any) => ipcRenderer.invoke('download-game-media', systemName, gamePath, matchData, options),
   downloadTempMedia: (url: string) => ipcRenderer.invoke('download-temp-media', url),
+  getDecorations: () => ipcRenderer.invoke('get-decorations'),
+  getShaders: () => ipcRenderer.invoke('get-shaders'),
 
   // Events
   on: (channel: string, callback: (...args: any[]) => void) => {

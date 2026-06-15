@@ -409,4 +409,37 @@ export function registerSystemIpc(context: IpcContext): void {
       return null
     }
   })
+
+  // 11. Get decorations (bezels) directory list
+  ipcMain.handle('get-decorations', async () => {
+    try {
+      const decorationsDir = join(getRetroBatPath(), 'decorations')
+      if (!fs.existsSync(decorationsDir)) return []
+
+      const files = fs.readdirSync(decorationsDir, { withFileTypes: true })
+      return files
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name)
+    } catch (e) {
+      console.error('Failed to read decorations directories:', e)
+      return []
+    }
+  })
+
+  // 12. Get shaders directory list
+  ipcMain.handle('get-shaders', async () => {
+    try {
+      const shadersDir = join(getRetroBatPath(), 'system', 'shaders', 'configs')
+      if (!fs.existsSync(shadersDir)) return []
+
+      const files = fs.readdirSync(shadersDir, { withFileTypes: true })
+      return files
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name)
+        .sort()
+    } catch (e) {
+      console.error('Failed to read shaders directories:', e)
+      return []
+    }
+  })
 }

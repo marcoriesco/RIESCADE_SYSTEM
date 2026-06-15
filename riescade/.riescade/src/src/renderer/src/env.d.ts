@@ -55,8 +55,10 @@ declare global {
       startScrape: () => Promise<boolean>
       cancelScrape: () => Promise<boolean>
       searchGameMedia: (systemName: string, gameName: string, databases: string[], gamePath?: string) => Promise<any[]>
-      downloadGameMedia: (systemName: string, gamePath: string, matchData: any) => Promise<any>
+      downloadGameMedia: (systemName: string, gamePath: string, matchData: any, options?: any) => Promise<any>
       downloadTempMedia: (url: string) => Promise<string>
+      getDecorations: () => Promise<string[]>
+      getShaders: () => Promise<string[]>
       on: (channel: string, callback: (...args: any[]) => void) => () => void
     }
   }
