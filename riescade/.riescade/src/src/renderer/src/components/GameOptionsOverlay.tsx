@@ -1301,9 +1301,19 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
       if (activeSection === 'matches') {
         if (e.key === 'ArrowDown') {
-          setScraperMatchSelectedIndex(prev => (prev + 1) % scraperMatches.length)
+          if (scraperMatchSelectedIndex === scraperMatches.length - 1) {
+            setActiveSection('buttons')
+            setFocusedButtonIndex(0)
+          } else {
+            setScraperMatchSelectedIndex(prev => prev + 1)
+          }
         } else if (e.key === 'ArrowUp') {
-          setScraperMatchSelectedIndex(prev => (prev - 1 + scraperMatches.length) % scraperMatches.length)
+          if (scraperMatchSelectedIndex === 0) {
+            setActiveSection('buttons')
+            setFocusedButtonIndex(0)
+          } else {
+            setScraperMatchSelectedIndex(prev => prev - 1)
+          }
         } else if (e.key === 'ArrowRight') {
           setActiveSection('checkboxes')
           setFocusedCheckboxIndex(0)
@@ -1324,7 +1334,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           if (focusedCheckboxIndex > 0) {
             setFocusedCheckboxIndex(prev => prev - 1)
           } else {
-            setActiveSection('matches')
+            setActiveSection('buttons')
+            setFocusedButtonIndex(0)
           }
         } else if (e.key === 'ArrowLeft') {
           setActiveSection('matches')
@@ -1647,7 +1658,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         }
       }
     },
-    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings, showDeleteConfirmModal, deleteModalSelectedIndex, confirmDelete, showMetadataEditor, showInputModal, metadataSelectedIndex, activeInputField, inputValue, draftMetadata]
+    [isOpen, selectedIndex, currentMenu, activeMenuStack, draftGame, gameCollections, customCollections, system, scraperStage, scraperDbSelectedIndex, scraperDbs, scraperMatches, scraperMatchSelectedIndex, settings, showDeleteConfirmModal, deleteModalSelectedIndex, confirmDelete, showMetadataEditor, showInputModal, metadataSelectedIndex, activeInputField, inputValue, draftMetadata, activeSection, focusedCheckboxIndex, focusedButtonIndex, scraperQuery, scrapeOptions]
   )
 
   useEffect(() => {
