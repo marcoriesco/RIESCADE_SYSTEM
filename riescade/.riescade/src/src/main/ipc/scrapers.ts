@@ -10,8 +10,8 @@ import { IpcContext } from './index'
 export function registerScrapersIpc(context: IpcContext): void {
   const { scraperService, libraryService, settingsParser } = context
 
-  ipcMain.handle('start-scrape', async () => {
-    scraperService.scrape()
+  ipcMain.handle('start-scrape', async (_, systemName?: string) => {
+    scraperService.scrape(systemName)
     return true
   })
 

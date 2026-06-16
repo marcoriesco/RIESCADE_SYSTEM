@@ -4,7 +4,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Simplified API - all config is done through EmulationStation
 const api = {
   // Library
-  preloadLibrary: (forcePhysicalScan?: boolean, systemName?: string) => ipcRenderer.invoke('preload-library', forcePhysicalScan, systemName),
+  preloadLibrary: (forcePhysicalScan?: boolean, systemName?: string | string[]) => ipcRenderer.invoke('preload-library', forcePhysicalScan, systemName),
   getSystems: () => ipcRenderer.invoke('get-systems'),
   getGames: (systemName: string) => ipcRenderer.invoke('get-games', systemName),
   updateGame: (systemName: string, gameData: any) => ipcRenderer.invoke('update-game', systemName, gameData),
@@ -66,7 +66,7 @@ const api = {
   downloadAndInstallUpdate: (zipUrl: string) => ipcRenderer.invoke('download-and-install-update', zipUrl),
   getMusicFiles: (subfolder?: string) => ipcRenderer.invoke('get-music-files', subfolder),
   getMusicPath: () => ipcRenderer.invoke('get-music-path'),
-  startScrape: () => ipcRenderer.invoke('start-scrape'),
+  startScrape: (systemName?: string) => ipcRenderer.invoke('start-scrape', systemName),
   cancelScrape: () => ipcRenderer.invoke('cancel-scrape'),
   searchGameMedia: (systemName: string, gameName: string, databases: string[], gamePath?: string) => ipcRenderer.invoke('search-game-media', systemName, gameName, databases, gamePath),
   downloadGameMedia: (systemName: string, gamePath: string, matchData: any, options?: any) => ipcRenderer.invoke('download-game-media', systemName, gamePath, matchData, options),

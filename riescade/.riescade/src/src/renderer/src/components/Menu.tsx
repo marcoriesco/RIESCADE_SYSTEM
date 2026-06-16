@@ -744,8 +744,14 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       return
     }
 
-    if (settingName === 'VisibleSystems' || settingName === 'ScraperSystems') {
+    if (settingName === 'VisibleSystems') {
       updateSetting(settingName, '')
+      return
+    }
+
+    if (settingName === 'ScraperSystems') {
+      const allValues = checklistItems.map(item => item.value)
+      updateSetting(settingName, allValues.join(','))
       return
     }
 
@@ -840,7 +846,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         onClick: () => {
           handleSaveQuietly(pendingSettings).then(() => {
             onClose()
-            window.api.startScrape()
+            window.api.startScrape(selectedSystem?.name)
           })
         }
       })

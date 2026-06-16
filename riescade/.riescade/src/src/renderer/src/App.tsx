@@ -263,9 +263,8 @@ function App() {
 		systemName: string;
 		gameName: string;
 	} | null>(null);
-	const [showGamelistUpdateModal, setShowGamelistUpdateModal] = useState(false);
-	const [reloadModalSelectedIndex, setReloadModalSelectedIndex] = useState(0);
 	const [isUpdatingGamelist, setIsUpdatingGamelist] = useState(false);
+	const [scrapedSystems, setScrapedSystems] = useState<string[]>([]);
 	const [showLaunchErrorModal, setShowLaunchErrorModal] = useState(false);
 	const [launchErrorMessage, setLaunchErrorMessage] = useState('');
 
@@ -635,15 +634,20 @@ function App() {
 
 		const removeScrapeFinished = window.api.on('scrape-finished', (_: any, data: any) => {
 			setBulkScrapeStatus(null);
-			setShowGamelistUpdateModal(true);
-			setReloadModalSelectedIndex(0); // Default to YES
+			const sysList = data.systems || [];
+			setScrapedSystems(sysList);
+			if (sysList.length > 0) {
+				performInPlaceGamelistReload(true, sysList);
+			} else {
+				performInPlaceGamelistReload(true);
+			}
 		});
 
 		return () => {
 			removeScrapeProgress();
 			removeScrapeFinished();
 		};
-	}, []);
+	}, [performInPlaceGamelistReload]);
 
 	// ─── Preloading & Caching Engine ───
 	const preloadThemeAssets = useCallback(async (currentSystems = systems, currentTheme = theme) => {
@@ -1048,11 +1052,10 @@ function App() {
 		};
 	}, []);
 
-	const performInPlaceGamelistReload = useCallback((forcePhysical = true, systemName?: string) => {
+	const performInPlaceGamelistReload = useCallback((forcePhysical = true, systemName?: string | string[]) => {
 		setIsUpdatingGamelist(true);
 		setIsMenuOpen(false);
 		setIsGameOptionsOpen(false);
-		setShowGamelistUpdateModal(false);
 
 		window.api.preloadLibrary(forcePhysical, systemName).then(() => {
 			Promise.all([
@@ -1134,9 +1137,7 @@ function App() {
 		return () => removeListener();
 	}, [performInPlaceGamelistReload]);
 
-	const handleFastReload = useCallback(() => {
-		performInPlaceGamelistReload(false);
-	}, [performInPlaceGamelistReload]);
+
 
 	const handleUpdateGamelists = useCallback((forcePhysicalOrSystem?: boolean | string, systemName?: string) => {
 		let force = true;
@@ -1990,7 +1991,7 @@ function App() {
 	const executeShortPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal || isSearchOpen;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showLaunchErrorModal || isSearchOpen;
 		if (isOverlayActive) {
 			if (key === 'x') {
 				dispatchKeyEvent('Enter');
@@ -2056,7 +2057,6 @@ function App() {
 		isGameOptionsOpen,
 		isSaveStateManagerOpen,
 		isHardwareSelectOpen,
-		showGamelistUpdateModal,
 		showLaunchErrorModal,
 		isSearchOpen,
 		selectedSystem,
@@ -2075,7 +2075,7 @@ function App() {
 	const executeLongPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showGamelistUpdateModal || showLaunchErrorModal || isSearchOpen;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showLaunchErrorModal || isSearchOpen;
 		if (isOverlayActive) return;
 
 		if (selectedSystem && currentGame) {
@@ -2096,7 +2096,6 @@ function App() {
 		isGameOptionsOpen,
 		isSaveStateManagerOpen,
 		isHardwareSelectOpen,
-		showGamelistUpdateModal,
 		showLaunchErrorModal,
 		isSearchOpen,
 		selectedSystem,
@@ -2137,20 +2136,7 @@ function App() {
 			return;
 		}
 
-		if (showGamelistUpdateModal) {
-			if (key === 'arrowleft' || key === 'arrowright') {
-				setReloadModalSelectedIndex((prev) => (prev === 0 ? 1 : 0));
-			} else if (key === 'enter' || key === ' ') {
-				if (reloadModalSelectedIndex === 0) {
-					handleFastReload();
-				} else {
-					setShowGamelistUpdateModal(false);
-				}
-			} else if (key === 'escape' || key === 'backspace') {
-				setShowGamelistUpdateModal(false);
-			}
-			return;
-		}
+
 
 		if (key === 'control') {
 			setIsMenuOpen(false);
@@ -2335,11 +2321,8 @@ function App() {
 		isGameOptionsOpen,
 		isSaveStateManagerOpen,
 		isHardwareSelectOpen,
-		showGamelistUpdateModal,
 		showLaunchErrorModal,
 		isSearchOpen,
-		reloadModalSelectedIndex,
-		handleFastReload,
 		selectedSystem,
 		systemIndex,
 		filteredSystems,
@@ -2713,31 +2696,7 @@ function App() {
 				</div>
 			)}
 
-			{/* Glassmorphic Gamelist Completion/Reload Modal */}
-			{showGamelistUpdateModal && (
-				<div className="riescade-overlay scraper-completion-overlay visible">
-					<div className="scraper-completion-modal">
-						<div className="scraper-completion-title">SCRAPE CONCLUÍDO</div>
-						<div className="scraper-completion-text">
-							Deseja atualizar a lista de jogos agora para aplicar as novas mídias baixadas?
-						</div>
-						<div className="scraper-completion-buttons">
-							<button 
-								className={`riescade-button primary ${reloadModalSelectedIndex === 0 ? 'selected' : ''}`}
-								onClick={handleFastReload}
-							>
-								SIM
-							</button>
-							<button 
-								className={`riescade-button secondary ${reloadModalSelectedIndex === 1 ? 'selected' : ''}`}
-								onClick={() => setShowGamelistUpdateModal(false)}
-							>
-								NÃO
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
+
 
 			{/* Graphical Gamelist Update Overlay */}
 			{isUpdatingGamelist && (

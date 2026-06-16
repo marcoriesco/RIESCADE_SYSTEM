@@ -145,7 +145,7 @@ export class ScraperService {
     this.isCancelled = true
   }
 
-  public async scrape(): Promise<void> {
+  public async scrape(systemName?: string): Promise<void> {
     this.isCancelled = false
     LibraryService.clearCache()
     const win = BrowserWindow.getAllWindows()[0]
@@ -162,7 +162,7 @@ export class ScraperService {
       const scraper = this.settingsParser.getSetting('Scraper', 'string') || 'ScreenScraper'
       if (scraper !== 'ScreenScraper') {
         // Currently we only support ScreenScraper as requested
-        sendUpdate('scrape-finished', { success: false, reason: 'Unsupported scraper source' })
+        sendUpdate('scrape-finished', { success: false, reason: 'Unsupported scraper source', systems: [] })
         return
       }
 
@@ -195,10 +195,14 @@ export class ScraperService {
 
       // Selected systems
       const scraperSystemsSetting = this.settingsParser.getSetting('ScraperSystems', 'string') || ''
-      const selectedSystems = scraperSystemsSetting
+      let selectedSystems = scraperSystemsSetting
         .split(',')
         .map(s => s.trim())
         .filter(s => s.length > 0)
+
+      if (selectedSystems.length === 0 && systemName) {
+        selectedSystems = [systemName]
+      }
 
       const allSystems = this.libraryService.getSystems()
       const physicalSystems = allSystems.filter(sys => {
@@ -210,8 +214,10 @@ export class ScraperService {
         return !isAuto && !isGenre && !isCustom && hasExtension && isIncluded
       })
 
+      const systemsScraped = physicalSystems.map(sys => sys.name)
+
       if (physicalSystems.length === 0) {
-        sendUpdate('scrape-finished', { success: true, count: 0, reason: 'No systems to scrape' })
+        sendUpdate('scrape-finished', { success: true, count: 0, reason: 'No systems to scrape', systems: [] })
         return
       }
 
@@ -272,7 +278,7 @@ export class ScraperService {
       }
 
       if (jobs.length === 0) {
-        sendUpdate('scrape-finished', { success: true, count: 0, reason: 'No games matched the scraper filter' })
+        sendUpdate('scrape-finished', { success: true, count: 0, reason: 'No games matched the scraper filter', systems: systemsScraped })
         return
       }
 
@@ -281,7 +287,7 @@ export class ScraperService {
 
       for (let i = 0; i < jobs.length; i++) {
         if (this.isCancelled) {
-          sendUpdate('scrape-finished', { success: false, reason: 'Scraping was cancelled by user', count: successCount })
+          sendUpdate('scrape-finished', { success: false, reason: 'Scraping was cancelled by user', count: successCount, systems: systemsScraped })
           return
         }
 
@@ -454,11 +460,11 @@ export class ScraperService {
         await new Promise(resolve => setTimeout(resolve, 500))
       }
 
-      sendUpdate('scrape-finished', { success: true, count: successCount, failed: failCount })
+      sendUpdate('scrape-finished', { success: true, count: successCount, failed: failCount, systems: systemsScraped })
 
     } catch (err: any) {
       console.error('Fatal error in ScraperService:', err)
-      sendUpdate('scrape-finished', { success: false, reason: err.message || 'Unknown fatal scraper error' })
+      sendUpdate('scrape-finished', { success: false, reason: err.message || 'Unknown fatal scraper error', systems: systemsScraped })
     }
   }
 }

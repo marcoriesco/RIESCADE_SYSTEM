@@ -522,27 +522,38 @@
 }
 
 .metadata-grid-label {
-  width: 160px;
-  font-weight: 800;
-  color: #ff007f;
-  letter-spacing: 1px;
+  min-width: 180px !important;
+  font-weight: 600 !important;
 }
 
 .metadata-grid-value {
-  font-weight: 500;
+  font-weight: 300 !important;
   color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scraper-game-title-container {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  .scraper-game-title {
+    font-size: 1.5em;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 15px;
+  }
 }
 
 .scraper-details-description {
-  margin-top: 30px;
   font-size: 0.95rem;
   color: #aaa;
   line-height: 1.6;
   max-height: 250px;
   overflow-y: auto;
   padding-right: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 20px;
 }
 
 .scraper-footer-buttons {

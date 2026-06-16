@@ -2155,6 +2155,11 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               </div>
             </div>
 
+            {/* Title */}
+            <div className="scraper-game-title-container">
+              <h6 className="scraper-game-title">{selectedMatch?.name}</h6>
+            </div>
+
             {/* Synopsis Description Text */}
             <div className="scraper-details-description custom-scrollbar">
               {selectedMatch?.desc || selectedMatch?.synopsis || 'Nenhuma descrição disponível para este jogo.'}

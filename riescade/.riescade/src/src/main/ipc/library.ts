@@ -7,9 +7,15 @@ import { IpcContext } from './index'
 export function registerLibraryIpc(context: IpcContext): void {
   const { libraryService, launcherService } = context
 
-  ipcMain.handle('preload-library', async (_, forcePhysicalScan?: boolean, systemName?: string) => {
+  ipcMain.handle('preload-library', async (_, forcePhysicalScan?: boolean, systemName?: string | string[]) => {
     if (systemName) {
-      await libraryService.preloadSystem(systemName, forcePhysicalScan)
+      if (Array.isArray(systemName)) {
+        for (const name of systemName) {
+          await libraryService.preloadSystem(name, forcePhysicalScan)
+        }
+      } else {
+        await libraryService.preloadSystem(systemName, forcePhysicalScan)
+      }
     } else {
       if (forcePhysicalScan) {
         LibraryService.clearCache()
