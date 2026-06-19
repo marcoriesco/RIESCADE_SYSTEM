@@ -1,1318 +1,413 @@
---- RIESCADE Log Started at 2026-06-19T04:31:59.728Z ---
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[01:31:59] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[01:31:59] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[01:31:59] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[01:31:59] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[01:31:59] [INFO] Theme file changed: assets\css\animate.css. Notifying renderer...
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(5, 'INDEXING_DATABASE')
-[01:32:00] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[01:32:00] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[01:32:00] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[01:32:00] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[01:32:00] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[01:32:00] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[01:32:00] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[01:32:00] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[01:32:00] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[01:32:00] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[01:32:00] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(10, 'INDEXING_DATABASE')
-[01:32:00] [INFO] 
-🗄️  First run: indexing 308 systems into SQLite...
-[01:32:00] [INFO]   📂 Indexing: flash ...
-[01:32:00] [INFO]     ✅ flash: 148 games indexed
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(10, 'INDEXING_DATABASE')
-[01:32:00] [INFO]   📂 Indexing: j2me ...
-[01:32:00] [INFO]     ✅ j2me: 518 games indexed
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(10, 'INDEXING_DATABASE')
-[01:32:00] [INFO]   📂 Indexing: mame ...
-[01:32:00] [INFO]     ✅ mame: 0 games indexed
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(10, 'INDEXING_DATABASE')
-[01:32:00] [INFO]   📂 Indexing: hbmame ...
-[01:32:00] [INFO]     ✅ hbmame: 518 games indexed
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:00] [INFO]   📂 Indexing: fbneo ...
-[01:32:00] [INFO]     ✅ fbneo: 570 games indexed
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:00] [INFO]   📂 Indexing: cave ...
-[01:32:00] [INFO]     ✅ cave: 26 games indexed
-[01:32:00] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:00] [INFO]   📂 Indexing: laseractive ...
-[01:32:01] [INFO]     ✅ laseractive: 3 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: daphne ...
-[01:32:01] [INFO]     ✅ daphne: 17 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: singe ...
-[01:32:01] [INFO]     ✅ singe: 94 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: actionmax ...
-[01:32:01] [INFO]     ✅ actionmax: 5 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: cps1 ...
-[01:32:01] [INFO]     ✅ cps1: 27 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(11, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: cps2 ...
-[01:32:01] [INFO]     ✅ cps2: 41 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: cps3 ...
-[01:32:01] [INFO]     ✅ cps3: 6 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: dice ...
-[01:32:01] [INFO]     ✅ dice: 10 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: neogeo ...
-[01:32:01] [INFO]     ✅ neogeo: 153 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: neogeocd ...
-[01:32:01] [INFO]     ✅ neogeocd: 81 games indexed
-[01:32:01] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:01] [INFO]   📂 Indexing: model2 ...
-[01:32:02] [INFO]     ✅ model2: 31 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: model3 ...
-[01:32:02] [INFO]     ✅ model3: 25 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: atomiswave ...
-[01:32:02] [INFO]     ✅ atomiswave: 27 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(12, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: naomi ...
-[01:32:02] [INFO]     ✅ naomi: 124 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(13, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: naomi2 ...
-[01:32:02] [INFO]     ✅ naomi2: 12 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(13, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: hikaru ...
-[01:32:02] [INFO]     ✅ hikaru: 6 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(13, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: gaelco ...
-[01:32:02] [INFO]     ✅ gaelco: 10 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(13, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: chihiro ...
-[01:32:02] [INFO]     ✅ chihiro: 12 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(13, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: triforce ...
-[01:32:02] [INFO]     ✅ triforce: 5 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(13, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: lindbergh ...
-[01:32:02] [INFO]     ✅ lindbergh: 26 games indexed
-[01:32:02] [INFO] [StartLoader:Backend] sendProgress(13, 'INDEXING_DATABASE')
-[01:32:02] [INFO]   📂 Indexing: sg1000 ...
-[01:32:03] [INFO]     ✅ sg1000: 68 games indexed
-[01:32:03] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:03] [INFO]   📂 Indexing: multivision ...
-[01:32:03] [INFO]     ✅ multivision: 12 games indexed
-[01:32:03] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:03] [INFO]   📂 Indexing: mastersystem ...
-[01:32:03] [INFO]     ✅ mastersystem: 334 games indexed
-[01:32:03] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:03] [INFO]   📂 Indexing: megadrive ...
-[01:32:03] [INFO]     ✅ megadrive: 699 games indexed
-[01:32:03] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:03] [INFO]   📂 Indexing: megadrive-msu ...
-[01:32:04] [INFO]     ✅ megadrive-msu: 151 games indexed
-[01:32:04] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:04] [INFO]   📂 Indexing: megacd ...
-[01:32:04] [INFO]     ✅ megacd: 132 games indexed
-[01:32:04] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:04] [INFO]   📂 Indexing: sega32x ...
-[01:32:04] [INFO]     ✅ sega32x: 34 games indexed
-[01:32:04] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:04] [INFO]   📂 Indexing: saturn ...
-[01:32:04] [INFO]     ✅ saturn: 248 games indexed
-[01:32:04] [INFO] [StartLoader:Backend] sendProgress(14, 'INDEXING_DATABASE')
-[01:32:04] [INFO]   📂 Indexing: segastv ...
-[01:32:04] [INFO]     ✅ segastv: 55 games indexed
-[01:32:04] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:04] [INFO]   📂 Indexing: dreamcast ...
-[01:32:05] [INFO]     ✅ dreamcast: 294 games indexed
-[01:32:05] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:05] [INFO]   📂 Indexing: fds ...
-[01:32:05] [INFO]     ✅ fds: 270 games indexed
-[01:32:05] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:05] [INFO]   📂 Indexing: nes ...
-[01:32:05] [INFO]     ✅ nes: 886 games indexed
-[01:32:05] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:05] [INFO]   📂 Indexing: snes ...
-[01:32:06] [INFO]     ✅ snes: 774 games indexed
-[01:32:06] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:06] [INFO]   📂 Indexing: snes-msu1 ...
-[01:32:06] [INFO]     ✅ snes-msu1: 120 games indexed
-[01:32:06] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:06] [INFO]   📂 Indexing: sgb-msu1 ...
-[01:32:06] [INFO]     ✅ sgb-msu1: 3 games indexed
-[01:32:06] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:06] [INFO]   📂 Indexing: satellaview ...
-[01:32:06] [INFO]     ✅ satellaview: 62 games indexed
-[01:32:06] [INFO] [StartLoader:Backend] sendProgress(15, 'INDEXING_DATABASE')
-[01:32:06] [INFO]   📂 Indexing: sufami ...
-[01:32:07] [INFO]     ✅ sufami: 15 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: virtualboy ...
-[01:32:07] [INFO]     ✅ virtualboy: 26 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: n64 ...
-[01:32:07] [INFO]     ✅ n64: 401 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: n64recomp ...
-[01:32:07] [INFO]     ✅ n64recomp: 9 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: n64dd ...
-[01:32:07] [INFO]     ✅ n64dd: 12 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: gamecube ...
-[01:32:07] [INFO]     ✅ gamecube: 16 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: wii ...
-[01:32:07] [INFO]     ✅ wii: 35 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: wiiu ...
-[01:32:07] [INFO]     ✅ wiiu: 155 games indexed
-[01:32:07] [INFO] [StartLoader:Backend] sendProgress(16, 'INDEXING_DATABASE')
-[01:32:07] [INFO]   📂 Indexing: switch ...
-[01:32:08] [INFO]     ✅ switch: 389 games indexed
-[01:32:08] [INFO] [StartLoader:Backend] sendProgress(17, 'INDEXING_DATABASE')
-[01:32:08] [INFO]   📂 Indexing: pcengine ...
-[01:32:08] [INFO]     ✅ pcengine: 322 games indexed
-[01:32:08] [INFO] [StartLoader:Backend] sendProgress(17, 'INDEXING_DATABASE')
-[01:32:08] [INFO]   📂 Indexing: pcenginecd ...
-[01:32:09] [INFO]     ✅ pcenginecd: 138 games indexed
-[01:32:09] [INFO] [StartLoader:Backend] sendProgress(17, 'INDEXING_DATABASE')
-[01:32:09] [INFO]   📂 Indexing: supergrafx ...
-[01:32:09] [INFO]     ✅ supergrafx: 5 games indexed
-[01:32:09] [INFO] [StartLoader:Backend] sendProgress(17, 'INDEXING_DATABASE')
-[01:32:09] [INFO]   📂 Indexing: pcfx ...
-[01:32:09] [INFO]     ✅ pcfx: 74 games indexed
-[01:32:09] [INFO] [StartLoader:Backend] sendProgress(17, 'INDEXING_DATABASE')
-[01:32:09] [INFO]   📂 Indexing: psx ...
-[01:32:10] [INFO]     ✅ psx: 1639 games indexed
-[01:32:10] [INFO] [StartLoader:Backend] sendProgress(17, 'INDEXING_DATABASE')
-[01:32:10] [INFO]   📂 Indexing: ps2 ...
-[01:32:10] [INFO]     ✅ ps2: 355 games indexed
-[01:32:10] [INFO] [StartLoader:Backend] sendProgress(17, 'INDEXING_DATABASE')
-[01:32:10] [INFO]   📂 Indexing: ps3 ...
-[01:32:10] [INFO]     ✅ ps3: 103 games indexed
-[01:32:10] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:10] [INFO]   📂 Indexing: ps4 ...
-[01:32:10] [INFO]     ✅ ps4: 6 games indexed
-[01:32:10] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:10] [INFO]   📂 Indexing: xbox ...
-[01:32:10] [INFO]     ✅ xbox: 499 games indexed
-[01:32:10] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:10] [INFO]   📂 Indexing: xbox360 ...
-[01:32:11] [INFO]     ✅ xbox360: 122 games indexed
-[01:32:11] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:11] [INFO]   📂 Indexing: 3do ...
-[01:32:11] [INFO]     ✅ 3do: 59 games indexed
-[01:32:11] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:11] [INFO]   📂 Indexing: amiga500 ...
-[01:32:12] [INFO]     ✅ amiga500: 1493 games indexed
-[01:32:12] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:12] [INFO]   📂 Indexing: amiga1200 ...
-[01:32:12] [INFO]     ✅ amiga1200: 151 games indexed
-[01:32:12] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:12] [INFO]   📂 Indexing: amiga4000 ...
-[01:32:12] [INFO]     ✅ amiga4000: 6 games indexed
-[01:32:12] [INFO] [StartLoader:Backend] sendProgress(18, 'INDEXING_DATABASE')
-[01:32:12] [INFO]   📂 Indexing: amigacd32 ...
-[01:32:13] [INFO]     ✅ amigacd32: 123 games indexed
-[01:32:13] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:13] [INFO]   📂 Indexing: amigacdtv ...
-[01:32:13] [INFO]     ✅ amigacdtv: 10 games indexed
-[01:32:13] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:13] [INFO]   📂 Indexing: amstradcpc ...
-[01:32:13] [INFO]     ✅ amstradcpc: 94 games indexed
-[01:32:13] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:13] [INFO]   📂 Indexing: gx4000 ...
-[01:32:13] [INFO]     ✅ gx4000: 24 games indexed
-[01:32:13] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:13] [INFO]   📂 Indexing: apple2 ...
-[01:32:13] [INFO]     ✅ apple2: 115 games indexed
-[01:32:13] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:13] [INFO]   📂 Indexing: apple2gs ...
-[01:32:13] [INFO]     ✅ apple2gs: 110 games indexed
-[01:32:13] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:13] [INFO]   📂 Indexing: atari800 ...
-[01:32:14] [INFO]     ✅ atari800: 100 games indexed
-[01:32:14] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:14] [INFO]   📂 Indexing: atari2600 ...
-[01:32:14] [INFO]     ✅ atari2600: 664 games indexed
-[01:32:14] [INFO] [StartLoader:Backend] sendProgress(19, 'INDEXING_DATABASE')
-[01:32:14] [INFO]   📂 Indexing: atari5200 ...
-[01:32:14] [INFO]     ✅ atari5200: 99 games indexed
-[01:32:14] [INFO] [StartLoader:Backend] sendProgress(20, 'INDEXING_DATABASE')
-[01:32:14] [INFO]   📂 Indexing: atari7800 ...
-[01:32:14] [INFO]     ✅ atari7800: 60 games indexed
-[01:32:14] [INFO] [StartLoader:Backend] sendProgress(20, 'INDEXING_DATABASE')
-[01:32:14] [INFO]   📂 Indexing: atarist ...
-[01:32:14] [INFO]     ✅ atarist: 94 games indexed
-[01:32:14] [INFO] [StartLoader:Backend] sendProgress(20, 'INDEXING_DATABASE')
-[01:32:14] [INFO]   📂 Indexing: xegs ...
-[01:32:14] [INFO]     ✅ xegs: 42 games indexed
-[01:32:14] [INFO] [StartLoader:Backend] sendProgress(20, 'INDEXING_DATABASE')
-[01:32:14] [INFO]   📂 Indexing: jaguar ...
-[01:32:15] [INFO]     ✅ jaguar: 56 games indexed
-[01:32:15] [INFO] [StartLoader:Backend] sendProgress(20, 'INDEXING_DATABASE')
-[01:32:15] [INFO]   📂 Indexing: jaguarcd ...
-[01:32:15] [INFO]     ✅ jaguarcd: 13 games indexed
-[01:32:15] [INFO] [StartLoader:Backend] sendProgress(20, 'INDEXING_DATABASE')
-[01:32:15] [INFO]   📂 Indexing: colecovision ...
-[01:32:15] [INFO]     ✅ colecovision: 140 games indexed
-[01:32:15] [INFO] [StartLoader:Backend] sendProgress(20, 'INDEXING_DATABASE')
-[01:32:15] [INFO]   📂 Indexing: c16 ...
-[01:32:15] [INFO]     ✅ c16: 0 games indexed
-[01:32:15] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:15] [INFO]   📂 Indexing: c20 ...
-[01:32:15] [INFO]     ✅ c20: 152 games indexed
-[01:32:15] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:15] [INFO]   📂 Indexing: c64 ...
-[01:32:15] [INFO]     ✅ c64: 59 games indexed
-[01:32:15] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:15] [INFO]   📂 Indexing: cplus4 ...
-[01:32:16] [INFO]     ✅ cplus4: 168 games indexed
-[01:32:16] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:16] [INFO]   📂 Indexing: pet ...
-[01:32:16] [INFO]     ✅ pet: 5 games indexed
-[01:32:16] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:16] [INFO]   📂 Indexing: c128 ...
-[01:32:16] [INFO]     ✅ c128: 31 games indexed
-[01:32:16] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:16] [INFO]   📂 Indexing: intellivision ...
-[01:32:16] [INFO]     ✅ intellivision: 135 games indexed
-[01:32:16] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:16] [INFO]   📂 Indexing: aquarius ...
-[01:32:16] [INFO]     ✅ aquarius: 9 games indexed
-[01:32:16] [INFO] [StartLoader:Backend] sendProgress(21, 'INDEXING_DATABASE')
-[01:32:16] [INFO]   📂 Indexing: channelf ...
-[01:32:16] [INFO]     ✅ channelf: 29 games indexed
-[01:32:16] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:16] [INFO]   📂 Indexing: enterprise ...
-[01:32:16] [INFO]     ✅ enterprise: 242 games indexed
-[01:32:16] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:16] [INFO]   📂 Indexing: msx1 ...
-[01:32:17] [INFO]     ✅ msx1: 439 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: msx2 ...
-[01:32:17] [INFO]     ✅ msx2: 517 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: msx2+ ...
-[01:32:17] [INFO]     ✅ msx2+: 71 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: msxturbor ...
-[01:32:17] [INFO]     ✅ msxturbor: 42 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: spectravideo ...
-[01:32:17] [INFO]     ✅ spectravideo: 106 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: oricatmos ...
-[01:32:17] [INFO]     ✅ oricatmos: 79 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(22, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: pc88 ...
-[01:32:17] [INFO]     ✅ pc88: 13 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(23, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: pc98 ...
-[01:32:17] [INFO]     ✅ pc98: 21 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(23, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: samcoupe ...
-[01:32:17] [INFO]     ✅ samcoupe: 34 games indexed
-[01:32:17] [INFO] [StartLoader:Backend] sendProgress(23, 'INDEXING_DATABASE')
-[01:32:17] [INFO]   📂 Indexing: x68000 ...
-[01:32:18] [INFO]     ✅ x68000: 120 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(23, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: x1 ...
-[01:32:18] [INFO]     ✅ x1: 268 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(23, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: thomson ...
-[01:32:18] [INFO]     ✅ thomson: 36 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(23, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: vectrex ...
-[01:32:18] [INFO]     ✅ vectrex: 25 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(23, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: odyssey2 ...
-[01:32:18] [INFO]     ✅ odyssey2: 51 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: p2000t ...
-[01:32:18] [INFO]     ✅ p2000t: 160 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: vg5k ...
-[01:32:18] [INFO]     ✅ vg5k: 21 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: zx81 ...
-[01:32:18] [INFO]     ✅ zx81: 60 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: zxspectrum ...
-[01:32:18] [INFO]     ✅ zxspectrum: 365 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: lynx ...
-[01:32:18] [INFO]     ✅ lynx: 84 games indexed
-[01:32:18] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:18] [INFO]   📂 Indexing: gamegear ...
-[01:32:19] [INFO]     ✅ gamegear: 385 games indexed
-[01:32:19] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:19] [INFO]   📂 Indexing: gw ...
-[01:32:19] [INFO]     ✅ gw: 57 games indexed
-[01:32:19] [INFO] [StartLoader:Backend] sendProgress(24, 'INDEXING_DATABASE')
-[01:32:19] [INFO]   📂 Indexing: gb ...
-[01:32:19] [INFO]     ✅ gb: 505 games indexed
-[01:32:19] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:19] [INFO]   📂 Indexing: gb2players ...
-[01:32:19] [INFO]     ✅ gb2players: 15 games indexed
-[01:32:19] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:19] [INFO]   📂 Indexing: gbc ...
-[01:32:19] [INFO]     ✅ gbc: 510 games indexed
-[01:32:19] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:19] [INFO]   📂 Indexing: gbc2players ...
-[01:32:20] [INFO]     ✅ gbc2players: 15 games indexed
-[01:32:20] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:20] [INFO]   📂 Indexing: gba ...
-[01:32:20] [INFO]     ✅ gba: 935 games indexed
-[01:32:20] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:20] [INFO]   📂 Indexing: gba2players ...
-[01:32:20] [INFO]     ✅ gba2players: 15 games indexed
-[01:32:20] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:20] [INFO]   📂 Indexing: karaoke ...
-[01:32:20] [INFO]     ✅ karaoke: 0 games indexed
-[01:32:20] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:20] [INFO]   📂 Indexing: pokemini ...
-[01:32:20] [INFO]     ✅ pokemini: 43 games indexed
-[01:32:20] [INFO] [StartLoader:Backend] sendProgress(25, 'INDEXING_DATABASE')
-[01:32:20] [INFO]   📂 Indexing: nds ...
-[01:32:21] [INFO]     ✅ nds: 215 games indexed
-[01:32:21] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:21] [INFO]   📂 Indexing: 3ds ...
-[01:32:21] [INFO]     ✅ 3ds: 412 games indexed
-[01:32:21] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:21] [INFO]   📂 Indexing: psp ...
-[01:32:21] [INFO]     ✅ psp: 342 games indexed
-[01:32:21] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:21] [INFO]   📂 Indexing: ngp ...
-[01:32:21] [INFO]     ✅ ngp: 9 games indexed
-[01:32:21] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:21] [INFO]   📂 Indexing: ngpc ...
-[01:32:21] [INFO]     ✅ ngpc: 68 games indexed
-[01:32:21] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:21] [INFO]   📂 Indexing: supervision ...
-[01:32:21] [INFO]     ✅ supervision: 63 games indexed
-[01:32:21] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:21] [INFO]   📂 Indexing: wswan ...
-[01:32:22] [INFO]     ✅ wswan: 110 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: wswanc ...
-[01:32:22] [INFO]     ✅ wswanc: 91 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(26, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: scummvm ...
-[01:32:22] [INFO]     ✅ scummvm: 35 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(27, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: ports ...
-[01:32:22] [INFO]     ✅ ports: 6 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(27, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: love ...
-[01:32:22] [INFO]     ✅ love: 4 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(27, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: lutro ...
-[01:32:22] [INFO]     ✅ lutro: 9 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(27, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: devilutionx ...
-[01:32:22] [INFO]     ✅ devilutionx: 1 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(27, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: easyrpg ...
-[01:32:22] [INFO]     ✅ easyrpg: 1 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(27, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: ecwolf ...
-[01:32:22] [INFO]     ✅ ecwolf: 2 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(27, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: gemrb ...
-[01:32:22] [INFO]     ✅ gemrb: 1 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: prboom ...
-[01:32:22] [INFO]     ✅ prboom: 3 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: gzdoom ...
-[01:32:22] [INFO]     ✅ gzdoom: 3 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: raze ...
-[01:32:22] [INFO]     ✅ raze: 1 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: doom3 ...
-[01:32:22] [INFO]     ✅ doom3: 1 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: quake ...
-[01:32:22] [INFO]     ✅ quake: 5 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: quake2 ...
-[01:32:22] [INFO]     ✅ quake2: 8 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: rtcw ...
-[01:32:22] [INFO]     ✅ rtcw: 1 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(28, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: halflife ...
-[01:32:22] [INFO]     ✅ halflife: 4 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: bstone ...
-[01:32:22] [INFO]     ✅ bstone: 2 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: cavestory ...
-[01:32:22] [INFO]     ✅ cavestory: 3 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: powerbomberman ...
-[01:32:22] [INFO]     ✅ powerbomberman: 1 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: ikemen ...
-[01:32:22] [INFO]     ✅ ikemen: 4 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: mugen ...
-[01:32:22] [INFO]     ✅ mugen: 15 games indexed
-[01:32:22] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:22] [INFO]   📂 Indexing: openbor ...
-[01:32:23] [INFO]     ✅ openbor: 15 games indexed
-[01:32:23] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:23] [INFO]   📂 Indexing: solarus ...
-[01:32:23] [INFO]     ✅ solarus: 7 games indexed
-[01:32:23] [INFO] [StartLoader:Backend] sendProgress(29, 'INDEXING_DATABASE')
-[01:32:23] [INFO]   📂 Indexing: teknoparrot ...
-[01:32:23] [INFO]     ✅ teknoparrot: 235 games indexed
-[01:32:23] [INFO] [StartLoader:Backend] sendProgress(30, 'INDEXING_DATABASE')
-[01:32:23] [INFO]   📂 Indexing: zinc ...
-[01:32:24] [INFO]     ✅ zinc: 32 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(30, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: namco2x6 ...
-[01:32:24] [INFO]     ✅ namco2x6: 26 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(30, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: namco3xx ...
-[01:32:24] [INFO]     ✅ namco3xx: 9 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(30, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: dos ...
-[01:32:24] [INFO]     ✅ dos: 72 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(30, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: exodos ...
-[01:32:24] [INFO]     ✅ exodos: 0 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(30, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: exowin3x ...
-[01:32:24] [INFO]     ✅ exowin3x: 0 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(30, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: exowin9x ...
-[01:32:24] [INFO]     ✅ exowin9x: 0 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: amazon ...
-[01:32:24] [INFO]     ✅ amazon: 0 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: steam ...
-[01:32:24] [INFO]     ✅ steam: 0 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: gog ...
-[01:32:24] [INFO]     ✅ gog: 10 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: epic ...
-[01:32:24] [INFO]     ✅ epic: 0 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: eagames ...
-[01:32:24] [INFO]     ✅ eagames: 0 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: Windows ...
-[01:32:24] [INFO]     ✅ Windows: 49 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: vpinball ...
-[01:32:24] [INFO]     ✅ vpinball: 94 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(31, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: fpinball ...
-[01:32:24] [INFO]     ✅ fpinball: 415 games indexed
-[01:32:24] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:24] [INFO]   📂 Indexing: pinballfx ...
-[01:32:25] [INFO]     ✅ pinballfx: 125 games indexed
-[01:32:25] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:25] [INFO]   📂 Indexing: pinballm ...
-[01:32:25] [INFO]     ✅ pinballm: 7 games indexed
-[01:32:25] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:25] [INFO]   📂 Indexing: pinballfx2 ...
-[01:32:25] [INFO]     ✅ pinballfx2: 41 games indexed
-[01:32:25] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:25] [INFO]   📂 Indexing: pinballfx3 ...
-[01:32:25] [INFO]     ✅ pinballfx3: 100 games indexed
-[01:32:25] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:25] [INFO]   📂 Indexing: zaccariapinball ...
-[01:32:25] [INFO]     ✅ zaccariapinball: 127 games indexed
-[01:32:25] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:25] [INFO]   📂 Indexing: pico8 ...
-[01:32:26] [INFO]     ✅ pico8: 4637 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: tic80 ...
-[01:32:26] [INFO]     ✅ tic80: 31 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(32, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: wasm4 ...
-[01:32:26] [INFO]     ✅ wasm4: 99 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(33, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: cdi ...
-[01:32:26] [INFO]     ✅ cdi: 126 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(33, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: ngage ...
-[01:32:26] [INFO]     ✅ ngage: 68 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(33, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: advision ...
-[01:32:26] [INFO]     ✅ advision: 4 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(33, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: tvgames ...
-[01:32:26] [INFO]     ✅ tvgames: 18 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(33, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: megaduck ...
-[01:32:26] [INFO]     ✅ megaduck: 23 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(33, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: arduboy ...
-[01:32:26] [INFO]     ✅ arduboy: 48 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(33, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: uzebox ...
-[01:32:26] [INFO]     ✅ uzebox: 73 games indexed
-[01:32:26] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:26] [INFO]   📂 Indexing: lowresnx ...
-[01:32:27] [INFO]     ✅ lowresnx: 610 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: vircon32 ...
-[01:32:27] [INFO]     ✅ vircon32: 13 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: pv1000 ...
-[01:32:27] [INFO]     ✅ pv1000: 12 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: bk ...
-[01:32:27] [INFO]     ✅ bk: 17 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: casloopy ...
-[01:32:27] [INFO]     ✅ casloopy: 7 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: crvision ...
-[01:32:27] [INFO]     ✅ crvision: 20 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: gamecom ...
-[01:32:27] [INFO]     ✅ gamecom: 22 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(34, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: gamepock ...
-[01:32:27] [INFO]     ✅ gamepock: 5 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: gp32 ...
-[01:32:27] [INFO]     ✅ gp32: 21 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: pegasus ...
-[01:32:27] [INFO]     ✅ pegasus: 3 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: cassettevision ...
-[01:32:27] [INFO]     ✅ cassettevision: 35 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: scv ...
-[01:32:27] [INFO]     ✅ scv: 26 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: fm7 ...
-[01:32:27] [INFO]     ✅ fm7: 21 games indexed
-[01:32:27] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:27] [INFO]   📂 Indexing: apfm1000 ...
-[01:32:28] [INFO]     ✅ apfm1000: 11 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: bbcmicro ...
-[01:32:28] [INFO]     ✅ bbcmicro: 156 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(35, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: electron ...
-[01:32:28] [INFO]     ✅ electron: 2 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: adam ...
-[01:32:28] [INFO]     ✅ adam: 14 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: atom ...
-[01:32:28] [INFO]     ✅ atom: 15 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: archimedes ...
-[01:32:28] [INFO]     ✅ archimedes: 132 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: arcadia ...
-[01:32:28] [INFO]     ✅ arcadia: 73 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: gmaster ...
-[01:32:28] [INFO]     ✅ gmaster: 13 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: astrocade ...
-[01:32:28] [INFO]     ✅ astrocade: 48 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: ti99 ...
-[01:32:28] [INFO]     ✅ ti99: 28 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(36, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: tutor ...
-[01:32:28] [INFO]     ✅ tutor: 9 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(37, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: coco ...
-[01:32:28] [INFO]     ✅ coco: 29 games indexed
-[01:32:28] [INFO] [StartLoader:Backend] sendProgress(37, 'INDEXING_DATABASE')
-[01:32:28] [INFO]   📂 Indexing: dragon32 ...
-[01:32:29] [INFO]     ✅ dragon32: 385 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(37, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: fmtowns ...
-[01:32:29] [INFO]     ✅ fmtowns: 20 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(37, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: lcdgames ...
-[01:32:29] [INFO]     ✅ lcdgames: 0 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(37, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: vsmile ...
-[01:32:29] [INFO]     ✅ vsmile: 9 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(37, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: camplynx ...
-[01:32:29] [INFO]     ✅ camplynx: 5 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(37, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: vc4000 ...
-[01:32:29] [INFO]     ✅ vc4000: 37 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: supracan ...
-[01:32:29] [INFO]     ✅ supracan: 11 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: gamate ...
-[01:32:29] [INFO]     ✅ gamate: 53 games indexed
-[01:32:29] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:29] [INFO]   📂 Indexing: sgb ...
-[01:32:30] [INFO]     ✅ sgb: 145 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: neogeo64 ...
-[01:32:30] [INFO]     ✅ neogeo64: 8 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: psvita ...
-[01:32:30] [INFO]     ✅ psvita: 55 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: bennugd ...
-[01:32:30] [INFO]     ✅ bennugd: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: bsyndrome ...
-[01:32:30] [INFO]     ✅ bsyndrome: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(38, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: cannonball ...
-[01:32:30] [INFO]     ✅ cannonball: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: cdogs ...
-[01:32:30] [INFO]     ✅ cdogs: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: cgenius ...
-[01:32:30] [INFO]     ✅ cgenius: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: corsixth ...
-[01:32:30] [INFO]     ✅ corsixth: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: openlara ...
-[01:32:30] [INFO]     ✅ openlara: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: opengoal ...
-[01:32:30] [INFO]     ✅ opengoal: 3 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: openjazz ...
-[01:32:30] [INFO]     ✅ openjazz: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: pdark ...
-[01:32:30] [INFO]     ✅ pdark: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(39, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: soh ...
-[01:32:30] [INFO]     ✅ soh: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(40, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: 2ship ...
-[01:32:30] [INFO]     ✅ 2ship: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(40, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: dusklight ...
-[01:32:30] [INFO]     ✅ dusklight: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(40, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: sonic3-air ...
-[01:32:30] [INFO]     ✅ sonic3-air: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(40, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: sonic-mania ...
-[01:32:30] [INFO]     ✅ sonic-mania: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(40, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: sonicretro ...
-[01:32:30] [INFO]     ✅ sonicretro: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(40, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: starship ...
-[01:32:30] [INFO]     ✅ starship: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(40, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: dinothawr ...
-[01:32:30] [INFO]     ✅ dinothawr: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: eduke32 ...
-[01:32:30] [INFO]     ✅ eduke32: 5 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: theforceengine ...
-[01:32:30] [INFO]     ✅ theforceengine: 1 games indexed
-[01:32:30] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:30] [INFO]   📂 Indexing: superbroswar ...
-[01:32:31] [INFO]     ✅ superbroswar: 1 games indexed
-[01:32:31] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:31] [INFO]   📂 Indexing: reminiscence ...
-[01:32:31] [INFO]     ✅ reminiscence: 1 games indexed
-[01:32:31] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:31] [INFO]   📂 Indexing: mess ...
-[01:32:31] [INFO]     ✅ mess: 0 games indexed
-[01:32:31] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:31] [INFO]   📂 Indexing: 3doj ...
-[01:32:31] [INFO]     ✅ 3doj: 38 games indexed
-[01:32:31] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:31] [INFO]   📂 Indexing: AAE ...
-[01:32:31] [INFO]     ✅ AAE: 37 games indexed
-[01:32:31] [INFO] [StartLoader:Backend] sendProgress(41, 'INDEXING_DATABASE')
-[01:32:31] [INFO]   📂 Indexing: android ...
-[01:32:31] [INFO]     ✅ android: 1 games indexed
-[01:32:31] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:31] [INFO]   📂 Indexing: arcade ...
-[01:32:32] [INFO]     ✅ arcade: 1197 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: arcadedumps ...
-[01:32:32] [INFO]     ✅ arcadedumps: 235 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: bigfish ...
-[01:32:32] [INFO]     ✅ bigfish: 15 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: btm ...
-[01:32:32] [INFO]     ✅ btm: 15 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: Casino ...
-[01:32:32] [INFO]     ✅ Casino: 76 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: cinematronics ...
-[01:32:32] [INFO]     ✅ cinematronics: 12 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: ddr ...
-[01:32:32] [INFO]     ✅ ddr: 15 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(42, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: elektronika ...
-[01:32:32] [INFO]     ✅ elektronika: 17 games indexed
-[01:32:32] [INFO] [StartLoader:Backend] sendProgress(43, 'INDEXING_DATABASE')
-[01:32:32] [INFO]   📂 Indexing: fc ...
-[01:32:33] [INFO]     ✅ fc: 1324 games indexed
-[01:32:33] [INFO] [StartLoader:Backend] sendProgress(43, 'INDEXING_DATABASE')
-[01:32:33] [INFO]   📂 Indexing: fightcade ...
-[01:32:33] [INFO]     ✅ fightcade: 2 games indexed
-[01:32:33] [INFO] [StartLoader:Backend] sendProgress(43, 'INDEXING_DATABASE')
-[01:32:33] [INFO]   📂 Indexing: fruit ...
-[01:32:33] [INFO]     ✅ fruit: 34 games indexed
-[01:32:33] [INFO] [StartLoader:Backend] sendProgress(43, 'INDEXING_DATABASE')
-[01:32:33] [INFO]   📂 Indexing: gamegearh ...
-[01:32:33] [INFO]     ✅ gamegearh: 112 games indexed
-[01:32:33] [INFO] [StartLoader:Backend] sendProgress(43, 'INDEXING_DATABASE')
-[01:32:33] [INFO]   📂 Indexing: genesis ...
-[01:32:34] [INFO]     ✅ genesis: 694 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(43, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: ique ...
-[01:32:34] [INFO]     ✅ ique: 15 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(43, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: jakks ...
-[01:32:34] [INFO]     ✅ jakks: 44 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: konamih ...
-[01:32:34] [INFO]     ✅ konamih: 14 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: locomalito ...
-[01:32:34] [INFO]     ✅ locomalito: 25 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: mastersystemfm ...
-[01:32:34] [INFO]     ✅ mastersystemfm: 47 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: mastersystemh ...
-[01:32:34] [INFO]     ✅ mastersystemh: 63 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: megadriveh ...
-[01:32:34] [INFO]     ✅ megadriveh: 1739 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: n64h ...
-[01:32:34] [INFO]     ✅ n64h: 2 games indexed
-[01:32:34] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:34] [INFO]   📂 Indexing: n64j ...
-[01:32:35] [INFO]     ✅ n64j: 82 games indexed
-[01:32:35] [INFO] [StartLoader:Backend] sendProgress(44, 'INDEXING_DATABASE')
-[01:32:35] [INFO]   📂 Indexing: neogeoaes ...
-[01:32:35] [INFO]     ✅ neogeoaes: 214 games indexed
-[01:32:35] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:35] [INFO]   📂 Indexing: neogeoh ...
-[01:32:35] [INFO]     ✅ neogeoh: 38 games indexed
-[01:32:35] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:35] [INFO]   📂 Indexing: nes3d ...
-[01:32:35] [INFO]     ✅ nes3d: 82 games indexed
-[01:32:35] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:35] [INFO]   📂 Indexing: nesb ...
-[01:32:36] [INFO]     ✅ nesb: 162 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: nesh ...
-[01:32:36] [INFO]     ✅ nesh: 3253 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: neshd ...
-[01:32:36] [INFO]     ✅ neshd: 25 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: ouya ...
-[01:32:36] [INFO]     ✅ ouya: 22 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: palm ...
-[01:32:36] [INFO]     ✅ palm: 4 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(45, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: pinballhd ...
-[01:32:36] [INFO]     ✅ pinballhd: 1 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: pippin ...
-[01:32:36] [INFO]     ✅ pippin: 40 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: Popcap ...
-[01:32:36] [INFO]     ✅ Popcap: 45 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: ps2br ...
-[01:32:36] [INFO]     ✅ ps2br: 23 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: ps2h ...
-[01:32:36] [INFO]     ✅ ps2h: 7 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: ps3br ...
-[01:32:36] [INFO]     ✅ ps3br: 2 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: ps3j ...
-[01:32:36] [INFO]     ✅ ps3j: 17 games indexed
-[01:32:36] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:36] [INFO]   📂 Indexing: pspminis ...
-[01:32:37] [INFO]     ✅ pspminis: 294 games indexed
-[01:32:37] [INFO] [StartLoader:Backend] sendProgress(46, 'INDEXING_DATABASE')
-[01:32:37] [INFO]   📂 Indexing: psxh ...
-[01:32:37] [INFO]     ✅ psxh: 2 games indexed
-[01:32:37] [INFO] [StartLoader:Backend] sendProgress(47, 'INDEXING_DATABASE')
-[01:32:37] [INFO]   📂 Indexing: quake3 ...
-[01:32:37] [INFO]     ✅ quake3: 1 games indexed
-[01:32:37] [INFO] [StartLoader:Backend] sendProgress(47, 'INDEXING_DATABASE')
-[01:32:37] [INFO]   📂 Indexing: saturnj ...
-[01:32:38] [INFO]     ✅ saturnj: 35 games indexed
-[01:32:38] [INFO] [StartLoader:Backend] sendProgress(47, 'INDEXING_DATABASE')
-[01:32:38] [INFO]   📂 Indexing: sega32xh ...
-[01:32:38] [INFO]     ✅ sega32xh: 26 games indexed
-[01:32:38] [INFO] [StartLoader:Backend] sendProgress(47, 'INDEXING_DATABASE')
-[01:32:38] [INFO]   📂 Indexing: segaages2500 ...
-[01:32:38] [INFO]     ✅ segaages2500: 33 games indexed
-[01:32:38] [INFO] [StartLoader:Backend] sendProgress(47, 'INDEXING_DATABASE')
-[01:32:38] [INFO]   📂 Indexing: sfc ...
-[01:32:38] [INFO]     ✅ sfc: 973 games indexed
-[01:32:38] [INFO] [StartLoader:Backend] sendProgress(47, 'INDEXING_DATABASE')
-[01:32:38] [INFO]   📂 Indexing: snesbr ...
-[01:32:39] [INFO]     ✅ snesbr: 274 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(47, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: snesh ...
-[01:32:39] [INFO]     ✅ snesh: 2382 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: socrates ...
-[01:32:39] [INFO]     ✅ socrates: 8 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: m5 ...
-[01:32:39] [INFO]     ✅ m5: 22 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: supercharger ...
-[01:32:39] [INFO]     ✅ supercharger: 13 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: svmu ...
-[01:32:39] [INFO]     ✅ svmu: 40 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: switch2 ...
-[01:32:39] [INFO]     ✅ switch2: 0 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: tg16 ...
-[01:32:39] [INFO]     ✅ tg16: 96 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: tg16cd ...
-[01:32:39] [INFO]     ✅ tg16cd: 9 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(48, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: tiger ...
-[01:32:39] [INFO]     ✅ tiger: 58 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: tigerrz ...
-[01:32:39] [INFO]     ✅ tigerrz: 3 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: touhou ...
-[01:32:39] [INFO]     ✅ touhou: 25 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: turboduo ...
-[01:32:39] [INFO]     ✅ turboduo: 15 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: unity ...
-[01:32:39] [INFO]     ✅ unity: 11 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: wiih ...
-[01:32:39] [INFO]     ✅ wiih: 5 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: wiiu-sky ...
-[01:32:39] [INFO]     ✅ wiiu-sky: 6 games indexed
-[01:32:39] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:39] [INFO]   📂 Indexing: wiiware ...
-[01:32:40] [INFO]     ✅ wiiware: 665 games indexed
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(49, 'INDEXING_DATABASE')
-[01:32:40] [INFO]   📂 Indexing: windows9x ...
-[01:32:40] [INFO]     ✅ windows9x: 130 games indexed
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(50, 'INDEXING_DATABASE')
-[01:32:40] [INFO]   📂 Indexing: xboxlivearcade ...
-[01:32:40] [INFO]     ✅ xboxlivearcade: 295 games indexed
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(50, 'INDEXING_DATABASE')
-[01:32:40] [INFO]   📂 Indexing: zeebo ...
-[01:32:40] [INFO]     ✅ zeebo: 61 games indexed
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(50, 'INDEXING_DATABASE')
-[01:32:40] [INFO]   📂 Indexing: zmachine ...
-[01:32:40] [INFO]     ✅ zmachine: 7 games indexed
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(50, 'INDEXING_DATABASE')
-[01:32:40] [INFO] 
-✅ Indexing complete: 45062 games across 308 systems
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(50, 'INDEXING_DATABASE')
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(80, 'INDEXING_DATABASE')
-[01:32:40] [INFO] [StartLoader:Backend] sendProgress(100, 'INDEXING_DATABASE')
-[01:32:40] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
-[01:32:42] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=185.199.111.133 (IPv4), Time=1203ms, HTTP=200
-[01:35:30] [INFO] [Netplay] getLobbyList() called
-[01:35:30] [INFO] [Netplay] Using port: 55435
-[01:35:30] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
-[01:35:30] [INFO] [Netplay] WAN response status: 200 (362ms)
-[01:35:30] [INFO] [Netplay] WAN data received: 27048 bytes (526ms)
-[01:35:30] [INFO] [Netplay] Parsed 34 WAN rooms
-[01:35:31] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 34
-[01:35:31] [INFO] [Netplay] matchLocalRoms() called with 34 rooms
-[01:35:31] [INFO] [Netplay] Opening database...
-[01:35:31] [INFO] [Netplay] Database opened successfully
-[01:35:31] [INFO] [Netplay] Room 1/34 "Secret of Mana (USA) (Virtual Console)" -> 5 candidates (sorted)
-[01:35:31] [INFO] [Netplay]   Hashing candidate 1/3: ./Secret of Mana (USA).zip
-[01:35:31] [INFO] [Netplay]   CRC: D0176B24 vs room CRC: 89990EF7
-[01:35:31] [INFO] [Netplay]   Hashing candidate 2/3: ./Secret of Mana (USA) (MSU1).squashfs
-[01:35:31] [INFO] [CRC32] Skipping large file (1205MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Secret of Mana (USA) (MSU1).squashfs
-[01:35:31] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 89990EF7
-[01:35:31] [INFO] [Netplay]   Hashing candidate 3/3: ./Secret of Mana.m3u
-[01:35:31] [INFO] [Netplay]   CRC: 9937901D vs room CRC: 89990EF7
-[01:35:31] [INFO] [Netplay] Room 3/34 "Diablo" -> 6 candidates (sorted)
-[01:35:31] [INFO] [Netplay]   Hashing candidate 1/3: ./Diablo.chd
-[01:35:31] [INFO] [CRC32] Skipping large file (356MB): C:\tmp\RIESCADE_SYSTEM\roms\psx\Diablo.chd
-[01:35:31] [INFO] [Netplay]   CRC: 00000000 vs room CRC: F5843A1D
-[01:35:31] [INFO] [Netplay]   Hashing candidate 2/3: ./Diablo.zip
-[01:35:32] [INFO] [Netplay]   CRC: 7C2DA151 vs room CRC: F5843A1D
-[01:35:32] [INFO] [Netplay]   Hashing candidate 3/3: ./Diablo.win
-[01:35:32] [ERROR] [Netplay]   CRC failed for C:\tmp\RIESCADE_SYSTEM\roms\devilutionx\Diablo.win: {"errno":-4068,"code":"EISDIR","syscall":"read"}
-[01:35:32] [INFO] [Netplay] Room 6/34 "Pokémon Fire Red Version (Suri)" -> Direct CRC32 match found: ./Pokemon - Fire Red Version.zip
-[01:35:32] [INFO] [Netplay] Room 7/34 "Adventures of Batman & Robin, The (Europe)" -> Direct CRC32 match found: ./Adventures of Batman & Robin, The (Europe).zip
-[01:35:32] [INFO] [Netplay] Room 9/34 "Ultimate Mortal Kombat 3 (Europe)" -> 12 candidates (sorted)
-[01:35:32] [INFO] [Netplay]   Hashing candidate 1/3: ./Ultimate Mortal Kombat 3 (USA).zip
-[01:35:32] [INFO] [Netplay]   CRC: F5BFE41E vs room CRC: 1C4C54D2
-[01:35:32] [INFO] [Netplay]   Hashing candidate 2/3: ./Ultimate Mortal Kombat 3 (Europe).zip
-[01:35:32] [INFO] [Netplay]   CRC: ECFB5CB4 vs room CRC: 1C4C54D2
-[01:35:32] [INFO] [Netplay]   Hashing candidate 3/3: ./Ultimate Mortal Kombat 3 (US).chd
-[01:35:32] [INFO] [CRC32] Skipping large file (202MB): C:\tmp\RIESCADE_SYSTEM\roms\saturn\Ultimate Mortal Kombat 3 (US).chd
-[01:35:32] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 1C4C54D2
-[01:35:32] [INFO] [Netplay] Room 11/34 "Tekken3" -> 2 candidates (sorted)
-[01:35:32] [INFO] [Netplay]   Hashing candidate 1/2: ./tekken3.zip
-[01:35:32] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[01:35:32] [INFO] [Netplay]   Hashing candidate 2/2: ./tekken3.zip
-[01:35:32] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[01:35:32] [INFO] [Netplay] Room 12/34 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:35:32] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:35:32] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:35:32] [INFO] [Netplay] Room 13/34 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:35:32] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:35:32] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:35:32] [INFO] [Netplay] Room 14/34 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:35:32] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:35:32] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:35:32] [INFO] [Netplay] Room 15/34 "Return to Dinosaur Land (English v1.2)" -> 1 candidates (sorted)
-[01:35:32] [INFO] [Netplay]   Hashing candidate 1/1: ./Super Mario World - Return to Dinosaur Land (Hack).zip
-[01:35:32] [INFO] [Netplay]   CRC: 91BB526A vs room CRC: 53AFA4D1
-[01:35:32] [INFO] [Netplay] Room 16/34 "magdrop2" -> 1 candidates (sorted)
-[01:35:32] [INFO] [Netplay]   Hashing candidate 1/1: ./magdrop2.zip
-[01:35:32] [INFO] [Netplay]   CRC: 14B90536 vs room CRC: 3FE4D43C
-[01:35:33] [INFO] [Netplay] Room 20/34 "Super Mario World (USA)" -> 2099 candidates (sorted)
-[01:35:33] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario World (USA).zip
-[01:35:33] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: B19ED489
-[01:35:33] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario World (USA) (MSU1).squashfs
-[01:35:33] [INFO] [CRC32] Skipping large file (271MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Super Mario World (USA) (MSU1).squashfs
-[01:35:33] [INFO] [Netplay]   CRC: 00000000 vs room CRC: B19ED489
-[01:35:33] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World (Homebrew).zip
-[01:35:33] [INFO] [Netplay]   CRC: CF540BA6 vs room CRC: B19ED489
-[01:35:33] [INFO] [Netplay] Room 22/34 "Super Mario Bros. 3 (Japan) (Rev A)" -> 3 candidates (sorted)
-[01:35:33] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario Bros 3.3dsen
-[01:35:33] [INFO] [Netplay]   CRC: B16A9FE8 vs room CRC: 77F59F3E
-[01:35:33] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario Bros 3 Wii.iso
-[01:35:33] [INFO] [CRC32] Skipping large file (4482MB): C:\tmp\RIESCADE_SYSTEM\roms\wiih\Super Mario Bros 3 Wii.iso
-[01:35:33] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 77F59F3E
-[01:35:33] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World - Super Mario Bros 3 Golden (Hack).zip
-[01:35:33] [INFO] [Netplay]   CRC: 3725FAAD vs room CRC: 77F59F3E
-[01:35:33] [INFO] [Netplay] Room 23/34 "Castlevania III - Dracula's Curse (USA)" -> Direct CRC32 match found: ./Castlevania III - Draculas Curse.zip
-[01:35:33] [INFO] [Netplay] Room 25/34 "mslug" -> 24 candidates (sorted)
-[01:35:33] [INFO] [Netplay]   Hashing candidate 1/3: ./mslug.zip
-[01:35:33] [INFO] [Netplay]   CRC: 472CF9DB vs room CRC: A892D8D7
-[01:35:33] [INFO] [Netplay]   Hashing candidate 2/3: ./mslug.zip
-[01:35:33] [INFO] [Netplay]   CRC: 472CF9DB vs room CRC: A892D8D7
-[01:35:33] [INFO] [Netplay]   Hashing candidate 3/3: ./mslug.zip
-[01:35:33] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: A892D8D7
-[01:35:33] [INFO] [Netplay] Room 27/34 "neodrift" -> Direct CRC32 match found: ./neodrift.zip
-[01:35:33] [INFO] [Netplay] Room 28/34 "dino" -> 324 candidates (sorted)
-[01:35:33] [INFO] [Netplay]   Hashing candidate 1/3: ./dino.zip
-[01:35:33] [INFO] [Netplay]   CRC: 2C67821D vs room CRC: 70DCFE0C
-[01:35:33] [INFO] [Netplay]   Hashing candidate 2/3: ./dino.zip
-[01:35:33] [INFO] [Netplay]   CRC: 8F4E585E vs room CRC: 70DCFE0C
-[01:35:33] [INFO] [Netplay]   Hashing candidate 3/3: ./dino.zip
-[01:35:33] [INFO] [Netplay]   CRC: D6CF5EF5 vs room CRC: 70DCFE0C
-[01:35:33] [INFO] [Netplay] Room 29/34 "tdragon2" -> Direct CRC32 match found: ./tdragon2.zip
-[01:35:33] [INFO] [Netplay] Room 31/34 "怒之铁拳1(无敌版)" -> 6609 candidates (sorted)
-[01:35:33] [INFO] [Netplay]   Hashing candidate 1/3: ./10 Super Jogos (Brazil).zip
-[01:35:34] [INFO] [Netplay]   CRC: C19AE368 vs room CRC: 27876E94
-[01:35:34] [INFO] [Netplay]   Hashing candidate 2/3: ./16 Zhang Ma Jiang (China) (Unl).zip
-[01:35:34] [INFO] [Netplay]   CRC: 36407C82 vs room CRC: 27876E94
-[01:35:34] [INFO] [Netplay]   Hashing candidate 3/3: ./16t (Japan) (SegaNet).zip
-[01:35:34] [INFO] [Netplay]   CRC: 537F04B6 vs room CRC: 27876E94
-[01:35:34] [INFO] [Netplay] Room 32/34 "Tetris (Nintendo)" -> Direct CRC32 match found: ./Tetris.zip
-[01:35:34] [INFO] [Netplay] Room 33/34 "Tecmo Super Bowl (U) [!]" -> Direct CRC32 match found: ./Tecmo Super Bowl.zip
-[01:35:34] [INFO] [Netplay] Room 34/34 "R.B.I. Baseball 2 (USA) (Unl)" -> Direct CRC32 match found: ./R.B.I. Baseball 2.zip
-[01:35:34] [INFO] [Netplay] matchLocalRoms() completed
-[01:35:34] [INFO] [Netplay] Returning 34 rooms (22 matched locally)
-[01:35:58] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system gba -emulator libretro -core mgba -netplaymode client -netplayport 55435 -netplaynick "EMULATIONSTATION Player" -netplayip us-east1.relay.retroarch.com -netplaysession Z1gnUwNcEthdP5R/ -rom "C:\tmp\RIESCADE_SYSTEM\roms\gba\Pokemon - Fire Red Version.zip"
-[01:36:59] [INFO] [Netplay] getLobbyList() called
-[01:36:59] [INFO] [Netplay] Using port: 55435
-[01:36:59] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
-[01:37:00] [INFO] [Netplay] WAN response status: 200 (427ms)
-[01:37:00] [INFO] [Netplay] WAN data received: 30243 bytes (636ms)
-[01:37:00] [INFO] [Netplay] Parsed 38 WAN rooms
-[01:37:00] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 38
-[01:37:00] [INFO] [Netplay] matchLocalRoms() called with 38 rooms
-[01:37:00] [INFO] [Netplay] Opening database...
-[01:37:00] [INFO] [Netplay] Database opened successfully
-[01:37:00] [INFO] [Netplay] Room 1/38 "Secret of Mana (USA) (Virtual Console)" -> 5 candidates (sorted)
-[01:37:00] [INFO] [Netplay]   Hashing candidate 1/3: ./Secret of Mana (USA).zip
-[01:37:00] [INFO] [Netplay]   CRC: D0176B24 vs room CRC: 89990EF7
-[01:37:00] [INFO] [Netplay]   Hashing candidate 2/3: ./Secret of Mana (USA) (MSU1).squashfs
-[01:37:00] [INFO] [CRC32] Skipping large file (1205MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Secret of Mana (USA) (MSU1).squashfs
-[01:37:00] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 89990EF7
-[01:37:00] [INFO] [Netplay]   Hashing candidate 3/3: ./Secret of Mana.m3u
-[01:37:00] [INFO] [Netplay]   CRC: 9937901D vs room CRC: 89990EF7
-[01:37:01] [INFO] [Netplay] Room 3/38 "Diablo" -> 6 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/3: ./Diablo.chd
-[01:37:01] [INFO] [CRC32] Skipping large file (356MB): C:\tmp\RIESCADE_SYSTEM\roms\psx\Diablo.chd
-[01:37:01] [INFO] [Netplay]   CRC: 00000000 vs room CRC: F5843A1D
-[01:37:01] [INFO] [Netplay]   Hashing candidate 2/3: ./Diablo.zip
-[01:37:01] [INFO] [Netplay]   CRC: 7C2DA151 vs room CRC: F5843A1D
-[01:37:01] [INFO] [Netplay]   Hashing candidate 3/3: ./Diablo.win
-[01:37:01] [ERROR] [Netplay]   CRC failed for C:\tmp\RIESCADE_SYSTEM\roms\devilutionx\Diablo.win: {"errno":-4068,"code":"EISDIR","syscall":"read"}
-[01:37:01] [INFO] [Netplay] Room 5/38 "Adventures of Batman & Robin, The (Europe)" -> Direct CRC32 match found: ./Adventures of Batman & Robin, The (Europe).zip
-[01:37:01] [INFO] [Netplay] Room 7/38 "Ultimate Mortal Kombat 3 (Europe)" -> 12 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/3: ./Ultimate Mortal Kombat 3 (USA).zip
-[01:37:01] [INFO] [Netplay]   CRC: F5BFE41E vs room CRC: 1C4C54D2
-[01:37:01] [INFO] [Netplay]   Hashing candidate 2/3: ./Ultimate Mortal Kombat 3 (Europe).zip
-[01:37:01] [INFO] [Netplay]   CRC: ECFB5CB4 vs room CRC: 1C4C54D2
-[01:37:01] [INFO] [Netplay]   Hashing candidate 3/3: ./Ultimate Mortal Kombat 3 (US).chd
-[01:37:01] [INFO] [CRC32] Skipping large file (202MB): C:\tmp\RIESCADE_SYSTEM\roms\saturn\Ultimate Mortal Kombat 3 (US).chd
-[01:37:01] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 1C4C54D2
-[01:37:01] [INFO] [Netplay] Room 9/38 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:37:01] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:37:01] [INFO] [Netplay] Room 10/38 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:37:01] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:37:01] [INFO] [Netplay] Room 11/38 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:37:01] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:37:01] [INFO] [Netplay] Room 12/38 "Return to Dinosaur Land (English v1.2)" -> 1 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/1: ./Super Mario World - Return to Dinosaur Land (Hack).zip
-[01:37:01] [INFO] [Netplay]   CRC: 91BB526A vs room CRC: 53AFA4D1
-[01:37:01] [INFO] [Netplay] Room 14/38 "Pokémon Fire Red Version (Suri)" -> Direct CRC32 match found: ./Pokemon - Fire Red Version.zip
-[01:37:01] [INFO] [Netplay] Room 16/38 "Tekken3" -> 2 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/2: ./tekken3.zip
-[01:37:01] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[01:37:01] [INFO] [Netplay]   Hashing candidate 2/2: ./tekken3.zip
-[01:37:01] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[01:37:01] [INFO] [Netplay] Room 18/38 "magdrop2" -> 1 candidates (sorted)
-[01:37:01] [INFO] [Netplay]   Hashing candidate 1/1: ./magdrop2.zip
-[01:37:01] [INFO] [Netplay]   CRC: 14B90536 vs room CRC: 3FE4D43C
-[01:37:02] [INFO] [Netplay] Room 22/38 "Super Mario World (USA)" -> 2099 candidates (sorted)
-[01:37:02] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario World (USA).zip
-[01:37:02] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: B19ED489
-[01:37:02] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario World (USA) (MSU1).squashfs
-[01:37:02] [INFO] [CRC32] Skipping large file (271MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Super Mario World (USA) (MSU1).squashfs
-[01:37:02] [INFO] [Netplay]   CRC: 00000000 vs room CRC: B19ED489
-[01:37:02] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World (Homebrew).zip
-[01:37:02] [INFO] [Netplay]   CRC: CF540BA6 vs room CRC: B19ED489
-[01:37:02] [INFO] [Netplay] Room 24/38 "Super Mario Bros. 3 (Japan) (Rev A)" -> 3 candidates (sorted)
-[01:37:02] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario Bros 3.3dsen
-[01:37:02] [INFO] [Netplay]   CRC: B16A9FE8 vs room CRC: 77F59F3E
-[01:37:02] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario Bros 3 Wii.iso
-[01:37:02] [INFO] [CRC32] Skipping large file (4482MB): C:\tmp\RIESCADE_SYSTEM\roms\wiih\Super Mario Bros 3 Wii.iso
-[01:37:02] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 77F59F3E
-[01:37:02] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World - Super Mario Bros 3 Golden (Hack).zip
-[01:37:02] [INFO] [Netplay]   CRC: 3725FAAD vs room CRC: 77F59F3E
-[01:37:02] [INFO] [Netplay] Room 25/38 "Castlevania III - Dracula's Curse (USA)" -> Direct CRC32 match found: ./Castlevania III - Draculas Curse.zip
-[01:37:02] [INFO] [Netplay] Room 26/38 "mslug" -> 24 candidates (sorted)
-[01:37:02] [INFO] [Netplay]   Hashing candidate 1/3: ./mslug.zip
-[01:37:02] [INFO] [Netplay]   CRC: 472CF9DB vs room CRC: A892D8D7
-[01:37:02] [INFO] [Netplay]   Hashing candidate 2/3: ./mslug.zip
-[01:37:02] [INFO] [Netplay]   CRC: 472CF9DB vs room CRC: A892D8D7
-[01:37:02] [INFO] [Netplay]   Hashing candidate 3/3: ./mslug.zip
-[01:37:02] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: A892D8D7
-[01:37:02] [INFO] [Netplay] Room 28/38 "dino" -> 324 candidates (sorted)
-[01:37:02] [INFO] [Netplay]   Hashing candidate 1/3: ./dino.zip
-[01:37:02] [INFO] [Netplay]   CRC: 2C67821D vs room CRC: 70DCFE0C
-[01:37:02] [INFO] [Netplay]   Hashing candidate 2/3: ./dino.zip
-[01:37:02] [INFO] [Netplay]   CRC: 8F4E585E vs room CRC: 70DCFE0C
-[01:37:02] [INFO] [Netplay]   Hashing candidate 3/3: ./dino.zip
-[01:37:02] [INFO] [Netplay]   CRC: D6CF5EF5 vs room CRC: 70DCFE0C
-[01:37:02] [INFO] [Netplay] Room 29/38 "neodrift" -> Direct CRC32 match found: ./neodrift.zip
-[01:37:02] [INFO] [Netplay] Room 31/38 "tdragon2" -> Direct CRC32 match found: ./tdragon2.zip
-[01:37:02] [INFO] [Netplay] Room 33/38 "FC原人[简]" -> 64 candidates (sorted)
-[01:37:02] [INFO] [Netplay]   Hashing candidate 1/3: ./FC Genjin - Frekthoropus Computerus (J) [!].nes
-[01:37:02] [INFO] [Netplay]   CRC: 7A3D3C21 vs room CRC: 8840ABF1
-[01:37:02] [INFO] [Netplay]   Hashing candidate 2/3: ./fcnudge.zip
-[01:37:02] [INFO] [Netplay]   CRC: 3823A36E vs room CRC: 8840ABF1
-[01:37:02] [INFO] [Netplay]   Hashing candidate 3/3: ./fcockt2.zip
-[01:37:02] [INFO] [Netplay]   CRC: 3A42F27D vs room CRC: 8840ABF1
-[01:37:02] [INFO] [Netplay] Room 34/38 "怒之铁拳1(无敌版)" -> 6609 candidates (sorted)
-[01:37:02] [INFO] [Netplay]   Hashing candidate 1/3: ./10 Super Jogos (Brazil).zip
-[01:37:02] [INFO] [Netplay]   CRC: C19AE368 vs room CRC: 27876E94
-[01:37:02] [INFO] [Netplay]   Hashing candidate 2/3: ./16 Zhang Ma Jiang (China) (Unl).zip
-[01:37:02] [INFO] [Netplay]   CRC: 36407C82 vs room CRC: 27876E94
-[01:37:02] [INFO] [Netplay]   Hashing candidate 3/3: ./16t (Japan) (SegaNet).zip
-[01:37:02] [INFO] [Netplay]   CRC: 537F04B6 vs room CRC: 27876E94
-[01:37:02] [INFO] [Netplay] Room 35/38 "gowcaizr" -> 1 candidates (sorted)
-[01:37:02] [INFO] [Netplay]   Hashing candidate 1/1: ./gowcaizr.zip
-[01:37:02] [INFO] [Netplay]   CRC: 8EDB776C vs room CRC: 3F1D9F78
-[01:37:02] [INFO] [Netplay] Room 36/38 "Tetris (Nintendo)" -> Direct CRC32 match found: ./Tetris.zip
-[01:37:02] [INFO] [Netplay] Room 37/38 "Tecmo Super Bowl (U) [!]" -> Direct CRC32 match found: ./Tecmo Super Bowl.zip
-[01:37:02] [INFO] [Netplay] Room 38/38 "R.B.I. Baseball 2 (USA) (Unl)" -> Direct CRC32 match found: ./R.B.I. Baseball 2.zip
-[01:37:02] [INFO] [Netplay] matchLocalRoms() completed
-[01:37:02] [INFO] [Netplay] Returning 38 rooms (24 matched locally)
-[01:37:13] [INFO] Open dev tool...
-[01:38:42] [INFO] [Netplay] getLobbyList() called
-[01:38:42] [INFO] [Netplay] Using port: 55435
-[01:38:42] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
-[01:38:43] [INFO] [Netplay] WAN response status: 200 (330ms)
-[01:38:43] [INFO] [Netplay] WAN data received: 31848 bytes (505ms)
-[01:38:43] [INFO] [Netplay] Parsed 40 WAN rooms
-[01:38:44] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 40
-[01:38:44] [INFO] [Netplay] matchLocalRoms() called with 40 rooms
-[01:38:44] [INFO] [Netplay] Opening database...
-[01:38:44] [INFO] [Netplay] Database opened successfully
-[01:38:44] [INFO] [Netplay] Room 1/40 "Secret of Mana (USA) (Virtual Console)" -> 5 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/3: ./Secret of Mana (USA).zip
-[01:38:44] [INFO] [Netplay]   CRC: D0176B24 vs room CRC: 89990EF7
-[01:38:44] [INFO] [Netplay]   Hashing candidate 2/3: ./Secret of Mana (USA) (MSU1).squashfs
-[01:38:44] [INFO] [CRC32] Skipping large file (1205MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Secret of Mana (USA) (MSU1).squashfs
-[01:38:44] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 89990EF7
-[01:38:44] [INFO] [Netplay]   Hashing candidate 3/3: ./Secret of Mana.m3u
-[01:38:44] [INFO] [Netplay]   CRC: 9937901D vs room CRC: 89990EF7
-[01:38:44] [INFO] [Netplay] Room 3/40 "Diablo" -> 6 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/3: ./Diablo.chd
-[01:38:44] [INFO] [CRC32] Skipping large file (356MB): C:\tmp\RIESCADE_SYSTEM\roms\psx\Diablo.chd
-[01:38:44] [INFO] [Netplay]   CRC: 00000000 vs room CRC: F5843A1D
-[01:38:44] [INFO] [Netplay]   Hashing candidate 2/3: ./Diablo.zip
-[01:38:44] [INFO] [Netplay]   CRC: 7C2DA151 vs room CRC: F5843A1D
-[01:38:44] [INFO] [Netplay]   Hashing candidate 3/3: ./Diablo.win
-[01:38:44] [ERROR] [Netplay]   CRC failed for C:\tmp\RIESCADE_SYSTEM\roms\devilutionx\Diablo.win: {"errno":-4068,"code":"EISDIR","syscall":"read"}
-[01:38:44] [INFO] [Netplay] Room 4/40 "Tekken3" -> 2 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/2: ./tekken3.zip
-[01:38:44] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[01:38:44] [INFO] [Netplay]   Hashing candidate 2/2: ./tekken3.zip
-[01:38:44] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[01:38:44] [INFO] [Netplay] Room 5/40 "Ultimate Mortal Kombat 3 (U) [T+Rus Pirate]" -> 12 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/3: ./Ultimate Mortal Kombat 3 (USA).zip
-[01:38:44] [INFO] [Netplay]   CRC: 7290770D vs room CRC: 11EF0514
-[01:38:44] [INFO] [Netplay]   Hashing candidate 2/3: ./Ultimate Mortal Kombat 3 (Europe).zip
-[01:38:44] [INFO] [Netplay]   CRC: ECFB5CB4 vs room CRC: 11EF0514
-[01:38:44] [INFO] [Netplay]   Hashing candidate 3/3: ./Ultimate Mortal Kombat 3 (US).chd
-[01:38:44] [INFO] [CRC32] Skipping large file (202MB): C:\tmp\RIESCADE_SYSTEM\roms\saturn\Ultimate Mortal Kombat 3 (US).chd
-[01:38:44] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 11EF0514
-[01:38:44] [INFO] [Netplay] Room 6/40 "Um Jammer Lammy (USA)" -> 1 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/1: ./Um Jammer Lammy.chd
-[01:38:44] [INFO] [CRC32] Skipping large file (494MB): C:\tmp\RIESCADE_SYSTEM\roms\psx\Um Jammer Lammy.chd
-[01:38:44] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 70DDE7EE
-[01:38:44] [INFO] [Netplay] Room 8/40 "Adventures of Batman & Robin, The (Europe)" -> Direct CRC32 match found: ./Adventures of Batman & Robin, The (Europe).zip
-[01:38:44] [INFO] [Netplay] Room 9/40 "Speed Ball 2 - Brutal Deluxe (E) [!]" -> Direct CRC32 match found: ./Speedball 2 (Europe).zip
-[01:38:44] [INFO] [Netplay] Room 10/40 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:38:44] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:38:44] [INFO] [Netplay] Room 11/40 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:38:44] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:38:44] [INFO] [Netplay] Room 12/40 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[01:38:44] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[01:38:44] [INFO] [Netplay] Room 13/40 "Ultimate Mortal Kombat 3 (U) [T+Rus Pirate]" -> 12 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/3: ./Ultimate Mortal Kombat 3 (USA).zip
-[01:38:44] [INFO] [Netplay]   CRC: 7290770D vs room CRC: 11EF0514
-[01:38:44] [INFO] [Netplay]   Hashing candidate 2/3: ./Ultimate Mortal Kombat 3 (Europe).zip
-[01:38:44] [INFO] [Netplay]   CRC: ECFB5CB4 vs room CRC: 11EF0514
-[01:38:44] [INFO] [Netplay]   Hashing candidate 3/3: ./Ultimate Mortal Kombat 3 (US).chd
-[01:38:44] [INFO] [CRC32] Skipping large file (202MB): C:\tmp\RIESCADE_SYSTEM\roms\saturn\Ultimate Mortal Kombat 3 (US).chd
-[01:38:44] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 11EF0514
-[01:38:44] [INFO] [Netplay] Room 14/40 "Return to Dinosaur Land (English v1.2)" -> 1 candidates (sorted)
-[01:38:44] [INFO] [Netplay]   Hashing candidate 1/1: ./Super Mario World - Return to Dinosaur Land (Hack).zip
-[01:38:44] [INFO] [Netplay]   CRC: 91BB526A vs room CRC: 53AFA4D1
-[01:38:45] [INFO] [Netplay] Room 17/40 "Ultimate Mortal Kombat 3 (Europe)" -> 12 candidates (sorted)
-[01:38:45] [INFO] [Netplay]   Hashing candidate 1/3: ./Ultimate Mortal Kombat 3 (USA).zip
-[01:38:45] [INFO] [Netplay]   CRC: F5BFE41E vs room CRC: 1C4C54D2
-[01:38:45] [INFO] [Netplay]   Hashing candidate 2/3: ./Ultimate Mortal Kombat 3 (Europe).zip
-[01:38:45] [INFO] [Netplay]   CRC: ECFB5CB4 vs room CRC: 1C4C54D2
-[01:38:45] [INFO] [Netplay]   Hashing candidate 3/3: ./Ultimate Mortal Kombat 3 (US).chd
-[01:38:45] [INFO] [CRC32] Skipping large file (202MB): C:\tmp\RIESCADE_SYSTEM\roms\saturn\Ultimate Mortal Kombat 3 (US).chd
-[01:38:45] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 1C4C54D2
-[01:38:45] [INFO] [Netplay] Room 18/40 "Pokémon Fire Red Version (Suri)" -> Direct CRC32 match found: ./Pokemon - Fire Red Version.zip
-[01:38:45] [INFO] [Netplay] Room 20/40 "magdrop2" -> 1 candidates (sorted)
-[01:38:45] [INFO] [Netplay]   Hashing candidate 1/1: ./magdrop2.zip
-[01:38:45] [INFO] [Netplay]   CRC: 14B90536 vs room CRC: 3FE4D43C
-[01:38:45] [INFO] [Netplay] Room 22/40 "Super Mario World (U) [!]" -> 2099 candidates (sorted)
-[01:38:45] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario World (USA).zip
-[01:38:45] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: A31BEAD4
-[01:38:45] [INFO] [Netplay] Room 25/40 "Super Mario World (USA)" -> 2099 candidates (sorted)
-[01:38:45] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario World (USA).zip
-[01:38:45] [INFO] [Netplay]   CRC: A31BEAD4 vs room CRC: B19ED489
-[01:38:45] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario World (USA) (MSU1).squashfs
-[01:38:45] [INFO] [CRC32] Skipping large file (271MB): C:\tmp\RIESCADE_SYSTEM\roms\snes-msu1\Super Mario World (USA) (MSU1).squashfs
-[01:38:45] [INFO] [Netplay]   CRC: 00000000 vs room CRC: B19ED489
-[01:38:45] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World (Homebrew).zip
-[01:38:45] [INFO] [Netplay]   CRC: CF540BA6 vs room CRC: B19ED489
-[01:38:45] [INFO] [Netplay] Room 27/40 "Super Mario Bros. 3 (Japan) (Rev A)" -> 3 candidates (sorted)
-[01:38:45] [INFO] [Netplay]   Hashing candidate 1/3: ./Super Mario Bros 3.3dsen
-[01:38:45] [INFO] [Netplay]   CRC: B16A9FE8 vs room CRC: 77F59F3E
-[01:38:45] [INFO] [Netplay]   Hashing candidate 2/3: ./Super Mario Bros 3 Wii.iso
-[01:38:45] [INFO] [CRC32] Skipping large file (4482MB): C:\tmp\RIESCADE_SYSTEM\roms\wiih\Super Mario Bros 3 Wii.iso
-[01:38:45] [INFO] [Netplay]   CRC: 00000000 vs room CRC: 77F59F3E
-[01:38:45] [INFO] [Netplay]   Hashing candidate 3/3: ./Super Mario World - Super Mario Bros 3 Golden (Hack).zip
-[01:38:45] [INFO] [Netplay]   CRC: 3725FAAD vs room CRC: 77F59F3E
-[01:38:45] [INFO] [Netplay] Room 28/40 "Castlevania III - Dracula's Curse (USA)" -> Direct CRC32 match found: ./Castlevania III - Draculas Curse.zip
-[01:38:45] [INFO] [Netplay] Room 30/40 "dino" -> 324 candidates (sorted)
-[01:38:45] [INFO] [Netplay]   Hashing candidate 1/3: ./dino.zip
-[01:38:45] [INFO] [Netplay]   CRC: 2C67821D vs room CRC: 70DCFE0C
-[01:38:45] [INFO] [Netplay]   Hashing candidate 2/3: ./dino.zip
-[01:38:45] [INFO] [Netplay]   CRC: 8F4E585E vs room CRC: 70DCFE0C
-[01:38:45] [INFO] [Netplay]   Hashing candidate 3/3: ./dino.zip
-[01:38:45] [INFO] [Netplay]   CRC: D6CF5EF5 vs room CRC: 70DCFE0C
-[01:38:45] [INFO] [Netplay] Room 32/40 "tdragon2" -> Direct CRC32 match found: ./tdragon2.zip
-[01:38:46] [INFO] [Netplay] Room 34/40 "FC原人[简]" -> 64 candidates (sorted)
-[01:38:46] [INFO] [Netplay]   Hashing candidate 1/3: ./FC Genjin - Frekthoropus Computerus (J) [!].nes
-[01:38:46] [INFO] [Netplay]   CRC: 7A3D3C21 vs room CRC: 8840ABF1
-[01:38:46] [INFO] [Netplay]   Hashing candidate 2/3: ./fcnudge.zip
-[01:38:46] [INFO] [Netplay]   CRC: 3823A36E vs room CRC: 8840ABF1
-[01:38:46] [INFO] [Netplay]   Hashing candidate 3/3: ./fcockt2.zip
-[01:38:46] [INFO] [Netplay]   CRC: 3A42F27D vs room CRC: 8840ABF1
-[01:38:46] [INFO] [Netplay] Room 36/40 "怒之铁拳1(无敌版)" -> 6609 candidates (sorted)
-[01:38:46] [INFO] [Netplay]   Hashing candidate 1/3: ./10 Super Jogos (Brazil).zip
-[01:38:46] [INFO] [Netplay]   CRC: C19AE368 vs room CRC: 27876E94
-[01:38:46] [INFO] [Netplay]   Hashing candidate 2/3: ./16 Zhang Ma Jiang (China) (Unl).zip
-[01:38:46] [INFO] [Netplay]   CRC: 36407C82 vs room CRC: 27876E94
-[01:38:46] [INFO] [Netplay]   Hashing candidate 3/3: ./16t (Japan) (SegaNet).zip
-[01:38:46] [INFO] [Netplay]   CRC: 537F04B6 vs room CRC: 27876E94
-[01:38:46] [INFO] [Netplay] Room 37/40 "mslug" -> 24 candidates (sorted)
-[01:38:46] [INFO] [Netplay]   Hashing candidate 1/3: ./mslug.zip
-[01:38:46] [INFO] [Netplay]   CRC: 472CF9DB vs room CRC: A892D8D7
-[01:38:46] [INFO] [Netplay]   Hashing candidate 2/3: ./mslug.zip
-[01:38:46] [INFO] [Netplay]   CRC: 472CF9DB vs room CRC: A892D8D7
-[01:38:46] [INFO] [Netplay]   Hashing candidate 3/3: ./mslug.zip
-[01:38:46] [INFO] [Netplay]   CRC: DFF6D41F vs room CRC: A892D8D7
-[01:38:46] [INFO] [Netplay] Room 38/40 "Tetris (Nintendo)" -> Direct CRC32 match found: ./Tetris.zip
-[01:38:46] [INFO] [Netplay] Room 39/40 "Tecmo Super Bowl (U) [!]" -> Direct CRC32 match found: ./Tecmo Super Bowl.zip
-[01:38:46] [INFO] [Netplay] Room 40/40 "R.B.I. Baseball 2 (USA) (Unl)" -> Direct CRC32 match found: ./R.B.I. Baseball 2.zip
-[01:38:46] [INFO] [Netplay] matchLocalRoms() completed
-[01:38:46] [INFO] [Netplay] Returning 40 rooms (27 matched locally)
-[01:39:39] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system switch -emulator citron -core  -rom "C:\tmp\RIESCADE_SYSTEM\roms\switch\The Legend of Zelda Tears of the Kingdom.xci"
-[01:48:09] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system switch -emulator eden -core  -rom "C:\tmp\RIESCADE_SYSTEM\roms\switch\The Legend of Zelda Tears of the Kingdom.xci"
-[01:49:47] [INFO] Executing system command: exit-frontend
+--- RIESCADE Log Started at 2026-06-19T06:16:28.840Z ---
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:16:28] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:16:28] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:16:28] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:16:28] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:16:29] [INFO] [SyncCheck] Starting startup synchronization check...
+[03:16:29] [INFO] [SyncCheck] System 'mess' changed: mtime matches: false (1781799517203.6912 vs 1781843761383.3135), fileCount matches: true (89 vs 89)
+[03:16:29] [INFO] [SyncCheck] 1/308 system(s) require synchronization. Initiating re-indexing.
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(5, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO]   📂 Indexing: mess ...
+[03:16:29] [INFO]     ✅ mess: 0 games indexed
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:16:29] [INFO] 🔄 Re-indexed 1 system(s) with changes
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(80, 'UPDATING_DATABASE')
+[03:16:29] [INFO] [StartLoader:Backend] sendProgress(100, 'UPDATING_DATABASE')
+[03:16:29] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
+[03:16:36] [INFO] Open dev tool...
+[03:17:22] [INFO] Open dev tool...
+[03:17:58] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:17:58] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:17:58] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:17:58] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:17:58] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:17:58] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:17:58] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:17:58] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:17:58] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:17:58] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:17:58] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:18:23] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:18:23] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:18:23] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:18:23] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:18:23] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:18:23] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:18:23] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:18:23] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:18:23] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:18:23] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:18:23] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:10] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:10] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:10] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:10] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:10] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:10] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:26:10] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:26:10] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:26:10] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:42] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:42] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:42] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:42] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:42] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:42] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:26:42] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:26:42] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:26:42] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default

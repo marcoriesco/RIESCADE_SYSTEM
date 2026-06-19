@@ -7,8 +7,8 @@
 	<img class="gamelist-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
 	
   <!-- VIDEO AUTOPLAY -->
-  <div class="gameplay-video-container {options:gamelist_video ? '' : 'hide'}" style="animation-delay: {options:gamelist_video_delay}s;" data-riescade-key="game">
-    <video class="gamelist-video" src="{options:gamelist_video ? '{game:video}' : ''}" loop autoplay disablepictureinpicture disableremoteplayback></video>
+  <div class="gameplay-video-container {options:gamelist_video ? '' : 'hide'}" data-riescade-key="game">
+    <riescade-video class="gamelist-video" autoplay loop delay="{options:gamelist_video_delay}"></riescade-video>
   </div>
 
 

@@ -3,6 +3,7 @@ import { resolvePath } from './utils'
 import { WebCarouselElement } from './elements/WebCarouselElement'
 import { WebGamelistElement } from './elements/WebGamelistElement'
 import { WebClockElement } from './elements/WebClockElement'
+import { WebVideoElement } from './elements/WebVideoElement'
 
 const resolveRelativeCssPath = (cssDir: string, relativePath: string): string => {
   const cssParts = cssDir.split('/')
@@ -675,11 +676,7 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
       }
 
       if (tagName === 'riescade-video') {
-        const src = props.src || ''
-        const fallback = props.fallback || ''
-        if (src) return <video key={index} src={resolveLocalPath(src)} autoPlay loop muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        if (fallback) return <img key={index} src={resolveLocalPath(fallback)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-        return null
+        return <WebVideoElement key={index} data={data} {...restProps} />
       }
 
       const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
