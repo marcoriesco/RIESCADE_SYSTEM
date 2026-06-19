@@ -3254,8 +3254,10 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
       {/* Software Updater Modal */}
       <Dialog.Root open={updateState.status !== 'idle'} onOpenChange={(open) => { if (!open) setUpdateState({ status: 'idle' }); }}>
-        <Dialog.Content style={{ maxWidth: '600px', width: '90%' }}>
-          <Heading size="3" mb="3">
+        <Dialog.Content className='riescade-menu' style={{ maxWidth: '600px', width: '90%' }}>
+                    <Flex className="riescade-menu-header">
+          
+          <Heading className='riescade-menu-title' size="3" mb="3">
             {updateState.status === 'checking' && t('CHECKING FOR UPDATES')}
             {updateState.status === 'no-update' && t('SOFTWARE UPDATES')}
             {updateState.status === 'available' && `${t('UPDATE AVAILABLE')} (v${updateState.version})`}
@@ -3331,7 +3333,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             )}
           </Box>
 
-          <Flex gap="3" justify="end">
+          <Flex gap="3" justify="center">
             {updateState.status === 'available' && (
               <>
                 <Button 
@@ -3369,6 +3371,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 {t('OK')}
               </Button>
             )}
+          </Flex>
           </Flex>
         </Dialog.Content>
       </Dialog.Root>

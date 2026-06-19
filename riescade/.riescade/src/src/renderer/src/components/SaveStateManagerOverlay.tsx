@@ -194,7 +194,7 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
             <Text size="3" color="gray">Carregando salvamentos...</Text>
           </Flex>
         ) : (
-          <Box className="riescade-menu-content custom-scrollbar" style={{ overflowX: 'auto', overflowY: 'hidden', padding: '15px 5px' }}>
+          <Box className="riescade-menu-content custom-scrollbar" style={{ overflowX: 'auto', overflowY: 'hidden', padding: '25px' }}>
             <Flex
               ref={containerRef}
               direction="row"
@@ -306,13 +306,6 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
             </Flex>
           </Box>
         )}
-
-        <Flex className="riescade-menu-footer-bar" justify="between" align="center">
-          <Flex align="center" gap="1" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            <Button size="1" variant="solid" color="gray" className="riescade-menu-footer-btn">B</Button>
-            <Text size="1">BACK</Text>
-          </Flex>
-        </Flex>
       </Dialog.Content>
     </Dialog.Root>
   )

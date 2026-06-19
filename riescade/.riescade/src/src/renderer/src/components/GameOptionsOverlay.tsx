@@ -1962,10 +1962,10 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           size="4" 
           className="riescade-menu"
           style={{ 
-            maxWidth: '950px', 
-            width: '95%', 
+            maxWidth: '90vw', 
+            width: '90vw', 
             height: '90vh', 
-            maxHeight: '800px'
+            maxHeight: '90vh'
           }}
         >
           <Flex className="riescade-menu-header">
@@ -1975,7 +1975,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             <Text size="1" color="gray" mt="1">{(system.fullname || system.name).toUpperCase()}</Text>
           </Flex>
 
-          <Grid columns="35% 25% 40%" gap="3" style={{ flexGrow: 1, overflow: 'hidden' }}>
+          <Grid columns="40% 25% 35%" gap="3" style={{ flexGrow: 1, overflow: 'hidden' }}>
             <Box style={{ overflowY: 'auto', borderRight: '1px solid rgba(255, 255, 255, 0.1)', padding: '15px' }} className="custom-scrollbar">
               {Object.entries(matchesByDb).map(([dbName, items]) => (
                 <Box key={dbName} mb="4">
@@ -1996,7 +1996,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                         >
                           <Flex className="riescade-menu-item-content">
                             <Flex className="riescade-menu-item-row">
-                              <Text weight="bold" size="2" className="riescade-menu-item-label" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>
+                              <Text weight="bold" size="2" className="riescade-menu-item-label" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                                 {match.name || 'Sem nome'}
                               </Text>
                             </Flex>
@@ -2451,18 +2451,17 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       {renderStageStage2Matches()}
 
       <Dialog.Root open={!!showDeleteConfirmModal} onOpenChange={(open) => { if (!open) setShowDeleteConfirmModal(false); }}>
-        <Dialog.Content style={{ maxWidth: '450px', width: '90%' }}>
-          <Flex direction="column" gap="4">
-            <Heading size="3" style={{ color: 'red' }}>REMOVER JOGO</Heading>
-            <Text size="2">
+        <Dialog.Content className='riescade-menu' style={{ maxWidth: '450px', width: '90%' }}>
+          <Flex className='riescade-menu-header' direction="column" gap="4">
+            <Heading size="3" className='riescade-menu-title'>REMOVER JOGO</Heading>
+            <Text size="2" className='center'>
               Você tem certeza que deseja remover o jogo <strong>{game.name.toUpperCase()}</strong>?<br/>
               Apagar os arquivos físicos também?
             </Text>
             <Flex justify="end" gap="3">
               <Button 
-                color="red"
                 variant={deleteModalSelectedIndex === 0 ? 'solid' : 'soft'}
-                style={{ cursor: 'pointer', outline: deleteModalSelectedIndex === 0 ? '2px solid #fff' : 'none' }}
+                style={{ cursor: 'pointer' }}
                 onClick={() => confirmDelete(true)}
               >
                 SIM (APAGAR ROM)
@@ -2470,7 +2469,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               <Button 
                 variant={deleteModalSelectedIndex === 1 ? 'solid' : 'soft'}
                 color="gray"
-                style={{ cursor: 'pointer', outline: deleteModalSelectedIndex === 1 ? '2px solid #fff' : 'none' }}
+                style={{ cursor: 'pointer' }}
                 onClick={() => confirmDelete(false)}
               >
                 NÃO (APENAS DA LISTA)

@@ -23,7 +23,9 @@ export const WebVideoElement: React.FC<Props> = ({
   src,
   fallback
 }) => {
-  const [shouldPlay, setShouldPlay] = useState(false)
+  // activeSrc is only set AFTER the delay has elapsed for the current videoSrc.
+  // This prevents the video from playing during the delay window, even across re-renders.
+  const [activeSrc, setActiveSrc] = useState('')
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const videoSrc = src || data['game:video'] || ''
@@ -46,20 +48,42 @@ export const WebVideoElement: React.FC<Props> = ({
   const delayMs = getDelayMs(delay)
 
   useEffect(() => {
-    setShouldPlay(false)
+    // Immediately clear the active source — the video stops until the delay elapses
+    setActiveSrc('')
+
     if (!videoSrc || !isVideoEnabled) return
 
     if (delayMs > 0) {
       const timer = setTimeout(() => {
-        setShouldPlay(true)
+        setActiveSrc(videoSrc)
       }, delayMs)
       return () => clearTimeout(timer)
     } else {
-      setShouldPlay(true)
+      setActiveSrc(videoSrc)
     }
   }, [videoSrc, isVideoEnabled, delayMs])
 
   if (!isVideoEnabled) {
+    return null
+  }
+
+  // While waiting for delay or if there is no video, show fallback/placeholder
+  if (!activeSrc) {
+    if (fallback) {
+      return (
+        <img
+          className={finalClassName}
+          src={fallback}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            ...style
+          }}
+          alt=""
+        />
+      )
+    }
     return null
   }
 
@@ -69,13 +93,19 @@ export const WebVideoElement: React.FC<Props> = ({
 
   return (
     <video
+      key={activeSrc}
       ref={videoRef}
       className={`riescade-video ${finalClassName}`}
-      src={videoSrc}
+      src={activeSrc}
       autoPlay={isAutoplay}
       loop={isLoop}
       muted={isMuted}
-      style={style}
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        ...style
+      }}
       disablePictureInPicture
       disableRemotePlayback
     />

@@ -152,13 +152,10 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
     <>
       <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
         <Dialog.Content 
-          className="riescade-osk-container"
+          className="riescade-menu riescade-osk-container"
           style={{
             maxWidth: '1000px',
             width: '95%',
-            padding: '25px 35px',
-            background: '#11141a',
-            border: '2px solid #333'
           }}
         >
           <h3 className="riescade-osk-title">{title}</h3>
