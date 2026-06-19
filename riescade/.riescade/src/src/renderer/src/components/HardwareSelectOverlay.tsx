@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { System } from '../App'
+import { Dialog, Box, Flex, Heading, Text, Button } from '@radix-ui/themes'
+import { System } from '../../../shared/types'
 
 interface HardwareSelectProps {
   isOpen: boolean
@@ -94,16 +95,24 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
       if (!isOpen || menuItems.length === 0) return
 
       if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        e.stopPropagation()
         setSelectedIndex(prev => (prev + 1) % menuItems.length)
       } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        e.stopPropagation()
         setSelectedIndex(prev => (prev - 1 + menuItems.length) % menuItems.length)
       } else if (e.key === 'Enter') {
+        e.preventDefault()
+        e.stopPropagation()
         const item = menuItems[selectedIndex]
         if (item) {
           onSelectSystem(item.systemName)
           onClose()
         }
       } else if (e.key === 'Backspace' || e.key === 'Escape' || e.key === 'Control') {
+        e.preventDefault()
+        e.stopPropagation()
         onClose()
       }
     },
@@ -111,54 +120,54 @@ export const HardwareSelectOverlay: React.FC<HardwareSelectProps> = ({
   )
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
   }, [handleKeyDown])
 
-  if (!isOpen) return null
-
   return (
-    <>
-      <div className={`riescade-overlay riescade-menu-overlay hardware-select ${visible ? 'visible' : ''}`}>
-        <div className="riescade-menu-container">
-          <div className="riescade-menu-header">
-            <h2 className="riescade-menu-title">IR PARA O HARDWARE</h2>
-          </div>
-          <div className="riescade-menu-list-container">
-            <div className="riescade-menu-list">
-              {menuItems.map((item, index) => (
-                <div
+    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <Dialog.Content 
+        size="3" 
+        className="riescade-menu riescade-menu-hardware"
+        style={{ maxWidth: '500px' }}
+      >
+        <Flex className="riescade-menu-header">
+          <Heading size="4" className="riescade-menu-title">
+            IR PARA O HARDWARE
+          </Heading>
+        </Flex>
+
+        <Box className="riescade-menu-content custom-scrollbar">
+          <Box className="riescade-menu-list">
+            {menuItems.map((item, index) => {
+              const isSelected = index === selectedIndex
+              return (
+                <Box
                   key={item.id}
-                  className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
                   onClick={() => {
                     onSelectSystem(item.systemName)
                     onClose()
                   }}
+                  className={`riescade-menu-item${isSelected ? ' selected' : ''}`}
                 >
-                  <div className="riescade-menu-item-content">
-                    <span className="riescade-menu-label">
-                      {item.label}
-                    </span>
-                    <span className="riescade-menu-sublabel">
-                      {item.subLabel}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="riescade-menu-footer">
-            <div className="riescade-menu-footer-actions">
-              <div className="riescade-menu-footer-action">
-                <span className="riescade-menu-footer-button">B</span>
-                <span className="riescade-menu-footer-text">BACK</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-    </>
+                  <Flex className="riescade-menu-item-content">
+                    <Flex className="riescade-menu-item-row">
+                      <Text weight="bold" size="2" className="riescade-menu-item-label">
+                        {item.label}
+                      </Text>
+                    </Flex>
+                    {item.subLabel && (
+                      <Text size="1" className="riescade-menu-item-description">
+                        {item.subLabel}
+                      </Text>
+                    )}
+                  </Flex>
+                </Box>
+              )
+            })}
+          </Box>
+        </Box>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

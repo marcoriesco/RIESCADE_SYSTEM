@@ -521,7 +521,10 @@ export class LibraryService {
     let changedSystemsCount = 0
     let systemsCheckedCount = 0
 
-    if (useDb && !forcePhysicalScan && dbService.getIndexedSystemCount() > 0) {
+    if (useDb && dbService.migrationOccurred) {
+      console.log('[SyncCheck] Database schema migration occurred. Sync required.')
+      needsSync = true
+    } else if (useDb && !forcePhysicalScan && dbService.getIndexedSystemCount() > 0) {
       console.log('[SyncCheck] Starting startup synchronization check...')
       
       const configPath = getConfigPath()

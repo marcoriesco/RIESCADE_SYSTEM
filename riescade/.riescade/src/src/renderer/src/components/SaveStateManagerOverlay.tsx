@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Dialog, Box, Flex, Heading, Text, Card, Button } from '@radix-ui/themes'
 import { Game, System } from '../../../shared/types'
 
 interface SaveState {
@@ -107,6 +108,7 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
 
       if (e.key === 'ArrowLeft') {
         e.preventDefault()
+        e.stopPropagation()
         setSelectedIndex((prev) => {
           const next = (prev - 1 + totalOptions) % totalOptions
           playNavSound()
@@ -114,6 +116,7 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
         })
       } else if (e.key === 'ArrowRight') {
         e.preventDefault()
+        e.stopPropagation()
         setSelectedIndex((prev) => {
           const next = (prev + 1) % totalOptions
           playNavSound()
@@ -121,15 +124,17 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
         })
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
+        e.stopPropagation()
         confirmSelection()
       } else if (e.key === 'Escape' || e.key === 'Backspace') {
         e.preventDefault()
+        e.stopPropagation()
         onClose()
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
   }, [isOpen, loading, options, selectedIndex])
 
   // Center the focused card in the viewport
@@ -153,8 +158,6 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
     }
   }
 
-  if (!isOpen) return null
-
   // Format date
   const formatDate = (timestamp: number) => {
     try {
@@ -171,100 +174,146 @@ export const SaveStateManagerOverlay: React.FC<SaveStateManagerProps> = ({
   }
 
   return (
-    <div className="riescade-overlay savestate-overlay visible">
+    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <Dialog.Content 
+        size="4" 
+        className="riescade-menu"
+        style={{
+          maxWidth: '85vw',
+          width: '900px'
+        }}
+      >
+        <Flex className="riescade-menu-header">
+          <Heading size="4" className="riescade-menu-title">
+            GERENCIADOR DE ESTADOS DE SALVAMENTO
+          </Heading>
+        </Flex>
 
-      {/* Header Title */}
-      <h1 className="savestate-header-title">
-        GERENCIADOR DE ESTADOS DE SALVAMENTO
-      </h1>
+        {loading ? (
+          <Flex justify="center" p="6" className="riescade-menu-content">
+            <Text size="3" color="gray">Carregando salvamentos...</Text>
+          </Flex>
+        ) : (
+          <Box className="riescade-menu-content custom-scrollbar" style={{ overflowX: 'auto', overflowY: 'hidden', padding: '15px 5px' }}>
+            <Flex
+              ref={containerRef}
+              direction="row"
+              gap="4"
+              align="center"
+              style={{
+                scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {options.map((option, index) => {
+                const isSelected = selectedIndex === index
 
-      {loading ? (
-        <div className="savestate-loading">Carregando salvamentos...</div>
-      ) : (
-        /* Horizontal Cards Container */
-        <div
-          ref={containerRef}
-          className="savestate-scroll"
-        >
-          {options.map((option, index) => {
-            const isSelected = selectedIndex === index
-
-            if (option.type === 'action') {
-              return (
-                <div
-                  key={option.id}
-                  className={`savestate-card action-card ${isSelected ? 'selected' : ''}`}
-                  onClick={() => {
-                    setSelectedIndex(index)
-                    onLaunch(option.slot)
-                  }}
-                >
-                  {/* Centered Curved Arrow Icon */}
-                  <div className="savestate-card-icon-container">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      width="72"
-                      height="72"
-                      fill="currentColor"
-                    >
-                      <path d="M10 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11.1z" />
-                    </svg>
-                  </div>
-
-                  {/* Clean card label */}
-                  <div className="savestate-card-label">
-                    {option.label}
-                  </div>
-                </div>
-              )
-            }
-
-            // Otherwise, it is a save state card (type === 'save')
-            return (
-              <div
-                key={option.id}
-                className={`savestate-card ${isSelected ? 'selected' : ''}`}
-                onClick={() => {
-                  setSelectedIndex(index)
-                  onLaunch(option.slot)
-                }}
-              >
-                {/* Screenshot or Fallback Gradient */}
-                {option.screenshotUrl ? (
-                  <>
-                    <div
-                      className="savestate-card-screenshot"
-                      style={{
-                        backgroundImage: `url("${option.screenshotUrl}")`
+                if (option.type === 'action') {
+                  return (
+                    <Card
+                      key={option.id}
+                      onClick={() => {
+                        setSelectedIndex(index)
+                        onLaunch(option.slot)
                       }}
-                    />
-                    {/* Details Footer */}
-                    <div className="savestate-card-details">
-                      <div className="savestate-card-details-title">
-                        {option.label}
-                      </div>
-                      <div className="savestate-card-details-date">
-                        {formatDate(option.date || 0)}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  /* Elegant full-card gradient containing the save metadata directly (No placeholder icon/separate footer) */
-                  <div className="savestate-card-gradient">
-                    <div className="savestate-card-gradient-title">
-                      {option.label}
-                    </div>
-                    <div className="savestate-card-details-date">
-                      {formatDate(option.date || 0)}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      )}
-    </div>
+                      style={{
+                        minWidth: '240px',
+                        height: '180px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        scrollSnapAlign: 'center',
+                        backgroundColor: isSelected ? 'var(--theme-color)' : 'rgba(255,255,255,0.03)',
+                        color: isSelected ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                        border: isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <Flex direction="column" align="center" justify="center" gap="3">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          width="48"
+                          height="48"
+                          fill="currentColor"
+                        >
+                          <path d="M10 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11.1z" />
+                        </svg>
+                        <Text weight="bold" size="2" style={{ textAlign: 'center', textTransform: 'uppercase' }}>
+                          {option.label}
+                        </Text>
+                      </Flex>
+                    </Card>
+                  )
+                }
+
+                return (
+                  <Card
+                    key={option.id}
+                    onClick={() => {
+                      setSelectedIndex(index)
+                      onLaunch(option.slot)
+                    }}
+                    style={{
+                      minWidth: '240px',
+                      height: '180px',
+                      padding: 0,
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      cursor: 'pointer',
+                      scrollSnapAlign: 'center',
+                      backgroundColor: isSelected ? 'var(--theme-color)' : 'rgba(255,255,255,0.03)',
+                      color: isSelected ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                      border: isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {option.screenshotUrl ? (
+                      <Flex direction="column" style={{ height: '100%' }}>
+                        <Box
+                          style={{
+                            height: '120px',
+                            backgroundImage: `url("${option.screenshotUrl}")`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                          }}
+                        />
+                        <Flex direction="column" p="2" gap="1" style={{ flexGrow: 1, background: isSelected ? 'transparent' : 'rgba(0,0,0,0.4)' }}>
+                          <Text weight="bold" size="1" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {option.label}
+                          </Text>
+                          <Text size="1" style={{ opacity: 0.6 }}>
+                            {formatDate(option.date || 0)}
+                          </Text>
+                        </Flex>
+                      </Flex>
+                    ) : (
+                      <Flex direction="column" justify="center" align="center" p="4" style={{ height: '100%', textAlign: 'center' }}>
+                        <Text weight="bold" size="2" mb="2">
+                          {option.label}
+                        </Text>
+                        <Text size="1" style={{ opacity: 0.6 }}>
+                          {formatDate(option.date || 0)}
+                        </Text>
+                      </Flex>
+                    )}
+                  </Card>
+                )
+              })}
+            </Flex>
+          </Box>
+        )}
+
+        <Flex className="riescade-menu-footer-bar" justify="between" align="center">
+          <Flex align="center" gap="1" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <Button size="1" variant="solid" color="gray" className="riescade-menu-footer-btn">B</Button>
+            <Text size="1">BACK</Text>
+          </Flex>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

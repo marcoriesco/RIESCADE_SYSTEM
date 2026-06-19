@@ -1,6 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import { LibraryService } from '../services/LibraryService'
 import { RomsWatcherService } from '../services/RomsWatcherService'
+import { NetplayService } from '../services/NetplayService'
 import { Game, System } from '../shared/types'
 import { IpcContext } from './index'
 
@@ -75,7 +76,6 @@ export function registerLibraryIpc(context: IpcContext): void {
   })
 
   ipcMain.handle('get-netplay-lobby', async () => {
-    const { NetplayService } = require('../services/NetplayService')
     const netplayService = new NetplayService()
     return netplayService.getLobbyList()
   })

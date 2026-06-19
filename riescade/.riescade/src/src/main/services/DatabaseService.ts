@@ -15,6 +15,7 @@ import { Game, System } from '../../shared/types'
 export class DatabaseService {
   private db: Database.Database | null = null
   private gamelistParser: GamelistParser
+  public migrationOccurred = false
 
   constructor() {
     this.gamelistParser = new GamelistParser()
@@ -120,6 +121,7 @@ export class DatabaseService {
         cheevos_hash  TEXT,
         file_size     INTEGER,
         file_mtime    INTEGER,
+        crc32         TEXT,
         PRIMARY KEY (system, path)
       );
 
@@ -142,6 +144,19 @@ export class DatabaseService {
         console.log("Database table 'systems' altered to add 'file_count' column.")
       } catch (err) {
         console.error("Failed to alter systems table to add file_count column:", err)
+      }
+    }
+
+    // Schema migration: Add crc32 to games if it doesn't exist
+    try {
+      db.prepare("SELECT crc32 FROM games LIMIT 1").get()
+    } catch {
+      try {
+        db.exec("ALTER TABLE games ADD COLUMN crc32 TEXT")
+        console.log("Database table 'games' altered to add 'crc32' column.")
+        this.migrationOccurred = true
+      } catch (err) {
+        console.error("Failed to alter games table to add crc32 column:", err)
       }
     }
   }
@@ -286,7 +301,7 @@ export class DatabaseService {
         favorite, hidden, kidgame, playcount, lastplayed,
         region, lang, emulator, core, sortname, tags,
         gamefamily, arcadesystem, languages, cheevos_id, cheevos_hash,
-        file_size, file_mtime
+        file_size, file_mtime, crc32
       ) VALUES (
         @id, @name, @path, @system, @desc, @image, @video, @marquee, @thumbnail,
         @fanart, @titleshot, @wheel, @mix, @boxback, @bezel, @manual, @magazine, @map,
@@ -294,7 +309,7 @@ export class DatabaseService {
         @favorite, @hidden, @kidgame, @playcount, @lastplayed,
         @region, @lang, @emulator, @core, @sortname, @tags,
         @gamefamily, @arcadesystem, @languages, @cheevos_id, @cheevos_hash,
-        @file_size, @file_mtime
+        @file_size, @file_mtime, @crc32
       )
     `)
 
@@ -363,7 +378,8 @@ export class DatabaseService {
           cheevos_id: g.cheevosId || null,
           cheevos_hash: g.cheevosHash || null,
           file_size: null,
-          file_mtime: null
+          file_mtime: null,
+          crc32: g.crc32 ? String(g.crc32).trim().toUpperCase() : null
         })
       }
 
@@ -730,7 +746,8 @@ export class DatabaseService {
         region = @region, lang = @lang, emulator = @emulator, core = @core,
         sortname = @sortname, tags = @tags, gamefamily = @gamefamily,
         arcadesystem = @arcadesystem, languages = @languages,
-        cheevos_id = @cheevos_id, cheevos_hash = @cheevos_hash
+        cheevos_id = @cheevos_id, cheevos_hash = @cheevos_hash,
+        crc32 = @crc32
       WHERE system = @system AND path = @path
     `).run({
       id: g.id || g.path,
@@ -771,6 +788,7 @@ export class DatabaseService {
       languages: g.languages || null,
       cheevos_id: g.cheevosId || null,
       cheevos_hash: g.cheevosHash || null,
+      crc32: g.crc32 ? String(g.crc32).trim().toUpperCase() : null,
       system: g.system,
       path: g.path
     })
@@ -799,7 +817,7 @@ export class DatabaseService {
         favorite, hidden, kidgame, playcount, lastplayed,
         region, lang, emulator, core, sortname, tags,
         gamefamily, arcadesystem, languages, cheevos_id, cheevos_hash,
-        file_size, file_mtime
+        file_size, file_mtime, crc32
       ) VALUES (
         @id, @name, @path, @system, @desc, @image, @video, @marquee, @thumbnail,
         @fanart, @titleshot, @wheel, @mix, @boxback, @bezel, @manual, @magazine, @map,
@@ -807,7 +825,7 @@ export class DatabaseService {
         @favorite, @hidden, @kidgame, @playcount, @lastplayed,
         @region, @lang, @emulator, @core, @sortname, @tags,
         @gamefamily, @arcadesystem, @languages, @cheevos_id, @cheevos_hash,
-        @file_size, @file_mtime
+        @file_size, @file_mtime, @crc32
       )
     `).run({
       id: g.id || g.path,
@@ -851,7 +869,8 @@ export class DatabaseService {
       cheevos_id: g.cheevosId || null,
       cheevos_hash: g.cheevosHash || null,
       file_size: null,
-      file_mtime: null
+      file_mtime: null,
+      crc32: g.crc32 ? String(g.crc32).trim().toUpperCase() : null
     })
   }
 
@@ -965,7 +984,8 @@ export class DatabaseService {
       languages: row.languages || undefined,
       region: row.region || undefined,
       cheevosId: row.cheevos_id || undefined,
-      cheevosHash: row.cheevos_hash || undefined
+      cheevosHash: row.cheevos_hash || undefined,
+      crc32: row.crc32 || undefined
     } as any
   }
 

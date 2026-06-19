@@ -1,4 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  Dialog,
+  Button,
+  Tabs,
+  Switch,
+  Checkbox,
+  Slider,
+  Select,
+  TextField,
+  Flex,
+  Box,
+  Heading,
+  Text
+} from '@radix-ui/themes'
 import { WebThemeRenderer } from './theme/WebThemeRenderer'
 import { InputConfigOverlay } from './InputConfigOverlay'
 import { ScraperProgressModal } from './ScraperProgressModal'
@@ -949,7 +963,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   // Auto-scroll to selected item
   useEffect(() => {
     if (isOpen) {
-      const selectedEl = document.querySelector('.riescade-menu-item.selected')
+      const selectedEl = document.querySelector(`[data-menu-index="${selectedIndex}"]`)
       if (selectedEl) {
         selectedEl.scrollIntoView({ block: 'nearest', behavior: 'instant' })
       }
@@ -2510,7 +2524,26 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isOpen || showInputConfig || showScraperProgress) return
+      if (!isOpen || showInputConfig || showScraperProgress || showOSK || showInputModal) return
+
+      if (isBluetoothScanning) {
+        if (e.key === 'Backspace' || e.key === 'Escape' || e.key.toLowerCase() === 'z') {
+          e.preventDefault()
+          e.stopPropagation()
+          if (bluetoothScanTimeoutRef.current) {
+            clearTimeout(bluetoothScanTimeoutRef.current)
+            bluetoothScanTimeoutRef.current = null
+          }
+          setIsBluetoothScanning(false)
+        }
+        return
+      }
+
+      const keyLower = e.key.toLowerCase()
+      const navKeys = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter', ' ', 'backspace', 'escape', 'pageup', 'pagedown', 'q', 'e']
+      if (navKeys.includes(keyLower)) {
+        e.stopPropagation()
+      }
 
       if (updateState.status !== 'idle') {
         const modalButtons: { label: string; action: () => void }[] = []
@@ -2541,12 +2574,20 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
         if (modalButtons.length > 0) {
           if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            e.preventDefault()
+            e.stopPropagation()
             setModalSelectedIndex(prev => (prev + 1) % modalButtons.length)
           } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault()
+            e.stopPropagation()
             setModalSelectedIndex(prev => (prev - 1 + modalButtons.length) % modalButtons.length)
           } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            e.stopPropagation()
             modalButtons[modalSelectedIndex]?.action()
           } else if (e.key === 'Backspace' || e.key === 'Escape') {
+            e.preventDefault()
+            e.stopPropagation()
             setUpdateState({ status: 'idle' })
           }
         }
@@ -2561,12 +2602,20 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         ]
 
         if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          e.stopPropagation()
           setModalSelectedIndex(prev => (prev + 1) % modalButtons.length)
         } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          e.stopPropagation()
           setModalSelectedIndex(prev => (prev - 1 + modalButtons.length) % modalButtons.length)
         } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          e.stopPropagation()
           modalButtons[modalSelectedIndex].action()
         } else if (e.key === 'Backspace' || e.key === 'Escape') {
+          e.preventDefault()
+          e.stopPropagation()
           setShowSaveModal(false)
         }
         return
@@ -2582,6 +2631,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           })
           setSelectedIndex(findFirstSelectableIndex(currentStackItem.items.filter(item => item.tab === newTab)))
           e.preventDefault()
+          e.stopPropagation()
           return
         } else if (e.key === 'PageDown' || e.key === 'e' || e.key === 'E') {
           const newTab = (currentStackItem.activeTab + 1) % currentStackItem.tabs.length
@@ -2592,6 +2642,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           })
           setSelectedIndex(findFirstSelectableIndex(currentStackItem.items.filter(item => item.tab === newTab)))
           e.preventDefault()
+          e.stopPropagation()
           return
         }
       }
@@ -2608,6 +2659,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
       if (e.key === 'ArrowDown') {
         e.preventDefault()
+        e.stopPropagation()
         if (selectedIndex >= currentMenu.length) {
           setSelectedIndex(findFirstSelectableIndex(currentMenu))
         } else if (selectedIndex === lastSelectableMenuIndex && bottomButtons.length > 0) {
@@ -2621,6 +2673,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
       } else if (e.key === 'ArrowUp') {
         e.preventDefault()
+        e.stopPropagation()
         if (selectedIndex >= currentMenu.length) {
           setSelectedIndex(lastSelectableMenuIndex !== -1 ? lastSelectableMenuIndex : 0)
         } else if (selectedIndex === findFirstSelectableIndex(currentMenu) && bottomButtons.length > 0) {
@@ -2635,27 +2688,44 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
       } else if (e.key === 'ArrowLeft') {
         if (selectedIndex >= currentMenu.length) {
           e.preventDefault()
+          e.stopPropagation()
           const currentBtnIdx = selectedIndex - currentMenu.length
           const nextBtnIdx = (currentBtnIdx - 1 + bottomButtons.length) % bottomButtons.length
           setSelectedIndex(currentMenu.length + nextBtnIdx)
           return
         }
         const item = currentMenu[selectedIndex]
-        if (item.type === 'select') handleSelect(item, -1)
-        else if (item.type === 'slider') handleSlider(item, -1)
+        if (item.type === 'select') {
+          e.preventDefault()
+          e.stopPropagation()
+          handleSelect(item, -1)
+        } else if (item.type === 'slider') {
+          e.preventDefault()
+          e.stopPropagation()
+          handleSlider(item, -1)
+        }
       } else if (e.key === 'ArrowRight') {
         if (selectedIndex >= currentMenu.length) {
           e.preventDefault()
+          e.stopPropagation()
           const currentBtnIdx = selectedIndex - currentMenu.length
           const nextBtnIdx = (currentBtnIdx + 1) % bottomButtons.length
           setSelectedIndex(currentMenu.length + nextBtnIdx)
           return
         }
         const item = currentMenu[selectedIndex]
-        if (item.type === 'select') handleSelect(item, 1)
-        else if (item.type === 'slider') handleSlider(item, 1)
+        if (item.type === 'select') {
+          e.preventDefault()
+          e.stopPropagation()
+          handleSelect(item, 1)
+        } else if (item.type === 'slider') {
+          e.preventDefault()
+          e.stopPropagation()
+          handleSlider(item, 1)
+        }
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
+        e.stopPropagation()
         if (selectedIndex >= currentMenu.length) {
           const btnIdx = selectedIndex - currentMenu.length
           bottomButtons[btnIdx]?.onClick()
@@ -2720,15 +2790,16 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
       } else if (e.key === 'Backspace' || e.key === 'Escape') {
         e.preventDefault()
+        e.stopPropagation()
         handleBackAction()
       }
     },
-    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData, needsReload, showInputConfig, showScraperProgress, getBottomButtons, handleBackAction, updateState]
+    [isOpen, currentMenu, selectedIndex, activeMenuStack, onClose, pendingSettings, themeSettings, settings, showSaveModal, modalSelectedIndex, themeData, needsReload, showInputConfig, showScraperProgress, getBottomButtons, handleBackAction, updateState, showOSK, showInputModal, isBluetoothScanning]
   )
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
   }, [handleKeyDown])
 
   const renderItemValue = (item: MenuItem) => {
@@ -2757,16 +2828,25 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
 
         return (
-          <div className={`menu-checkbox ${isOn ? 'checked' : 'unchecked'}`}>
-            {isOn && <span className="checkmark">✔</span>}
-          </div>
+          <Checkbox 
+            checked={isOn}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleToggle(item)
+            }}
+          />
         )
       }
 
       return (
-        <div className={`riescade-switch ${isOn ? 'on' : ''}`}>
-          <div className="thumb toggle-thumb" />
-        </div>
+        <Switch 
+          checked={isOn}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleToggle(item)
+          }}
+          style={{ cursor: 'pointer' }}
+        />
       )
     }
     if (item.type === 'select') {
@@ -2775,64 +2855,68 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         : (item.options?.[0]?.value !== undefined ? item.options[0].value : '')
       const label = item.options?.find(o => isOptionMatch(o.value, currentVal))?.label || currentVal
       return (
-        <div className="menu-select">
-          <span 
-            className="arrow-clickable" 
+        <Flex align="center" gap="2" className="riescade-menu-value-control">
+          <Button 
+            variant="ghost" 
+            size="1" 
             onClick={(e) => {
               e.stopPropagation()
               handleSelect(item, -1)
             }}
           >
             ◁
-          </span>
-          <span className="value">{label}</span>
-          <span 
-            className="arrow-clickable" 
+          </Button>
+          <Text size="2">{label}</Text>
+          <Button 
+            variant="ghost" 
+            size="1" 
             onClick={(e) => {
               e.stopPropagation()
               handleSelect(item, 1)
             }}
           >
             ▷
-          </span>
-        </div>
+          </Button>
+        </Flex>
       )
     }
     if (item.type === 'slider') {
       const currentVal = getSetting(item.settingName!, item.allowAuto ? '' : (item.min ?? 0))
       const isAuto = currentVal === '' || currentVal === 'AUTO' || currentVal === 'auto'
       return (
-        <div className="menu-slider">
-          <span 
-            className="arrow-clickable" 
+        <Flex align="center" gap="2" className="riescade-menu-value-control">
+          <Button 
+            variant="ghost" 
+            size="1" 
             onClick={(e) => {
               e.stopPropagation()
               handleSlider(item, -1)
             }}
           >
             ◁
-          </span>
-          <span className="value">
+          </Button>
+          <Text size="2">
             {isAuto ? t('AUTO') : `${currentVal}${item.suffix || '%'}`}
-          </span>
-          <span 
-            className="arrow-clickable" 
+          </Text>
+          <Button 
+            variant="ghost" 
+            size="1" 
             onClick={(e) => {
               e.stopPropagation()
               handleSlider(item, 1)
             }}
           >
             ▷
-          </span>
-        </div>
+          </Button>
+        </Flex>
       )
     }
     if (item.type === 'input') {
       const displayVal = item.isPassword ? '••••••••' : (currentSettingVal || '')
-      return <div className="menu-input-preview">{displayVal || t('EMPTY')}</div>
+      return <Text size="2" color="gray" className={`riescade-menu-input-display${!displayVal ? ' empty' : ''}`}>{displayVal || t('EMPTY')}</Text>
     }
     if (item.type === 'info') {
-      return <div className="menu-info">{item.value}</div>
+      return <Text size="2" color="gray">{item.value}</Text>
     }
     if (item.submenu) {
       // Calculate selected count for submenus with toggles, but only if requested
@@ -2862,37 +2946,47 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
 
         if (selectedCount > 0) {
           return (
-            <div className="menu-submenu-preview">
-              <span className="menu-selected-count">{selectedCount} {t('SELECTED')}</span>
-              <span className="menu-submenu-arrow">›</span>
-            </div>
+            <Flex align="center" gap="2">
+              <Text size="1" color="indigo" weight="bold" className="riescade-menu-badge">
+                {selectedCount} {t('SELECTED')}
+              </Text>
+              <Text size="3" color="gray">›</Text>
+            </Flex>
           )
         }
       }
 
-      return <span className="menu-submenu-arrow">›</span>
+      return <Text size="3" className="riescade-menu-arrow">›</Text>
     }
     return null
   }
 
   const menuItemsNode = (
-    <div className="riescade-menu-list">
+    <Box className="riescade-menu-list">
       {currentMenu.map((item, index) => {
         if (item.type === 'group') {
           return (
-            <div key={item.id} className="riescade-menu-group">
+            <Text 
+              key={item.id} 
+              size="1" 
+              weight="bold" 
+              className="riescade-menu-group"
+            >
               {item.label}
-            </div>
+            </Text>
           )
         }
-        // Theme card: renders with preview thumbnail + status badge
+        const isSelected = index === selectedIndex
+        const isMainMenu = activeMenuStack.length === 1
+
         if (item.type === 'theme_card') {
           const isInstalled = item.badge === t('INSTALLED')
           const isInstalling = item.badge === t('INSTALLING...')
           return (
-            <div
+            <Flex
               key={item.id}
-              className={`riescade-menu-item theme-card-item ${index === selectedIndex ? 'selected' : ''} ${isInstalled ? 'installed' : ''}`}
+              data-menu-index={index}
+              className={`riescade-menu-theme-card${isSelected ? ' selected' : ''}`}
               onMouseMove={(e) => {
                 if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
                   setLastMousePos({ x: e.clientX, y: e.clientY })
@@ -2901,7 +2995,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               }}
               onClick={() => handleItemClick(item, index)}
             >
-              <div className="theme-card-preview">
+              <Box className="riescade-menu-theme-card-preview">
                 {item.preview ? (
                   <img
                     src={item.preview}
@@ -2916,23 +3010,28 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                   />
                 ) : null}
                 <span className="theme-card-preview-fallback" style={item.preview ? { display: 'none' } : undefined}>{item.label.charAt(0)}</span>
-              </div>
-              <div className="theme-card-info">
-                <span className="theme-card-name">{item.label}</span>
-                {item.description && <span className="theme-card-meta">{item.description}</span>}
-              </div>
-              <div className={`theme-card-badge ${isInstalled ? 'badge-installed' : isInstalling ? 'badge-installing' : 'badge-download'}`}>
-                {isInstalling && <span className="theme-card-spinner" />}
+              </Box>
+              <Flex className="riescade-menu-theme-card-info">
+                <Text weight="bold" size="2">{item.label}</Text>
+                {item.description && <Text size="1" className={`riescade-menu-theme-card-description${isSelected ? ' selected' : ''}`}>{item.description}</Text>}
+              </Flex>
+              <Button 
+                size="1" 
+                variant={isInstalled ? "solid" : "soft"} 
+                color={isInstalled ? "green" : isInstalling ? "yellow" : "gray"}
+                style={{ flexShrink: 0 }}
+              >
                 {item.badge}
-              </div>
-            </div>
+              </Button>
+            </Flex>
           )
         }
-        const isMainMenu = activeMenuStack.length === 1
+
         return (
-          <div
+          <Box
             key={item.id}
-            className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
+            data-menu-index={index}
+            className={`riescade-menu-item${isSelected ? ' selected' : ''}`}
             onMouseMove={(e) => {
               if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
                 setLastMousePos({ x: e.clientX, y: e.clientY })
@@ -2941,79 +3040,82 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
             }}
             onClick={() => handleItemClick(item, index)}
           >
-            {isMainMenu ? (
-              <div className="riescade-menu-label-container">
-                <span className="riescade-menu-icon" id={item.id}></span>
-                <div className="riescade-menu-text-container">
-                  <span className="riescade-menu-label">
-                    {item.label}
-                  </span>
-                  {item.description && (
-                    <span className="riescade-menu-description">
-                      {item.description}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="riescade-menu-text-container">
-                <span className="riescade-menu-label">
+            <Flex className="riescade-menu-item-content">
+              <Flex className="riescade-menu-item-row">
+                {isMainMenu && <span className="riescade-menu-icon" id={item.id}></span>}
+                <Text weight="bold" size="2" className="riescade-menu-item-label">
                   {item.label}
-                </span>
-                {item.description && (
-                  <span className="riescade-menu-description">
-                    {item.description}
-                  </span>
-                )}
-              </div>
-            )}
-            <div className="riescade-menu-value">{renderItemValue(item)}</div>
-          </div>
+                </Text>
+              </Flex>
+              {item.description && (
+                <Text size="1" className="riescade-menu-item-description">
+                  {item.description}
+                </Text>
+              )}
+            </Flex>
+            <Box className="riescade-menu-item-value">{renderItemValue(item)}</Box>
+          </Box>
         )
       })}
-    </div>
+    </Box>
   )
 
   return (
-    <div style={{ display: isOpen ? 'block' : 'none' }}>
-      <div className={`riescade-overlay riescade-menu-overlay ${visible && !showInputConfig && !showScraperProgress ? 'visible' : ''}`}>
-        <div className="riescade-menu-container">
-          <div className="riescade-menu-header">
-            <h2 className="riescade-menu-title">{menuTitle}</h2>
+    <>
+      <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) handleBackAction(); }}>
+        <Dialog.Content 
+          size="3" 
+          className="riescade-menu"
+        >
+          {/* Header */}
+          <Flex className="riescade-menu-header">
+            <Heading size="4" className="riescade-menu-title">
+              {menuTitle}
+            </Heading>
+            {/* Tabs */}
             {currentStackItem?.tabs && currentStackItem.tabs.length > 0 && (
-              <div className="riescade-menu-tabs">
-                {currentStackItem.tabs.map((tab, idx) => (
-                  <div
-                    key={tab}
-                    className={`riescade-menu-tab ${idx === currentStackItem.activeTab ? 'active' : ''}`}
-                    onClick={() => {
-                      setActiveMenuStack(prev => {
-                        const next = [...prev]
-                        next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
-                        return next
-                      })
-                      setSelectedIndex(findFirstSelectableIndex(currentStackItem.items.filter(item => item.tab === idx)))
-                    }}
-                  >
-                    {t(tab)}
-                  </div>
-                ))}
-              </div>
+              <Tabs.Root value={currentStackItem.tabs[currentStackItem.activeTab || 0]}>
+                <Tabs.List>
+                  {currentStackItem.tabs.map((tab, idx) => (
+                    <Tabs.Trigger 
+                      key={tab} 
+                      value={tab}
+                      onClick={() => {
+                        setActiveMenuStack(prev => {
+                          const next = [...prev]
+                          next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
+                          return next
+                        })
+                        setSelectedIndex(findFirstSelectableIndex(currentStackItem.items.filter(item => item.tab === idx)))
+                      }}
+                    >
+                      {t(tab)}
+                    </Tabs.Trigger>
+                  ))}
+                </Tabs.List>
+              </Tabs.Root>
             )}
-          </div>
+          </Flex>
 
-          <div className="riescade-menu-list-container">
+          {/* Scrollable list */}
+          <Box className="riescade-menu-content custom-scrollbar">
             {menuItemsNode}
-          </div>
+          </Box>
 
+          {/* Footer */}
           {bottomButtons.length > 0 && (
-            <div className="riescade-menu-bottom-bar">
+            <Flex className="riescade-menu-footer">
               {bottomButtons.map((btn, btnIdx) => {
                 const isSelected = selectedIndex === currentMenu.length + btnIdx
                 return (
-                  <button
+                  <Button
                     key={btn.id}
-                    className={`riescade-button ${isSelected ? 'selected' : ''}`}
+                    variant={isSelected ? "solid" : "soft"}
+                    color={isSelected ? undefined : "gray"}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      btn.onClick()
+                    }}
                     onMouseMove={(e) => {
                       if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
                         setLastMousePos({ x: e.clientX, y: e.clientY })
@@ -3021,83 +3123,67 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                         if (selectedIndex !== targetIdx) setSelectedIndex(targetIdx)
                       }
                     }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      btn.onClick()
-                    }}
                   >
                     {btn.label}
-                  </button>
+                  </Button>
                 )
               })}
-            </div>
+            </Flex>
           )}
 
-          {activeMenuStack.length === 1 && (
-            <div className="riescade-menu-footer">
-              {bottomButtons.length === 0 && (
-                <div className="riescade-menu-footer-actions">
-                  <div className="riescade-menu-footer-action">
-                    <span className="riescade-menu-footer-button">A</span>
-                    <span className="riescade-menu-footer-text">{t('CHOOSE')}</span>
-                  </div>
-                  <div className="riescade-menu-footer-action">
-                    <span className="riescade-menu-footer-button">B</span>
-                    <span className="riescade-menu-footer-text">{t('BACK')}</span>
-                  </div>
-                </div>
-              )}
-              {/* <div className="riescade-menu-version">
-                RIESCADE {versions.app}
-              </div> */}
-            </div>
-          )}
-        </div>
-      </div>
 
-      {showSaveModal && (
-        <div className="riescade-overlay riescade-modal-overlay visible">
-          <div className="riescade-modal-container">
-            <h3 className="riescade-modal-title">{t('Apply Changes?')}</h3>
-            <p className="riescade-modal-message">
-              {t('Settings will be saved. The app will refresh to apply changes.')}
-            </p>
-            <div className="riescade-modal-buttons">
-              <button 
-                onClick={handleSave}
-                className={`riescade-button ${modalSelectedIndex === 0 ? 'selected' : ''}`}
-              >
-                {t('Save & Apply')}
-              </button>
-              <button 
-                onClick={onClose}
-                className={`riescade-button ${modalSelectedIndex === 1 ? 'selected' : ''}`}
-              >
-                {t('Discard Changes')}
-              </button>
-              <button 
-                onClick={() => setShowSaveModal(false)}
-                className={`riescade-button ${modalSelectedIndex === 2 ? 'selected' : ''}`}
-              >
-                {t('Cancel')}
-              </button>
-            </div>
-          </div>
-        </div>
+        </Dialog.Content>
+      </Dialog.Root>
+
+      {/* Save Modal */}
+      <Dialog.Root open={!!showSaveModal} onOpenChange={(open) => { if (!open) setShowSaveModal(false); }}>
+        <Dialog.Content style={{ maxWidth: '400px' }}>
+          <Heading size="3" mb="2">{t('Apply Changes?')}</Heading>
+          <Text size="2" color="gray">
+            {t('Settings will be saved. The app will refresh to apply changes.')}
+          </Text>
+          <Flex gap="3" mt="4" justify="end">
+            <Button 
+              onClick={handleSave}
+              variant={modalSelectedIndex === 0 ? "solid" : "soft"}
+              color={modalSelectedIndex === 0 ? undefined : "gray"}
+            >
+              {t('Save & Apply')}
+            </Button>
+            <Button 
+              onClick={onClose}
+              variant={modalSelectedIndex === 1 ? "solid" : "soft"}
+              color={modalSelectedIndex === 1 ? undefined : "gray"}
+            >
+              {t('Discard Changes')}
+            </Button>
+            <Button 
+              onClick={() => setShowSaveModal(false)}
+              variant={modalSelectedIndex === 2 ? "solid" : "soft"}
+              color={modalSelectedIndex === 2 ? undefined : "gray"}
+            >
+              {t('Cancel')}
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+
+      {showInputConfig && (
+        <InputConfigOverlay isOpen={showInputConfig} onClose={() => setShowInputConfig(false)} />
       )}
 
+      {showScraperProgress && (
+        <ScraperProgressModal isOpen={showScraperProgress} onClose={() => setShowScraperProgress(false)} t={t} />
+      )}
 
-      {showInputConfig && <InputConfigOverlay onClose={() => setShowInputConfig(false)} />}
-
-      {showScraperProgress && <ScraperProgressModal isOpen={showScraperProgress} onClose={() => setShowScraperProgress(false)} t={t} />}
-      
-      {isBluetoothScanning && (
-        <div className="riescade-overlay riescade-modal-overlay bluetooth-scanning visible">
-          <div className="riescade-modal-container bluetooth-scanning-container">
-            <h3 className="riescade-modal-title bluetooth-scanning-title">{t('SCANNING BLUETOOTH')}</h3>
-            <p className="riescade-modal-text bluetooth-scanning-text">{t('Searching for devices...')}</p>
-            <div className="riescade-modal-spinner" />
-            <button
+      {/* Bluetooth Scanning Modal */}
+      <Dialog.Root open={!!isBluetoothScanning} onOpenChange={(open) => { if (!open) setIsBluetoothScanning(false); }}>
+        <Dialog.Content style={{ maxWidth: '400px' }}>
+          <Flex direction="column" align="center" gap="3">
+            <Heading size="3">{t('SCANNING BLUETOOTH')}</Heading>
+            <Text size="2" color="gray">{t('Searching for devices...')}</Text>
+            <Box className="riescade-modal-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+            <Button
               onClick={() => {
                 if (bluetoothScanTimeoutRef.current) {
                   clearTimeout(bluetoothScanTimeoutRef.current)
@@ -3105,14 +3191,15 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                 }
                 setIsBluetoothScanning(false)
               }}
-              className="riescade-button"
+              variant="soft"
+              color="gray"
             >
               {t('Cancel')}
-            </button>
-          </div>
-        </div>
-      )}
-      
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+
       <VirtualKeyboard
         isOpen={showOSK}
         onClose={() => setShowOSK(false)}
@@ -3125,173 +3212,166 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         isPassword={activeInputItem?.isPassword}
       />
 
-      {showInputModal && (
-        <div className="riescade-overlay riescade-modal-overlay visible">
-          <div className="riescade-modal-container">
-            <h3 className="riescade-modal-title">{activeInputItem?.label}</h3>
-            <div style={{ margin: '20px 0' }}>
-              <input 
-                type={activeInputItem?.isPassword ? 'password' : 'text'}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    updateSetting(activeInputItem!.settingName!, inputValue)
-                    setShowInputModal(false)
-                  } else if (e.key === 'Escape') {
-                    setShowInputModal(false)
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  fontSize: '1.2rem',
-                  border: '2px solid var(--theme-color)',
-                  borderRadius: '4px',
-                  outline: 'none'
-                }}
-              />
-            </div>
-            <div className="riescade-modal-buttons">
-              <button 
-                className="riescade-button selected"
-                onClick={() => {
+      {/* Manual Input Modal */}
+      <Dialog.Root open={!!showInputModal} onOpenChange={(open) => { if (!open) setShowInputModal(false); }}>
+        <Dialog.Content style={{ maxWidth: '400px' }}>
+          <Heading size="3" mb="3">{activeInputItem?.label}</Heading>
+          <Box mb="4">
+            <TextField.Root 
+              type={activeInputItem?.isPassword ? 'password' : 'text'}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
                   updateSetting(activeInputItem!.settingName!, inputValue)
                   setShowInputModal(false)
-                }}
-              >
-                {t('OK')}
-              </button>
-              <button 
-                className="riescade-button"
-                onClick={() => setShowInputModal(false)}
-              >
-                {t('Cancel')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {updateState.status !== 'idle' && (
-        <div className="riescade-overlay riescade-modal-overlay visible">
-          <div className="riescade-modal-container updater-modal-container" style={{ maxWidth: '600px', width: '90%' }}>
-            <h3 className="riescade-modal-title">
-              {updateState.status === 'checking' && t('CHECKING FOR UPDATES')}
-              {updateState.status === 'no-update' && t('SOFTWARE UPDATES')}
-              {updateState.status === 'available' && `${t('UPDATE AVAILABLE')} (v${updateState.version})`}
-              {updateState.status === 'downloading' && t('DOWNLOADING UPDATE')}
-              {updateState.status === 'error' && t('UPDATE ERROR')}
-            </h3>
+                } else if (e.key === 'Escape') {
+                  setShowInputModal(false)
+                }
+              }}
+            />
+          </Box>
+          <Flex gap="3" justify="end">
+            <Button 
+              onClick={() => {
+                updateSetting(activeInputItem!.settingName!, inputValue)
+                setShowInputModal(false)
+              }}
+            >
+              {t('OK')}
+            </Button>
+            <Button 
+              onClick={() => setShowInputModal(false)}
+              variant="soft"
+              color="gray"
+            >
+              {t('Cancel')}
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
 
-            <div className="riescade-modal-content" style={{ margin: '20px 0', maxHeight: '300px', overflowY: 'auto' }}>
-              {updateState.status === 'checking' && (
-                <div style={{ textAlign: 'center', padding: '20px' }}>
-                  <div className="riescade-modal-spinner" style={{ margin: '0 auto 15px' }} />
-                  <p>{t('Checking for updates...')}</p>
-                </div>
-              )}
+      {/* Software Updater Modal */}
+      <Dialog.Root open={updateState.status !== 'idle'} onOpenChange={(open) => { if (!open) setUpdateState({ status: 'idle' }); }}>
+        <Dialog.Content style={{ maxWidth: '600px', width: '90%' }}>
+          <Heading size="3" mb="3">
+            {updateState.status === 'checking' && t('CHECKING FOR UPDATES')}
+            {updateState.status === 'no-update' && t('SOFTWARE UPDATES')}
+            {updateState.status === 'available' && `${t('UPDATE AVAILABLE')} (v${updateState.version})`}
+            {updateState.status === 'downloading' && t('DOWNLOADING UPDATE')}
+            {updateState.status === 'error' && t('UPDATE ERROR')}
+          </Heading>
 
-              {updateState.status === 'no-update' && (
-                <p style={{ textAlign: 'center', padding: '10px' }}>{t('Your software is up to date.')}</p>
-              )}
+          <Box mb="4" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {updateState.status === 'checking' && (
+              <Flex direction="column" align="center" gap="3" p="4">
+                <Box className="riescade-modal-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+                <Text>{t('Checking for updates...')}</Text>
+              </Flex>
+            )}
 
-              {updateState.status === 'error' && (
-                <p style={{ color: '#ef4444', textAlign: 'center', padding: '10px' }}>
-                  {t('An error occurred during update:')}<br/>
-                  <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>{updateState.errorMsg}</span>
-                </p>
-              )}
+            {updateState.status === 'no-update' && (
+              <Text style={{ textAlign: 'center', display: 'block' }}>{t('Your software is up to date.')}</Text>
+            )}
 
-              {updateState.status === 'available' && (
-                <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>{t('Release Notes:')}</p>
-                  <pre style={{
-                    whiteSpace: 'pre-wrap',
-                    fontFamily: 'inherit',
-                    fontSize: '0.95rem',
-                    background: 'rgba(255,255,255,0.05)',
-                    padding: '12px',
-                    borderRadius: '4px',
-                    maxHeight: '200px',
-                    overflowY: 'auto'
-                  }} className="custom-scrollbar">
-                    {updateState.releaseNotes || t('No release notes provided.')}
-                  </pre>
-                  <p style={{ marginTop: '15px', fontSize: '0.9rem', opacity: 0.8 }}>
-                    {t('The application will download the update and apply it portable.')}
-                  </p>
-                </div>
-              )}
+            {updateState.status === 'error' && (
+              <Text style={{ color: '#ef4444', textAlign: 'center', display: 'block' }}>
+                {t('An error occurred during update:')}<br/>
+                <Text size="1" style={{ opacity: 0.8 }}>{updateState.errorMsg}</Text>
+              </Text>
+            )}
 
-              {updateState.status === 'downloading' && (
-                <div style={{ textAlign: 'center', padding: '20px' }}>
-                  {updateState.percent !== undefined ? (
-                    <div style={{ margin: '0 auto 20px', width: '100%', maxWidth: '400px' }}>
-                      <div className="scraper-progress-overlay" style={{ position: 'static', background: 'none', backdropFilter: 'none', padding: 0 }}>
-                        <div className="scraper-progress-track" style={{ height: '14px', borderRadius: '7px', background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.05)', overflow: 'hidden', marginBottom: '10px' }}>
-                          <div className="scraper-progress-fill" style={{ width: `${updateState.percent}%`, height: '100%', background: 'linear-gradient(to right, var(--theme-color), #a855f7)', borderRadius: '6px', boxShadow: '0 0 10px var(--theme-color)', transition: 'width 0.2s ease-out' }} />
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '1.1rem', fontWeight: 800, marginTop: '5px' }}>
-                        <span style={{ color: 'var(--theme-color)' }}>{updateState.percent}%</span>
-                        {updateState.downloadedBytes !== undefined && updateState.totalBytes !== undefined && (
-                          <span style={{ opacity: 0.6, fontSize: '0.9rem' }}>
-                            {((updateState.downloadedBytes) / 1024 / 1024).toFixed(1)} MB / {((updateState.totalBytes) / 1024 / 1024).toFixed(1)} MB
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="riescade-modal-spinner" style={{ margin: '0 auto 15px' }} />
-                  )}
-                  <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{t('Downloading and extracting update files...')}</p>
-                  <p style={{ fontSize: '0.85rem', opacity: 0.7, marginTop: '10px' }}>
-                    {t('The application will restart automatically when finished.')}
-                  </p>
-                </div>
-              )}
-            </div>
+            {updateState.status === 'available' && (
+              <Flex direction="column" align="start" gap="2">
+                <Text weight="bold">{t('Release Notes:')}</Text>
+                <pre style={{
+                  whiteSpace: 'pre-wrap',
+                  fontFamily: 'inherit',
+                  fontSize: '0.95rem',
+                  background: 'rgba(255,255,255,0.05)',
+                  padding: '12px',
+                  borderRadius: '4px',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  width: '100%'
+                }} className="custom-scrollbar">
+                  {updateState.releaseNotes || t('No release notes provided.')}
+                </pre>
+                <Text size="1" style={{ opacity: 0.8, marginTop: '10px' }}>
+                  {t('The application will download the update and apply it portable.')}
+                </Text>
+              </Flex>
+            )}
 
-            <div className="riescade-modal-buttons">
-              {updateState.status === 'available' && (
-                <>
-                  <button 
-                    className={`riescade-button ${modalSelectedIndex === 0 ? 'selected' : ''}`}
-                    onClick={() => {
-                      setUpdateState(prev => ({ ...prev, status: 'downloading' }))
-                      window.api.downloadAndInstallUpdate(updateState.zipUrl!)
-                        .catch((err: any) => {
-                          setUpdateState({
-                            status: 'error',
-                            errorMsg: err.message || String(err)
-                          })
+            {updateState.status === 'downloading' && (
+              <Flex direction="column" align="center" gap="3" p="4">
+                {updateState.percent !== undefined ? (
+                  <Box style={{ width: '100%', maxWidth: '400px' }}>
+                    <Box style={{ height: '14px', borderRadius: '7px', background: 'rgba(255, 255, 255, 0.1)', overflow: 'hidden', marginBottom: '10px' }}>
+                      <Box style={{ width: `${updateState.percent}%`, height: '100%', background: 'var(--theme-color)', borderRadius: '6px', transition: 'width 0.2s ease-out' }} />
+                    </Box>
+                    <Flex justify="between" align="center">
+                      <Text weight="bold" style={{ color: 'var(--theme-color)' }}>{updateState.percent}%</Text>
+                      {updateState.downloadedBytes !== undefined && updateState.totalBytes !== undefined && (
+                        <Text size="1" style={{ opacity: 0.6 }}>
+                          {((updateState.downloadedBytes) / 1024 / 1024).toFixed(1)} MB / {((updateState.totalBytes) / 1024 / 1024).toFixed(1)} MB
+                        </Text>
+                      )}
+                    </Flex>
+                  </Box>
+                ) : (
+                  <Box className="riescade-modal-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+                )}
+                <Text weight="bold">{t('Downloading and extracting update files...')}</Text>
+                <Text size="1" style={{ opacity: 0.7, marginTop: '10px' }}>
+                  {t('The application will restart automatically when finished.')}
+                </Text>
+              </Flex>
+            )}
+          </Box>
+
+          <Flex gap="3" justify="end">
+            {updateState.status === 'available' && (
+              <>
+                <Button 
+                  variant={modalSelectedIndex === 0 ? "solid" : "soft"}
+                  color={modalSelectedIndex === 0 ? undefined : "gray"}
+                  onClick={() => {
+                    setUpdateState(prev => ({ ...prev, status: 'downloading' }))
+                    window.api.downloadAndInstallUpdate(updateState.zipUrl!)
+                      .catch((err: any) => {
+                        setUpdateState({
+                          status: 'error',
+                          errorMsg: err.message || String(err)
                         })
-                    }}
-                  >
-                    {t('DOWNLOAD & UPDATE')}
-                  </button>
-                  <button 
-                    className={`riescade-button ${modalSelectedIndex === 1 ? 'selected' : ''}`}
-                    onClick={() => setUpdateState({ status: 'idle' })}
-                  >
-                    {t('Cancel')}
-                  </button>
-                </>
-              )}
-
-              {(updateState.status === 'no-update' || updateState.status === 'error') && (
-                <button 
-                  className={`riescade-button ${modalSelectedIndex === 0 ? 'selected' : ''}`}
+                      })
+                  }}
+                >
+                  {t('DOWNLOAD & UPDATE')}
+                </Button>
+                <Button 
+                  variant={modalSelectedIndex === 1 ? "solid" : "soft"}
+                  color={modalSelectedIndex === 1 ? undefined : "gray"}
                   onClick={() => setUpdateState({ status: 'idle' })}
                 >
-                  {t('OK')}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+                  {t('Cancel')}
+                </Button>
+              </>
+            )}
+
+            {(updateState.status === 'no-update' || updateState.status === 'error') && (
+              <Button 
+                variant={modalSelectedIndex === 0 ? "solid" : "soft"}
+                color={modalSelectedIndex === 0 ? undefined : "gray"}
+                onClick={() => setUpdateState({ status: 'idle' })}
+              >
+                {t('OK')}
+              </Button>
+            )}
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+    </>
   )
 }

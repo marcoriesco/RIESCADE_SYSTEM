@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { Dialog } from '@radix-ui/themes'
 
 interface VirtualKeyboardProps {
   isOpen: boolean
@@ -138,21 +139,29 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown)
+      window.addEventListener('keydown', handleKeyDown, true)
     }
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', handleKeyDown, true)
     }
   }, [isOpen, handleKeyDown])
-
-  if (!isOpen) return null
 
   const activeKeyId = gridMapping[gridPos.row][gridPos.col]
 
   return (
-    <div className="riescade-osk-overlay visible" onClick={onClose}>
-      <div className="riescade-osk-container" onClick={e => e.stopPropagation()}>
-        <h3 className="riescade-osk-title">{title}</h3>
+    <>
+      <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+        <Dialog.Content 
+          className="riescade-osk-container"
+          style={{
+            maxWidth: '1000px',
+            width: '95%',
+            padding: '25px 35px',
+            background: '#11141a',
+            border: '2px solid #333'
+          }}
+        >
+          <h3 className="riescade-osk-title">{title}</h3>
         
         <div className="riescade-osk-input-wrapper">
           <input 
@@ -249,24 +258,11 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
             {getKeyDisplay('CANCEL', layout)}
           </div>
         </div>
-      </div>
+      </Dialog.Content>
+    </Dialog.Root>
 
-      <style>{`
-        .riescade-osk-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.85);
-          z-index: 15000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          backdrop-filter: blur(8px);
-          animation: osk-fade-in 0.15s ease-out;
-        }
-        .riescade-osk-container {
+    <style>{`
+      .riescade-osk-container {
           background: #11141a;
           border: 2px solid #333;
           border-radius: 8px;
@@ -365,6 +361,6 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
           to { opacity: 1; transform: scale(1); }
         }
       `}</style>
-    </div>
+    </>
   )
 }

@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { Theme } from '@radix-ui/themes';
+import * as Toast from '@radix-ui/react-toast';
 import { WebThemeRenderer } from './components/theme/WebThemeRenderer';
 import { getNextGridIndex } from './components/theme/utils';
 import { Menu } from './components/Menu';
@@ -93,7 +95,6 @@ const preloadImage = (url: string): Promise<void> => {
 	});
 };
 
-// Concurrency-limited batch image preloader to avoid saturating Chromium's decode pipeline
 const preloadImageBatch = async (urls: string[], concurrency = 5): Promise<void> => {
 	const queue = [...urls];
 	const workers = Array.from({ length: concurrency }, async () => {
@@ -103,6 +104,22 @@ const preloadImageBatch = async (urls: string[], concurrency = 5): Promise<void>
 		}
 	});
 	await Promise.all(workers);
+};
+
+const mapHexToRadixColor = (hex: string): any => {
+	const normalized = (hex || '').toLowerCase().trim();
+	switch (normalized) {
+		case '#9f0043': return 'pink';
+		case '#ffffff': return 'gray';
+		case '#3377ff': return 'blue';
+		case '#13eafd': return 'cyan';
+		case '#fb2246': return 'red';
+		case '#cccccc': return 'gray';
+		case '#00ffbf': return 'teal';
+		case '#9133c7': return 'purple';
+		case '#ffc233': return 'yellow';
+		default: return 'indigo';
+	}
 };
 
 const getNotificationIcon = (category: string | undefined, type: string) => {
@@ -281,6 +298,79 @@ function App() {
 	const longPressTimersRef = useRef<Record<string, NodeJS.Timeout>>({});
 	const longPressHandledRef = useRef<Record<string, boolean>>({});
 	const gamepadButtonsStateRef = useRef<Record<number, boolean>>({});
+
+	const performInPlaceGamelistReload = useCallback((forcePhysical = true, systemName?: string | string[]) => {
+		setIsUpdatingGamelist(true);
+		setIsMenuOpen(false);
+		setIsGameOptionsOpen(false);
+
+		window.api.preloadLibrary(forcePhysical, systemName).then(() => {
+			Promise.all([
+				window.api.getSystems(),
+				window.api.getSettings(),
+				window.api.getMusicFiles(),
+				window.api.getMusicPath()
+			]).then(([s, updatedSettings, files, mPath]: [System[], any, string[], string]) => {
+				setSystems(s);
+				setSettings(updatedSettings);
+				setMusicFiles(files);
+				setMusicPath(mPath);
+
+				if (selectedSystem) {
+					window.api.getGames(selectedSystem.name).then((masterGames: Game[]) => {
+						const groupedSetting = updatedSettings.SystemsGrouped?.value || '';
+						const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
+
+						const childSystems = s.filter(cs => 
+							cs.group && 
+							cs.group.toLowerCase() === selectedSystem.name.toLowerCase() && 
+							groupedList.includes(cs.name)
+						);
+
+						if (childSystems.length > 0) {
+							Promise.all(childSystems.map(cs => window.api.getGames(cs.name))).then((allChildGames) => {
+								const gameMap = new Map<string, Game>();
+								masterGames.forEach(g => {
+									const sysObj = s.find(sys => sys.name.toLowerCase() === g.system.toLowerCase()) || selectedSystem;
+									if (sysObj) {
+										const absPath = resolveAbsolutePath(sysObj.path, g.path);
+										gameMap.set(absPath, g);
+									}
+								});
+								allChildGames.forEach((childGames, childIdx) => {
+									const childSys = childSystems[childIdx];
+									childGames.forEach(g => {
+										const absPath = resolveAbsolutePath(childSys.path, g.path);
+										gameMap.set(absPath, g);
+									});
+								});
+								const merged = Array.from(gameMap.values());
+								merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+								setGames(merged);
+								setIsUpdatingGamelist(false);
+								addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
+							});
+						} else {
+							setGames(masterGames);
+							setIsUpdatingGamelist(false);
+							addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
+						}
+					});
+				} else {
+					setIsUpdatingGamelist(false);
+					addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
+				}
+			}).catch(err => {
+				console.error('Failed to load libraries during in-place reload:', err);
+				setIsUpdatingGamelist(false);
+				addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
+			});
+		}).catch(err => {
+			console.error('Failed to preload during in-place reload:', err);
+			setIsUpdatingGamelist(false);
+			addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
+		});
+	}, [selectedSystem, addNotification]);
 
 	const currentGame = filteredGames[selectedGameIndex];
 
@@ -1052,78 +1142,7 @@ function App() {
 		};
 	}, []);
 
-	const performInPlaceGamelistReload = useCallback((forcePhysical = true, systemName?: string | string[]) => {
-		setIsUpdatingGamelist(true);
-		setIsMenuOpen(false);
-		setIsGameOptionsOpen(false);
 
-		window.api.preloadLibrary(forcePhysical, systemName).then(() => {
-			Promise.all([
-				window.api.getSystems(),
-				window.api.getSettings(),
-				window.api.getMusicFiles(),
-				window.api.getMusicPath()
-			]).then(([s, updatedSettings, files, mPath]: [System[], any, string[], string]) => {
-				setSystems(s);
-				setSettings(updatedSettings);
-				setMusicFiles(files);
-				setMusicPath(mPath);
-
-				if (selectedSystem) {
-					window.api.getGames(selectedSystem.name).then((masterGames: Game[]) => {
-						const groupedSetting = updatedSettings.SystemsGrouped?.value || '';
-						const groupedList = String(groupedSetting).split(',').filter(v => v.trim() !== '');
-
-						const childSystems = s.filter(cs => 
-							cs.group && 
-							cs.group.toLowerCase() === selectedSystem.name.toLowerCase() && 
-							groupedList.includes(cs.name)
-						);
-
-						if (childSystems.length > 0) {
-							Promise.all(childSystems.map(cs => window.api.getGames(cs.name))).then((allChildGames) => {
-								const gameMap = new Map<string, Game>();
-								masterGames.forEach(g => {
-									const sysObj = s.find(sys => sys.name.toLowerCase() === g.system.toLowerCase()) || selectedSystem;
-									if (sysObj) {
-										const absPath = resolveAbsolutePath(sysObj.path, g.path);
-										gameMap.set(absPath, g);
-									}
-								});
-								allChildGames.forEach((childGames, childIdx) => {
-									const childSys = childSystems[childIdx];
-									childGames.forEach(g => {
-										const absPath = resolveAbsolutePath(childSys.path, g.path);
-										gameMap.set(absPath, g);
-									});
-								});
-								const merged = Array.from(gameMap.values());
-								merged.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
-								setGames(merged);
-								setIsUpdatingGamelist(false);
-								addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
-							});
-						} else {
-							setGames(masterGames);
-							setIsUpdatingGamelist(false);
-							addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
-						}
-					});
-				} else {
-					setIsUpdatingGamelist(false);
-					addNotification('GAMELIST ATUALIZADA', 'success', 'scraper');
-				}
-			}).catch(err => {
-				console.error('Failed to load libraries during in-place reload:', err);
-				setIsUpdatingGamelist(false);
-				addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
-			});
-		}).catch(err => {
-			console.error('Failed to preload during in-place reload:', err);
-			setIsUpdatingGamelist(false);
-			addNotification('ERRO AO ATUALIZAR GAMELIST', 'warning', 'general');
-		});
-	}, [selectedSystem, addNotification]);
 
 	// Listen for systems updated event (e.g. from windows_installers)
 	useEffect(() => {
@@ -1991,7 +2010,7 @@ function App() {
 	const executeShortPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showLaunchErrorModal || isSearchOpen;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showLaunchErrorModal || isSearchOpen || isNetplayLobbyOpen;
 		if (isOverlayActive) {
 			if (key === 'x') {
 				dispatchKeyEvent('Enter');
@@ -2059,6 +2078,7 @@ function App() {
 		isHardwareSelectOpen,
 		showLaunchErrorModal,
 		isSearchOpen,
+		isNetplayLobbyOpen,
 		selectedSystem,
 		systemIndex,
 		filteredSystems,
@@ -2075,7 +2095,7 @@ function App() {
 	const executeLongPressAction = useCallback((key: string) => {
 		if (isInitializing || isLaunching) return;
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showLaunchErrorModal || isSearchOpen;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || showLaunchErrorModal || isSearchOpen || isNetplayLobbyOpen;
 		if (isOverlayActive) return;
 
 		if (selectedSystem && currentGame) {
@@ -2098,6 +2118,7 @@ function App() {
 		isHardwareSelectOpen,
 		showLaunchErrorModal,
 		isSearchOpen,
+		isNetplayLobbyOpen,
 		selectedSystem,
 		currentGame,
 		toggleFavoriteGame,
@@ -2146,7 +2167,7 @@ function App() {
 			return;
 		}
 
-		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || isSearchOpen;
+		const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || isSearchOpen || isNetplayLobbyOpen;
 
 		// Navigation keys handled immediately on keydown
 		if (key === 'arrowup' || key === 'arrowdown' || key === 'arrowleft' || key === 'arrowright') {
@@ -2323,6 +2344,7 @@ function App() {
 		isHardwareSelectOpen,
 		showLaunchErrorModal,
 		isSearchOpen,
+		isNetplayLobbyOpen,
 		selectedSystem,
 		systemIndex,
 		filteredSystems,
@@ -2365,14 +2387,14 @@ function App() {
 			delete wasOverlayActiveOnKeyDownRef.current[key];
 
 			if (!longPressHandledRef.current[key]) {
-				const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || isSearchOpen;
+				const isOverlayActive = isMenuOpen || isGameOptionsOpen || isSaveStateManagerOpen || isHardwareSelectOpen || isSearchOpen || isNetplayLobbyOpen;
 				if (wasOverlayActive && !isOverlayActive) {
 					return;
 				}
 				executeShortPressAction(key);
 			}
 		}
-	}, [executeShortPressAction, isMenuOpen, isGameOptionsOpen, isSaveStateManagerOpen, isHardwareSelectOpen, isSearchOpen]);
+	}, [executeShortPressAction, isMenuOpen, isGameOptionsOpen, isSaveStateManagerOpen, isHardwareSelectOpen, isSearchOpen, isNetplayLobbyOpen]);
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
@@ -2557,11 +2579,12 @@ function App() {
 				['--theme-color' as any]: themeData['options:colors'] || themeData['colors'] || '#3b82f6',
 			}}
 		>
-			<WebThemeRenderer
-				htmlContent={selectedSystem ? theme.views.gamelist : theme.views.system}
-				data={themeData}
-				themePath={theme.path}
-			/>
+			<Theme appearance="dark" accentColor={mapHexToRadixColor(themeData['options:colors'] || themeData['colors'])} grayColor="slate" panelBackground="translucent">
+				<WebThemeRenderer
+					htmlContent={selectedSystem ? theme.views.gamelist : theme.views.system}
+					data={themeData}
+					themePath={theme.path}
+				/>
 			<Menu
 				isOpen={isMenuOpen}
 				settings={settings}
@@ -2644,31 +2667,46 @@ function App() {
 			)}
 
 			{/* Notifications Layer (General and Controller - Center Top) */}
-			<div className="riescade-notifications-container">
+			<Toast.Provider swipeDirection="right">
 				{notifications
 					.filter((n) => n.category !== 'scraper')
 					.map((n) => (
-						<div 
-							key={n.id} 
+						<Toast.Root 
+							key={n.id}
+							open={true}
 							className={`riescade-notification ${n.type} ${n.category === 'controller' ? 'controller' : ''} ${n.category === 'controller' && n.type === 'success' ? 'connected' : ''}`}
 						>
-							{getNotificationIcon(n.category, n.type)}
-							<span className="riescade-notification-message">{n.message}</span>
-						</div>
+							<Toast.Description asChild>
+								<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+									{getNotificationIcon(n.category, n.type)}
+									<span className="riescade-notification-message">{n.message}</span>
+								</div>
+							</Toast.Description>
+						</Toast.Root>
 					))}
-			</div>
+				<Toast.Viewport className="riescade-notifications-container" />
+			</Toast.Provider>
 
 			{/* Notifications Layer (Scraper - Right Top) */}
-			<div className="riescade-notifications-container scraper-notifications">
+			<Toast.Provider swipeDirection="right">
 				{notifications
 					.filter((n) => n.category === 'scraper')
 					.map((n) => (
-						<div key={n.id} className={`riescade-notification ${n.type}`}>
-							{getNotificationIcon(n.category, n.type)}
-							<span className="riescade-notification-message">{n.message}</span>
-						</div>
+						<Toast.Root 
+							key={n.id}
+							open={true}
+							className={`riescade-notification ${n.type}`}
+						>
+							<Toast.Description asChild>
+								<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+									{getNotificationIcon(n.category, n.type)}
+									<span className="riescade-notification-message">{n.message}</span>
+								</div>
+							</Toast.Description>
+						</Toast.Root>
 					))}
-			</div>
+				<Toast.Viewport className="riescade-notifications-container scraper-notifications" />
+			</Toast.Provider>
 
 			{/* Song Title Notification Overlay */}
 			<div className={`riescade-music-title-overlay ${showMusicTitle && currentTrackName ? 'visible' : ''}`}>
@@ -2881,6 +2919,7 @@ function App() {
 				<span style={{ fontFamily: '"Inter Tight"', fontWeight: 600 }}>preload Inter Tight 600</span>
 				<span style={{ fontFamily: '"Roboto Condensed"', fontWeight: 400 }}>preload Roboto Condensed 400</span>
 			</div>
+			</Theme>
 		</div>
 
 			{/* Splash screen overlay — rendered on top of app-root so the system view can

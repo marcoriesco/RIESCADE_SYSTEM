@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { Dialog, Box, Flex, Heading, Text, Button, Badge } from '@radix-ui/themes'
 
 interface NetplayRoom {
   isLan: boolean
@@ -76,7 +77,8 @@ export const NetplayLobbyOverlay: React.FC<NetplayLobbyOverlayProps> = ({
   const groupedRooms = [
     ...lanRooms,
     ...availableRooms,
-    ...differentRomRooms
+    ...differentRomRooms,
+    ...unavailableRooms
   ]
 
   // Handle keyboard/controller events
@@ -122,16 +124,18 @@ export const NetplayLobbyOverlay: React.FC<NetplayLobbyOverlayProps> = ({
           e.preventDefault()
           e.stopPropagation()
           const currentRoom = groupedRooms[selectedIndex]
-          if (currentRoom && currentRoom.localGame) {
-            onLaunchRoom(currentRoom, 'client')
+          const isRoomSelectable = currentRoom && !!currentRoom.localGame && currentRoom.localGame.matchStatus !== 'UNAVAILABLE'
+          if (isRoomSelectable) {
+            onLaunchRoom(currentRoom!, 'client')
           }
         } else if (key === 'q') {
           // North button for spectating
           e.preventDefault()
           e.stopPropagation()
           const currentRoom = groupedRooms[selectedIndex]
-          if (currentRoom && currentRoom.localGame) {
-            onLaunchRoom(currentRoom, 'spectator')
+          const isRoomSelectable = currentRoom && !!currentRoom.localGame && currentRoom.localGame.matchStatus !== 'UNAVAILABLE'
+          if (isRoomSelectable) {
+            onLaunchRoom(currentRoom!, 'spectator')
           }
         }
       } else {
@@ -170,19 +174,9 @@ export const NetplayLobbyOverlay: React.FC<NetplayLobbyOverlayProps> = ({
   // Center selected item in scroll container
   useEffect(() => {
     if (listContainerRef.current) {
-      const activeItem = listContainerRef.current.querySelector('.netplay-lobby-row.active') as HTMLElement
+      const activeItem = listContainerRef.current.querySelector('.riescade-menu-item.selected') as HTMLElement
       if (activeItem) {
-        const container = listContainerRef.current
-        const itemTop = activeItem.offsetTop
-        const itemHeight = activeItem.offsetHeight
-        const containerHeight = container.clientHeight
-        const scrollTop = container.scrollTop
-
-        if (itemTop < scrollTop) {
-          container.scrollTop = itemTop
-        } else if (itemTop + itemHeight > scrollTop + containerHeight) {
-          container.scrollTop = itemTop + itemHeight - containerHeight
-        }
+        activeItem.scrollIntoView({ block: 'nearest', behavior: 'instant' })
       }
     }
   }, [selectedIndex, focusedPart])
@@ -191,159 +185,148 @@ export const NetplayLobbyOverlay: React.FC<NetplayLobbyOverlayProps> = ({
 
   // Helpers to get header offsets for sections
   const getSectionHeaderIndex = (type: 'lan' | 'available' | 'different' | 'unavailable') => {
-    if (type === 'lan') return 0
-    if (type === 'available') return lanRooms.length
-    if (type === 'different') return lanRooms.length + availableRooms.length
-    return lanRooms.length + availableRooms.length + differentRomRooms.length
+    if (type === 'lan') return lanRooms.length > 0 ? 0 : -1
+    if (type === 'available') return availableRooms.length > 0 ? lanRooms.length : -1
+    if (type === 'different') return differentRomRooms.length > 0 ? lanRooms.length + availableRooms.length : -1
+    if (type === 'unavailable') return unavailableRooms.length > 0 ? lanRooms.length + availableRooms.length + differentRomRooms.length : -1
+    return -1
   }
 
   return (
-    <div className="netplay-lobby-overlay">
-      <div className="netplay-lobby-panel">
-        <div className="netplay-lobby-header">
-          <h2 className="netplay-lobby-title">{t('NETPLAY LOBBY')}</h2>
-          <div className="netplay-lobby-subtitle">
+    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <Dialog.Content 
+        size="4" 
+        className="riescade-menu riescade-menu-netplay"
+        style={{
+          maxWidth: '800px',
+          height: '80vh',
+          maxHeight: '700px'
+        }}
+      >
+        <Flex className="riescade-menu-header">
+          <Heading size="4" className="riescade-menu-title">
+            {t('NETPLAY LOBBY')}
+          </Heading>
+          <Text size="2" color="gray" mt="1">
             {loading ? t('SEARCHING NETPLAY GAMES...') : t('Select a game lobby to join')}
-          </div>
-        </div>
+          </Text>
+        </Flex>
 
         {loading ? (
-          <div className="netplay-lobby-loading">
-            <div className="netplay-spinner" />
-            <div style={{ fontSize: '14px', color: '#9ca3af', letterSpacing: '0.5px' }}>
-              {t('SEARCHING NETPLAY GAMES...')}
-            </div>
-          </div>
+          <Flex direction="column" align="center" justify="center" p="6" gap="3" style={{ flexGrow: 1 }}>
+            <Box className="netplay-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+            <Text size="2" color="gray">{t('SEARCHING NETPLAY GAMES...')}</Text>
+          </Flex>
         ) : groupedRooms.length === 0 ? (
-          <div className="netplay-lobby-empty">
-            {t('NO ACTIVE NETPLAY SESSIONS FOUND')}
-          </div>
+          <Flex align="center" justify="center" p="6" style={{ flexGrow: 1 }}>
+            <Text size="2" color="gray" weight="bold">{t('NO ACTIVE NETPLAY SESSIONS FOUND')}</Text>
+          </Flex>
         ) : (
-          <div className="netplay-lobby-list" ref={listContainerRef}>
-            {lanRooms.length > 0 ? (
-              <div className="netplay-lobby-section-header">{t('LAN GAMES')}</div>
-            ) : availableRooms.length > 0 ? (
-              <div className="netplay-lobby-section-header">{t('ONLINE GAMES')}</div>
-            ) : differentRomRooms.length > 0 ? (
-              <div className="netplay-lobby-section-header">{t('DIFFERENT ROM')}</div>
-            ) : null}
-            {groupedRooms.map((room, idx) => {
-              const isSectionStart =
-                (idx === getSectionHeaderIndex('lan') && lanRooms.length > 0) ||
-                (idx === getSectionHeaderIndex('available') && availableRooms.length > 0) ||
-                (idx === getSectionHeaderIndex('different') && differentRomRooms.length > 0) ||
-                (idx === getSectionHeaderIndex('unavailable') && unavailableRooms.length > 0)
+          <Box className="riescade-menu-content custom-scrollbar" ref={listContainerRef}>
+            <Flex direction="column" gap="2">
+              {groupedRooms.map((room, idx) => {
+                const isSectionStart =
+                  idx === getSectionHeaderIndex('lan') ||
+                  idx === getSectionHeaderIndex('available') ||
+                  idx === getSectionHeaderIndex('different') ||
+                  idx === getSectionHeaderIndex('unavailable')
 
-              let sectionTitle = ''
-              if (isSectionStart) {
-                if (idx === getSectionHeaderIndex('lan')) sectionTitle = t('LAN GAMES')
-                else if (idx === getSectionHeaderIndex('available')) sectionTitle = t('ONLINE GAMES')
-                else if (idx === getSectionHeaderIndex('different')) sectionTitle = t('DIFFERENT ROM')
-                else if (idx === getSectionHeaderIndex('unavailable')) sectionTitle = t('UNAVAILABLE')
-              }
+                let sectionTitle = ''
+                if (isSectionStart) {
+                  if (idx === getSectionHeaderIndex('lan')) sectionTitle = t('LAN GAMES')
+                  else if (idx === getSectionHeaderIndex('available')) sectionTitle = t('ONLINE GAMES')
+                  else if (idx === getSectionHeaderIndex('different')) sectionTitle = t('DIFFERENT ROM')
+                  else if (idx === getSectionHeaderIndex('unavailable')) sectionTitle = t('UNAVAILABLE')
+                }
 
-              const isRowActive = focusedPart === 'list' && selectedIndex === idx
-              const matchStatus = room.localGame?.matchStatus || 'UNAVAILABLE'
-              const isRoomSelectable = !!room.localGame
+                const isRowActive = focusedPart === 'list' && selectedIndex === idx
+                const matchStatus = room.localGame?.matchStatus || 'UNAVAILABLE'
+                const isRoomSelectable = !!room.localGame && room.localGame.matchStatus !== 'UNAVAILABLE'
+                return (
+                  <React.Fragment key={`${room.ip}-${room.port}-${room.username}-${idx}`}>
+                    {isSectionStart && (
+                      <Text 
+                        size="1" 
+                        weight="bold" 
+                        className="riescade-menu-group"
+                      >
+                        {sectionTitle}
+                      </Text>
+                    )}
+                    <Box
+                      onClick={() => {
+                        if (isRoomSelectable) {
+                          setSelectedIndex(idx)
+                          setFocusedPart('list')
+                          onLaunchRoom(room, 'client')
+                        }
+                      }}
+                      className={`riescade-menu-item${isRowActive ? ' selected' : ''}`}
+                      style={{
+                        cursor: isRoomSelectable ? 'pointer' : 'not-allowed',
+                        opacity: isRoomSelectable ? 1 : 0.4,
+                      }}
+                    >
+                      <Flex align="center" gap="3" style={{ flexGrow: 1, overflow: 'hidden' }}>
+                        <Box style={{ background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                          {room.localGame?.system?.substring(0, 3).toUpperCase() || 'NET'}
+                        </Box>
+                        <Flex direction="column" align="start" gap="1" style={{ overflow: 'hidden' }}>
+                          <Text weight="bold" size="2" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '280px' }}>
+                            {room.game_name}
+                            {room.has_password && <span style={{ marginLeft: '8px' }}>🔒</span>}
+                          </Text>
+                          <Flex align="center" gap="2" style={{ fontSize: '0.75rem', opacity: isRowActive ? 0.9 : 0.6 }}>
+                            {room.isLan && <Badge color="green">LAN</Badge>}
+                            <Text>👤 {room.username}</Text>
+                            {room.country && room.country !== 'lan' && <Text>🌐 {room.country.toUpperCase()}</Text>}
+                            <Text>💻 {room.frontend}</Text>
+                          </Flex>
+                        </Flex>
+                      </Flex>
 
-              return (
-                <React.Fragment key={`${room.ip}-${room.port}-${room.username}-${idx}`}>
-                  {isSectionStart && idx > 0 && (
-                    <div className="netplay-lobby-section-header">{sectionTitle}</div>
-                  )}
-                  <div
-                    className={`netplay-lobby-row ${isRowActive ? 'active' : ''} ${
-                      !isRoomSelectable ? 'unavailable' : ''
-                    }`}
-                    onClick={() => {
-                      if (isRoomSelectable) {
-                        setSelectedIndex(idx)
-                        setFocusedPart('list')
-                        onLaunchRoom(room, 'client')
-                      }
-                    }}
-                  >
-                    <div className="netplay-row-left">
-                      <div className="netplay-system-icon">
-                        {room.localGame?.system?.substring(0, 3).toUpperCase() || 'NET'}
-                      </div>
-                      <div className="netplay-game-details">
-                        <div className="netplay-game-name">
-                          {room.game_name}
-                          {room.has_password && <span style={{ marginLeft: '8px', fontSize: '12px' }}>🔒</span>}
-                        </div>
-                        <div className="netplay-host-info">
-                          {room.isLan && <span className="netplay-badge-lan">LAN</span>}
-                          <span>👤 {room.username}</span>
-                          {room.country && room.country !== 'lan' && (
-                            <span>🌐 {room.country.toUpperCase()}</span>
-                          )}
-                          <span>💻 {room.frontend}</span>
-                        </div>
-                      </div>
-                    </div>
+                      <Flex align="center" gap="3" style={{ flexShrink: 0 }}>
+                        <Flex direction="column" align="end" gap="1">
+                          <Text size="1" weight="bold">{room.core_name}</Text>
+                          <Text size="1" style={{ opacity: 0.6 }}>RA {room.retroarch_version}</Text>
+                        </Flex>
 
-                    <div className="netplay-row-right">
-                      <div className="netplay-core-info">
-                        <div className="core-name">{room.core_name}</div>
-                        <div className="ra-version">
-                          RA {room.retroarch_version}
-                        </div>
-                      </div>
-
-                      {matchStatus === 'SAME_ROM' && (
-                        <div className="netplay-status-badge same">{t('SAME ROM')}</div>
-                      )}
-                      {matchStatus === 'DIFFERENT_ROM' && (
-                        <div className="netplay-status-badge diff">{t('DIFFERENT ROM')}</div>
-                      )}
-                      {matchStatus === 'UNAVAILABLE' && (
-                        <div className="netplay-status-badge missing">{t('UNAVAILABLE')}</div>
-                      )}
-                    </div>
-                  </div>
-                </React.Fragment>
-              )
-            })}
-          </div>
+                        <Badge 
+                          color={matchStatus === 'SAME_ROM' ? 'green' : matchStatus === 'DIFFERENT_ROM' ? 'yellow' : 'red'}
+                          variant="solid"
+                        >
+                          {matchStatus === 'SAME_ROM' && t('SAME ROM')}
+                          {matchStatus === 'DIFFERENT_ROM' && t('DIFFERENT ROM')}
+                          {matchStatus === 'UNAVAILABLE' && t('UNAVAILABLE')}
+                        </Badge>
+                      </Flex>
+                    </Box>
+                  </React.Fragment>
+                )
+              })}
+            </Flex>
+          </Box>
         )}
 
-        <div className="netplay-lobby-footer">
-          <div className="netplay-lobby-help">
-            <div className="netplay-help-item">
-              <span className="netplay-help-btn">X / Enter</span> {t('JOIN GAME')}
-            </div>
-            <div className="netplay-help-item">
-              <span className="netplay-help-btn">Q</span> {t('WATCH GAME')}
-            </div>
-            <div className="netplay-help-item">
-              <span className="netplay-help-btn">S</span> {t('REFRESH')}
-            </div>
-            <div className="netplay-help-item">
-              <span className="netplay-help-btn">O / ESC</span> {t('CLOSE')}
-            </div>
-          </div>
-
-          <div className="netplay-lobby-buttons">
-            <button
-              className={`riescade-button ${
-                focusedPart === 'buttons' && buttonIndex === 0 ? 'active' : ''
-              }`}
+        <Flex className="riescade-menu-footer" justify="between" align="center">
+          <Flex gap="3">
+            <Button
+              variant={focusedPart === 'buttons' && buttonIndex === 0 ? 'solid' : 'soft'}
+              color={focusedPart === 'buttons' && buttonIndex === 0 ? undefined : 'gray'}
               onClick={fetchRooms}
             >
               {t('REFRESH')}
-            </button>
-            <button
-              className={`riescade-button ${
-                focusedPart === 'buttons' && buttonIndex === 1 ? 'active' : ''
-              }`}
+            </Button>
+            <Button
+              variant={focusedPart === 'buttons' && buttonIndex === 1 ? 'solid' : 'soft'}
+              color={focusedPart === 'buttons' && buttonIndex === 1 ? undefined : 'gray'}
               onClick={onClose}
             >
               {t('CLOSE')}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Button>
+          </Flex>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

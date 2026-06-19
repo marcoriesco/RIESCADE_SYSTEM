@@ -4,13 +4,7 @@
 @use "./components";
 @use "./menu";
 @use "./overlays";
-@use "./save_state";
-@use "./hardware_select";
-@use "./game_options";
-@use "./input_config";
-@use "./netplay";
 @use "./themes";
-@use "./search";
 
 
 $theme-color: #9f0043;
@@ -29,11 +23,14 @@ $border-default: 1px solid #111;
   --font-menu: #{$font-menu};
   --font-shadow: #{$font-shadow};
   --border-default: #{$border-default};
+
+  // RADIX
+  --accent-indicator: #{$theme-color};
 }
 
 body {
   background-color: var(--theme-color);
-  font-family: var(--font-main);
+  font-family: var(--font-main) !important;
   font-optical-sizing: auto;
   margin: 0;
   padding: 0;

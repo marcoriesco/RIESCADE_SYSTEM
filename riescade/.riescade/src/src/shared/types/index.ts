@@ -60,4 +60,5 @@ export interface Game {
   wheel?: string
   boxart?: string
   cartridge?: string
+  crc32?: string
 }

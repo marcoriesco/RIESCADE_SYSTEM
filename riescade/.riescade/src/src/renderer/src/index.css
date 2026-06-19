@@ -51,3 +51,75 @@ body {
   width: 100%;
   height: 100vh;
 }
+
+/* Radix Themes Color & Font Overrides */
+.radix-themes {
+  /* Override Radix's font variables (used internally by all Radix components) */
+  --default-font-family: 'Roboto Condensed', 'Inter Tight', system-ui, sans-serif;
+  --heading-font-family: 'Roboto Condensed', 'Inter Tight', system-ui, sans-serif;
+  --strong-font-family: 'Roboto Condensed', 'Inter Tight', system-ui, sans-serif;
+  --em-font-family: 'Roboto Condensed', 'Inter Tight', system-ui, sans-serif;
+  --quote-font-family: 'Roboto Condensed', 'Inter Tight', system-ui, sans-serif;
+  font-family: 'Inter Tight', system-ui, sans-serif !important;
+
+  /* Theme accent color overrides */
+  --accent-9: var(--theme-color) !important;
+  --accent-10: var(--theme-color) !important;
+  --accent-11: var(--theme-color) !important;
+  --accent-a9: var(--theme-color) !important;
+  --accent-a10: var(--theme-color) !important;
+  --accent-track: rgba(255, 255, 255, 0.1) !important;
+  --focus-8: var(--theme-color) !important;
+}
+
+/* Force font on all Radix component classes that override font-family internally */
+.radix-themes .rt-Text,
+.radix-themes .rt-Heading,
+.radix-themes .rt-Button,
+.radix-themes .rt-SelectTrigger,
+.radix-themes .rt-SelectContent,
+.radix-themes .rt-TabsTrigger,
+.radix-themes .rt-DialogContent,
+.radix-themes .rt-ToastRoot,
+.radix-themes .rt-TextFieldInput,
+.radix-themes .rt-CheckboxButton,
+.radix-themes .rt-SwitchButton,
+.radix-themes .rt-SliderRoot,
+.radix-themes .rt-Badge,
+.radix-themes .rt-Code,
+.radix-themes .rt-Link,
+.radix-themes .rt-Em,
+.radix-themes .rt-Strong,
+.radix-themes .rt-Quote,
+.radix-themes .rt-Blockquote,
+.radix-themes [class^="rt-"] {
+  font-family: 'Roboto Condensed', 'Inter Tight', system-ui, sans-serif !important;
+}
+
+/* Ensure backdrop blur on Radix dialogs matches RIESCADE design */
+.rt-DialogOverlay {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+.rt-DialogContent {
+  background-color: rgba(10, 11, 16, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid #222 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Scrollbar integration */
+.rt-ScrollAreaViewport::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.rt-ScrollAreaViewport::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+.rt-ScrollAreaViewport::-webkit-scrollbar-thumb {
+  background: var(--theme-color);
+  border-radius: 3px;
+}

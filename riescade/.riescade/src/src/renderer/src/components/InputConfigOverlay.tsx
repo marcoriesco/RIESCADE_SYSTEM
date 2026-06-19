@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Dialog, Flex, Heading, Text, Button, Box } from '@radix-ui/themes'
 
 import buttonsSouthIcon from '../resources/buttons_south.svg'
 import buttonsEastIcon from '../resources/buttons_east.svg'
@@ -102,10 +103,11 @@ const formatMappingValue = (mapping: { type: string, id: number, value: number }
 }
 
 interface Props {
+  isOpen: boolean
   onClose: () => void
 }
 
-export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
+export const InputConfigOverlay: React.FC<Props> = ({ isOpen, onClose }) => {
   const [phase, setPhase] = useState<'warning' | 'detect' | 'map' | 'done'>('warning')
   const [device, setDevice] = useState<{ id: string, index: number, name: string } | null>(null)
   const [numGamepads, setNumGamepads] = useState(0)
@@ -461,8 +463,8 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
         }
       }
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
   }, [onClose])
 
   // Handle a successfully validated input mapping
@@ -602,163 +604,182 @@ export const InputConfigOverlay: React.FC<Props> = ({ onClose }) => {
   }
 
   return (
-    <div className="riescade-overlay input-config-overlay visible">
-      
-      {/* PHASE 1: WARNING DIALOG REPLICA (Screenshot 1) */}
-      {phase === 'warning' && (
-        <div className="input-config-warning-container">
-          <div className="input-config-warning-header">
-            {/* Info Circle Icon */}
-            <div className="input-config-warning-icon">
-              i
-            </div>
-            
-            {/* Warning Text */}
-            <div className="input-config-warning-text">
-              YOU ARE GOING TO MAP A CONTROLLER. MAP BASED ON THE BUTTON'S POSITION, NOT ITS PHYSICAL LABEL. IF YOU DO NOT HAVE A SPECIAL BUTTON FOR HOTKEY, USE THE SELECT BUTTON. SKIP ALL BUTTONS/STICKS YOU DO NOT HAVE BY HOLDING ANY BUTTON. PRESS THE SOUTH BUTTON TO CONFIRM WHEN DONE.
-            </div>
-          </div>
-
-          {/* OK and CANCEL Action Buttons */}
-          <div className="input-config-warning-buttons">
-            <button
-              className={`riescade-button ${warningSelection === 'ok' ? 'active selected' : ''}`}
-              onClick={() => setPhaseWithRef('detect')}
-            >
-              OK
-            </button>
-            <button
-              className={`riescade-button ${warningSelection === 'cancel' ? 'active selected' : ''}`}
-              onClick={onClose}
-            >
-              CANCEL
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* PHASE 2: DETECTION OVERLAY REPLICA (Screenshots 2 & 3) */}
-      {phase === 'detect' && (
-        <div className="input-config-detect-container">
-          {/* Header titles */}
-          <h1 className="input-config-detect-title">
-            CONFIGURE INPUT
-          </h1>
-          <h2 className="input-config-detect-subtitle">
-            {numGamepads > 0 ? `${numGamepads} GAMEPAD${numGamepads > 1 ? 'S' : ''} DETECTED` : 'NO GAMEPADS DETECTED'}
-          </h2>
-
-          {/* Prompts */}
-          <div className="input-config-detect-prompts">
-            HOLD A BUTTON ON YOUR DEVICE TO CONFIGURE IT.<br />
-            PRESS ESC OR A HOTKEY TO CANCEL.
-          </div>
-
-          {/* Gamepad Name display upon hold (Screenshot 3) */}
-          <div className="input-config-detect-device">
-            {device ? device.name.split(' (')[0].toUpperCase() : ''}
-          </div>
-        </div>
-      )}
-
-      {/* PHASE 3 & 4: CONFIGURE/LIST SCREEN (Screenshots 4 & 5) */}
-      {(phase === 'map' || phase === 'done') && device && (
-        <div className="input-config-panel">
-          
-          {/* Top Title Headers */}
-          <h1 className="input-config-panel-title">
-            {phase === 'done' ? 'CONFIGURATION' : 'CONFIGURING'}
-          </h1>
-          <h2 className="input-config-panel-subtitle">
-            GAMEPAD {device.index + 1}
-          </h2>
-          <h3
-            className="input-config-panel-hint"
-            style={{
-              visibility: phase === 'done' ? 'hidden' : 'visible'
-            }}
-          >
-            HOLD ANY BUTTON TO SKIP
-          </h3>
-
-          {/* Hold to skip visual progress bar */}
-          {phase === 'map' && skipProgress > 0 && (
-            <div className="input-config-skip-track">
-              <div
-                className="input-config-skip-fill"
-                style={{
-                  width: `${skipProgress}%`
-                }}
-              />
-            </div>
-          )}
-
-          {/* Scrollable button configuration list container */}
-          <div 
-            ref={listContainerRef}
-            className="input-config-scroll-list custom-scrollbar"
-          >
-            {MAPPING_ORDER.map((item, idx) => {
-              const isActive = phase === 'map' && idx === mappingIndex
-              const isTaken = idx === alreadyTakenIndex
-              const isMapped = mappings[item.id] !== undefined
-              
-              return (
-                <div
-                  key={item.id}
-                  ref={isActive ? activeRowRef : null}
-                  className={`input-config-row ${isActive ? 'active' : ''}`}
+    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <Dialog.Content 
+        size="3" 
+        className="riescade-menu"
+        style={{
+          maxWidth: '600px'
+        }}
+      >
+        {/* PHASE 1: WARNING DIALOG */}
+        {phase === 'warning' && (
+          <>
+            <Box className="riescade-menu-content">
+              <Flex align="center" gap="3" p="3" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '6px', borderLeft: '4px solid var(--theme-color)' }}>
+                <Box 
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: 'var(--theme-color)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    flexShrink: 0
+                  }}
                 >
-                  {/* Left Label & SVG Icon */}
-                  <div className="input-config-row-label-section">
-                    {renderIcon(item.icon, isActive)}
-                    <span className="input-config-row-label">{item.label}</span>
-                  </div>
+                  i
+                </Box>
+                <Text size="2" style={{ lineHeight: '1.4', textAlign: 'left' }}>
+                  YOU ARE GOING TO MAP A CONTROLLER. MAP BASED ON THE BUTTON'S POSITION, NOT ITS PHYSICAL LABEL. IF YOU DO NOT HAVE A SPECIAL BUTTON FOR HOTKEY, USE THE SELECT BUTTON. SKIP ALL BUTTONS/STICKS YOU DO NOT HAVE BY HOLDING ANY BUTTON. PRESS THE SOUTH BUTTON TO CONFIRM WHEN DONE.
+                </Text>
+              </Flex>
+            </Box>
 
-                  {/* Right Status / Mapped key */}
-                  <div className="input-config-row-value">
-                    {isTaken ? (
-                      <span className="status-text taken">ALREADY TAKEN</span>
-                    ) : isActive ? (
-                      <span className="status-text blink">PRESS ANYTHING</span>
-                    ) : isMapped ? (
-                      <span>
-                        {formatMappingValue(mappings[item.id])}
-                      </span>
-                    ) : (
-                      <span className="status-text undefined">-NOT DEFINED-</span>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+            <Flex className="riescade-menu-footer">
+              <Button
+                variant={warningSelection === 'ok' ? 'solid' : 'soft'}
+                color={warningSelection === 'ok' ? undefined : 'gray'}
+                onClick={() => setPhaseWithRef('detect')}
+                style={{ flex: 1 }}
+              >
+                OK
+              </Button>
+              <Button
+                variant={warningSelection === 'cancel' ? 'solid' : 'soft'}
+                color={warningSelection === 'cancel' ? undefined : 'gray'}
+                onClick={onClose}
+                style={{ flex: 1 }}
+              >
+                CANCEL
+              </Button>
+            </Flex>
+          </>
+        )}
 
-          {/* PHASE 4: Bottom confirmation OK & CANCEL dialog */}
-          <div
-            className="input-config-done-actions"
-            style={{
-              opacity: phase === 'done' ? 1 : 0.4,
-              pointerEvents: phase === 'done' ? 'auto' : 'none'
-            }}
-          >
-            <button
-              className={`riescade-button ${doneSelection === 'ok' && phase === 'done' ? 'active selected' : ''}`}
-              onClick={saveAndExit}
-            >
-              OK
-            </button>
-            <button
-              className={`riescade-button ${doneSelection === 'cancel' && phase === 'done' ? 'active selected' : ''}`}
-              onClick={onClose}
-            >
-              CANCEL
-            </button>
-          </div>
+        {/* PHASE 2: DETECTION OVERLAY */}
+        {phase === 'detect' && (
+          <>
+            <Flex className="riescade-menu-header">
+              <Heading size="4" className="riescade-menu-title">
+                CONFIGURE INPUT
+              </Heading>
+              <Heading size="3" color="gray" mt="1">
+                {numGamepads > 0 ? `${numGamepads} GAMEPAD${numGamepads > 1 ? 'S' : ''} DETECTED` : 'NO GAMEPADS DETECTED'}
+              </Heading>
+            </Flex>
 
-        </div>
-      )}
+            <Box className="riescade-menu-content" style={{ textAlign: 'center' }}>
+              <Text size="2" style={{ opacity: 0.8 }}>
+                HOLD A BUTTON ON YOUR DEVICE TO CONFIGURE IT.<br />
+                PRESS ESC OR A HOTKEY TO CANCEL.
+              </Text>
 
-    </div>
+              {device && (
+                <Box p="3" mt="4" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '4px', width: '100%' }}>
+                  <Text weight="bold" style={{ color: 'var(--theme-color)' }}>
+                    {device.name.split(' (')[0].toUpperCase()}
+                  </Text>
+                </Box>
+              )}
+            </Box>
+          </>
+        )}
+
+        {/* PHASE 3 & 4: CONFIGURE/LIST SCREEN */}
+        {(phase === 'map' || phase === 'done') && device && (
+          <Flex direction="column" gap="3" style={{ height: '70vh', maxHeight: '600px' }}>
+            <Flex className="riescade-menu-header">
+              <Heading size="4" className="riescade-menu-title">
+                {phase === 'done' ? 'CONFIGURATION' : 'CONFIGURING'}
+              </Heading>
+              <Text size="2" color="gray" weight="bold" mt="1">
+                GAMEPAD {device.index + 1}
+              </Text>
+              {phase !== 'done' && (
+                <Text size="1" color="yellow" weight="bold" mt="1">
+                  HOLD ANY BUTTON TO SKIP
+                </Text>
+              )}
+            </Flex>
+
+            {/* Skip Progress Bar */}
+            {phase === 'map' && skipProgress > 0 && (
+              <Box mx="4" style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                <Box style={{ height: '100%', background: 'var(--theme-color)', width: `${skipProgress}%`, transition: 'width 0.1s linear' }} />
+              </Box>
+            )}
+
+            {/* Scrollable List */}
+            <Box className="riescade-menu-content custom-scrollbar" ref={listContainerRef}>
+              <Flex direction="column" gap="1">
+                {MAPPING_ORDER.map((item, idx) => {
+                  const isActive = phase === 'map' && idx === mappingIndex
+                  const isTaken = idx === alreadyTakenIndex
+                  const isMapped = mappings[item.id] !== undefined
+                  
+                  return (
+                    <Flex
+                      key={item.id}
+                      ref={isActive ? activeRowRef : null}
+                      align="center"
+                      justify="between"
+                      p="2"
+                      style={{
+                        backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                        borderLeft: isActive ? '3px solid var(--theme-color)' : '3px solid transparent',
+                        borderRadius: '4px'
+                      }}
+                    >
+                      <Flex align="center" gap="3">
+                        {renderIcon(item.icon, isActive)}
+                        <Text weight={isActive ? "bold" : "regular"} size="2">{item.label}</Text>
+                      </Flex>
+
+                      <Box>
+                        {isTaken ? (
+                          <Text color="red" size="2" weight="bold">ALREADY TAKEN</Text>
+                        ) : isActive ? (
+                          <Text color="yellow" size="2" weight="bold" style={{ animation: 'blink 1s infinite' }}>PRESS ANYTHING</Text>
+                        ) : isMapped ? (
+                          <Text size="2" weight="bold">{formatMappingValue(mappings[item.id])}</Text>
+                        ) : (
+                          <Text color="gray" size="2">-NOT DEFINED-</Text>
+                        )}
+                      </Box>
+                    </Flex>
+                  )
+                })}
+              </Flex>
+            </Box>
+
+            {/* Phase 4 Bottom Buttons */}
+            <Flex className="riescade-menu-footer" style={{ opacity: phase === 'done' ? 1 : 0.4 }}>
+              <Button
+                variant={doneSelection === 'ok' && phase === 'done' ? 'solid' : 'soft'}
+                color={doneSelection === 'ok' && phase === 'done' ? undefined : 'gray'}
+                disabled={phase !== 'done'}
+                onClick={saveAndExit}
+                style={{ flex: 1 }}
+              >
+                OK
+              </Button>
+              <Button
+                variant={doneSelection === 'cancel' && phase === 'done' ? 'solid' : 'soft'}
+                color={doneSelection === 'cancel' && phase === 'done' ? undefined : 'gray'}
+                disabled={phase !== 'done'}
+                onClick={onClose}
+                style={{ flex: 1 }}
+              >
+                CANCEL
+              </Button>
+            </Flex>
+          </Flex>
+        )}
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

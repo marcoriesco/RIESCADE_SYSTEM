@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { Dialog, Box, Flex, Heading, Text, Button, Switch, Checkbox, Tabs, Grid, Progress } from '@radix-ui/themes'
 import { Game, System } from '../../../shared/types'
 import { GameMediaOverlay } from './GameMediaOverlay'
 import { VirtualKeyboard } from './VirtualKeyboard'
@@ -735,7 +736,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   // Auto-scroll to selected menu item
   useEffect(() => {
     if (isOpen && !showMetadataEditor && scraperStage === 0) {
-      const selectedEl = document.querySelector('.riescade-menu-overlay.visible .riescade-menu-item.selected')
+      const selectedEl = document.querySelector('.riescade-menu .riescade-menu-item.selected')
       if (selectedEl) {
         selectedEl.scrollIntoView({ block: 'nearest', behavior: 'instant' })
       }
@@ -1533,6 +1534,12 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
       if (activeMenuStack.length === 0) return
 
+      const keyLower = e.key.toLowerCase()
+      const navKeys = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter', ' ', 'backspace', 'escape']
+      if (navKeys.includes(keyLower)) {
+        e.stopPropagation()
+      }
+
       const bottomButtons = getBottomButtons()
       const lastSelectableMenuIndex = (() => {
         for (let i = currentMenu.length - 1; i >= 0; i--) {
@@ -1662,8 +1669,8 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   )
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
   }, [handleKeyDown])
 
   useEffect(() => {
@@ -1678,19 +1685,25 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const bottomButtons = getBottomButtons()
 
   const menuItemsNode = (
-    <div className="riescade-menu-list">
+    <Box className="riescade-menu-list">
       {currentMenu.map((item, index) => {
         if (item.type === 'group') {
           return (
-            <div key={item.id} className="riescade-menu-group">
+            <Text 
+              key={item.id} 
+              size="1" 
+              weight="bold" 
+              className="riescade-menu-group"
+            >
               {item.label}
-            </div>
+            </Text>
           )
         }
+        const isSelected = index === selectedIndex
+
         return (
-          <div
+          <Box
             key={item.id}
-            className={`riescade-menu-item ${index === selectedIndex ? 'selected' : ''}`}
             onMouseMove={(e) => {
               if (scraperStage === 0) {
                 if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
@@ -1726,40 +1739,57 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                 handleAction(item)
               }
             }}
+            className={`riescade-menu-item${isSelected ? ' selected' : ''}`}
           >
-            <div className="riescade-menu-text-container">
-              <span className="riescade-menu-label">
-                {item.label}
-              </span>
+            <Flex className="riescade-menu-item-content">
+              <Flex className="riescade-menu-item-row">
+                <Text weight="bold" size="2" className="riescade-menu-item-label">
+                  {item.label}
+                </Text>
+              </Flex>
               {item.description && (
-                <span className="riescade-menu-description">
+                <Text size="1" className="riescade-menu-item-description">
                   {item.description}
-                </span>
+                </Text>
               )}
-            </div>
-            <div className="riescade-menu-value">
+            </Flex>
+            <Box className="riescade-menu-item-value">
               {item.type === 'toggle' ? (
-                <div className={`riescade-switch ${item.value ? 'on' : ''}`}>
-                  <div className="thumb toggle-thumb" />
-                </div>
+                <Switch 
+                  checked={item.value} 
+                  onClick={(e) => { e.stopPropagation(); handleToggle() }} 
+                  style={{ cursor: 'pointer' }} 
+                />
               ) : item.type === 'submenu' || item.showArrow ? (
-                <span className="menu-submenu-arrow">›</span>
+                <span className="riescade-menu-arrow">›</span>
               ) : item.type === 'select' ? (
-                <div className="menu-select">
-                  <span className="arrow-clickable" onClick={(e) => { e.stopPropagation(); handleSelect(-1) }}>◁</span>
-                  <span className="value">{item.items?.find((i: any) => i.value === item.value)?.label || item.value}</span>
-                  <span className="arrow-clickable" onClick={(e) => { e.stopPropagation(); handleSelect(1) }}>▷</span>
-                </div>
+                <Flex className="riescade-menu-value-control">
+                  <Button 
+                    variant="ghost" 
+                    size="1" 
+                    onClick={(e) => { e.stopPropagation(); handleSelect(-1) }}
+                  >
+                    ◁
+                  </Button>
+                  <Text size="2">{item.items?.find((i: any) => i.value === item.value)?.label || item.value}</Text>
+                  <Button 
+                    variant="ghost" 
+                    size="1" 
+                    onClick={(e) => { e.stopPropagation(); handleSelect(1) }}
+                  >
+                    ▷
+                  </Button>
+                </Flex>
               ) : item.type === 'info' ? (
-                <div className="menu-info" style={{ fontSize: '0.85rem', fontWeight: 600, color: index === selectedIndex ? '#fff' : '#888' }}>
+                <Text size="2" weight="bold" style={{ color: isSelected ? '#fff' : '#888' }}>
                   {item.value}
-                </div>
+                </Text>
               ) : null}
-            </div>
-          </div>
+            </Box>
+          </Box>
         )
       })}
-    </div>
+    </Box>
   )
 
   if (!isOpen) return null
@@ -1769,79 +1799,97 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const renderStageStage1 = () => {
     const dbKeys = ['ScreenScraper', 'ArcadeDB', 'TheGamesDB', 'HfsDB', 'IGDB']
     return (
-      <div className="riescade-overlay scraper-modal-overlay game-options-scraper visible">
-        <div className="scraper-modal-container db-select-modal">
-          <h3 className="scraper-modal-title">BUSCAR MÍDIAS</h3>
-          <div className="scraper-db-list">
-            {dbKeys.map((db, idx) => {
-              const isSelected = scraperDbSelectedIndex === idx
-              const isChecked = scraperDbs[db]
-              return (
-                <div 
-                  key={db}
-                  className={`scraper-db-item ${isSelected ? 'selected' : ''}`}
-                  onClick={() => {
-                    setScraperDbSelectedIndex(idx)
-                    setScraperDbs(prev => ({ ...prev, [db]: !prev[db] }))
-                  }}
-                >
-                  <div className={`riescade-checkbox ${isChecked ? 'checked' : ''}`}>
-                    {isChecked && <span className="checkmark">✔</span>}
-                  </div>
-                  <span className="scraper-db-name">{db.toUpperCase()}</span>
-                </div>
-              )
-            })}
-          </div>
-          <div className="scraper-modal-buttons">
-            <button 
-              className={`riescade-button ${scraperDbSelectedIndex === dbKeys.length ? 'selected' : ''}`}
+      <Dialog.Root open={isOpen && scraperStage === 1} onOpenChange={(open) => { if (!open) setScraperStage(0); }}>
+        <Dialog.Content 
+          size="3" 
+          className="riescade-menu"
+          style={{ maxWidth: '500px' }}
+        >
+          <Flex className="riescade-menu-header">
+            <Heading size="4" className="riescade-menu-title">
+              {t('SEARCH FOR MEDIA')}
+            </Heading>
+          </Flex>
+          <Box className="riescade-menu-content">
+            <Box className="riescade-menu-list">
+              {dbKeys.map((db, idx) => {
+                const isSelected = scraperDbSelectedIndex === idx
+                const isChecked = scraperDbs[db]
+                return (
+                  <Box
+                    key={db}
+                    onMouseMove={() => setScraperDbSelectedIndex(idx)}
+                    onClick={() => {
+                      setScraperDbSelectedIndex(idx)
+                      setScraperDbs(prev => ({ ...prev, [db]: !prev[db] }))
+                    }}
+                    className={`riescade-menu-item${isSelected ? ' selected' : ''}`}
+                  >
+                    <Flex className="riescade-menu-item-content">
+                      <Flex className="riescade-menu-item-row" gap="3" align="center">
+                        <Checkbox checked={isChecked} onClick={(e) => { e.stopPropagation(); setScraperDbs(prev => ({ ...prev, [db]: !prev[db] })); }} />
+                        <Text size="2" className="riescade-menu-item-label">{db.toUpperCase()}</Text>
+                      </Flex>
+                    </Flex>
+                  </Box>
+                )
+              })}
+            </Box>
+          </Box>
+          <Flex className="riescade-menu-footer">
+            <Button
+              variant={scraperDbSelectedIndex === 5 ? "solid" : "soft"}
+              color={scraperDbSelectedIndex === 5 ? undefined : "gray"}
+              onMouseMove={() => setScraperDbSelectedIndex(5)}
               onClick={() => triggerScraperSearch()}
             >
-              BUSCAR
-            </button>
-            <button 
-              className={`riescade-button secondary ${scraperDbSelectedIndex === dbKeys.length + 1 ? 'selected' : ''}`}
+              {t('SEARCH')}
+            </Button>
+            <Button
+              variant={scraperDbSelectedIndex === 6 ? "solid" : "soft"}
+              color={scraperDbSelectedIndex === 6 ? "red" : "gray"}
+              onMouseMove={() => setScraperDbSelectedIndex(6)}
               onClick={() => setScraperStage(0)}
             >
-              CANCELAR
-            </button>
-          </div>
-        </div>
-      </div>
+              {t('CANCEL')}
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
     )
   }
 
-  const renderStageStage2 = () => {
-    if (scraperIsSearching) {
-      return (
-        <div className="riescade-overlay scraper-modal-overlay game-options-scraper visible">
-          <div className="scraper-modal-container searching-modal">
-            <div className="scraper-spinner"></div>
-            <p className="searching-text">BUSCANDO MÍDIAS NAS BASES DE DADOS...</p>
-          </div>
-        </div>
-      )
-    }
+  const renderStageStage2Searching = () => {
+    return (
+      <Dialog.Root open={isOpen && scraperStage === 2 && scraperIsSearching} onOpenChange={(open) => { if (!open) setScraperStage(1); }}>
+        <Dialog.Content size="2" style={{ maxWidth: '400px', width: '90%' }}>
+          <Flex direction="column" align="center" justify="center" p="6" gap="3">
+            <Box className="netplay-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+            <Text size="2" color="gray">{t('SEARCHING FOR MEDIA IN DATABASES...')}</Text>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+    )
+  }
 
-    if (scraperMatches.length === 0) {
-      return (
-        <div className="riescade-overlay scraper-modal-overlay game-options-scraper visible">
-          <div className="scraper-modal-container no-results-modal">
-            <h3 className="scraper-modal-title">RESULTADOS</h3>
-            <p className="no-results-text">NENHUMA MÍDIA ENCONTRADA PARA ESTE JOGO.</p>
-            <div className="scraper-modal-buttons" style={{ justifyContent: 'center' }}>
-              <button className="riescade-button selected" onClick={() => setScraperStage(1)}>
-                VOLTAR
-              </button>
-            </div>
-          </div>
-        </div>
-      )
-    }
+  const renderStageStage2NoMatches = () => {
+    return (
+      <Dialog.Root open={isOpen && scraperStage === 2 && !scraperIsSearching && scraperMatches.length === 0} onOpenChange={(open) => { if (!open) setScraperStage(1); }}>
+        <Dialog.Content size="2" style={{ maxWidth: '400px', width: '90%' }}>
+          <Flex direction="column" align="center" justify="center" p="6" gap="4">
+            <Heading size="3" style={{ color: 'var(--theme-color)' }}>{t('RESULTS')}</Heading>
+            <Text size="2" color="gray" style={{ textAlign: 'center' }}>{t('NO MEDIA FOUND FOR THIS GAME.')}</Text>
+            <Button onClick={() => setScraperStage(1)} style={{ outline: '2px solid #fff' }}>
+              {t('BACK')}
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+    )
+  }
 
+  const renderStageStage2Matches = () => {
     const selectedMatch = scraperMatches[scraperMatchSelectedIndex]
-    // Priority: BOX/thumbnail → IMAGE → LOGO/marquee → VIDEO
     let previewImage = selectedMatch?.media?.thumbnail || selectedMatch?.thumbnail || selectedMatch?.media?.image || selectedMatch?.image || selectedMatch?.media?.marquee
     let previewVideo = selectedMatch?.media?.video || selectedMatch?.video
 
@@ -1861,7 +1909,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       return url.startsWith('file:///') || url.startsWith('data:') || !url.startsWith('http')
     }
 
-    // Image takes priority over video in preview display
     const showImage = previewImage && isLocalUrl(previewImage)
     const showVideo = !showImage && previewVideo && isLocalUrl(previewVideo)
 
@@ -1876,7 +1923,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     const isCached = selectedMatch ? !!tempMediaUrls[selectedMatch.id] : false
     const isLoadingMedia = tempMediaLoading || (hasMediaToDownload && !isCached)
 
-    // Group matches by database source
     const matchesByDb: Record<string, { match: any; globalIndex: number }[]> = {}
     scraperMatches.forEach((match, idx) => {
       const dbName = match.db || 'DESCONHECIDO'
@@ -1895,7 +1941,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       const stars = []
       for (let i = 0; i < 5; i++) {
         stars.push(
-          <span 
+          <Text 
             key={i} 
             style={{ 
               color: i < filledCount ? '#fff' : '#444', 
@@ -1904,317 +1950,198 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             }}
           >
             ★
-          </span>
+          </Text>
         )
       }
       return stars
     }
 
     return (
-      <div 
-        className="riescade-overlay scraper-modal-overlay stage2-overlay game-options-scraper visible"
-        data-active-section={activeSection}
-      >
-        <style>{`
-          .stage2-overlay .scraper-matches-section {
-            width: 35% !important;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          .stage2-overlay .scraper-checkboxes-section {
-            width: 25%;
-            display: flex;
-            flex-direction: column;
-            padding-right: 15px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          .stage2-overlay .scraper-checkboxes-title {
-            font-size: 0.85rem;
-            font-weight: 900;
-            color: var(--theme-color);
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-          }
-          .stage2-overlay .scraper-checkboxes-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-          }
-          .stage2-overlay .scraper-checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px 15px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.02);
-            cursor: pointer;
-            transition: all 0.12s ease;
-            user-select: none;
-          }
-          .stage2-overlay .scraper-checkbox-item.focused .scraper-checkbox-label {
-            color: #fff;
-            font-weight: 800;
-          }
-          .stage2-overlay .scraper-checkbox-box {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--theme-color);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: var(--theme-color);
-            background: rgba(0, 0, 0, 0.3);
-            transition: all 0.1s ease;
-          }
-          .stage2-overlay .scraper-checkbox-box.checked {
-            border-color: var(--theme-color);
-            background: rgba(255, 0, 85, 0.1);
-          }
-          .stage2-overlay .scraper-checkbox-label {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #eee;
-            letter-spacing: 0.5px;
-          }
-          .stage2-overlay .scraper-details-section {
-            width: 40% !important;
-          }
-          .stage2-overlay[data-active-section="checkboxes"] .scraper-checkbox-item.focused {
-            outline: 3px solid var(--theme-color);
-          }
-        `}</style>
+      <Dialog.Root open={isOpen && scraperStage === 2 && !scraperIsSearching && scraperMatches.length > 0} onOpenChange={(open) => { if (!open) setScraperStage(1); }}>
+        <Dialog.Content 
+          size="4" 
+          className="riescade-menu"
+          style={{ 
+            maxWidth: '950px', 
+            width: '95%', 
+            height: '90vh', 
+            maxHeight: '800px'
+          }}
+        >
+          <Flex className="riescade-menu-header">
+            <Heading size="4" className="riescade-menu-title">
+              {getRomFileName(game.path).toUpperCase()}
+            </Heading>
+            <Text size="1" color="gray" mt="1">{(system.fullname || system.name).toUpperCase()}</Text>
+          </Flex>
 
-        <div className="scraper-header">
-          <div className="rom-filename">{getRomFileName(game.path).toUpperCase()}</div>
-          <div className="system-fullname">{(system.fullname || system.name).toUpperCase()}</div>
-        </div>
+          <Grid columns="35% 25% 40%" gap="3" style={{ flexGrow: 1, overflow: 'hidden' }}>
+            <Box style={{ overflowY: 'auto', borderRight: '1px solid rgba(255, 255, 255, 0.1)', padding: '15px' }} className="custom-scrollbar">
+              {Object.entries(matchesByDb).map(([dbName, items]) => (
+                <Box key={dbName} mb="4">
+                  <Text size="1" weight="bold" color="gray" style={{ textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '8px' }}>
+                    {dbName.toUpperCase()}
+                  </Text>
+                  <Box className="riescade-menu-list">
+                    {items.map(({ match, globalIndex }) => {
+                      const isSelected = scraperMatchSelectedIndex === globalIndex
+                      return (
+                        <Box
+                          key={globalIndex}
+                          onClick={() => {
+                            setScraperMatchSelectedIndex(globalIndex)
+                            setActiveSection('matches')
+                          }}
+                          className={`riescade-menu-item${isSelected ? ' selected' : ''}`}
+                        >
+                          <Flex className="riescade-menu-item-content">
+                            <Flex className="riescade-menu-item-row">
+                              <Text weight="bold" size="2" className="riescade-menu-item-label" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>
+                                {match.name || 'Sem nome'}
+                              </Text>
+                            </Flex>
+                          </Flex>
+                        </Box>
+                      )
+                    })}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
 
-        <div className="scraper-stage2-main-content">
-          {/* Left Column: Matches List grouped by DB */}
-          <div className="scraper-matches-section custom-scrollbar">
-            {Object.entries(matchesByDb).map(([dbName, items]) => (
-              <div key={dbName} className="scraper-db-group">
-                <div className="scraper-db-group-title">{dbName.toUpperCase()}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  {items.map(({ match, globalIndex }) => {
-                    const isSelected = scraperMatchSelectedIndex === globalIndex
-                    const hasBox = !!(match.media?.thumbnail || match.thumbnail)
-                    const hasImage = !!(match.media?.image || match.image)
-                    const hasLogo = !!(match.media?.marquee)
-                    const hasVid = !!(match.video || match.media?.video)
-                    const hasTxt = !!(match.desc || match.synopsis)
+            <Box style={{ overflowY: 'auto', borderRight: '1px solid rgba(255, 255, 255, 0.1)', padding: '15px' }}>
+              <Text size="1" weight="bold" style={{ color: 'var(--theme-color)', letterSpacing: '1.5px', textTransform: 'uppercase', display: 'block', marginBottom: '15px' }}>
+                {t('DOWNLOAD CONTENT')}
+              </Text>
+              <Box className="riescade-menu-list">
+                {[
+                  { key: 'title', label: t('TITLE') },
+                  { key: 'desc', label: t('DESCRIPTION') },
+                  { key: 'fanart', label: t('FANART') },
+                  { key: 'logo', label: t('LOGO') },
+                  { key: 'cover', label: t('COVER') },
+                  { key: 'video', label: t('VIDEO') }
+                ].map((item, index) => {
+                  const isFocused = activeSection === 'checkboxes' && focusedCheckboxIndex === index
+                  const isChecked = scrapeOptions[item.key as keyof typeof scrapeOptions]
+                  return (
+                    <Box
+                      key={item.key}
+                      onMouseMove={() => {
+                        setActiveSection('checkboxes')
+                        setFocusedCheckboxIndex(index)
+                      }}
+                      onClick={() => {
+                        setActiveSection('checkboxes')
+                        setFocusedCheckboxIndex(index)
+                        setScrapeOptions(prev => ({ ...prev, [item.key]: !prev[item.key as keyof typeof scrapeOptions] }))
+                      }}
+                      className={`riescade-menu-item${isFocused ? ' selected' : ''}`}
+                    >
+                      <Flex className="riescade-menu-item-content">
+                        <Flex className="riescade-menu-item-row" gap="3" align="center">
+                          <Checkbox checked={isChecked} onClick={(e) => { e.stopPropagation(); setScrapeOptions(prev => ({ ...prev, [item.key]: !prev[item.key as keyof typeof scrapeOptions] })); }} />
+                          <Text size="2" className="riescade-menu-item-label">{item.label}</Text>
+                        </Flex>
+                      </Flex>
+                    </Box>
+                  )
+                })}
+              </Box>
+            </Box>
 
-                    return (
-                      <div
-                        key={globalIndex}
-                        className={`scraper-match-item ${isSelected ? 'selected' : ''}`}
-                        onClick={() => {
-                          setScraperMatchSelectedIndex(globalIndex)
-                          setActiveSection('matches')
-                        }}
-                      >
-                        <span className="match-name">{match.name || 'Sem nome'}</span>
-                        <div className="match-icons">
-                          {hasBox && (
-                            <span className="icon-badge img" title="Box / Cover">
-                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h12v16zM9 13.5h6v1H9z"/>
-                              </svg>
-                            </span>
-                          )}
-                          {hasImage && (
-                            <span className="icon-badge img" title="Imagem">
-                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
-                              </svg>
-                            </span>
-                          )}
-                          {hasLogo && (
-                            <span className="icon-badge img" title="Logo">
-                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                <path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/>
-                              </svg>
-                            </span>
-                          )}
-                          {hasVid && (
-                            <span className="icon-badge vid" title="Vídeo">
-                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                              </svg>
-                            </span>
-                          )}
-                          {hasTxt && (
-                            <span className="icon-badge txt" title="Texto">
-                              TXT
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Middle Column: Options Checklist */}
-          <div className="scraper-checkboxes-section">
-            <div className="scraper-checkboxes-title">CONTEÚDO PARA BAIXAR</div>
-            <div className="scraper-checkboxes-list">
-              {[
-                { key: 'title', label: 'TÍTULO' },
-                { key: 'desc', label: 'DESCRIÇÃO' },
-                { key: 'fanart', label: 'FANART' },
-                { key: 'logo', label: 'LOGO' },
-                { key: 'cover', label: 'COVER' },
-                { key: 'video', label: 'VÍDEO' }
-              ].map((item, index) => {
-                const isFocused = activeSection === 'checkboxes' && focusedCheckboxIndex === index
-                const isChecked = scrapeOptions[item.key as keyof typeof scrapeOptions]
-                return (
-                  <div
-                    key={item.key}
-                    className={`scraper-checkbox-item ${isFocused ? 'focused' : ''}`}
-                    onClick={() => {
-                      setFocusedCheckboxIndex(index)
-                      setActiveSection('checkboxes')
-                      setScrapeOptions(prev => ({ ...prev, [item.key]: !prev[item.key as keyof typeof scrapeOptions] }))
-                    }}
-                  >
-                    <span className={`scraper-checkbox-box ${isChecked ? 'checked' : ''}`}>
-                      {isChecked && '✔'}
-                    </span>
-                    <span className="scraper-checkbox-label">{item.label}</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Right Column: Media Preview & Metadata Grid */}
-          <div className="scraper-details-section">
-            <div className="scraper-details-top">
-              {/* Media Preview Box */}
-              <div className="scraper-details-image-container" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '250px' }}>
-                {isLoadingMedia && (
-                  <div className="scraper-spinner" style={{ position: 'absolute', zIndex: 2 }}></div>
-                )}
-                {showImage ? (
-                  <img
-                    key={previewImage}
-                    src={previewImage}
-                    alt="Preview"
-                    style={{ maxWidth: '100%', maxHeight: '250px', objectFit: 'contain', opacity: isLoadingMedia ? 0.3 : 1 }}
-                  />
+            <Box style={{ display: 'flex', flexDirection: 'column', padding: '15px', overflowY: 'auto' }} className="custom-scrollbar">
+              <Text size="1" weight="bold" style={{ color: 'var(--theme-color)', letterSpacing: '1.5px', textTransform: 'uppercase', display: 'block', marginBottom: '15px' }}>
+                {t('PREVIEW')}
+              </Text>
+              
+              <Box className="riescade-preview-container">
+                {isLoadingMedia ? (
+                  <Box className="netplay-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+                ) : showImage ? (
+                  <img src={previewImage} className="riescade-preview-media" alt="Preview" />
                 ) : showVideo ? (
-                  <video
-                    key={previewVideo}
-                    src={previewVideo}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    style={{ maxWidth: '100%', maxHeight: '250px', objectFit: 'contain', opacity: isLoadingMedia ? 0.3 : 1 }}
-                  />
-                ) : isLoadingMedia ? null : (
-                  <div style={{ color: '#555', fontWeight: 'bold', fontSize: '0.9rem' }}>SEM PRÉVIA DISPONÍVEL</div>
+                  <video src={previewVideo} className="riescade-preview-media" autoPlay loop muted />
+                ) : (
+                  <Text size="1" color="gray">{t('Nenhuma prévia disponível')}</Text>
                 )}
-              </div>
+              </Box>
 
-              {/* Metadata Attributes */}
-              <div className="scraper-details-metadata">
-                <div className="metadata-grid-row">
-                  <span className="metadata-grid-label">PUBLICADORA:</span>
-                  <span className="metadata-grid-value">{selectedMatch?.publisher || 'N/A'}</span>
-                </div>
-                <div className="metadata-grid-row">
-                  <span className="metadata-grid-label">DESENVOLVEDORA:</span>
-                  <span className="metadata-grid-value">{selectedMatch?.developer || 'N/A'}</span>
-                </div>
-                <div className="metadata-grid-row">
-                  <span className="metadata-grid-label">GÊNERO:</span>
-                  <span className="metadata-grid-value">{selectedMatch?.genre || 'N/A'}</span>
-                </div>
-                <div className="metadata-grid-row">
-                  <span className="metadata-grid-label">JOGADORES:</span>
-                  <span className="metadata-grid-value">{selectedMatch?.players || 'N/A'}</span>
-                </div>
-                <div className="metadata-grid-row">
-                  <span className="metadata-grid-label">LANÇAMENTO:</span>
-                  <span className="metadata-grid-value">{formatReleaseDate(selectedMatch?.releasedate)}</span>
-                </div>
-                <div className="metadata-grid-row" style={{ alignItems: 'center' }}>
-                  <span className="metadata-grid-label">CLASSIFICAÇÃO:</span>
-                  <span className="metadata-grid-value" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                    {renderStars(selectedMatch?.rating)}
-                  </span>
-                </div>
-              </div>
-            </div>
+              <Heading size="3" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                {selectedMatch?.name || 'Sem nome'}
+              </Heading>
+              
+              <Flex gap="3" mt="2" mb="3" style={{ opacity: 0.8, fontSize: '0.8rem' }} align="center" wrap="wrap">
+                <Text>{t('DEVELOPER')}: {selectedMatch?.developer || 'N/A'}</Text>
+                <Text>•</Text>
+                <Text>{t('RELEASE DATE')}: {formatReleaseDate(selectedMatch?.releasedate)}</Text>
+                {selectedMatch?.rating !== undefined && (
+                  <>
+                    <Text>•</Text>
+                    <Flex align="center">{renderStars(selectedMatch.rating)}</Flex>
+                  </>
+                )}
+              </Flex>
 
-            {/* Title */}
-            <div className="scraper-game-title-container">
-              <h6 className="scraper-game-title">{selectedMatch?.name}</h6>
-            </div>
+              <Heading size="1" color="gray" style={{ textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px', marginBottom: '8px' }}>
+                {t('DESCRIPTION')}
+              </Heading>
+              <Text size="1" color="gray" style={{ display: 'block', maxHeight: '100px', overflowY: 'auto', marginTop: '10px', whiteSpace: 'normal' }} className="custom-scrollbar">
+                {selectedMatch?.desc || selectedMatch?.synopsis || t('Nenhuma descrição disponível para este jogo.')}
+              </Text>
+            </Box>
+          </Grid>
 
-            {/* Synopsis Description Text */}
-            <div className="scraper-details-description custom-scrollbar">
-              {selectedMatch?.desc || selectedMatch?.synopsis || 'Nenhuma descrição disponível para este jogo.'}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer actions center bottom */}
-        <div className="scraper-footer-buttons">
-          <button 
-            className={`riescade-button ${activeSection === 'buttons' && focusedButtonIndex === 0 ? 'selected' : ''}`} 
-            onClick={triggerScraperDownload}
-            onMouseEnter={() => {
-              setActiveSection('buttons')
-              setFocusedButtonIndex(0)
-            }}
-          >
-            BAIXAR
-          </button>
-          <button 
-            className={`riescade-button ${activeSection === 'buttons' && focusedButtonIndex === 1 ? 'selected' : ''}`} 
-            onClick={() => {
-              setActiveInputField('scraper_search_query')
-              setInputValue(scraperQuery)
-              const useOSK = settings.UseOSK?.value !== 'false' && settings.UseOSK?.value !== false
-              if (useOSK) {
-                setShowOSK(true)
-              } else {
-                setShowInputModal(true)
-              }
-            }}
-            onMouseEnter={() => {
-              setActiveSection('buttons')
-              setFocusedButtonIndex(1)
-            }}
-          >
-            ENTRADA
-          </button>
-          <button 
-            className={`riescade-button ${activeSection === 'buttons' && focusedButtonIndex === 2 ? 'selected' : ''}`} 
-            onClick={() => setScraperStage(1)}
-            onMouseEnter={() => {
-              setActiveSection('buttons')
-              setFocusedButtonIndex(2)
-            }}
-          >
-            CANCELAR
-          </button>
-        </div>
-      </div>
+          <Flex className="riescade-menu-footer">
+            <Button
+              variant={activeSection === 'buttons' && focusedButtonIndex === 0 ? "solid" : "soft"}
+              color={activeSection === 'buttons' && focusedButtonIndex === 0 ? undefined : "gray"}
+              onClick={triggerScraperDownload}
+              onMouseEnter={() => {
+                setActiveSection('buttons')
+                setFocusedButtonIndex(0)
+              }}
+            >
+              {t('DOWNLOAD')}
+            </Button>
+            <Button
+              variant={activeSection === 'buttons' && focusedButtonIndex === 1 ? "solid" : "soft"}
+              color={activeSection === 'buttons' && focusedButtonIndex === 1 ? undefined : "gray"}
+              onClick={() => {
+                setActiveInputField('scraper_search_query')
+                setInputValue(scraperQuery)
+                const useOSK = settings.UseOSK?.value !== 'false' && settings.UseOSK?.value !== false
+                if (useOSK) {
+                  setShowOSK(true)
+                } else {
+                  setShowInputModal(true)
+                }
+              }}
+              onMouseEnter={() => {
+                setActiveSection('buttons')
+                setFocusedButtonIndex(1)
+              }}
+            >
+              {t('INPUT')}
+            </Button>
+            <Button
+              variant={activeSection === 'buttons' && focusedButtonIndex === 2 ? "solid" : "soft"}
+              color={activeSection === 'buttons' && focusedButtonIndex === 2 ? "red" : "gray"}
+              onClick={() => setScraperStage(1)}
+              onMouseEnter={() => {
+                setActiveSection('buttons')
+                setFocusedButtonIndex(2)
+              }}
+            >
+              {t('CANCEL')}
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
     )
   }
 
   const renderInputModal = () => {
-    if (!showInputModal) return null
     const field = fields.find(f => f.key === activeInputField)
     let label = field ? field.label : ''
     if (activeInputField === 'netplay_password') label = t('SENHA DO JOGADOR')
@@ -2223,94 +2150,115 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     const isRating = activeInputField === 'rating'
 
     return (
-      <div className="riescade-metadata-input-overlay" onClick={() => setShowInputModal(false)}>
-        <div className="riescade-metadata-input-container" onClick={e => e.stopPropagation()}>
-          <div className="riescade-metadata-input-title">
-            {label}
-          </div>
-          
-          {isRating ? (
-            <div className="riescade-metadata-input-rating-container">
-              <div className="riescade-metadata-input-stars">
-                {getStarsString(inputValue)}
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={typeof inputValue === 'number' ? inputValue : parseFloat(inputValue || '0')}
-                onChange={e => setInputValue(parseFloat(e.target.value) as any)}
-                className="riescade-metadata-input-range"
+      <Dialog.Root open={!!showInputModal && !showMetadataEditor} onOpenChange={(open) => { if (!open) setShowInputModal(false); }}>
+        <Dialog.Content style={{ maxWidth: '450px', width: '90%' }}>
+          <Flex direction="column" gap="4">
+            <Heading size="3" style={{ color: 'var(--theme-color)' }}>
+              {t(label)}
+            </Heading>
+            
+            {isRating ? (
+              <Flex direction="column" align="center" gap="2">
+                <Text size="5" style={{ color: 'var(--theme-color)' }}>
+                  {getStarsString(inputValue)}
+                </Text>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={typeof inputValue === 'number' ? inputValue : parseFloat(inputValue || '0')}
+                  onChange={e => setInputValue(parseFloat(e.target.value) as any)}
+                  style={{ width: '100%', accentColor: 'var(--theme-color)' }}
+                />
+                <Text size="2" weight="bold">
+                  {Math.round((typeof inputValue === 'number' ? inputValue : parseFloat(inputValue || '0')) * 100)}%
+                </Text>
+              </Flex>
+            ) : isMultiline ? (
+              <textarea
+                autoFocus
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                style={{
+                  width: '100%',
+                  minHeight: '120px',
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '4px',
+                  color: '#fff',
+                  padding: '8px',
+                  fontSize: '0.9rem',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
               />
-              <div className="riescade-metadata-input-percent">
-                {Math.round((typeof inputValue === 'number' ? inputValue : parseFloat(inputValue || '0')) * 100)}%
-              </div>
-            </div>
-          ) : isMultiline ? (
-            <textarea
-              autoFocus
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              className="riescade-metadata-input"
-            />
-          ) : (
-            <input
-              type="text"
-              autoFocus
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              className="riescade-metadata-input"
-            />
-          )}
+            ) : (
+              <input
+                type="text"
+                autoFocus
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '4px',
+                  color: '#fff',
+                  padding: '8px',
+                  fontSize: '0.9rem',
+                  fontFamily: 'inherit'
+                }}
+              />
+            )}
 
-          <div className="riescade-metadata-modal-buttons">
-            <button
-              onClick={() => {
-                if (activeInputField === 'netplay_password') {
-                  setNetplayPassword(inputValue)
-                  updateNetplayMenuItemValue('netplay_password', inputValue)
-                } else if (activeInputField === 'netplay_spectator_password') {
-                  setNetplaySpectatorPassword(inputValue)
-                  updateNetplayMenuItemValue('netplay_spectator_password', inputValue)
-                } else {
-                  const savedVal = activeInputField === 'releasedate' ? parseDateForDb(inputValue) : inputValue
-                  setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
-                }
-                setShowInputModal(false)
-              }}
-              className="riescade-button"
-            >
-              SAVE
-            </button>
-            <button
-              onClick={() => setShowInputModal(false)}
-              className="riescade-button"
-            >
-              CANCEL
-            </button>
-          </div>
-        </div>
-      </div>
+            <Flex justify="end" gap="3">
+              <Button
+                onClick={() => {
+                  if (activeInputField === 'netplay_password') {
+                    setNetplayPassword(inputValue)
+                    updateNetplayMenuItemValue('netplay_password', inputValue)
+                  } else if (activeInputField === 'netplay_spectator_password') {
+                    setNetplaySpectatorPassword(inputValue)
+                    updateNetplayMenuItemValue('netplay_spectator_password', inputValue)
+                  } else {
+                    const savedVal = activeInputField === 'releasedate' ? parseDateForDb(inputValue) : inputValue
+                    setDraftMetadata(prev => ({ ...prev, [activeInputField]: savedVal }))
+                  }
+                  setShowInputModal(false)
+                }}
+                style={{ cursor: 'pointer', outline: '2px solid #fff' }}
+              >
+                {t('SAVE')}
+              </Button>
+              <Button
+                onClick={() => setShowInputModal(false)}
+                variant="soft"
+                color="gray"
+                style={{ cursor: 'pointer' }}
+              >
+                {t('CANCEL')}
+              </Button>
+            </Flex>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
     )
   }
 
-
   const renderMetadataEditor = () => {
     const totalFields = fields.length
-    const romDisplayPath = getRomDisplayPath(game.path)
-
     return (
-      <div className="riescade-metadata-editor-overlay">
-        <div className="riescade-metadata-editor-container riescade-menu-container">
-          {/* Header */}
-          <div className="riescade-metadata-editor-header">
-            <h2 className="riescade-metadata-editor-title">EDIT METADATA</h2>
-            <div className="riescade-metadata-editor-path">{romDisplayPath}</div>
-          </div>
+      <Flex direction="column" style={{ height: '100%' }}>
+        <Flex className="riescade-menu-header">
+          <Heading size="4" className="riescade-menu-title">
+            {t('EDIT METADATA')}
+          </Heading>
+          <Text size="1" color="gray" mt="1">{getRomDisplayPath(game.path)}</Text>
+        </Flex>
 
-          {/* Scrollable Fields List */}
-          <div className="riescade-metadata-fields-list custom-scrollbar">
+        <Box className="riescade-menu-content custom-scrollbar">
+          <Box className="riescade-menu-list">
             {fields.map((field, idx) => {
               const isSelected = metadataSelectedIndex === idx
               const val = (draftMetadata[field.key as keyof Game] as string) || ''
@@ -2318,10 +2266,10 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               const boolVal = !!draftMetadata[field.key as keyof Game]
 
               return (
-                <div
+                <Box
                   key={field.key}
-                  className={`riescade-metadata-row ${isSelected ? 'selected' : ''}`}
-                  onMouseEnter={() => {
+                  className={`riescade-menu-item${isSelected ? ' selected' : ''} riescade-metadata-row`}
+                  onMouseMove={() => {
                     if (!showInputModal) setMetadataSelectedIndex(idx)
                   }}
                   onClick={() => {
@@ -2342,62 +2290,62 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                     }
                   }}
                 >
-                  <span className="riescade-metadata-field-label">{field.label}</span>
+                  <Flex className="riescade-menu-item-content">
+                    <Flex className="riescade-menu-item-row">
+                      <Text weight="bold" size="2" className="riescade-menu-item-label">{t(field.label)}</Text>
+                    </Flex>
+                  </Flex>
                   
-                  <div className="riescade-metadata-value-wrapper">
+                  <Box className="riescade-menu-item-value">
                     {isBool ? (
-                      <div className={`riescade-switch ${boolVal ? 'on' : ''} ${isSelected ? 'selected-row' : ''}`}>
-                        <div className={`thumb ${boolVal ? 'on' : ''} ${isSelected ? 'selected-row' : ''}`} />
-                      </div>
+                      <Switch checked={boolVal} style={{ cursor: 'pointer' }} />
                     ) : (
-                      <>
-                        <span className="riescade-metadata-value-text">
+                      <Flex align="center" gap="1">
+                        <Text size="2" color={isSelected ? undefined : "gray"}>
                           {field.key === 'releasedate' ? formatDateForDisplay(val) : (field.type === 'rating' ? getStarsString(val) : val)}
-                        </span>
-                        <span className="riescade-metadata-arrow">›</span>
-                      </>
+                        </Text>
+                        <span className="riescade-menu-arrow">›</span>
+                      </Flex>
                     )}
-                  </div>
-                </div>
+                  </Box>
+                </Box>
               )
             })}
-          </div>
+          </Box>
+        </Box>
 
-          {/* Bottom Buttons */}
-          <div className="riescade-metadata-actions">
-            {['SAVE', 'SCRAPE', 'DELETE', 'CANCEL'].map((label, btnIdx) => {
-              const idx = totalFields + btnIdx
-              const isSelected = metadataSelectedIndex === idx
-              return (
-                <button
-                  key={label}
-                  className={`riescade-button ${isSelected ? 'selected' : ''}`}
-                  onMouseEnter={() => {
-                    if (!showInputModal) setMetadataSelectedIndex(idx)
-                  }}
-                  onClick={() => {
-                    if (btnIdx === 0) handleSaveMetadata()
-                    else if (btnIdx === 1) {
-                      setScraperStage(1)
-                      setScraperDbs({ ScreenScraper: true, ArcadeDB: true, TheGamesDB: true, HfsDB: true, IGDB: true })
-                      setScraperDbSelectedIndex(0)
-                    } else if (btnIdx === 2) {
-                      setDeleteModalSelectedIndex(1)
-                      setShowDeleteConfirmModal(true)
-                    } else if (btnIdx === 3) {
-                      setShowMetadataEditor(false)
-                    }
-                  }}
-                >
-                  {label}
-                </button>
-              )
-            })}
-          </div>
-
-          {showInputModal && renderInputModal()}
-        </div>
-      </div>
+        <Flex className="riescade-menu-footer">
+          {['SAVE', 'SCRAPE', 'DELETE', 'CANCEL'].map((label, btnIdx) => {
+            const idx = totalFields + btnIdx
+            const isSelected = metadataSelectedIndex === idx
+            return (
+              <Button
+                key={label}
+                variant={isSelected ? "solid" : "soft"}
+                color={isSelected ? undefined : "gray"}
+                onMouseMove={() => {
+                  if (!showInputModal) setMetadataSelectedIndex(idx)
+                }}
+                onClick={() => {
+                  if (btnIdx === 0) handleSaveMetadata()
+                  else if (btnIdx === 1) {
+                    setScraperStage(1)
+                    setScraperDbs({ ScreenScraper: true, ArcadeDB: true, TheGamesDB: true, HfsDB: true, IGDB: true })
+                    setScraperDbSelectedIndex(0)
+                  } else if (btnIdx === 2) {
+                    setDeleteModalSelectedIndex(1)
+                    setShowDeleteConfirmModal(true)
+                  } else if (btnIdx === 3) {
+                    setShowMetadataEditor(false)
+                  }
+                }}
+              >
+                {t(label)}
+              </Button>
+            )
+          })}
+        </Flex>
+      </Flex>
     )
   }
 
@@ -2407,117 +2355,130 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
 
   return (
     <>
-      <div className={`riescade-overlay riescade-menu-overlay ${showMetadataEditor ? 'game-options-metatada game-options-metadata' : (isAdvancedMenu ? 'game-options-advanced' : 'game-options-root')} ${visible && scraperStage === 0 ? 'visible' : ''}`}>
-        {!showMetadataEditor && scraperStage === 0 && (
-          <div className="riescade-menu-container">
-            <div className="riescade-menu-header">
-              {marqueeUrl && menuTitle !== 'JOGOS EM REDE' && menuTitle !== t('START ONLINE GAME') ? (
-                <div className="riescade-menu-marquee-container">
-                  <img src={marqueeUrl} alt="Game Marquee" className="riescade-menu-marquee" />
-                </div>
-              ) : (
-                <h2 className="riescade-menu-title">
-                  {menuTitle === 'GAME OPTIONS' || menuTitle === 'ADVANCED GAME OPTIONS'
-                    ? game.name.toUpperCase()
-                    : menuTitle}
-                </h2>
-              )}
-              
-              <div className="riescade-menu-subtitle">
-                {menuTitle === 'JOGOS EM REDE' || menuTitle === t('START ONLINE GAME')
-                  ? game.name
-                  : (menuTitle === 'GAME OPTIONS' || menuTitle === 'ADVANCED GAME OPTIONS' || menuTitle === game.name.toUpperCase()
-                      ? (system.fullname || system.name).toUpperCase()
-                      : game.name.toUpperCase())}
-              </div>
+      <Dialog.Root open={isOpen && scraperStage === 0} onOpenChange={(open) => { if (!open) onClose(); }}>
+        <Dialog.Content 
+          size={showMetadataEditor ? "4" : "3"}
+          className="riescade-menu"
+          style={{ maxWidth: showMetadataEditor ? '850px' : '600px' }}
+        >
+          {showMetadataEditor ? (
+            renderMetadataEditor()
+          ) : (
+            <Flex direction="column" style={{ height: '100%' }}>
+              <Flex className="riescade-menu-header">
+                {marqueeUrl && menuTitle !== 'JOGOS EM REDE' && menuTitle !== t('START ONLINE GAME') ? (
+                  <Box style={{ height: '90px', maxWidth: '280px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src={marqueeUrl} alt="Game Marquee" style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
+                  </Box>
+                ) : (
+                  <Heading size="4" className="riescade-menu-title">
+                    {menuTitle === 'GAME OPTIONS' || menuTitle === 'ADVANCED GAME OPTIONS'
+                      ? game.name.toUpperCase()
+                      : menuTitle}
+                  </Heading>
+                )}
+                
+                <Text size="1" color="gray" mt="1" style={{ letterSpacing: '1px' }}>
+                  {menuTitle === 'JOGOS EM REDE' || menuTitle === t('START ONLINE GAME')
+                    ? game.name
+                    : (system.fullname || system.name).toUpperCase()}
+                </Text>
 
-              {marqueeUrl && menuTitle !== 'GAME OPTIONS' && menuTitle !== 'ADVANCED GAME OPTIONS' && menuTitle !== 'JOGOS EM REDE' && menuTitle !== t('START ONLINE GAME') && (
-                <h2 className="riescade-menu-title" style={{ marginTop: '10px' }}>{menuTitle}</h2>
-              )}
+                {currentStackItem?.tabs && currentStackItem.tabs.length > 0 && (
+                  <Tabs.Root value={currentStackItem.tabs[currentStackItem.activeTab || 0]} style={{ marginTop: '10px', width: '100%' }}>
+                    <Tabs.List style={{ justifyContent: 'center' }}>
+                      {currentStackItem.tabs.map((tab, idx) => (
+                        <Tabs.Trigger 
+                          key={tab} 
+                          value={tab}
+                          onClick={() => {
+                            setActiveMenuStack(prev => {
+                              const next = [...prev]
+                              next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
+                              return next
+                            })
+                            const tabItems = currentStackItem.items.filter(item => item.tab === idx)
+                            setSelectedIndex(getFirstSelectableIndex(tabItems))
+                          }}
+                        >
+                          {tab}
+                        </Tabs.Trigger>
+                      ))}
+                    </Tabs.List>
+                  </Tabs.Root>
+                )}
+              </Flex>
 
-              {currentStackItem?.tabs && currentStackItem.tabs.length > 0 && (
-                <div className="riescade-menu-tabs">
-                  {currentStackItem.tabs.map((tab, idx) => (
-                    <div
-                      key={tab}
-                      className={`riescade-menu-tab ${idx === currentStackItem.activeTab ? 'active' : ''}`}
-                      onClick={() => {
-                        setActiveMenuStack(prev => {
-                          const next = [...prev]
-                          next[next.length - 1] = { ...next[next.length - 1], activeTab: idx }
-                          return next
-                        })
-                        const tabItems = currentStackItem.items.filter(item => item.tab === idx)
-                        setSelectedIndex(getFirstSelectableIndex(tabItems))
-                      }}
-                    >
-                      {tab}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <div className="riescade-menu-list-container">{menuItemsNode}</div>
-            
-            {bottomButtons.length > 0 && (
-              <div className="riescade-menu-bottom-bar">
-                {bottomButtons.map((btn, btnIdx) => {
-                  const isSelected = selectedIndex === currentMenu.length + btnIdx
-                  return (
-                    <button
-                      key={btn.id}
-                      className={`riescade-button ${isSelected ? 'selected' : ''}`}
-                      onMouseMove={(e) => {
-                        if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
-                          setLastMousePos({ x: e.clientX, y: e.clientY })
-                          const targetIdx = currentMenu.length + btnIdx
-                          if (selectedIndex !== targetIdx) setSelectedIndex(targetIdx)
-                        }
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        btn.onClick()
-                      }}
-                    >
-                      {btn.label}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
-        {showMetadataEditor && scraperStage === 0 && renderMetadataEditor()}
-      </div>
+              <Box className="riescade-menu-content custom-scrollbar">
+                {menuItemsNode}
+              </Box>
 
-      {scraperStage === 1 && renderStageStage1()}
-      {scraperStage === 2 && renderStageStage2()}
-      {showDeleteConfirmModal && (
-        <div className="riescade-overlay scraper-completion-overlay visible" onClick={() => setShowDeleteConfirmModal(false)}>
-          <div className="scraper-completion-modal" onClick={e => e.stopPropagation()}>
-            <h3 className="scraper-completion-title">REMOVER JOGO</h3>
-            <p className="scraper-completion-text">
+              {bottomButtons.length > 0 && (
+                <Flex className="riescade-menu-footer">
+                  {bottomButtons.map((btn, btnIdx) => {
+                    const isSelected = selectedIndex === currentMenu.length + btnIdx
+                    return (
+                      <Button
+                        key={btn.id}
+                        variant={isSelected ? "solid" : "soft"}
+                        color={isSelected ? undefined : "gray"}
+                        onMouseMove={(e) => {
+                          if (e.clientX !== lastMousePos.x || e.clientY !== lastMousePos.y) {
+                            setLastMousePos({ x: e.clientX, y: e.clientY })
+                            const targetIdx = currentMenu.length + btnIdx
+                            if (selectedIndex !== targetIdx) setSelectedIndex(targetIdx)
+                          }
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          btn.onClick()
+                        }}
+                      >
+                        {btn.label}
+                      </Button>
+                    )
+                  })}
+                </Flex>
+              )}
+            </Flex>
+          )}
+        </Dialog.Content>
+      </Dialog.Root>
+
+      {renderStageStage1()}
+      {renderStageStage2Searching()}
+      {renderStageStage2NoMatches()}
+      {renderStageStage2Matches()}
+
+      <Dialog.Root open={!!showDeleteConfirmModal} onOpenChange={(open) => { if (!open) setShowDeleteConfirmModal(false); }}>
+        <Dialog.Content style={{ maxWidth: '450px', width: '90%' }}>
+          <Flex direction="column" gap="4">
+            <Heading size="3" style={{ color: 'red' }}>REMOVER JOGO</Heading>
+            <Text size="2">
               Você tem certeza que deseja remover o jogo <strong>{game.name.toUpperCase()}</strong>?<br/>
               Apagar os arquivos físicos também?
-            </p>
-            <div className="scraper-completion-buttons">
-              <button 
-                className={`riescade-button primary ${deleteModalSelectedIndex === 0 ? 'selected' : ''}`}
+            </Text>
+            <Flex justify="end" gap="3">
+              <Button 
+                color="red"
+                variant={deleteModalSelectedIndex === 0 ? 'solid' : 'soft'}
+                style={{ cursor: 'pointer', outline: deleteModalSelectedIndex === 0 ? '2px solid #fff' : 'none' }}
                 onClick={() => confirmDelete(true)}
               >
                 SIM (APAGAR ROM)
-              </button>
-              <button 
-                className={`riescade-button secondary ${deleteModalSelectedIndex === 1 ? 'selected' : ''}`}
+              </Button>
+              <Button 
+                variant={deleteModalSelectedIndex === 1 ? 'solid' : 'soft'}
+                color="gray"
+                style={{ cursor: 'pointer', outline: deleteModalSelectedIndex === 1 ? '2px solid #fff' : 'none' }}
                 onClick={() => confirmDelete(false)}
               >
                 NÃO (APENAS DA LISTA)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              </Button>
+            </Flex>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
 
       {isMediaViewerOpen && (
         <GameMediaOverlay
@@ -2530,7 +2491,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
         />
       )}
 
-      {showInputModal && !showMetadataEditor && renderInputModal()}
+      {renderInputModal()}
 
       <VirtualKeyboard
         isOpen={showOSK}

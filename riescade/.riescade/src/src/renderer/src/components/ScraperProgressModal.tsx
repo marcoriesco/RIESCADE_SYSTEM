@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { Dialog, Box, Flex, Heading, Text, Button, Progress } from '@radix-ui/themes'
 
 interface ScraperProgressModalProps {
   isOpen: boolean
@@ -49,22 +50,25 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
     }
   }, [isOpen])
 
-  // Handle keyboard navigation for Cancel
+  // Handle keyboard navigation for Cancel / Close
   useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Backspace' || e.key === 'Escape') {
+      const key = (e.key || '').toLowerCase()
+      if (key === 'backspace' || key === 'escape' || key === 'z') {
         e.preventDefault()
+        e.stopPropagation()
         handleCancel()
-      } else if (finished && (e.key === 'Enter' || e.key === ' ')) {
+      } else if (finished && (key === 'enter' || key === 'x' || key === ' ')) {
         e.preventDefault()
+        e.stopPropagation()
         onClose()
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
   }, [isOpen, finished, onClose])
 
   const handleCancel = () => {
@@ -80,96 +84,103 @@ export const ScraperProgressModal: React.FC<ScraperProgressModalProps> = ({ isOp
     : 0
 
   return (
-    <div className="riescade-overlay scraper-progress-overlay visible">
-      <div className="scraper-progress-card">
-        {/* Decorative Header Border */}
-        <div className="scraper-progress-glow"></div>
+    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) { if (finished) onClose(); else handleCancel(); } }}>
+      <Dialog.Content 
+        size="3"
+        style={{
+          maxWidth: '500px',
+          width: '90%',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: 0,
+          overflow: 'hidden'
+        }}
+      >
+        <Flex direction="column" align="center" p="4" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+          <Heading size="4" style={{ letterSpacing: '2px', color: 'var(--theme-color)', textTransform: 'uppercase' }}>
+            {finished ? t('SCRAPING COMPLETED') : t('SEARCHING FOR MEDIA')}
+          </Heading>
+        </Flex>
 
-        <h2 className="scraper-progress-title">
-          {finished ? t('SCRAPING COMPLETED') : t('SEARCHING FOR MEDIA')}
-        </h2>
+        <Box p="5" style={{ flexGrow: 1 }}>
+          {!finished ? (
+            <Flex direction="column" gap="4">
+              {/* Current Game Details */}
+              <Flex direction="column" align="center" gap="1">
+                <Text size="3" weight="bold" style={{ color: 'var(--theme-color)' }}>
+                  {progress ? progress.systemName : t('PREPARING...')}
+                </Text>
+                <Text size="2" color="gray" style={{ textAlign: 'center', wordBreak: 'break-word' }}>
+                  {progress ? progress.gameName : t('Loading gamelist...')}
+                </Text>
+              </Flex>
 
-        {!finished ? (
-          <>
-            {/* Current Game Details */}
-            <div className="scraper-progress-details">
-              <div className="scraper-progress-system">
-                {progress ? progress.systemName : t('PREPARING...')}
-              </div>
-              <div className="scraper-progress-game">
-                {progress ? progress.gameName : t('Loading gamelist...')}
-              </div>
-            </div>
+              {/* Progress Bar Container */}
+              <Box>
+                <Progress value={percent} style={{ height: '8px' }} />
+                <Flex justify="end" mt="1">
+                  <Text size="2" weight="bold" style={{ color: 'var(--theme-color)' }}>{percent}%</Text>
+                </Flex>
+              </Box>
 
-            {/* Progress Bar Container */}
-            <div className="scraper-progress-track">
-              <div
-                className="scraper-progress-fill"
-                style={{
-                  width: `${percent}%`
-                }}
-              />
-            </div>
-            <div className="scraper-progress-percent">{percent}%</div>
+              {/* Stats Grid */}
+              <Flex gap="3" p="3" style={{ justifyContent: 'space-around', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '6px' }}>
+                <Flex direction="column" align="center">
+                  <Text size="1" color="gray" weight="bold">{t('TOTAL')}</Text>
+                  <Text size="4" weight="bold">{progress ? progress.total : 0}</Text>
+                </Flex>
+                <Flex direction="column" align="center">
+                  <Text size="1" color="green" weight="bold">{t('SUCCESS')}</Text>
+                  <Text size="4" weight="bold" color="green">
+                    {progress ? progress.successCount : 0}
+                  </Text>
+                </Flex>
+                <Flex direction="column" align="center">
+                  <Text size="1" color="red" weight="bold">{t('FAILURES')}</Text>
+                  <Text size="4" weight="bold" color="red">
+                    {progress ? progress.failCount : 0}
+                  </Text>
+                </Flex>
+              </Flex>
 
-            {/* Stats Grid */}
-            <div className="scraper-progress-grid">
-              <div className="scraper-progress-item">
-                <span className="scraper-progress-label">{t('TOTAL')}</span>
-                <span className="scraper-progress-val">{progress ? progress.total : 0}</span>
-              </div>
-              <div className="scraper-progress-item">
-                <span className="scraper-progress-label">{t('SUCCESS')}</span>
-                <span className="scraper-progress-val success">
-                  {progress ? progress.successCount : 0}
-                </span>
-              </div>
-              <div className="scraper-progress-item">
-                <span className="scraper-progress-label">{t('FAILURES')}</span>
-                <span className="scraper-progress-val fail">
-                  {progress ? progress.failCount : 0}
-                </span>
-              </div>
-            </div>
+              {/* Cancel hint */}
+              <Flex direction="column" align="center" gap="2" mt="2">
+                <Button color="red" variant="solid" onClick={handleCancel} style={{ cursor: 'pointer', minWidth: '120px', outline: '2px solid #fff' }}>
+                  {t('CANCEL')}
+                </Button>
+                <Text size="1" color="gray">
+                  {t('Press B or ESC to cancel')}
+                </Text>
+              </Flex>
+            </Flex>
+          ) : (
+            <Flex direction="column" gap="4">
+              {/* Finished View */}
+              <Flex direction="column" align="center" gap="2" p="3">
+                {finishReason ? (
+                  <Text size="3" style={{ textAlign: 'center' }}>{finishReason}</Text>
+                ) : (
+                  <Text size="3" color="green" weight="bold" style={{ textAlign: 'center' }}>
+                    {t('Scraping completed successfully!')}
+                  </Text>
+                )}
+                <Text size="2">
+                  {t('Games updated:')} <strong style={{ color: 'var(--theme-color)' }}>{scrapedCount}</strong>
+                </Text>
+              </Flex>
 
-            {/* Cancel hint */}
-            <div className="scraper-progress-cancel" onClick={handleCancel}>
-              <button className="riescade-button scraper-progress-cancel-btn">
-                {t('CANCEL')}
-              </button>
-              <div className="scraper-progress-hint">
-                {t('Press B or ESC to cancel')}
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Finished View */}
-            <div className="scraper-progress-finished">
-              {finishReason ? (
-                <div className="scraper-progress-reason">{finishReason}</div>
-              ) : (
-                <div className="scraper-progress-success-msg">
-                  {t('Scraping completed successfully!')}
-                </div>
-              )}
-              <div className="scraper-progress-final-count">
-                {t('Games updated:')} <strong style={{ color: 'var(--theme-color, #f042b0)' }}>{scrapedCount}</strong>
-              </div>
-            </div>
-
-            <div className="scraper-progress-close" onClick={onClose}>
-              <button className="riescade-button scraper-progress-close-btn">
-                {t('OK')}
-              </button>
-              <div className="scraper-progress-hint">
-                {t('Press A or ENTER to close')}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+              <Flex direction="column" align="center" gap="2" mt="2">
+                <Button onClick={onClose} style={{ cursor: 'pointer', minWidth: '120px', outline: '2px solid #fff' }}>
+                  {t('OK')}
+                </Button>
+                <Text size="1" color="gray">
+                  {t('Press A or ENTER to close')}
+                </Text>
+              </Flex>
+            </Flex>
+          )}
+        </Box>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }
-

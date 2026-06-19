@@ -46,6 +46,66 @@ function normalizeGameName(name: string): string {
     .trim()
 }
 
+function scoreCandidate(candidate: any, roomGameName: string, roomCore: string): number {
+  const normRoomName = normalizeGameName(roomGameName)
+  const normCandName = normalizeGameName(candidate.name)
+  
+  const filename = path.basename(candidate.path)
+  const dotIndex = filename.lastIndexOf('.')
+  const stem = dotIndex !== -1 ? filename.substring(0, dotIndex) : filename
+  const normCandStem = normalizeGameName(stem)
+
+  let score = 0
+
+  // 1. Exact match on normalized name gets highest score
+  if (normCandName === normRoomName) {
+    score += 100
+  }
+  // 2. Exact match on normalized filename stem gets a very high score
+  if (normCandStem === normRoomName) {
+    score += 90
+  }
+
+  // 3. Substring match/starts with match
+  if (normCandName.startsWith(normRoomName) || normRoomName.startsWith(normCandName)) {
+    score += 50
+  }
+  if (normCandStem.startsWith(normRoomName) || normRoomName.startsWith(normCandStem)) {
+    score += 40
+  }
+
+  // 4. Boost if core/system matches (RetroArch core name contains/matches system name, or system matches core target)
+  const sysLower = (candidate.system || '').toLowerCase()
+  const coreLower = (roomCore || '').toLowerCase()
+  if (coreLower.includes(sysLower) || sysLower.includes(coreLower)) {
+    score += 30
+  }
+  
+  const systemToCoreMap: Record<string, string[]> = {
+    snes: ['snes9x', 'bsnes', 'mesen', 'chao'],
+    nes: ['fceumm', 'nestopia', 'mesen', 'quicknes'],
+    megadrive: ['genesis_plus_gx', 'picodrive', 'blastem'],
+    genesis: ['genesis_plus_gx', 'picodrive', 'blastem'],
+    gb: ['gambatte', 'sameboy', 'gearboy', 'mgba'],
+    gbc: ['gambatte', 'sameboy', 'gearboy', 'mgba'],
+    gba: ['mgba', 'gpsp', 'vba'],
+    playstation: ['pcsx_rearmed', 'mednafen', 'duckstation'],
+    psx: ['pcsx_rearmed', 'mednafen', 'duckstation']
+  }
+  
+  const mappedCores = systemToCoreMap[sysLower]
+  if (mappedCores) {
+    for (const mc of mappedCores) {
+      if (coreLower.includes(mc) || mc.includes(coreLower)) {
+        score += 25
+        break
+      }
+    }
+  }
+
+  return score
+}
+
 export class NetplayService {
   private settingsParser: SettingsParser
 
@@ -224,10 +284,40 @@ export class NetplayService {
         roomIdx++
         if (!room.game_name) continue
 
+        // 1. Try direct lookup by CRC32 first if valid
+        const cleanCrc = (room.game_crc || '').trim().toUpperCase()
+        if (cleanCrc && cleanCrc !== '00000000') {
+          try {
+            const dbMatch = db.prepare(`
+              SELECT g.*, s.path as system_path
+              FROM games g
+              JOIN systems s ON g.system = s.name
+              WHERE UPPER(g.crc32) = ?
+            `).get(cleanCrc) as any
+
+            if (dbMatch) {
+              const absolutePath = path.resolve(dbMatch.system_path, dbMatch.path)
+              room.localGame = {
+                id: dbMatch.id,
+                name: dbMatch.name,
+                path: dbMatch.path,
+                system: dbMatch.system,
+                absolutePath,
+                matchStatus: 'SAME_ROM',
+                localCrc: cleanCrc
+              }
+              console.log(`[Netplay] Room ${roomIdx}/${rooms.length} "${room.game_name}" -> Direct CRC32 match found: ${dbMatch.path}`)
+              continue
+            }
+          } catch (dbErr) {
+            console.error(`[Netplay] DB CRC32 query failed for room ${roomIdx}:`, dbErr)
+          }
+        }
+
         const normalizedName = normalizeGameName(room.game_name)
         if (!normalizedName) continue
 
-        // 1. Search SQLite database for fuzzy match by title or filename
+        // 2. Search SQLite database for fuzzy match by title or filename
         let candidates: any[] = []
         try {
           candidates = db.prepare(`
@@ -243,13 +333,16 @@ export class NetplayService {
 
         if (candidates.length === 0) continue
 
-        console.log(`[Netplay] Room ${roomIdx}/${rooms.length} "${room.game_name}" -> ${candidates.length} candidates`)
+        // 3. Sort candidates using our scoring function
+        candidates.sort((a, b) => scoreCandidate(b, room.game_name, room.core_name) - scoreCandidate(a, room.game_name, room.core_name))
+
+        console.log(`[Netplay] Room ${roomIdx}/${rooms.length} "${room.game_name}" -> ${candidates.length} candidates (sorted)`)
 
         let bestMatch: any = null
         let matchedStatus: 'SAME_ROM' | 'DIFFERENT_ROM' = 'DIFFERENT_ROM'
         let matchedCrc = ''
 
-        // 2. Perform on-demand hashing on candidate files (limit to first 3 to avoid long blocking)
+        // 4. Perform on-demand hashing on candidate files (limit to first 3 to avoid long blocking)
         const maxCandidates = Math.min(candidates.length, 3)
         for (let ci = 0; ci < maxCandidates; ci++) {
           const candidate = candidates[ci]
