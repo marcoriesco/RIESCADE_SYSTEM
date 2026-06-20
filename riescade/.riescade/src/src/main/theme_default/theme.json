@@ -110,6 +110,44 @@
       "default": "carousel"
     },
     {
+      "id": "system_video",
+      "name": "VÍDEO GAMEPLAY",
+      "type": "toggle",
+      "default": true
+    },
+    {
+      "id": "system_video_delay",
+      "name": "VIDEO ATRASO",
+      "type": "select",
+      "options": [
+        {
+          "value": "0",
+          "label": "NENHUM"
+        },
+        {
+          "value": "2",
+          "label": "2 segundos"
+        },
+        {
+          "value": "3",
+          "label": "3 segundos"
+        },
+        {
+          "value": "4",
+          "label": "4 segundos"
+        },
+        {
+          "value": "5",
+          "label": "5 segundos"
+        },
+        {
+          "value": "10",
+          "label": "10 segundos"
+        }
+      ],
+      "default": "3"
+    },
+    {
       "id": "gamelist_group",
       "name": "OPÇÕES DA GAMELIST",
       "type": "group"

@@ -410,6 +410,23 @@ export function registerSystemIpc(context: IpcContext): void {
     }
   })
 
+  // 10b. Check if file exists on disk
+  ipcMain.handle('file-exists', async (_, filePath: string) => {
+    try {
+      let cleanPath = filePath
+      if (cleanPath.startsWith('file:///')) {
+        cleanPath = cleanPath.substring(8)
+      } else if (cleanPath.startsWith('file://')) {
+        cleanPath = cleanPath.substring(7)
+      }
+      cleanPath = decodeURIComponent(cleanPath).replace(/\\/g, '/').split('?')[0].split('#')[0]
+      return fs.existsSync(cleanPath)
+    } catch (e) {
+      console.error('Failed to check if file exists:', e)
+      return false
+    }
+  })
+
   // 11. Get decorations (bezels) directory list
   ipcMain.handle('get-decorations', async () => {
     try {

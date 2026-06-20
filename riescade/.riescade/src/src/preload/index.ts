@@ -53,6 +53,7 @@ const api = {
   saveThemeSetting: (themeName: string, key: string, value: string) => 
     ipcRenderer.invoke('save-theme-setting', themeName, key, value),
   getFileContent: (path: string) => ipcRenderer.invoke('get-file-content', path),
+  fileExists: (path: string) => ipcRenderer.invoke('file-exists', path),
 
   // Controllers
   getConfiguredControllers: () => ipcRenderer.invoke('get-configured-controllers'),

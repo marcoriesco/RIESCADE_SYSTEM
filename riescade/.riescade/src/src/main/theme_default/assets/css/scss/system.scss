@@ -8,20 +8,32 @@
 }
 
 /* 1. FANART */
-.system-fanart {
+.system-image-fanart,
+.system-image-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
 
-  .system-image-fanart,
-  .system-image-overlay {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
-  }
+.system-image-overlay {
+  z-index: 3;
+}
 
-  .system-image-overlay {
-    z-index: 2;
-  }
+
+.system-animate-fanart {
+	position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+
+	.system-video {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
 }
 
 /* CAROUSEL AREA */

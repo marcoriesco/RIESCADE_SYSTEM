@@ -10,6 +10,7 @@ interface Props {
   style?: React.CSSProperties
   src?: string
   fallback?: string
+  children?: React.ReactNode
 }
 
 export const WebVideoElement: React.FC<Props> = ({
@@ -21,14 +22,29 @@ export const WebVideoElement: React.FC<Props> = ({
   class: classAttr = '',
   style = {},
   src,
-  fallback
+  fallback,
+  children
 }) => {
   // activeSrc is only set AFTER the delay has elapsed for the current videoSrc.
   // This prevents the video from playing during the delay window, even across re-renders.
   const [activeSrc, setActiveSrc] = useState('')
+  const [fileExists, setFileExists] = useState<boolean | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  const videoSrc = src || data['game:video'] || ''
+  // Find source from children
+  let childSrc = ''
+  if (children) {
+    React.Children.forEach(children, (child) => {
+      if (React.isValidElement(child) && (child.type === 'source' || (typeof child.type === 'string' && child.type.toLowerCase() === 'source'))) {
+        const childProps = child.props as any
+        if (childProps && childProps.src) {
+          childSrc = childProps.src
+        }
+      }
+    })
+  }
+
+  const videoSrc = src || childSrc || data['game:video'] || ''
   const isVideoEnabled = data['gamelist_video'] !== false && data['gamelist_video'] !== 'false'
 
   // Combine className (React style) and class (WebComponent style)
@@ -47,11 +63,45 @@ export const WebVideoElement: React.FC<Props> = ({
 
   const delayMs = getDelayMs(delay)
 
+  // Check if file exists on disk
+  useEffect(() => {
+    let active = true
+
+    if (!videoSrc) {
+      setFileExists(false)
+      return
+    }
+
+    if (videoSrc.startsWith('http://') || videoSrc.startsWith('https://') || videoSrc.startsWith('data:')) {
+      setFileExists(true)
+      return
+    }
+
+    if (window.api && typeof window.api.fileExists === 'function') {
+      window.api.fileExists(videoSrc).then((exists) => {
+        if (active) {
+          setFileExists(exists)
+        }
+      }).catch((err) => {
+        console.error('Error verifying video file existence:', err)
+        if (active) {
+          setFileExists(false)
+        }
+      })
+    } else {
+      setFileExists(true)
+    }
+
+    return () => {
+      active = false
+    }
+  }, [videoSrc])
+
   useEffect(() => {
     // Immediately clear the active source — the video stops until the delay elapses
     setActiveSrc('')
 
-    if (!videoSrc || !isVideoEnabled) return
+    if (!videoSrc || !isVideoEnabled || fileExists === false) return
 
     if (delayMs > 0) {
       const timer = setTimeout(() => {
@@ -61,9 +111,9 @@ export const WebVideoElement: React.FC<Props> = ({
     } else {
       setActiveSrc(videoSrc)
     }
-  }, [videoSrc, isVideoEnabled, delayMs])
+  }, [videoSrc, isVideoEnabled, delayMs, fileExists])
 
-  if (!isVideoEnabled) {
+  if (!isVideoEnabled || fileExists === false || fileExists === null) {
     return null
   }
 

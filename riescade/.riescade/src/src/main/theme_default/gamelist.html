@@ -6,11 +6,12 @@
   <img class="{game:fanart ? 'gamelist-image-fanart' : 'gamelist-image-default' } animate__animated animate__fadeIn" decoding="async" src="{game:fanart}" onerror="this.onerror=null; this.src = './assets/arts/{system:theme}.webp'; this.className = 'gamelist-image-default'" data-riescade-key="game" />
 	<img class="gamelist-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
 	
-  <!-- VIDEO AUTOPLAY -->
-  <div class="gameplay-video-container {options:gamelist_video ? '' : 'hide'}" data-riescade-key="game">
-    <riescade-video class="gamelist-video" autoplay loop delay="{options:gamelist_video_delay}"></riescade-video>
+  <!-- GAMEPLAY VIDEO -->
+  <div class="gameplay-video-container" data-riescade-key="game">
+    <riescade-video class="gamelist-video" autoplay loop delay="{options:gamelist_video_delay}">
+      <source src="{game:video}" />
+    </riescade-video>
   </div>
-
 
   <!-- HEADER GLOBAL -->
   <div class="riescade-header">

@@ -38,6 +38,7 @@ declare global {
       getCollectionsForGame: (systemName: string, gamePath: string) => Promise<string[]>
       toggleGameInCollection: (collectionName: string, systemName: string, gamePath: string, action: 'add' | 'remove') => Promise<boolean>
       getFileContent: (path: string) => Promise<string | null>
+      fileExists: (path: string) => Promise<boolean>
       getHostname: () => Promise<string>
       getBiosInformation: () => Promise<any[]>
       cleanGamelists: () => Promise<any>

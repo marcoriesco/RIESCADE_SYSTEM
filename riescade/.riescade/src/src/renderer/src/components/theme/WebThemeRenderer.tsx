@@ -675,8 +675,8 @@ export const WebThemeRenderer: React.FC<Props> = ({ htmlContent, data, themePath
         return menuItemsNode ? React.cloneElement(menuItemsNode as React.ReactElement, { key: index }) : null
       }
 
-      if (tagName === 'riescade-video') {
-        return <WebVideoElement key={index} data={data} {...restProps} />
+      if (tagName === 'riescade-video' || tagName === 'riescade-gamelist-video' || tagName === 'riescade-system-video') {
+        return <WebVideoElement key={index} data={data} {...restProps}>{finalChildren}</WebVideoElement>
       }
 
       const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']

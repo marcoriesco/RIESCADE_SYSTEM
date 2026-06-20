@@ -3,9 +3,14 @@
 	<link rel="stylesheet" href="./assets/css/animate.css" />
 
 	<!-- FANART & OVERLAY -->
-	<div class="system-fanart">
-		<img class="system-image-fanart" decoding="async" src="./assets/arts/{system:theme}.webp" onerror="this.src = './assets/default.webp'"/>
-		<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
+	<img class="system-image-fanart" decoding="async" src="./assets/arts/{system:theme}.webp" onerror="this.src = './assets/default.webp'"/>
+	<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
+
+	<!-- ANIMATE BACKGROUND -->
+	<div class="system-animate-fanart" data-riescade-key="system">
+		<riescade-system-video class="system-video" autoplay loop delay="{options:system_video_delay}">
+			<source src="./assets/animate/{system:theme}.mp4" />
+		</riescade-system-video>
 	</div>
 
 	<!-- HEADER GLOBAL -->
@@ -95,4 +100,5 @@
 			<img src="./assets/indicators/{options:controller}.svg" class="controller-activity-icon" />
 		</riescade-controller-activity>
 	</div>
+	
 </div>

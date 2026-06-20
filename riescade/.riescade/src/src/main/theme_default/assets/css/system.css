@@ -8,16 +8,30 @@
 }
 
 /* 1. FANART */
-.system-fanart .system-image-fanart,
-.system-fanart .system-image-overlay {
+.system-image-fanart,
+.system-image-overlay {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   z-index: 1;
 }
-.system-fanart .system-image-overlay {
+
+.system-image-overlay {
+  z-index: 3;
+}
+
+.system-animate-fanart {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 2;
+}
+.system-animate-fanart .system-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* CAROUSEL AREA */
