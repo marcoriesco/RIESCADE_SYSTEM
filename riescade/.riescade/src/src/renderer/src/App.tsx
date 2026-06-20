@@ -1251,28 +1251,29 @@ function App() {
 	// Contextual Game Media Preloading
 	useEffect(() => {
 		if (filteredGames.length === 0) return;
-		
-		const prefetchRange = 15;
+
+		const prefetchRange = 2;
 		const start = Math.max(0, selectedGameIndex - prefetchRange);
 		const end = Math.min(filteredGames.length - 1, selectedGameIndex + prefetchRange);
-		
-		const urlsToPreload: string[] = [];
+		const urlsToPreload = new Set<string>();
+
 		for (let i = start; i <= end; i++) {
 			const game = filteredGames[i];
 			if (!game) continue;
-			
+
 			const mediaFields = [game.marquee, game.image, game.fanart];
+
 			mediaFields.forEach(p => {
-				if (p) {
-					const cleanPath = p.replace(/\\/g, '/');
-					const url = cleanPath.startsWith('/') || cleanPath.match(/^[a-zA-Z]:/)
+				if (!p) return;
+				const cleanPath = p.replace(/\\/g, '/');
+				const url =
+					cleanPath.startsWith('/') || cleanPath.match(/^[a-zA-Z]:/)
 						? `file:///${cleanPath}`
 						: `file://${cleanPath}`;
-					urlsToPreload.push(escapeFileUrl(url));
-				}
+				urlsToPreload.add(escapeFileUrl(url));
 			});
 		}
-		
+
 		urlsToPreload.forEach(url => {
 			preloadImage(url);
 		});
