@@ -559,7 +559,6 @@
   --font-menu: Roboto Condensed, sans-serif;
   --font-shadow: 0 0 3px #000000;
   --border-default: 1px solid #111;
-  --accent-indicator: #9f0043;
 }
 
 body {
@@ -609,4 +608,8 @@ body {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+.rt-SpinnerLeaf:before {
+  background-color: var(--theme-color) !important;
 }

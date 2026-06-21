@@ -20,9 +20,6 @@ $border-default: 1px solid #111;
   --font-menu: #{$font-menu};
   --font-shadow: #{$font-shadow};
   --border-default: #{$border-default};
-
-  // RADIX
-  --accent-indicator: #{$theme-color};
 }
 
 body {
@@ -79,4 +76,9 @@ body {
       background: rgba(255, 255, 255, 0.3);
     }
   }
+}
+
+// RADIX HACKS
+.rt-SpinnerLeaf:before {
+  background-color: var(--theme-color) !important;
 }
