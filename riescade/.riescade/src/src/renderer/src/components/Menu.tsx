@@ -1142,6 +1142,29 @@ export const Menu: React.FC<MenuProps> = ({
     }
   }
 
+  // Auto-generate description for submenu items showing changed settings (SELECT only)
+  const getSubmenuDescription = (submenuItems: MenuItem[]): string | undefined => {
+    const changed: string[] = []
+    for (const sub of submenuItems) {
+      // Only process SELECT items with settingName
+      if (!sub.settingName || sub.type !== 'select' || !sub.options || sub.options.length === 0) continue
+
+      const val = getSetting(sub.settingName, '')
+      const valStr = String(val).toLowerCase()
+
+      // Skip if value is AUTO/empty (not changed)
+      if (!val || val === '' || valStr === 'auto') continue
+
+      // Show the label of the selected option
+      const selectedOpt = sub.options.find(o => isOptionMatch(o.value, val))
+      if (selectedOpt && !isOptionMatch(selectedOpt.value, '') && String(selectedOpt.value).toLowerCase() !== 'auto') {
+        changed.push(sub.label + ': ' + selectedOpt.label.toUpperCase())
+      }
+    }
+
+    return changed.length > 0 ? changed.join(', ') : undefined
+  }
+
   const getMainMenuItems = (): MenuItem[] => {
     const showReloadSystem = selectedSystem && !(
       selectedSystem.name === 'collections' ||
@@ -1347,7 +1370,6 @@ export const Menu: React.FC<MenuProps> = ({
           {
             id: 'switch_submenu',
             label: t('SWITCH'),
-            description: t('SAVES IN RETROBAT SAVES FOLDER') + ' : ' + (getSetting('yuzu_mutualize', 'false') === 'true' ? t('ON') : t('OFF')),
             submenu: [
               { id: 'yuzu_mutualize', label: t('SAVES IN RETROBAT SAVES FOLDER'), type: 'toggle', settingName: 'yuzu_mutualize', settingType: 'bool', description: t('Switch on to use RetroBat saves folder for Citron and Eden saves (instead of emulator folder).') }
             ]
@@ -1460,7 +1482,6 @@ export const Menu: React.FC<MenuProps> = ({
           {
             id: 'screen_sync_submenu',
             label: t('SCREEN SYNC'),
-            description: t('G-SYNC/FREESYNC COMPATIBILITY') + ' : ' + (getSetting('vrr_runloop_enable', 'false') === 'true' ? t('ON') : t('OFF')),
             submenu: [
               { id: 'video_vsync', label: t('VERTICAL SYNC'), type: 'select', settingName: 'video_vsync', options: [
                 { label: t('AUTO'), value: '' },
@@ -1573,7 +1594,6 @@ export const Menu: React.FC<MenuProps> = ({
           {
             id: 'ui_elements_submenu',
             label: t('USER INTERFACE'),
-            description: t('SHOW MENU ELEMENTS') + ' : ' + String(getSetting('OptionsMenu', 'full')).toUpperCase(),
             submenu: [
               { id: 'OnScreenMsg', label: t('NOTIFICATIONS'), type: 'toggle', settingName: 'OnScreenMsg', settingType: 'bool', description: t('Display or not on-screen notifications.') },
               { id: 'DrawStats', label: t('DRAW STATISTICS'), type: 'select', settingName: 'DrawStats', description: t('Display different level of information about performance statistics.'), options: [
@@ -1606,7 +1626,6 @@ export const Menu: React.FC<MenuProps> = ({
           {
             id: 'drivers_submenu',
             label: t('DRIVERS'),
-            description: t('VIDEO') + ' : ' + String(getSetting('video_driver', 'vulkan')).toUpperCase(),
             submenu: [
               { id: 'video_driver', label: t('VIDEO'), type: 'select', settingName: 'video_driver', description: t('The driver vulkan will generally offer better performance if hardware compatible. Some libretro cores will force the choosen driver.'), options: [
                 { label: 'AUTO', value: '' },
@@ -3061,11 +3080,14 @@ export const Menu: React.FC<MenuProps> = ({
                   {item.label}
                 </Text>
               </Flex>
-              {item.description && (
-                <Text size="1" className="riescade-menu-item-description">
-                  {item.description}
-                </Text>
-              )}
+              {(() => {
+                const desc = item.description || (!isMainMenu && item.submenu ? getSubmenuDescription(item.submenu) : undefined)
+                return desc ? (
+                  <Text size="1" className="riescade-menu-item-description">
+                    {desc}
+                  </Text>
+                ) : null
+              })()}
             </Flex>
             <Box className="riescade-menu-item-value">{renderItemValue(item)}</Box>
           </Box>

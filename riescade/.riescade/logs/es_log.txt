@@ -1,220 +1,434 @@
---- RIESCADE Log Started at 2026-06-21T05:54:53.348Z ---
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[02:54:53] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[02:54:53] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[02:54:53] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[02:54:53] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[02:54:53] [INFO] [SyncCheck] Starting startup synchronization check...
-[02:54:53] [INFO] [SyncCheck] All 308 systems are up-to-date. SQLite fast path active.
-[02:54:53] [INFO] [StartLoader:Backend] sendProgress(10, 'LOADING_PLATFORMS')
-[02:54:53] [INFO] [StartLoader:Backend] sendProgress(30, 'LOADING_PLATFORMS')
-[02:54:53] [INFO] [StartLoader:Backend] sendProgress(60, 'LOADING_PLATFORMS')
-[02:54:53] [INFO] [StartLoader:Backend] sendProgress(80, 'LOADING_PLATFORMS')
-[02:54:53] [INFO] [StartLoader:Backend] sendProgress(100, 'READY')
-[02:54:53] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
-[02:54:55] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=185.199.111.133 (IPv4), Time=1217ms, HTTP=200
-[02:54:55] [INFO] [Netplay] getLobbyList() called
-[02:54:55] [INFO] [Netplay] Using port: 55435
-[02:54:55] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
-[02:54:57] [INFO] [Netplay] WAN response status: 200 (2074ms)
-[02:54:57] [INFO] [Netplay] WAN data received: 24605 bytes (2075ms)
-[02:54:57] [INFO] [Netplay] Parsed 31 WAN rooms
-[02:54:57] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 31
-[02:54:57] [INFO] [Netplay] matchLocalRoms() called with 31 rooms
-[02:54:57] [INFO] [Netplay] Opening database...
-[02:54:57] [INFO] [Netplay] Database opened successfully
-[02:54:57] [INFO] [Netplay] Room 2/31 "Super Mario Bros. (Two Player Hack)" -> Direct CRC32 match found: ./Super Mario Bros. - Cooperative Two Player (Hack).zip
-[02:54:57] [INFO] [Netplay] Room 3/31 "Donkey Kong Country (USA) (Rev 2)" -> 37 candidates (sorted)
-[02:54:57] [INFO] [Netplay]   Hashing candidate 1/3: ./Donkey Kong Country (USA) (Rev 2).zip
-[02:54:57] [INFO] [Netplay]   CRC: 762AF827 vs room CRC: 762AF827
-[02:54:57] [INFO] [Netplay] Room 4/31 "Tekken3" -> 2 candidates (sorted)
-[02:54:57] [INFO] [Netplay]   Hashing candidate 1/2: ./tekken3.zip
-[02:54:57] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[02:54:57] [INFO] [Netplay]   Hashing candidate 2/2: ./tekken3.zip
-[02:54:57] [INFO] [Netplay]   CRC: FFEBA79F vs room CRC: 892889E7
-[02:54:57] [INFO] [Netplay] Room 7/31 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[02:54:57] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[02:55:01] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[02:55:01] [INFO] [Netplay] Room 8/31 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[02:55:01] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[02:55:05] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[02:55:05] [INFO] [Netplay] Room 9/31 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[02:55:05] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[02:55:08] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[02:55:08] [INFO] [Netplay] Room 10/31 "Xeno Crisis" -> Direct CRC32 match found: ./Xeno Crisis (Homebrew).zip
-[02:55:08] [INFO] [Netplay] Room 12/31 "captcomm" -> 112 candidates (sorted)
-[02:55:08] [INFO] [Netplay]   Hashing candidate 1/3: ./captcomm.zip
-[02:55:08] [INFO] [Netplay]   CRC: 0FD34195 vs room CRC: A4A89D48
-[02:55:08] [INFO] [Netplay]   Hashing candidate 2/3: ./captcomm.zip
-[02:55:08] [INFO] [Netplay]   CRC: 42C814C5 vs room CRC: A4A89D48
-[02:55:08] [INFO] [Netplay]   Hashing candidate 3/3: ./captcomm.zip
-[02:55:08] [INFO] [Netplay]   CRC: 42C814C5 vs room CRC: A4A89D48
-[02:55:09] [INFO] [Netplay] Room 17/31 "Digimon World 2 (USA)" -> Direct CRC32 match found: ./Digimon World 2.chd
-[02:55:09] [INFO] [Netplay] Room 18/31 "Top Gear 2 (U) [f1][T+Spa100_Chilensis]" -> 8 candidates (sorted)
-[02:55:09] [INFO] [Netplay]   Hashing candidate 1/3: ./Top Gear 2 (USA).zip
-[02:55:09] [INFO] [Netplay]   CRC: 2B88BEE8 vs room CRC: 4220285B
-[02:55:09] [INFO] [Netplay]   Hashing candidate 2/3: ./Top Gear 2/Top Gear 2.cue
-[02:55:10] [INFO] [Netplay]   CRC: 736037D4 vs room CRC: 4220285B
-[02:55:10] [INFO] [Netplay]   Hashing candidate 3/3: ./Top Gear 2/Top Gear 2.md
-[02:55:15] [INFO] [Netplay]   CRC: 89F8E4F0 vs room CRC: 4220285B
-[02:55:15] [INFO] [Netplay] Room 20/31 "kof96cn" -> 1 candidates (sorted)
-[02:55:15] [INFO] [Netplay]   Hashing candidate 1/1: ./kof96cn.zip
-[02:55:15] [INFO] [Netplay]   CRC: 05B54F37 vs room CRC: 0E5C19D0
-[02:55:15] [INFO] [Netplay] Room 21/31 "theglad" -> 1 candidates (sorted)
-[02:55:15] [INFO] [Netplay]   Hashing candidate 1/1: ./theglad.zip
-[02:55:15] [INFO] [Netplay]   CRC: 45AE7159 vs room CRC: CAD123ED
-[02:55:15] [INFO] [Netplay] Room 23/31 "吞食天地III" -> Direct CRC32 match found: ./Tun Shi Tian Di III (China) (Unl).zip
-[02:55:16] [INFO] [Netplay] Room 25/31 "魂斗罗1" -> 6609 candidates (sorted)
-[02:55:16] [INFO] [Netplay]   Hashing candidate 1/3: ./10-Yard Fight (J) (V1.0) [!].nes
-[02:55:16] [INFO] [Netplay]   CRC: 44AA3EEB vs room CRC: 4D9E53AF
-[02:55:16] [INFO] [Netplay]   Hashing candidate 2/3: ./10-Yard Fight (J) (V1.1) [!].nes
-[02:55:17] [INFO] [Netplay]   CRC: 83146ECF vs room CRC: 4D9E53AF
-[02:55:17] [INFO] [Netplay]   Hashing candidate 3/3: ./100 Man Dollar Kid - Maboroshi no Teiou Hen (J) [!].nes
-[02:55:17] [INFO] [Netplay]   CRC: FCCB5CEA vs room CRC: 4D9E53AF
-[02:55:17] [INFO] [Netplay] Room 27/31 "Tetris (Nintendo)" -> Direct CRC32 match found: ./Tetris.zip
-[02:55:17] [INFO] [Netplay] Room 29/31 "Tecmo Super Bowl (U) [!]" -> Direct CRC32 match found: ./Tecmo Super Bowl.zip
-[02:55:17] [INFO] [Netplay] Room 30/31 "R.B.I. Baseball 2 (USA) (Unl)" -> Direct CRC32 match found: ./R.B.I. Baseball 2.zip
-[02:55:17] [INFO] [Netplay] Room 31/31 "Marble Madness (USA)" -> Direct CRC32 match found: ./Marble Madness.zip
-[02:55:17] [INFO] [Netplay] matchLocalRoms() completed
-[02:55:17] [INFO] [Netplay] Returning 31 rooms (18 matched locally)
-[02:55:36] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system nes -emulator libretro -core fceumm -netplaymode client -netplayport 55435 -netplaynick "EMULATIONSTATION Player" -netplayip 187.127.5.191 -rom "C:\tmp\RIESCADE_SYSTEM\roms\nes\Tetris.zip"
-[02:56:02] [INFO] [Netplay] getLobbyList() called
-[02:56:02] [INFO] [Netplay] Using port: 55435
-[02:56:02] [INFO] [Netplay] Fetching WAN lobby from: http://lobby.libretro.com/list/
-[02:56:02] [INFO] [Netplay] WAN response status: 200 (322ms)
-[02:56:02] [INFO] [Netplay] WAN data received: 23757 bytes (487ms)
-[02:56:02] [INFO] [Netplay] Parsed 30 WAN rooms
-[02:56:03] [INFO] [Netplay] LAN rooms found: 0, WAN rooms found: 30
-[02:56:03] [INFO] [Netplay] matchLocalRoms() called with 30 rooms
-[02:56:03] [INFO] [Netplay] Opening database...
-[02:56:03] [INFO] [Netplay] Database opened successfully
-[02:56:03] [INFO] [Netplay] Room 4/30 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[02:56:03] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[02:56:03] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[02:56:03] [INFO] [Netplay] Room 5/30 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[02:56:03] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[02:56:03] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[02:56:03] [INFO] [Netplay] Room 6/30 "Battle Formula (Japan)" -> 1 candidates (sorted)
-[02:56:03] [INFO] [Netplay]   Hashing candidate 1/1: ./Battle Formula (J) [!].nes
-[02:56:03] [INFO] [Netplay]   CRC: 90F46294 vs room CRC: F6454BE1
-[02:56:03] [INFO] [Netplay] Room 9/30 "Xeno Crisis" -> Direct CRC32 match found: ./Xeno Crisis (Homebrew).zip
-[02:56:03] [INFO] [Netplay] Room 10/30 "kf2k2mp2" -> Direct CRC32 match found: ./kof2002.zip
-[02:56:04] [INFO] [Netplay] Room 12/30 "captcomm" -> 112 candidates (sorted)
-[02:56:04] [INFO] [Netplay]   Hashing candidate 1/3: ./captcomm.zip
-[02:56:04] [INFO] [Netplay]   CRC: 0FD34195 vs room CRC: A4A89D48
-[02:56:04] [INFO] [Netplay]   Hashing candidate 2/3: ./captcomm.zip
-[02:56:04] [INFO] [Netplay]   CRC: 42C814C5 vs room CRC: A4A89D48
-[02:56:04] [INFO] [Netplay]   Hashing candidate 3/3: ./captcomm.zip
-[02:56:04] [INFO] [Netplay]   CRC: 42C814C5 vs room CRC: A4A89D48
-[02:56:04] [INFO] [Netplay] Room 17/30 "Digimon World 2 (USA)" -> Direct CRC32 match found: ./Digimon World 2.chd
-[02:56:04] [INFO] [Netplay] Room 18/30 "Top Gear 2 (U) [f1][T+Spa100_Chilensis]" -> 8 candidates (sorted)
-[02:56:04] [INFO] [Netplay]   Hashing candidate 1/3: ./Top Gear 2 (USA).zip
-[02:56:04] [INFO] [Netplay]   CRC: 2B88BEE8 vs room CRC: 4220285B
-[02:56:04] [INFO] [Netplay]   Hashing candidate 2/3: ./Top Gear 2/Top Gear 2.cue
-[02:56:04] [INFO] [Netplay]   CRC: 736037D4 vs room CRC: 4220285B
-[02:56:04] [INFO] [Netplay]   Hashing candidate 3/3: ./Top Gear 2/Top Gear 2.md
-[02:56:04] [INFO] [Netplay]   CRC: 89F8E4F0 vs room CRC: 4220285B
-[02:56:04] [INFO] [Netplay] Room 20/30 "魂斗罗1" -> 6609 candidates (sorted)
-[02:56:04] [INFO] [Netplay]   Hashing candidate 1/3: ./10-Yard Fight (J) (V1.0) [!].nes
-[02:56:04] [INFO] [Netplay]   CRC: 44AA3EEB vs room CRC: 4D9E53AF
-[02:56:04] [INFO] [Netplay]   Hashing candidate 2/3: ./10-Yard Fight (J) (V1.1) [!].nes
-[02:56:04] [INFO] [Netplay]   CRC: 83146ECF vs room CRC: 4D9E53AF
-[02:56:04] [INFO] [Netplay]   Hashing candidate 3/3: ./100 Man Dollar Kid - Maboroshi no Teiou Hen (J) [!].nes
-[02:56:04] [INFO] [Netplay]   CRC: FCCB5CEA vs room CRC: 4D9E53AF
-[02:56:04] [INFO] [Netplay] Room 22/30 "theglad" -> 1 candidates (sorted)
-[02:56:04] [INFO] [Netplay]   Hashing candidate 1/1: ./theglad.zip
-[02:56:04] [INFO] [Netplay]   CRC: 45AE7159 vs room CRC: CAD123ED
-[02:56:04] [INFO] [Netplay] Room 25/30 "吞食天地III" -> Direct CRC32 match found: ./Tun Shi Tian Di III (China) (Unl).zip
-[02:56:04] [INFO] [Netplay] Room 26/30 "Tetris (Nintendo)" -> Direct CRC32 match found: ./Tetris.zip
-[02:56:04] [INFO] [Netplay] Room 28/30 "Tecmo Super Bowl (U) [!]" -> Direct CRC32 match found: ./Tecmo Super Bowl.zip
-[02:56:04] [INFO] [Netplay] Room 29/30 "R.B.I. Baseball 2 (USA) (Unl)" -> Direct CRC32 match found: ./R.B.I. Baseball 2.zip
-[02:56:04] [INFO] [Netplay] Room 30/30 "Marble Madness (USA)" -> Direct CRC32 match found: ./Marble Madness.zip
-[02:56:04] [INFO] [Netplay] matchLocalRoms() completed
-[02:56:04] [INFO] [Netplay] Returning 30 rooms (15 matched locally)
-[02:56:28] [INFO] Launching: "C:\tmp\RIESCADE_SYSTEM\riescade\emulatorLauncher.exe" -gameinfo "C:\Users\MARCOR~1\AppData\Local\Temp\riescade.tmp\game.xml" -p1index 0 -p1guid 030000005e0400008e02000000007200 -p1name "Xbox 360 Controller" -p1nbbuttons 17 -p1nbaxes 4 -p1nbhats 1 -p1path "USB\VID_045E&PID_028E\01" -system hbmame -emulator hbmame -core  -netplaymode client -netplayport 55435 -netplaynick "EMULATIONSTATION Player" -netplayip 88.182.162.151 -rom "C:\tmp\RIESCADE_SYSTEM\roms\hbmame\captcomm.zip"
-[02:59:21] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=185.199.111.133 (IPv4), Time=113ms, HTTP=200
-[02:59:23] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=185.199.111.133 (IPv4), Time=54ms, HTTP=200
-[02:59:25] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=185.199.111.133 (IPv4), Time=56ms, HTTP=200
-[03:03:21] [INFO] Theme file changed: theme.json. Notifying renderer...
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[03:03:21] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[03:03:21] [INFO] Theme file changed: locales\ar.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\ca.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\cs_CZ.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\cy_GB.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\de.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\el.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\en_GB.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\en_US.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\es.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\es_ES.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\es_MX.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\eu_ES.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\fi_FI.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\fr.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\fr_FR.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\gl_ES.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\he.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\hu.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\id_ID.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\it.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\ja_JP.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\ko.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\nb_NO.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\nl.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\nn_NO.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\oc_FR.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\pl.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\pt_BR.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\pt_PT.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\ro_RO.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\ru_RU.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\sk_SK.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\sv_SE.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\tr.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\uk_UA.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\vi_VN.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\zh_CN.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: locales\zh_TW.json. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: start.html. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: system_carousel.html. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: gamelist.html. Notifying renderer...
-[03:03:21] [INFO] Theme file changed: loading.html. Notifying renderer...
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
-[03:03:21] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
-[03:03:21] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
-[03:03:21] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
-[03:16:45] [INFO] Executing system command: exit-frontend
+--- RIESCADE Log Started at 2026-06-21T06:50:17.940Z ---
+[03:50:17] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:50:17] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:50:17] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:50:17] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:50:17] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:50:18] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:50:18] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:50:18] [INFO] Theme file changed: assets\css\animate.css. Notifying renderer...
+[03:50:18] [INFO] [SyncCheck] Starting startup synchronization check...
+[03:50:18] [INFO] [SyncCheck] System 'mess' changed: mtime matches: false (1782018898325.3367 vs 1782021338528.2715), fileCount matches: true (89 vs 89)
+[03:50:18] [INFO] [SyncCheck] 1/308 system(s) require synchronization. Initiating re-indexing.
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(5, 'UPDATING_DATABASE')
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:50:18] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:50:18] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:50:18] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(10, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(11, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(12, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(13, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(14, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(15, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(16, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(17, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(18, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(19, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(20, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(21, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(22, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(23, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(24, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(25, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(26, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(27, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(28, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(29, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(30, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(31, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(32, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(33, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(34, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(35, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(36, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(37, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(38, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(39, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(40, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO]   📂 Indexing: mess ...
+[03:50:18] [INFO]     ✅ mess: 0 games indexed
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(41, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(42, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(43, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(44, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(45, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(46, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(47, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(48, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(49, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:50:18] [INFO] 🔄 Re-indexed 1 system(s) with changes
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(50, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(80, 'UPDATING_DATABASE')
+[03:50:18] [INFO] [StartLoader:Backend] sendProgress(100, 'UPDATING_DATABASE')
+[03:50:18] [INFO] 📡 Starting ROMs watcher on: C:\tmp\RIESCADE_SYSTEM\roms
+[03:50:20] [WARN] [check-for-updates] Attempt 1: Success=true, DNS=185.199.109.133 (IPv4), Time=1278ms, HTTP=200
+[03:54:15] [INFO] Open dev tool...
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:55:40] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\loading.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\loading.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\start.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\start.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\system.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\system.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\loading.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\loading.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\start.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\start.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\system.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\system.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\gamelist.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\loading.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\loading.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\start.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\start.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\system.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\system.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Theme file changed: assets\css\global.css. Notifying renderer...
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\gamelist.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\gamelist.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\global.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\global.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\loading.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\loading.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\start.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\start.css
+[03:55:40] [INFO] Compiling SCSS: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\scss\system.scss
+[03:55:40] [INFO] Successfully compiled to: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default\assets\css\system.css
+[03:55:40] [INFO] Loading theme from: C:\tmp\RIESCADE_SYSTEM\riescade\.riescade\src\src\main\theme_default
+[03:58:25] [INFO] Executing system command: exit-frontend

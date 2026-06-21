@@ -401,6 +401,7 @@
 
 .riescade-menu-value-control {
   font-weight: bold;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 8px;
