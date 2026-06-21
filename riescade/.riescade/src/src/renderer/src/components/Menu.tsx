@@ -1278,10 +1278,7 @@ export const Menu: React.FC<MenuProps> = ({
           { id: 'group_display', label: t('DISPLAY CONFIGURATION'), type: 'group' },
           { id: 'shaders', label: t('SHADER SET'), type: 'select', settingName: 'global.shaderset', options: [
             { label: t('NONE'), value: 'none' },
-            ...shaders.map(sh => {
-              let label = sh.toUpperCase()
-              return { label, value: sh }
-            })
+            ...shaders.map(sh => ({ label: sh.toUpperCase(), value: sh }))
           ]},
           { id: 'decorations', label: t('DECORATIONS'), type: 'select', settingName: 'global.bezel', options: [
             { label: t('NONE'), value: 'none' },
