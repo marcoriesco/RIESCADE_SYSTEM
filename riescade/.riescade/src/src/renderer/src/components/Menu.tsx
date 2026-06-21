@@ -870,7 +870,7 @@ export const Menu: React.FC<MenuProps> = ({
       })
     }
 
-    if (currentStackItem?.parentItemId === 'scraper' && currentStackItem?.activeTab === 0) {
+    if (currentStackItem?.parentItemId === 'scraper') {
       buttons.push({
         id: 'scrape_now_btn',
         label: t('SCRAPE NOW'),
@@ -2006,7 +2006,6 @@ export const Menu: React.FC<MenuProps> = ({
           { id: 'group_music', label: t('MUSIC'), type: 'group' },
           { id: 'frontend_music', label: t('FRONTEND MUSIC'), type: 'toggle', settingName: 'audio.bgmusic', settingType: 'bool' },
           { id: 'display_titles', label: t('DISPLAY SONG TITLES'), type: 'toggle', settingName: 'audio.display_titles', settingType: 'bool' },
-          { id: 'display_titles_time', label: t('SONG TITLE DISPLAY DURATION'), type: 'slider', settingName: 'audio.display_titles_time', settingType: 'int', min: 2, max: 120, step: 2, suffix: 's' },
           { id: 'persystem', label: t('ONLY PLAY SYSTEM-SPECIFIC MUSIC FOLDER'), type: 'toggle', settingName: 'audio.persystem', settingType: 'bool' },
           { id: 'thememusics', label: t('PLAY SYSTEM-SPECIFIC MUSIC'), type: 'toggle', settingName: 'audio.thememusics', settingType: 'bool' },
           { id: 'video_lowers_music', label: t('LOWER MUSIC WHEN PLAYING VIDEO'), type: 'toggle', settingName: 'VideoLowersMusic', settingType: 'bool' },
@@ -2258,18 +2257,20 @@ export const Menu: React.FC<MenuProps> = ({
         ]
       },
       {
-        id: 'scraper', label: t('SCRAPER'), tabs: ['SCRAPE', 'OPTIONS', 'ACCOUNTS'], submenu: [
-          // === TAB 0: SCRAPE ===
-          { id: 'group_scrape_source', label: t('SOURCE'), type: 'group', tab: 0 },
-          { id: 'scrape_from', label: t('SCRAPE FROM'), type: 'select', settingName: 'Scraper', tab: 0, options: [
+        id: 'scraper', label: t('SCRAPER'), submenu: [
+          // SOURCE Group
+          { id: 'group_scrape_source', label: t('SOURCE'), type: 'group' },
+          { id: 'scrape_from', label: t('SCRAPE FROM'), type: 'select', settingName: 'Scraper', options: [
             { label: 'SCREEN SCRAPER', value: 'ScreenScraper' },
             { label: 'THE GAMES DB', value: 'TheGamesDB' },
             { label: 'HFSDB', value: 'HfsDB' },
             { label: 'IGDB', value: 'IGDB' },
             { label: 'ARCADEDB', value: 'ArcadeDB' }
           ]},
-          { id: 'group_scrape_filters', label: t('FILTERS'), type: 'group', tab: 0 },
-          { id: 'scrape_filter', label: t('GAMES TO SCRAPE FOR'), type: 'select', settingName: 'ScrapperFilter', tab: 0, options: [
+          
+          // FILTERS Group
+          { id: 'group_scrape_filters', label: t('FILTERS'), type: 'group' },
+          { id: 'scrape_filter', label: t('GAMES TO SCRAPE FOR'), type: 'select', settingName: 'ScrapperFilter', options: [
             { label: t('ALL GAMES'), value: 'all' },
             { label: t('GAMES MISSING ANY MEDIA'), value: 'missing' },
             { label: t('GAMES MISSING ALL MEDIA'), value: 'missing_all' }
@@ -2279,7 +2280,6 @@ export const Menu: React.FC<MenuProps> = ({
             label: t('IGNORE RECENTLY SCRAPED GAMES'), 
             type: 'select', 
             settingName: 'ScrapperIgnoreRecent', 
-            tab: 0,
             options: [
               { label: t('NO'), value: '0' },
               { label: t('LAST DAY'), value: '1' },
@@ -2294,7 +2294,6 @@ export const Menu: React.FC<MenuProps> = ({
             id: 'scraper_systems_included',
             label: t('SYSTEMS INCLUDED'),
             showCount: true,
-            tab: 0,
             submenu: (() => {
               const systemsSource = allSystems || []
               const scrapableSystems = systemsSource.filter(isGameSystem)
@@ -2314,71 +2313,84 @@ export const Menu: React.FC<MenuProps> = ({
                 })) as MenuItem[]
             })()
           },
-          // === TAB 1: OPTIONS ===
-          { id: 'group_scrape_settings', label: t('SETTINGS'), type: 'group', tab: 1 },
-          { id: 'scrape_image_src', label: t('IMAGE SOURCE'), type: 'select', settingName: 'ScrapperImageSrc', tab: 1, options: [
-            { label: t('NONE'), value: '' },
-            { label: t('SCREENSHOT'), value: 'ss' },
-            { label: t('TITLE SCREENSHOT'), value: 'sstitle' },
-            { label: t('MIX V1'), value: 'mixrbv1' },
-            { label: t('MIX V2'), value: 'mixrbv2' },
-            { label: t('BOX 2D'), value: 'box-2D' },
-            { label: t('BOX 3D'), value: 'box-3D' },
-            { label: t('FAN ART'), value: 'fanart' }
-          ]},
-          { id: 'scrape_thumb_src', label: t('BOX SOURCE'), type: 'select', settingName: 'ScrapperThumbSrc', tab: 1, options: [
-            { label: t('NONE'), value: '' },
-            { label: t('BOX 2D'), value: 'box-2D' },
-            { label: t('BOX 3D'), value: 'box-3D' }
-          ]},
-          { id: 'scrape_logo_src', label: t('LOGO SOURCE'), type: 'select', settingName: 'ScrapperLogoSrc', tab: 1, options: [
-            { label: t('NONE'), value: '' },
-            { label: t('HD WHEEL'), value: 'wheel-hd' },
-            { label: t('WHEEL'), value: 'wheel' },
-            { label: t('MARQUEE'), value: 'marquee' }
-          ]},
-          { id: 'scrape_region', label: t('PREFERED REGION'), type: 'select', settingName: 'ScraperRegion', tab: 1, options: [
-            { label: t('AUTOMATIC'), value: '' },
-            { label: t('EUROPE'), value: 'eu' },
-            { label: t('USA'), value: 'us' },
-            { label: t('JAPAN'), value: 'jp' },
-            { label: t('WORLD'), value: 'wor' }
-          ]},
-          { id: 'scrape_names', label: t('OVERWRITE NAMES'), type: 'toggle', settingName: 'ScrapeNames', settingType: 'bool', tab: 1 },
-          { id: 'scrape_desc', label: t('OVERWRITE DESCRIPTIONS'), type: 'toggle', settingName: 'ScrapeDescription', settingType: 'bool', tab: 1 },
-          { id: 'scrape_overwrite', label: t('OVERWRITE MEDIAS'), type: 'toggle', settingName: 'ScrapeOverWrite', settingType: 'bool', tab: 1 },
-          { id: 'group_scrape_for', label: t('SCRAPE FOR'), type: 'group', tab: 1 },
-          { id: 'scrape_short_title', label: t('SHORT NAME'), type: 'toggle', settingName: 'ScrapeShortTitle', settingType: 'bool', tab: 1 },
-          { id: 'scrape_ratings_toggle', label: t('COMMUNITY RATING'), type: 'toggle', settingName: 'ScrapeRatings', settingType: 'bool', tab: 1 },
-          { id: 'scrape_videos_toggle', label: t('VIDEO'), type: 'toggle', settingName: 'ScrapeVideos', settingType: 'bool', tab: 1 },
-          { id: 'scrape_fanart', label: t('FANART'), type: 'toggle', settingName: 'ScrapeFanart', settingType: 'bool', tab: 1 },
-          { id: 'scrape_bezel', label: t('BEZEL (16:9)'), type: 'toggle', settingName: 'ScrapeBezel', settingType: 'bool', tab: 1 },
-          { id: 'scrape_boxback', label: t('BOX BACKSIDE'), type: 'toggle', settingName: 'ScrapeBoxBack', settingType: 'bool', tab: 1 },
-          { id: 'scrape_map', label: t('MAP'), type: 'toggle', settingName: 'ScrapeMap', settingType: 'bool', tab: 1 },
-          { id: 'scrape_manual', label: t('MANUAL'), type: 'toggle', settingName: 'ScrapeManual', settingType: 'bool', tab: 1 },
-          { id: 'scrape_padtokey', label: t('PADTOKEY SETTINGS'), type: 'toggle', settingName: 'ScrapePadToKey', settingType: 'bool', tab: 1 },
-          { id: 'group_manual_scrape', label: t('MANUAL SCRAPE'), type: 'group', tab: 1 },
+
+          // CONFIGURAÇÕES Group
+          { id: 'group_scraper_config', label: t('SETTINGS') || 'CONFIGURAÇÕES', type: 'group' },
           {
-            id: 'included_scrapers_submenu',
-            label: t('INCLUDED SCRAPERS'),
-            showCount: true,
-            tab: 1,
+            id: 'scraper_options_submenu',
+            label: t('OPTIONS') || 'OPÇÕES',
             submenu: [
-              { id: 'inc_scrape_screenscraper', label: 'SCREEN SCRAPER', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'ScreenScraper' },
-              { id: 'inc_scrape_thegamesdb', label: 'THE GAMES DB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'TheGamesDB' },
-              { id: 'inc_scrape_hfsdb', label: 'HFSDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'HfsDB' },
-              { id: 'inc_scrape_igdb', label: 'IGDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'IGDB' },
-              { id: 'inc_scrape_arcadedb', label: 'ARCADEDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'ArcadeDB' }
+              { id: 'group_scrape_settings', label: t('SETTINGS'), type: 'group' },
+              { id: 'scrape_image_src', label: t('IMAGE SOURCE'), type: 'select', settingName: 'ScrapperImageSrc', options: [
+                { label: t('NONE'), value: '' },
+                { label: t('SCREENSHOT'), value: 'ss' },
+                { label: t('TITLE SCREENSHOT'), value: 'sstitle' },
+                { label: t('MIX V1'), value: 'mixrbv1' },
+                { label: t('MIX V2'), value: 'mixrbv2' },
+                { label: t('BOX 2D'), value: 'box-2D' },
+                { label: t('BOX 3D'), value: 'box-3D' },
+                { label: t('FAN ART'), value: 'fanart' }
+              ]},
+              { id: 'scrape_thumb_src', label: t('BOX SOURCE'), type: 'select', settingName: 'ScrapperThumbSrc', options: [
+                { label: t('NONE'), value: '' },
+                { label: t('BOX 2D'), value: 'box-2D' },
+                { label: t('BOX 3D'), value: 'box-3D' }
+              ]},
+              { id: 'scrape_logo_src', label: t('LOGO SOURCE'), type: 'select', settingName: 'ScrapperLogoSrc', options: [
+                { label: t('NONE'), value: '' },
+                { label: t('HD WHEEL'), value: 'wheel-hd' },
+                { label: t('WHEEL'), value: 'wheel' },
+                { label: t('MARQUEE'), value: 'marquee' }
+              ]},
+              { id: 'scrape_region', label: t('PREFERED REGION'), type: 'select', settingName: 'ScraperRegion', options: [
+                { label: t('AUTOMATIC'), value: '' },
+                { label: t('EUROPE'), value: 'eu' },
+                { label: t('USA'), value: 'us' },
+                { label: t('JAPAN'), value: 'jp' },
+                { label: t('WORLD'), value: 'wor' }
+              ]},
+              { id: 'scrape_names', label: t('OVERWRITE NAMES'), type: 'toggle', settingName: 'ScrapeNames', settingType: 'bool' },
+              { id: 'scrape_desc', label: t('OVERWRITE DESCRIPTIONS'), type: 'toggle', settingName: 'ScrapeDescription', settingType: 'bool' },
+              { id: 'scrape_overwrite', label: t('OVERWRITE MEDIAS'), type: 'toggle', settingName: 'ScrapeOverWrite', settingType: 'bool' },
+              
+              { id: 'group_scrape_for', label: t('SCRAPE FOR'), type: 'group' },
+              { id: 'scrape_short_title', label: t('SHORT NAME'), type: 'toggle', settingName: 'ScrapeShortTitle', settingType: 'bool' },
+              { id: 'scrape_ratings_toggle', label: t('COMMUNITY RATING'), type: 'toggle', settingName: 'ScrapeRatings', settingType: 'bool' },
+              { id: 'scrape_videos_toggle', label: t('VIDEO'), type: 'toggle', settingName: 'ScrapeVideos', settingType: 'bool' },
+              { id: 'scrape_fanart', label: t('FANART'), type: 'toggle', settingName: 'ScrapeFanart', settingType: 'bool' },
+              { id: 'scrape_bezel', label: t('BEZEL (16:9)'), type: 'toggle', settingName: 'ScrapeBezel', settingType: 'bool' },
+              { id: 'scrape_boxback', label: t('BOX BACKSIDE'), type: 'toggle', settingName: 'ScrapeBoxBack', settingType: 'bool' },
+              { id: 'scrape_map', label: t('MAP'), type: 'toggle', settingName: 'ScrapeMap', settingType: 'bool' },
+              { id: 'scrape_manual', label: t('MANUAL'), type: 'toggle', settingName: 'ScrapeManual', settingType: 'bool' },
+              { id: 'scrape_padtokey', label: t('PADTOKEY SETTINGS'), type: 'toggle', settingName: 'ScrapePadToKey', settingType: 'bool' },
+              
+              { id: 'group_manual_scrape', label: t('MANUAL SCRAPE'), type: 'group' },
+              {
+                id: 'included_scrapers_submenu',
+                label: t('INCLUDED SCRAPERS'),
+                showCount: true,
+                submenu: [
+                  { id: 'inc_scrape_screenscraper', label: 'SCREEN SCRAPER', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'ScreenScraper' },
+                  { id: 'inc_scrape_thegamesdb', label: 'THE GAMES DB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'TheGamesDB' },
+                  { id: 'inc_scrape_hfsdb', label: 'HFSDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'HfsDB' },
+                  { id: 'inc_scrape_igdb', label: 'IGDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'IGDB' },
+                  { id: 'inc_scrape_arcadedb', label: 'ARCADEDB', type: 'toggle', settingName: 'DisabledManualScrapers', value: 'ArcadeDB' }
+                ]
+              }
             ]
           },
-
-          // === TAB 2: ACCOUNTS ===
-          { id: 'group_screenscraper_account', label: t('SCREENSCRAPER'), type: 'group', tab: 2 },
-          { id: 'screenscraper_user', label: t('USERNAME'), type: 'input', settingName: 'ScreenScraperUser', settingType: 'string', tab: 2 },
-          { id: 'screenscraper_pass', label: t('PASSWORD'), type: 'input', settingName: 'ScreenScraperPass', settingType: 'string', isPassword: true, tab: 2 },
-          { id: 'group_igdb_account', label: t('IGDB'), type: 'group', tab: 2 },
-          { id: 'igdb_client_id', label: t('CLIENT ID'), type: 'input', settingName: 'IGDBClientID', settingType: 'string', tab: 2 },
-          { id: 'igdb_secret', label: t('CLIENT SECRET'), type: 'input', settingName: 'IGDBSecret', settingType: 'string', isPassword: true, tab: 2 }
+          {
+            id: 'scraper_accounts_submenu',
+            label: t('ACCOUNTS') || 'CONTAS',
+            submenu: [
+              { id: 'group_screenscraper_account', label: t('SCREENSCRAPER'), type: 'group' },
+              { id: 'screenscraper_user', label: t('USERNAME'), type: 'input', settingName: 'ScreenScraperUser', settingType: 'string' },
+              { id: 'screenscraper_pass', label: t('PASSWORD'), type: 'input', settingName: 'ScreenScraperPass', settingType: 'string', isPassword: true },
+              { id: 'group_igdb_account', label: t('IGDB'), type: 'group' },
+              { id: 'igdb_client_id', label: t('CLIENT ID'), type: 'input', settingName: 'IGDBClientID', settingType: 'string' },
+              { id: 'igdb_secret', label: t('CLIENT SECRET'), type: 'input', settingName: 'IGDBSecret', settingType: 'string', isPassword: true }
+            ]
+          }
         ]
       },
       {

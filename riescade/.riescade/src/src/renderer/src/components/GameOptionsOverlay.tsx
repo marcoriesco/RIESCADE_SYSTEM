@@ -1883,7 +1883,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   const renderStageStage2Searching = () => {
     return (
       <Dialog.Root open={isOpen && scraperStage === 2 && scraperIsSearching} onOpenChange={(open) => { if (!open) setScraperStage(1); }}>
-        <Dialog.Content size="2" style={{ maxWidth: '400px', width: '90%' }}>
+        <Dialog.Content className='riescade-menu' size="2" style={{ maxWidth: '400px', width: '90%' }}>
           <Flex direction="column" align="center" justify="center" p="6" gap="3">
             <Spinner size="3" />
             <Text size="2" color="gray">{t('SEARCHING FOR MEDIA IN DATABASES...')}</Text>

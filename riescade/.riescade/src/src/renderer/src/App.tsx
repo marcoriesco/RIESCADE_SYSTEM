@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { Theme, Card, Flex, Text, Box, Dialog, Heading, Button, Spinner } from '@radix-ui/themes';
+import { Theme, Card, Flex, Text, Box, Dialog, Heading, Button, Spinner, Progress } from '@radix-ui/themes';
 import * as Toast from '@radix-ui/react-toast';
 import { WebThemeRenderer } from './components/theme/WebThemeRenderer';
 import { getNextGridIndex } from './components/theme/utils';
@@ -2777,9 +2777,9 @@ function App() {
 					// Icon color mappings matching Radix UI Theme guidelines
 					let iconColor = 'var(--blue-9)'; // Default info/general
 					if (n.type === 'success') {
-						iconColor = 'var(--green-9)';
+						iconColor = 'var(--theme-color)';
 					} else if (n.type === 'warning') {
-						iconColor = 'var(--amber-9)';
+						iconColor = 'gray';
 					} else if (n.category === 'controller') {
 						iconColor = 'var(--theme-color)';
 					}
@@ -2796,15 +2796,10 @@ function App() {
 						>
 							<Toast.Description asChild>
 								<Card
+									className='riescade-menu riescade-notification-controllers'
 									size="1"
 									style={{
-										background: 'rgba(10, 11, 16, 0.93)',
-										backdropFilter: 'blur(20px)',
-										WebkitBackdropFilter: 'blur(20px)',
-										border: '1px solid rgba(255, 255, 255, 0.1)',
-										borderRadius: '6px',
 										padding: '10px 18px',
-										boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
 										minWidth: '280px',
 										maxWidth: '500px',
 										pointerEvents: 'auto',
@@ -2833,94 +2828,156 @@ function App() {
 						</Toast.Root>
 					);
 				})}
-				<Toast.Viewport className="riescade-notifications-container" />
-			</Toast.Provider>
-
-			{/* Song Title Notification Overlay */}
-			<div 
-				className={`riescade-music-title-overlay ${showMusicTitle && currentTrackName ? 'visible' : ''}`}
-				style={{
-					position: 'fixed',
-					top: '40px',
-					left: '50%',
-					zIndex: 10999,
-					pointerEvents: 'none',
-					transform: showMusicTitle && currentTrackName ? 'translate(-50%, 0)' : 'translate(-50%, -120%)',
-					opacity: showMusicTitle && currentTrackName ? 1 : 0,
-					transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-				}}
-			>
-				<Card
-					size="1"
+				{/* Persistent Scraper Progress Toast */}
+				{bulkScrapeStatus && bulkScrapeStatus.active && (
+					<Toast.Root
+						open={true}
+						duration={Infinity}
+						className="riescade-notification-toast"
+						style={{
+							listStyleType: 'none',
+							animation: 'NotificationSlideIn 0.3s ease-out forwards',
+						}}
+					>
+						<Toast.Description asChild>
+							<Card
+								className='riescade-menu riescade-notification-scraper'
+								size="1"
+								style={{
+									padding: '10px 18px',
+									minWidth: '280px',
+									maxWidth: '500px',
+									pointerEvents: 'auto',
+								}}
+							>
+								<Flex align="center" gap="3" style={{ width: '100%' }}>
+									<Spinner size="2" />
+									<Flex direction="column" gap="0">
+										<Text size="2" weight="bold" style={{ color: 'var(--theme-color)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+											PROCURANDO MÍDIAS {bulkScrapeStatus.current}/{bulkScrapeStatus.total}
+										</Text>
+										<Text size="1" style={{ opacity: 0.7, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
+											<Text size="1" weight="bold" style={{ color: 'var(--theme-color)' }}>{bulkScrapeStatus.systemCode}</Text>: {bulkScrapeStatus.gameName}
+										</Text>
+									</Flex>
+								</Flex>
+							</Card>
+						</Toast.Description>
+					</Toast.Root>
+				)}
+				{/* Song Title Notification Toast */}
+				<Toast.Root
+					open={showMusicTitle && !!currentTrackName}
+					onOpenChange={(open) => {
+						if (!open) {
+							setShowMusicTitle(false);
+						}
+					}}
+					duration={Infinity}
+					className="riescade-notification-toast"
 					style={{
-						background: 'rgba(10, 11, 16, 0.93)',
-						backdropFilter: 'blur(20px)',
-						WebkitBackdropFilter: 'blur(20px)',
-						border: '1px solid rgba(255, 255, 255, 0.1)',
-						borderRadius: '6px',
-						padding: '10px 18px',
-						boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
-						minWidth: '280px',
-						maxWidth: '480px',
+						listStyleType: 'none',
+						animation: 'NotificationSlideIn 0.3s ease-out forwards',
 					}}
 				>
-					<Flex align="center" gap="3">
-						<Box 
+					<Toast.Description asChild>
+						<Card
+							className='riescade-menu riescade-notification-music'
+							size="1"
+							style={{
+								padding: '10px 18px',
+								minWidth: '280px',
+								maxWidth: '480px',
+								pointerEvents: 'auto',
+							}}
+						>
+							<Flex align="center" gap="3">
+								<Box 
+									style={{ 
+										width: '10px', 
+										height: '10px', 
+										borderRadius: '50%', 
+										background: 'var(--theme-color)', 
+										boxShadow: '0 0 10px var(--theme-color), 0 0 20px var(--theme-color)',
+										animation: 'musicPulse 1.5s infinite alternate',
+										flexShrink: 0
+									}} 
+								/>
+								<Flex direction="column" gap="1" style={{ overflow: 'hidden' }}>
+									<Text 
+										size="1" 
+										weight="bold" 
+										style={{ 
+											color: '#888', 
+											letterSpacing: '1.5px', 
+											textTransform: 'uppercase' 
+										}}
+									>
+										REPRODUZINDO AGORA
+									</Text>
+									<Text 
+										size="2" 
+										weight="bold" 
+										style={{ 
+											color: '#fff', 
+											letterSpacing: '0.5px',
+											whiteSpace: 'nowrap',
+											overflow: 'hidden',
+											textOverflow: 'ellipsis'
+										}}
+									>
+										{currentTrackName}
+									</Text>
+								</Flex>
+							</Flex>
+						</Card>
+					</Toast.Description>
+				</Toast.Root>
+
+				{/* Premium Volume Toast */}
+				<Toast.Root
+					open={showVolumeOverlay}
+					onOpenChange={(open) => {
+						if (!open) {
+							setShowVolumeOverlay(false);
+						}
+					}}
+					duration={Infinity}
+					className="riescade-notification-toast"
+					style={{
+						listStyleType: 'none',
+						animation: 'NotificationSlideIn 0.3s ease-out forwards',
+					}}
+				>
+					<Toast.Description asChild>
+						<Card
+							className="riescade-menu riescade-notification-volume"
+							size="1"
 							style={{ 
-								width: '10px', 
-								height: '10px', 
-								borderRadius: '50%', 
-								background: 'var(--theme-color)', 
-								boxShadow: '0 0 10px var(--theme-color), 0 0 20px var(--theme-color)',
-								animation: 'musicPulse 1.5s infinite alternate',
-								flexShrink: 0
-							}} 
-						/>
-						<Flex direction="column" gap="1" style={{ overflow: 'hidden' }}>
-							<Text 
-								size="1" 
-								weight="bold" 
-								style={{ 
-									color: '#888', 
-									letterSpacing: '1.5px', 
-									textTransform: 'uppercase' 
-								}}
-							>
-								REPRODUZINDO AGORA
-							</Text>
-							<Text 
-								size="2" 
-								weight="bold" 
-								style={{ 
-									color: '#fff', 
-									letterSpacing: '0.5px',
-									whiteSpace: 'nowrap',
-									overflow: 'hidden',
-									textOverflow: 'ellipsis'
-								}}
-							>
-								{currentTrackName}
-							</Text>
-						</Flex>
-					</Flex>
-				</Card>
-			</div>
+								padding: '8px 16px',
+								minWidth: '220px',
+								pointerEvents: 'auto',
+							}}
+						>
+							<Flex align="center" gap="3">
+								<Text size="2" weight="bold" style={{ color: 'var(--theme-color)', minWidth: '35px' }}>
+									VOL
+								</Text>
+								<Progress
+									color="pink" 
+									radius="full"									
+									value={overlayVolume} 
+								/>
+								<Text size="2" weight="bold" style={{ color: '#fff', minWidth: '40px', textAlign: 'right' }}>
+									{overlayVolume}%
+								</Text>
+							</Flex>
+						</Card>
+					</Toast.Description>
+				</Toast.Root>
 
-			{/* Floating Background Scraper Progress Card */}
-			{bulkScrapeStatus && bulkScrapeStatus.active && (
-				<div className="scraper-progress-card">
-					<Spinner size="2" />
-					<div className="scraper-info-wrap">
-						<span className="scraper-progress-title">
-							PROCURANDO MÍDIAS {bulkScrapeStatus.current}/{bulkScrapeStatus.total}
-						</span>
-						<span className="scraper-progress-sub">
-							<span className="scraper-system-tag">{bulkScrapeStatus.systemCode}</span>: {bulkScrapeStatus.gameName}
-						</span>
-					</div>
-				</div>
-			)}
-
+				<Toast.Viewport className="riescade-notifications-container" />
+			</Toast.Provider>
 
 
 			{/* Graphical Gamelist Update Overlay */}
@@ -3035,59 +3092,7 @@ function App() {
 				</Dialog.Content>
 			</Dialog.Root>
 
-			{/* Premium Volume Overlay */}
-			<div 
-				className={`riescade-volume-overlay ${showVolumeOverlay ? 'visible' : ''}`}
-				style={{
-					position: 'fixed',
-					top: '25px',
-					left: '50%',
-					transform: `translateX(-50%) ${showVolumeOverlay ? 'translateY(0)' : 'translateY(-20px)'}`,
-					opacity: showVolumeOverlay ? 1 : 0,
-					transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-					zIndex: 9999999,
-					pointerEvents: 'none'
-				}}
-			>
-				<Card 
-					style={{ 
-						background: 'rgba(0, 0, 0, 0.75)', 
-						backdropFilter: 'blur(10px)', 
-						border: '1px solid rgba(255, 255, 255, 0.1)',
-						padding: '8px 16px',
-						borderRadius: '8px',
-						boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
-					}}
-				>
-					<Flex align="center" gap="3">
-						<Text size="2" weight="bold" style={{ color: 'var(--theme-color)', minWidth: '35px' }}>
-							VOL
-						</Text>
-						<div 
-							style={{ 
-								width: '100px', 
-								height: '6px', 
-								background: 'rgba(255, 255, 255, 0.1)', 
-								borderRadius: '3px',
-								overflow: 'hidden'
-							}}
-						>
-							<div 
-								style={{ 
-									width: `${overlayVolume}%`, 
-									height: '100%', 
-									background: 'var(--theme-color)',
-									borderRadius: '3px',
-									transition: 'width 0.1s ease-out'
-								}}
-							/>
-						</div>
-						<Text size="2" weight="bold" style={{ color: '#fff', minWidth: '40px', textAlign: 'right' }}>
-							{overlayVolume}%
-						</Text>
-					</Flex>
-				</Card>
-			</div>
+
 
 			{/* Font Preloader to force Chromium to load fonts immediately on boot */}
 			<div
@@ -3124,7 +3129,7 @@ function App() {
 						background: '#000',
 						overflow: 'hidden',
 						zIndex: 99999,
-						['--theme-color' as any]: themeData['options:colors'] || themeData['colors'] || '#3b82f6',
+						['--theme-color' as any]: themeData['options:colors'] || themeData['colors'],
 					}} 
 					dangerouslySetInnerHTML={{ __html: startHtmlOnce }} 
 				/>
@@ -3163,32 +3168,46 @@ const FPSCounter: React.FC<{ visible: boolean }> = ({ visible }) => {
 	if (!visible) return null;
 
 	return (
-		<div
+		<Card
+			size="1"
 			style={{
 				position: 'fixed',
 				top: '12px',
 				right: '12px',
 				background: 'rgba(0, 0, 0, 0.75)',
-				color: '#00ff66',
-				fontFamily: '"Roboto Condensed", sans-serif',
-				fontSize: '11px',
-				fontWeight: 800,
-				letterSpacing: '1px',
+				borderColor: 'rgba(0, 255, 102, 0.25)',
 				padding: '4px 8px',
 				borderRadius: '4px',
 				zIndex: 999999,
 				pointerEvents: 'none',
 				boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-				border: '1px solid rgba(0, 255, 102, 0.25)',
-				display: 'flex',
-				alignItems: 'center',
-				gap: '4px',
-				textShadow: '0 0 4px rgba(0, 255, 102, 0.4)',
 			}}
 		>
-			<span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00ff66', display: 'inline-block', boxShadow: '0 0 6px #00ff66' }} />
-			{fps} FPS
-		</div>
+			<Flex align="center" gap="2">
+				<Box 
+					style={{ 
+						width: '6px', 
+						height: '6px', 
+						borderRadius: '50%', 
+						background: '#00ff66', 
+						boxShadow: '0 0 6px #00ff66',
+						display: 'inline-block'
+					}} 
+				/>
+				<Text 
+					style={{
+						color: '#00ff66',
+						fontFamily: '"Roboto Condensed", sans-serif',
+						fontSize: '11px',
+						fontWeight: 800,
+						letterSpacing: '1px',
+						textShadow: '0 0 4px rgba(0, 255, 102, 0.4)',
+					}}
+				>
+					{fps} FPS
+				</Text>
+			</Flex>
+		</Card>
 	);
 };
 
@@ -3288,33 +3307,37 @@ const NetworkIndicator: React.FC<{ visible: boolean; offsetTop: boolean }> = ({ 
 	};
 
 	return (
-		<div
+		<Card
+			size="1"
 			style={{
 				position: 'fixed',
 				top: offsetTop ? '42px' : '12px',
 				right: '12px',
 				background: 'rgba(0, 0, 0, 0.75)',
-				color: getColor(),
-				fontFamily: '"Roboto Condensed", sans-serif',
-				fontSize: '11px',
-				fontWeight: 800,
-				letterSpacing: '1px',
+				borderColor: connType === 'none' ? 'rgba(255, 51, 51, 0.25)' : 'rgba(0, 153, 255, 0.25)',
 				padding: '4px 8px',
 				borderRadius: '4px',
 				zIndex: 999999,
 				pointerEvents: 'none',
 				boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-				border: `1px solid ${connType === 'none' ? 'rgba(255, 51, 51, 0.25)' : 'rgba(0, 153, 255, 0.25)'}`,
-				display: 'flex',
-				alignItems: 'center',
-				gap: '6px',
-				textShadow: `0 0 4px ${connType === 'none' ? 'rgba(255, 51, 51, 0.4)' : 'rgba(0, 153, 255, 0.4)'}`,
 				transition: 'top 0.3s ease',
 			}}
 		>
-			{renderIcon()}
-			<span>{getLabel()}</span>
-		</div>
+			<Flex align="center" gap="2" style={{ color: getColor() }}>
+				{renderIcon()}
+				<Text
+					style={{
+						fontFamily: '"Roboto Condensed", sans-serif',
+						fontSize: '11px',
+						fontWeight: 800,
+						letterSpacing: '1px',
+						textShadow: `0 0 4px ${connType === 'none' ? 'rgba(255, 51, 51, 0.4)' : 'rgba(0, 153, 255, 0.4)'}`,
+					}}
+				>
+					{getLabel()}
+				</Text>
+			</Flex>
+		</Card>
 	);
 };
 
@@ -3455,78 +3478,80 @@ const ScreensaverMetadataCard: React.FC<{ game: Game | null; t: (key: string) =>
 	const releaseYear = game.releasedate ? game.releasedate.substring(0, 4) : '';
 
 	return (
-		<div
+		<Card
+			size="2"
 			style={{
 				position: 'absolute',
 				bottom: '40px',
 				left: '40px',
 				background: 'rgba(0, 0, 0, 0.65)',
 				backdropFilter: 'blur(20px)',
+				WebkitBackdropFilter: 'blur(20px)',
 				border: '1px solid rgba(255, 255, 255, 0.1)',
 				borderRadius: '12px',
 				padding: '20px 24px',
-				color: '#ffffff',
 				width: '380px',
 				boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
-				fontFamily: '"Roboto Condensed", sans-serif',
-				display: 'flex',
-				flexDirection: 'column',
-				gap: '8px',
 				pointerEvents: 'none',
 				zIndex: 100000,
 			}}
 		>
-			<div
-				style={{
-					fontSize: '11px',
-					fontWeight: 800,
-					letterSpacing: '2px',
-					color: 'var(--theme-color, #3b82f6)',
-					textTransform: 'uppercase',
-				}}
-			>
-				{cleanSystemName}
-			</div>
-			<div
-				style={{
-					fontSize: '22px',
-					fontWeight: 900,
-					lineHeight: '1.2',
-					letterSpacing: '0.5px',
-				}}
-			>
-				{game.name.toUpperCase()}
-			</div>
-			{(game.developer || releaseYear) && (
-				<div
+			<Flex direction="column" gap="2">
+				<Text
 					style={{
-						fontSize: '13px',
-						color: 'rgba(255, 255, 255, 0.6)',
-						fontWeight: 500,
-						marginTop: '4px',
+						fontSize: '11px',
+						fontWeight: 800,
+						letterSpacing: '2px',
+						color: 'var(--theme-color, #3b82f6)',
+						textTransform: 'uppercase',
+						fontFamily: '"Roboto Condensed", sans-serif',
 					}}
 				>
-					{game.developer} {releaseYear ? `(${releaseYear})` : ''}
-				</div>
-			)}
-			{game.desc && (
-				<div
+					{cleanSystemName}
+				</Text>
+				<Heading
+					size="4"
 					style={{
-						fontSize: '12px',
-						color: 'rgba(255, 255, 255, 0.45)',
-						lineHeight: '1.4',
-						marginTop: '8px',
-						display: '-webkit-box',
-						WebkitLineClamp: 3,
-						WebkitBoxOrient: 'vertical',
-						overflow: 'hidden',
-						textOverflow: 'ellipsis',
+						fontWeight: 900,
+						lineHeight: '1.2',
+						letterSpacing: '0.5px',
+						color: '#ffffff',
+						fontFamily: '"Roboto Condensed", sans-serif',
 					}}
 				>
-					{game.desc}
-				</div>
-			)}
-		</div>
+					{game.name.toUpperCase()}
+				</Heading>
+				{(game.developer || releaseYear) && (
+					<Text
+						style={{
+							fontSize: '13px',
+							color: 'rgba(255, 255, 255, 0.6)',
+							fontWeight: 500,
+							fontFamily: '"Roboto Condensed", sans-serif',
+						}}
+					>
+						{game.developer} {releaseYear ? `(${releaseYear})` : ''}
+					</Text>
+				)}
+				{game.desc && (
+					<Text
+						style={{
+							fontSize: '12px',
+							color: 'rgba(255, 255, 255, 0.45)',
+							lineHeight: '1.4',
+							fontFamily: '"Roboto Condensed", sans-serif',
+							display: '-webkit-box',
+							WebkitLineClamp: 3,
+							WebkitBoxOrient: 'vertical',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+						}}
+					>
+						{game.desc}
+					</Text>
+				)}
+			</Flex>
+		</Card>
 	);
 };
 
