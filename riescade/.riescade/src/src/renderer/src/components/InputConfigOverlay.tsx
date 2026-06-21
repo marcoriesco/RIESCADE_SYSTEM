@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Dialog, Flex, Heading, Text, Button, Box } from '@radix-ui/themes'
+import { Dialog, Flex, Heading, Text, Button, Box, Progress } from '@radix-ui/themes'
 
 import buttonsSouthIcon from '../resources/buttons_south.svg'
 import buttonsEastIcon from '../resources/buttons_east.svg'
@@ -644,7 +644,6 @@ export const InputConfigOverlay: React.FC<Props> = ({ isOpen, onClose }) => {
                 variant={warningSelection === 'ok' ? 'solid' : 'soft'}
                 color={warningSelection === 'ok' ? undefined : 'gray'}
                 onClick={() => setPhaseWithRef('detect')}
-                style={{ flex: 1 }}
               >
                 OK
               </Button>
@@ -652,7 +651,6 @@ export const InputConfigOverlay: React.FC<Props> = ({ isOpen, onClose }) => {
                 variant={warningSelection === 'cancel' ? 'solid' : 'soft'}
                 color={warningSelection === 'cancel' ? undefined : 'gray'}
                 onClick={onClose}
-                style={{ flex: 1 }}
               >
                 CANCEL
               </Button>
@@ -708,8 +706,8 @@ export const InputConfigOverlay: React.FC<Props> = ({ isOpen, onClose }) => {
 
             {/* Skip Progress Bar */}
             {phase === 'map' && skipProgress > 0 && (
-              <Box mx="4" style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                <Box style={{ height: '100%', background: 'var(--theme-color)', width: `${skipProgress}%`, transition: 'width 0.1s linear' }} />
+              <Box mx="4">
+                <Progress value={skipProgress} style={{ height: '4px' }} />
               </Box>
             )}
 

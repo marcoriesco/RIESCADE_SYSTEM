@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Dialog, Box, Flex, Heading, Text, Button, Switch, Checkbox, Tabs, Grid, Progress } from '@radix-ui/themes'
+import { Dialog, Box, Flex, Heading, Text, Button, Switch, Checkbox, Tabs, Grid, Spinner } from '@radix-ui/themes'
 import { Game, System } from '../../../shared/types'
 import { GameMediaOverlay } from './GameMediaOverlay'
 import { VirtualKeyboard } from './VirtualKeyboard'
@@ -450,13 +450,21 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     })
 
     // Submenu: ADICIONAR A COLEÇÃO
-    const addColSubmenu: any[] = allCols.map(col => ({
-      id: `add_col_${col}`,
-      label: col.toUpperCase(),
-      type: 'action',
-      collectionName: col,
-      actionType: 'add'
-    }))
+    const addColSubmenu: any[] = [
+      ...allCols.map(col => ({
+        id: `add_col_${col}`,
+        label: col.toUpperCase(),
+        type: 'action',
+        collectionName: col,
+        actionType: 'add'
+      })),
+      {
+        id: 'back_collection',
+        label: t('BACK'),
+        type: 'action',
+        actionType: 'back'
+      }
+    ]
 
     items.push({
       id: 'add_to_collection',
@@ -1011,6 +1019,19 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
   )
 
   const handleAction = async (item: any) => {
+    if (item.actionType === 'back') {
+      if (activeMenuStack.length > 1) {
+        setActiveMenuStack(prev => prev.slice(0, -1))
+        const parentItem = activeMenuStack[activeMenuStack.length - 2]
+        const parentItems = parentItem?.items || []
+        const savedIdx = parentItem?.savedSelectedIndex
+        setSelectedIndex(savedIdx !== undefined ? savedIdx : getFirstSelectableIndex(parentItems))
+      } else {
+        onClose()
+      }
+      return
+    }
+
     if (item.actionType === 'netplay_game') {
       const netplaySubmenu = [
         { id: 'group_netplay_launch', label: t('INICIAR JOGO'), type: 'group' },
@@ -1864,7 +1885,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       <Dialog.Root open={isOpen && scraperStage === 2 && scraperIsSearching} onOpenChange={(open) => { if (!open) setScraperStage(1); }}>
         <Dialog.Content size="2" style={{ maxWidth: '400px', width: '90%' }}>
           <Flex direction="column" align="center" justify="center" p="6" gap="3">
-            <Box className="netplay-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+            <Spinner size="3" />
             <Text size="2" color="gray">{t('SEARCHING FOR MEDIA IN DATABASES...')}</Text>
           </Flex>
         </Dialog.Content>
@@ -2057,7 +2078,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
               
               <Box className="riescade-preview-container">
                 {isLoadingMedia ? (
-                  <Box className="netplay-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+                  <Spinner size="2" />
                 ) : showImage ? (
                   <img src={previewImage} className="riescade-preview-media" alt="Preview" />
                 ) : showVideo ? (
@@ -2246,10 +2267,11 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     )
   }
 
+
   const renderMetadataEditor = () => {
     const totalFields = fields.length
     return (
-      <Flex direction="column" style={{ height: '100%' }}>
+      <Flex direction="column" style={{ height: '100%', maxHeight: 'inherit', overflow: 'hidden' }}>
         <Flex className="riescade-menu-header">
           <Heading size="4" className="riescade-menu-title">
             {t('EDIT METADATA')}
@@ -2349,6 +2371,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
     )
   }
 
+
   const isAdvancedMenu = activeMenuStack.some(
     item => item.parentItemId === 'advanced_game_options' || item.title === 'ADVANCED GAME OPTIONS'
   )
@@ -2364,7 +2387,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
           {showMetadataEditor ? (
             renderMetadataEditor()
           ) : (
-            <Flex direction="column" style={{ height: '100%' }}>
+            <Flex direction="column" style={{ height: '100%', maxHeight: 'inherit', overflow: 'hidden' }}>
               <Flex className="riescade-menu-header">
                 {marqueeUrl && menuTitle !== 'JOGOS EM REDE' && menuTitle !== t('START ONLINE GAME') ? (
                   <Box style={{ height: '90px', maxWidth: '280px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -2460,16 +2483,16 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
             </Text>
             <Flex justify="end" gap="3">
               <Button 
+                className='riescade-button'
                 variant={deleteModalSelectedIndex === 0 ? 'solid' : 'soft'}
-                style={{ cursor: 'pointer' }}
                 onClick={() => confirmDelete(true)}
               >
                 SIM (APAGAR ROM)
               </Button>
               <Button 
+                className='riescade-button'
                 variant={deleteModalSelectedIndex === 1 ? 'solid' : 'soft'}
                 color="gray"
-                style={{ cursor: 'pointer' }}
                 onClick={() => confirmDelete(false)}
               >
                 NÃO (APENAS DA LISTA)

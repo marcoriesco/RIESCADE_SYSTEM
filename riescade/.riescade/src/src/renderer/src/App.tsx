@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { Theme } from '@radix-ui/themes';
+import { Theme, Card, Flex, Text, Box, Dialog, Heading, Button, Spinner } from '@radix-ui/themes';
 import * as Toast from '@radix-ui/react-toast';
 import { WebThemeRenderer } from './components/theme/WebThemeRenderer';
 import { getNextGridIndex } from './components/theme/utils';
@@ -204,6 +204,14 @@ function App() {
 	const [themeRevision, setThemeRevision] = useState(0);
 	const [mediaRevision, setMediaRevision] = useState(0);
 	const [settings, setSettings] = useState<any>({});
+	const [showVolumeOverlay, setShowVolumeOverlay] = useState(false);
+	const [overlayVolume, setOverlayVolume] = useState(100);
+
+	const settingsRef = useRef<any>({});
+	useEffect(() => {
+		settingsRef.current = settings;
+	}, [settings]);
+
 	const [isSaveStateManagerOpen, setIsSaveStateManagerOpen] = useState(false);
 	const [saveManagerGame, setSaveManagerGame] = useState<Game | null>(null);
 	const [saveManagerSystem, setSaveManagerSystem] = useState<System | null>(null);
@@ -481,6 +489,8 @@ function App() {
 			const themePathClean = theme.path ? theme.path.replace(/\\/g, '/') : '';
 			const clickSoundUrl = `file:///${themePathClean}/assets/sounds/click.ogg`;
 			
+			const systemVol = (settings.Volume?.value !== undefined ? parseInt(settings.Volume.value, 10) : 100) / 100;
+			navSoundRef.current.volume = systemVol;
 			navSoundRef.current.src = clickSoundUrl;
 			navSoundRef.current.currentTime = 0;
 			navSoundRef.current.play().catch(() => {});
@@ -504,7 +514,7 @@ function App() {
 			window.removeEventListener('keydown', handleKeyDown);
 			window.removeEventListener('riescade-play-nav-sound', handleCustomNavSound);
 		};
-	}, [theme, settings.EnableSounds?.value]);
+	}, [theme, settings.EnableSounds?.value, settings.Volume?.value]);
 
 	// Background Music Player Loop Controller
 	useEffect(() => {
@@ -512,12 +522,15 @@ function App() {
 
 		const isBgMusicEnabled = settings['audio.bgmusic']?.value !== 'false' && settings['audio.bgmusic']?.value !== false;
 		
-		if (!isBgMusicEnabled) {
+		if (!isBgMusicEnabled || isLaunching) {
 			bgMusicRef.current.pause();
 			return;
 		}
 
-		const baseVol = (settings.MusicVolume?.value !== undefined ? parseInt(settings.MusicVolume.value, 10) : 80) / 100;
+		const baseMusicVol = (settings.MusicVolume?.value !== undefined ? parseInt(settings.MusicVolume.value, 10) : 80) / 100;
+		const systemVol = (settings.Volume?.value !== undefined ? parseInt(settings.Volume.value, 10) : 100) / 100;
+		const baseVol = baseMusicVol * systemVol;
+
 		const shouldDuck = selectedSystem && 
 			currentGame && 
 			currentGame.video && 
@@ -617,8 +630,9 @@ function App() {
 		settings['audio.persystem']?.value, 
 		settings['audio.useFavoriteMusic']?.value, 
 		settings['audio.favoriteSongs']?.value,
-		theme,
+		theme?.path,
 		isInitializing,
+		isLaunching,
 		playTrack
 	]);
 
@@ -626,7 +640,10 @@ function App() {
 	useEffect(() => {
 		if (!bgMusicRef.current) return;
 		
-		const baseVol = (settings.MusicVolume?.value !== undefined ? parseInt(settings.MusicVolume.value, 10) : 80) / 100;
+		const baseMusicVol = (settings.MusicVolume?.value !== undefined ? parseInt(settings.MusicVolume.value, 10) : 80) / 100;
+		const systemVol = (settings.Volume?.value !== undefined ? parseInt(settings.Volume.value, 10) : 100) / 100;
+		const baseVol = baseMusicVol * systemVol;
+
 		const shouldDuck = selectedSystem && 
 			currentGame && 
 			currentGame.video && 
@@ -639,9 +656,42 @@ function App() {
 		selectedSystem,
 		currentGame,
 		settings.MusicVolume?.value,
+		settings.Volume?.value,
 		settings.VideoLowersMusic?.value,
 		settings.VideoAudio?.value
 	]);
+
+	// Volume Overlay Controller
+	const lastVolumeRef = useRef<string | null>(null);
+	useEffect(() => {
+		const volVal = settings.Volume?.value;
+		if (volVal === undefined) return;
+		
+		if (lastVolumeRef.current === null) {
+			lastVolumeRef.current = String(volVal);
+			return;
+		}
+
+		if (String(volVal) !== lastVolumeRef.current) {
+			lastVolumeRef.current = String(volVal);
+			
+			const showPopup = settings.VolumePopup?.value === 'true' || settings.VolumePopup?.value === true;
+			if (showPopup) {
+				setOverlayVolume(parseInt(String(volVal), 10));
+				setShowVolumeOverlay(true);
+			}
+		}
+	}, [settings.Volume?.value, settings.VolumePopup?.value]);
+
+	useEffect(() => {
+		if (showVolumeOverlay) {
+			const timer = setTimeout(() => {
+				setShowVolumeOverlay(false);
+			}, 1500);
+			return () => clearTimeout(timer);
+		}
+		return undefined;
+	}, [showVolumeOverlay]);
 
 
 	// Listen for systems loading progress from the main process
@@ -1078,9 +1128,23 @@ function App() {
 					updateControllers();
 					controllersInitialized = true;
 				}
-				// Skip gamepad-to-keyboard dispatch when InputConfigOverlay is active
-				// (it sets data-input-config-active on document.body to claim exclusive gamepad control)
 				if (!document.body.hasAttribute('data-input-config-active')) {
+					// Gamepad Volume Shortcuts (Select + D-Pad Up/Down)
+					const isSelectPressed = gp.buttons[8]?.pressed || gp.buttons[11]?.pressed;
+					if (isSelectPressed && (gp.buttons[12]?.pressed || gp.buttons[13]?.pressed)) {
+						if (time - lastInputTime > 150) {
+							const isUp = gp.buttons[12]?.pressed;
+							const currentVol = settingsRef.current.Volume?.value !== undefined ? parseInt(settingsRef.current.Volume.value, 10) : 100;
+							const newVol = isUp ? Math.min(100, currentVol + 5) : Math.max(0, currentVol - 5);
+							
+							handleSettingChangeRef.current('Volume', newVol);
+							window.api.saveSetting('Volume', String(newVol), 'int');
+							lastInputTime = time;
+						}
+						rafId = requestAnimationFrame(pollGamepad);
+						return;
+					}
+
 					// 1. D-Pad & Left Stick navigation with 200ms repeat delay
 					if (time - lastInputTime > 200) {
 						let navKey = '';
@@ -1157,6 +1221,18 @@ function App() {
 	}, [performInPlaceGamelistReload]);
 
 
+
+	const handleSettingChange = useCallback((name: string, value: any) => {
+		setSettings((prev: any) => ({
+			...prev,
+			[name]: { ...prev[name], value: String(value) }
+		}));
+	}, []);
+
+	const handleSettingChangeRef = useRef(handleSettingChange);
+	useEffect(() => {
+		handleSettingChangeRef.current = handleSettingChange;
+	}, [handleSettingChange]);
 
 	const handleUpdateGamelists = useCallback((forcePhysicalOrSystem?: boolean | string, systemName?: string) => {
 		let force = true;
@@ -2150,6 +2226,29 @@ function App() {
 		// Normalize key casing
 		const key = (e.key || '').toLowerCase();
 
+		const isVolUp = key === 'volumeup' || key === 'audiovolumeup';
+		const isVolDown = key === 'volumedown' || key === 'audiovolumedown';
+		const isVolMute = key === 'volumemute' || key === 'audiovolumemute';
+
+		if (isVolUp || isVolDown || isVolMute) {
+			e.preventDefault();
+			e.stopPropagation();
+			
+			const currentVol = settingsRef.current.Volume?.value !== undefined ? parseInt(settingsRef.current.Volume.value, 10) : 100;
+			let newVol = currentVol;
+			if (isVolUp) {
+				newVol = Math.min(100, currentVol + 5);
+			} else if (isVolDown) {
+				newVol = Math.max(0, currentVol - 5);
+			} else if (isVolMute) {
+				newVol = currentVol > 0 ? 0 : 80;
+			}
+			
+			handleSettingChange('Volume', newVol);
+			window.api.saveSetting('Volume', String(newVol), 'int');
+			return;
+		}
+
 		if (showLaunchErrorModal) {
 			if (key === 'enter' || key === ' ' || key === 'escape' || key === 'backspace') {
 				setShowLaunchErrorModal(false);
@@ -2355,7 +2454,8 @@ function App() {
 		swapSystem,
 		toggleScreenReader,
 		refreshTheme,
-		executeLongPressAction
+		executeLongPressAction,
+		handleSettingChange
 	]);
 
 	const handleKeyUp = useCallback((e: KeyboardEvent) => {
@@ -2591,6 +2691,7 @@ function App() {
 				settings={settings}
 				selectedSystem={selectedSystem}
 				onUpdateGamelists={handleUpdateGamelists}
+				onSettingChange={handleSettingChange}
 				onClose={() => {
 					setIsMenuOpen(false);
 					// Refresh settings when menu closes to reflect changes like DrawFramerate
@@ -2598,7 +2699,10 @@ function App() {
 						setSettings(latestSettings);
 					});
 					window.api.getMusicFiles().then((files: string[]) => {
-						setMusicFiles(files);
+						setMusicFiles(prev => {
+							if (prev.length === files.length && prev.every((f, i) => f === files[i])) return prev;
+							return files;
+						});
 					});
 					if (theme && theme.name) {
 						window.api.loadTheme(theme.name).then(setTheme);
@@ -2667,63 +2771,145 @@ function App() {
 				/>
 			)}
 
-			{/* Notifications Layer (General and Controller - Center Top) */}
+			{/* Centralized Notifications Layer (Radix Toast with unified styling) */}
 			<Toast.Provider swipeDirection="right">
-				{notifications
-					.filter((n) => n.category !== 'scraper')
-					.map((n) => (
-						<Toast.Root 
+				{notifications.map((n) => {
+					// Icon color mappings matching Radix UI Theme guidelines
+					let iconColor = 'var(--blue-9)'; // Default info/general
+					if (n.type === 'success') {
+						iconColor = 'var(--green-9)';
+					} else if (n.type === 'warning') {
+						iconColor = 'var(--amber-9)';
+					} else if (n.category === 'controller') {
+						iconColor = 'var(--theme-color)';
+					}
+
+					return (
+						<Toast.Root
 							key={n.id}
 							open={true}
-							className={`riescade-notification ${n.type} ${n.category === 'controller' ? 'controller' : ''} ${n.category === 'controller' && n.type === 'success' ? 'connected' : ''}`}
+							className="riescade-notification-toast"
+							style={{
+								listStyleType: 'none',
+								animation: 'NotificationSlideIn 0.3s ease-out forwards',
+							}}
 						>
 							<Toast.Description asChild>
-								<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-									{getNotificationIcon(n.category, n.type)}
-									<span className="riescade-notification-message">{n.message}</span>
-								</div>
+								<Card
+									size="1"
+									style={{
+										background: 'rgba(10, 11, 16, 0.93)',
+										backdropFilter: 'blur(20px)',
+										WebkitBackdropFilter: 'blur(20px)',
+										border: '1px solid rgba(255, 255, 255, 0.1)',
+										borderRadius: '6px',
+										padding: '10px 18px',
+										boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+										minWidth: '280px',
+										maxWidth: '500px',
+										pointerEvents: 'auto',
+									}}
+								>
+									<Flex align="center" gap="3" style={{ width: '100%' }}>
+										<Box style={{ color: iconColor, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+											{getNotificationIcon(n.category, n.type)}
+										</Box>
+										<Text
+											size="2"
+											weight="bold"
+											style={{
+												color: '#fff',
+												letterSpacing: '0.5px',
+												textTransform: 'uppercase',
+												whiteSpace: 'normal',
+												wordBreak: 'break-word',
+											}}
+										>
+											{n.message}
+										</Text>
+									</Flex>
+								</Card>
 							</Toast.Description>
 						</Toast.Root>
-					))}
+					);
+				})}
 				<Toast.Viewport className="riescade-notifications-container" />
 			</Toast.Provider>
 
-			{/* Notifications Layer (Scraper - Right Top) */}
-			<Toast.Provider swipeDirection="right">
-				{notifications
-					.filter((n) => n.category === 'scraper')
-					.map((n) => (
-						<Toast.Root 
-							key={n.id}
-							open={true}
-							className={`riescade-notification ${n.type}`}
-						>
-							<Toast.Description asChild>
-								<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-									{getNotificationIcon(n.category, n.type)}
-									<span className="riescade-notification-message">{n.message}</span>
-								</div>
-							</Toast.Description>
-						</Toast.Root>
-					))}
-				<Toast.Viewport className="riescade-notifications-container scraper-notifications" />
-			</Toast.Provider>
-
 			{/* Song Title Notification Overlay */}
-			<div className={`riescade-music-title-overlay ${showMusicTitle && currentTrackName ? 'visible' : ''}`}>
-				<div className="music-title-container">
-					<div className="music-icon-glow" />
-					<div className="music-title-text-wrap">
-						<span className="music-title-label">REPRODUZINDO AGORA</span>
-						<span className="music-title-value">{currentTrackName}</span>
-					</div>
-				</div>
+			<div 
+				className={`riescade-music-title-overlay ${showMusicTitle && currentTrackName ? 'visible' : ''}`}
+				style={{
+					position: 'fixed',
+					top: '40px',
+					left: '50%',
+					zIndex: 10999,
+					pointerEvents: 'none',
+					transform: showMusicTitle && currentTrackName ? 'translate(-50%, 0)' : 'translate(-50%, -120%)',
+					opacity: showMusicTitle && currentTrackName ? 1 : 0,
+					transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+				}}
+			>
+				<Card
+					size="1"
+					style={{
+						background: 'rgba(10, 11, 16, 0.93)',
+						backdropFilter: 'blur(20px)',
+						WebkitBackdropFilter: 'blur(20px)',
+						border: '1px solid rgba(255, 255, 255, 0.1)',
+						borderRadius: '6px',
+						padding: '10px 18px',
+						boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+						minWidth: '280px',
+						maxWidth: '480px',
+					}}
+				>
+					<Flex align="center" gap="3">
+						<Box 
+							style={{ 
+								width: '10px', 
+								height: '10px', 
+								borderRadius: '50%', 
+								background: 'var(--theme-color)', 
+								boxShadow: '0 0 10px var(--theme-color), 0 0 20px var(--theme-color)',
+								animation: 'musicPulse 1.5s infinite alternate',
+								flexShrink: 0
+							}} 
+						/>
+						<Flex direction="column" gap="1" style={{ overflow: 'hidden' }}>
+							<Text 
+								size="1" 
+								weight="bold" 
+								style={{ 
+									color: '#888', 
+									letterSpacing: '1.5px', 
+									textTransform: 'uppercase' 
+								}}
+							>
+								REPRODUZINDO AGORA
+							</Text>
+							<Text 
+								size="2" 
+								weight="bold" 
+								style={{ 
+									color: '#fff', 
+									letterSpacing: '0.5px',
+									whiteSpace: 'nowrap',
+									overflow: 'hidden',
+									textOverflow: 'ellipsis'
+								}}
+							>
+								{currentTrackName}
+							</Text>
+						</Flex>
+					</Flex>
+				</Card>
 			</div>
 
 			{/* Floating Background Scraper Progress Card */}
 			{bulkScrapeStatus && bulkScrapeStatus.active && (
 				<div className="scraper-progress-card">
-					<div className="scraper-spinner" />
+					<Spinner size="2" />
 					<div className="scraper-info-wrap">
 						<span className="scraper-progress-title">
 							PROCURANDO MÍDIAS {bulkScrapeStatus.current}/{bulkScrapeStatus.total}
@@ -2738,69 +2924,16 @@ function App() {
 
 
 			{/* Graphical Gamelist Update Overlay */}
-			{isUpdatingGamelist && (
-				<div 
-					className="riescade-overlay scraper-modal-overlay visible"
-					style={{
-						position: 'fixed',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						background: 'rgba(0, 0, 0, 0.85)',
-						backdropFilter: 'blur(15px)',
-						WebkitBackdropFilter: 'blur(15px)',
-						zIndex: 10000000,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						color: '#fff'
-					}}
-				>
-					<div 
-						className="scraper-modal-container searching-modal"
-						style={{
-							background: 'rgba(0, 0, 0, 0.85)',
-							backdropFilter: 'blur(10px)',
-							WebkitBackdropFilter: 'blur(10px)',
-							border: '1px solid #111',
-							borderRadius: '4px',
-							padding: '40px 30px',
-							width: '420px',
-							boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
-							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							textAlign: 'center'
-						}}
-					>
-						<div 
-							className="scraper-spinner" 
-							style={{ 
-								width: '50px', 
-								height: '50px', 
-								border: '5px solid rgba(255, 255, 255, 0.1)', 
-								borderTopColor: 'var(--theme-color)', 
-								borderRadius: '50%',
-								animation: 'scraper-spin 1s linear infinite'
-							}} 
-						/>
-						<p 
-							className="searching-text"
-							style={{ 
-								fontSize: '1.25rem', 
-								fontWeight: 900, 
-								color: 'var(--theme-color)', 
-								margin: '25px 0 8px 0',
-								letterSpacing: '2px',
-								textTransform: 'uppercase'
-							}}
-						>
-							ATUALIZANDO GAMELISTS
-						</p>
-					</div>
-				</div>
-			)}
+			<Dialog.Root open={isUpdatingGamelist}>
+				<Dialog.Content style={{ maxWidth: '400px' }}>
+					<Flex direction="column" align="center" gap="4" p="4">
+						<Spinner size="3" />
+						<Heading size="3" style={{ color: 'var(--theme-color)', letterSpacing: '2px', textTransform: 'uppercase' }}>
+							{t('UPDATING GAMELISTS') || 'ATUALIZANDO GAMELISTS'}
+						</Heading>
+					</Flex>
+				</Dialog.Content>
+			</Dialog.Root>
 
 			{/* Save State Manager Overlay */}
 			{isSaveStateManagerOpen && saveManagerGame && saveManagerSystem && (
@@ -2867,40 +3000,94 @@ function App() {
 				t={t}
 			/>
 
-			{/* Launch Error Modal */}
-			{showLaunchErrorModal && (
-				<div
-					className="riescade-overlay visible"
-					onClick={() => {
+			{/* Launch Error Modal (Radix UI Themes standardized Dialog) */}
+			<Dialog.Root
+				open={showLaunchErrorModal}
+				onOpenChange={(open) => {
+					if (!open) {
 						setShowLaunchErrorModal(false);
 						setLaunchErrorMessage('');
+					}
+				}}
+			>
+				<Dialog.Content className='riescade-menu' style={{ maxWidth: '450px' }}>
+					<Flex className='riescade-menu-content' direction="column" align="center">
+						<Heading className='riescade-menu-title' size="3" mb="3">
+							{t('LAUNCH ERROR') || 'ERRO AO INICIAR'}
+						</Heading>
+						<Text size="2" color="gray" style={{ display: 'block', marginBottom: '20px' }}>
+							{launchErrorMessage || t('An unknown error occurred while trying to launch the emulator.') || 'Ocorreu um erro desconhecido ao tentar iniciar o emulador.'}
+						</Text>
+						<Flex gap="3" justify="center">
+							<Button
+								className='riescade-button'
+								variant="soft"
+								onClick={() => {
+									setShowLaunchErrorModal(false);
+									setLaunchErrorMessage('');
+								}}
+								style={{ cursor: 'pointer' }}
+							>
+								OK
+							</Button>
+						</Flex>
+					</Flex>
+				</Dialog.Content>
+			</Dialog.Root>
+
+			{/* Premium Volume Overlay */}
+			<div 
+				className={`riescade-volume-overlay ${showVolumeOverlay ? 'visible' : ''}`}
+				style={{
+					position: 'fixed',
+					top: '25px',
+					left: '50%',
+					transform: `translateX(-50%) ${showVolumeOverlay ? 'translateY(0)' : 'translateY(-20px)'}`,
+					opacity: showVolumeOverlay ? 1 : 0,
+					transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+					zIndex: 9999999,
+					pointerEvents: 'none'
+				}}
+			>
+				<Card 
+					style={{ 
+						background: 'rgba(0, 0, 0, 0.75)', 
+						backdropFilter: 'blur(10px)', 
+						border: '1px solid rgba(255, 255, 255, 0.1)',
+						padding: '8px 16px',
+						borderRadius: '8px',
+						boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
 					}}
 				>
-					<div
-						className="riescade-error-modal"
-						onClick={(e) => e.stopPropagation()}
-					>
-						{/* Title */}
-						<div className="error-title">ERRO AO INICIAR</div>
-
-						{/* Error Message */}
-						<div className="error-message">
-							{launchErrorMessage || 'Ocorreu um erro desconhecido ao tentar iniciar o emulador.'}
-						</div>
-
-						{/* OK Button */}
-						<button
-							className="riescade-button primary selected"
-							onClick={() => {
-								setShowLaunchErrorModal(false);
-								setLaunchErrorMessage('');
+					<Flex align="center" gap="3">
+						<Text size="2" weight="bold" style={{ color: 'var(--theme-color)', minWidth: '35px' }}>
+							VOL
+						</Text>
+						<div 
+							style={{ 
+								width: '100px', 
+								height: '6px', 
+								background: 'rgba(255, 255, 255, 0.1)', 
+								borderRadius: '3px',
+								overflow: 'hidden'
 							}}
 						>
-							OK
-						</button>
-					</div>
-				</div>
-			)}
+							<div 
+								style={{ 
+									width: `${overlayVolume}%`, 
+									height: '100%', 
+									background: 'var(--theme-color)',
+									borderRadius: '3px',
+									transition: 'width 0.1s ease-out'
+								}}
+							/>
+						</div>
+						<Text size="2" weight="bold" style={{ color: '#fff', minWidth: '40px', textAlign: 'right' }}>
+							{overlayVolume}%
+						</Text>
+					</Flex>
+				</Card>
+			</div>
 
 			{/* Font Preloader to force Chromium to load fonts immediately on boot */}
 			<div

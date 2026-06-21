@@ -58,6 +58,16 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
     <div
       className="launch-screen"
       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 10000,
+        background: '#000',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         opacity: isReady ? opacity : 0,
         pointerEvents: isReady && opacity > 0 ? 'auto' : 'none',
         transition: 'opacity 0.6s ease-in-out'
@@ -66,6 +76,11 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
       <div
         className="launch-screen-inner"
         style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           opacity: 1,
           transition: 'opacity 0.6s ease-in-out'
         }}
@@ -81,17 +96,49 @@ export const LaunchScreen: React.FC<LaunchScreenProps> = ({ game, system, theme,
             onReady={() => setIsReady(true)}
           />
         ) : (
-          <div className="launch-screen-content">
+          <div
+            className="launch-screen-content"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '20px',
+              textAlign: 'center'
+            }}
+          >
             {logo ? (
               <img
                 src={resolveFilePath(logo)}
                 className="launch-screen-logo"
                 alt=""
+                style={{
+                  maxWidth: '400px',
+                  maxHeight: '200px',
+                  objectFit: 'contain'
+                }}
               />
             ) : (
-              <h1 className="launch-screen-title">{name}</h1>
+              <h1
+                className="launch-screen-title"
+                style={{
+                  color: '#fff',
+                  fontSize: '3rem',
+                  margin: 0,
+                  fontWeight: 900
+                }}
+              >
+                {name}
+              </h1>
             )}
-            <p className="launch-screen-text">
+            <p
+              className="launch-screen-text"
+              style={{
+                color: '#fff',
+                opacity: 0.5,
+                letterSpacing: '3px',
+                fontSize: '1.2rem'
+              }}
+            >
               {status === 'closed'
                 ? t('RETURNING')
                 : status === 'running'

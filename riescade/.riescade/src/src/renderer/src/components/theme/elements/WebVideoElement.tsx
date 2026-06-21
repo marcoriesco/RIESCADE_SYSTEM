@@ -11,6 +11,7 @@ interface Props {
   src?: string
   fallback?: string
   children?: React.ReactNode
+  videoType?: 'gamelist' | 'system'
 }
 
 export const WebVideoElement: React.FC<Props> = ({
@@ -23,7 +24,8 @@ export const WebVideoElement: React.FC<Props> = ({
   style = {},
   src,
   fallback,
-  children
+  children,
+  videoType = 'gamelist'
 }) => {
   // activeSrc is only set AFTER the delay has elapsed for the current videoSrc.
   // This prevents the video from playing during the delay window, even across re-renders.
@@ -45,7 +47,9 @@ export const WebVideoElement: React.FC<Props> = ({
   }
 
   const videoSrc = src || childSrc || data['game:video'] || ''
-  const isVideoEnabled = data['gamelist_video'] !== false && data['gamelist_video'] !== 'false'
+  const isVideoEnabled = videoType === 'system'
+    ? (data['system_video'] !== false && data['system_video'] !== 'false')
+    : (data['gamelist_video'] !== false && data['gamelist_video'] !== 'false')
 
   // Combine className (React style) and class (WebComponent style)
   const finalClassName = [className, classAttr].filter(Boolean).join(' ')
@@ -113,6 +117,29 @@ export const WebVideoElement: React.FC<Props> = ({
     }
   }, [videoSrc, isVideoEnabled, delayMs, fileExists])
 
+  const isMuted = !(data['VideoAudio'] === true || data['VideoAudio'] === 'true') || data['game:launching'] === true
+  const isAutoplay = autoplay === true || autoplay === 'true' || autoplay === '' || autoplay === 'autoplay'
+  const isLoop = loop === true || loop === 'true' || loop === '' || loop === 'loop'
+
+  useEffect(() => {
+    if (!videoRef.current) return
+    if (data['game:launching'] === true) {
+      videoRef.current.pause()
+    } else {
+      if (isAutoplay && activeSrc) {
+        videoRef.current.play().catch(() => {})
+      }
+    }
+  }, [data['game:launching'], activeSrc, isAutoplay])
+
+  const systemVolume = (data['Volume'] !== undefined ? parseInt(data['Volume'], 10) : 100) / 100
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = systemVolume
+    }
+  }, [systemVolume])
+
   if (!isVideoEnabled || fileExists === false || fileExists === null) {
     return null
   }
@@ -137,17 +164,13 @@ export const WebVideoElement: React.FC<Props> = ({
     return null
   }
 
-  const isMuted = !(data['VideoAudio'] === true || data['VideoAudio'] === 'true')
-  const isAutoplay = autoplay === true || autoplay === 'true' || autoplay === '' || autoplay === 'autoplay'
-  const isLoop = loop === true || loop === 'true' || loop === '' || loop === 'loop'
-
   return (
     <video
       key={activeSrc}
       ref={videoRef}
       className={`riescade-video ${finalClassName}`}
       src={activeSrc}
-      autoPlay={isAutoplay}
+      autoPlay={isAutoplay && data['game:launching'] !== true}
       loop={isLoop}
       muted={isMuted}
       style={{

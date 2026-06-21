@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { Dialog, Box, Flex, Heading, Text, Tabs } from '@radix-ui/themes'
 import { Game, System } from '../../../shared/types'
 
 const escapeFileUrl = (url: string): string => {
@@ -55,7 +56,6 @@ export const GameMediaOverlay: React.FC<GameMediaOverlayProps> = ({
   t
 }) => {
   const [activeTab, setActiveTab] = useState(0)
-  const [visible, setVisible] = useState(false)
 
   // Build dynamic tabs based on active files
   const tabs: MediaTab[] = []
@@ -105,9 +105,6 @@ export const GameMediaOverlay: React.FC<GameMediaOverlayProps> = ({
   useEffect(() => {
     if (isOpen) {
       setActiveTab(0)
-      requestAnimationFrame(() => setVisible(true))
-    } else {
-      setVisible(false)
     }
   }, [isOpen])
 
@@ -151,49 +148,69 @@ export const GameMediaOverlay: React.FC<GameMediaOverlayProps> = ({
   const activeTabItem = tabs[activeTab]
 
   return (
-    <div className={`riescade-overlay riescade-menu-overlay game-media-overlay ${visible ? 'visible' : ''}`}>
-      <div className="riescade-menu-container">
-        <div className="riescade-menu-header">
-          <h2 className="riescade-menu-title">{game.name.toUpperCase()}</h2>
-          <div className="riescade-menu-subtitle">{t('VIEW GAME MEDIA')}</div>
+    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <Dialog.Content
+        size="4"
+        className="riescade-menu riescade-menu-game-media"
+        style={{
+          maxWidth: '90vw',
+          width: '90vw',
+          height: '90vh',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: 0
+        }}
+      >
+        <Flex className="riescade-menu-header" direction="column" align="center">
+          <Heading size="4" className="riescade-menu-title">
+            {game.name.toUpperCase()}
+          </Heading>
+          <Text size="1" color="gray" mt="1" style={{ letterSpacing: '1px' }}>
+            {t('VIEW GAME MEDIA')}
+          </Text>
 
           {tabs.length > 0 && (
-            <div className="riescade-menu-tabs">
-              {tabs.map((tab, idx) => (
-                <div
-                  key={tab.id}
-                  className={`riescade-menu-tab ${idx === activeTab ? 'active' : ''}`}
-                  onClick={() => setActiveTab(idx)}
-                >
-                  {tab.label}
-                </div>
-              ))}
-            </div>
+            <Tabs.Root value={tabs[activeTab].id} style={{ marginTop: '10px', width: '100%' }}>
+              <Tabs.List style={{ justifyContent: 'center' }}>
+                {tabs.map((tab, idx) => (
+                  <Tabs.Trigger
+                    key={tab.id}
+                    value={tab.id}
+                    onClick={() => setActiveTab(idx)}
+                  >
+                    {tab.label}
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+            </Tabs.Root>
           )}
-        </div>
+        </Flex>
 
-        <div className="game-media-content-container">
+        <Flex className="game-media-content-container" style={{ flexGrow: 1, padding: '30px', overflow: 'hidden' }} justify="center" align="center">
           {tabs.length === 0 ? (
-            <div className="pdf-viewer-fallback">
-              <span className="pdf-help-text">{t('NO MEDIA AVAILABLE')}</span>
-            </div>
+            <Flex direction="column" align="center" justify="center" gap="3" style={{ border: '2px dashed rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '40px', maxWidth: '80%' }}>
+              <Text size="2" color="gray" weight="bold">
+                {t('NO MEDIA AVAILABLE')}
+              </Text>
+            </Flex>
           ) : (
             activeTabItem && (
-              <div className="game-media-wrapper">
+              <Flex className="game-media-wrapper" justify="center" align="center" style={{ width: '100%', height: '100%' }}>
                 {activeTabItem.type === 'image' && (
-                  <img src={activeTabItem.url} className="game-media-item image" alt={activeTabItem.label} />
+                  <img src={activeTabItem.url} className="game-media-item image" alt={activeTabItem.label} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '4px', boxShadow: '0 10px 35px rgba(0, 0, 0, 0.5)' }} />
                 )}
                 {activeTabItem.type === 'video' && (
-                  <video src={activeTabItem.url} className="game-media-item video" autoPlay loop muted controls />
+                  <video src={activeTabItem.url} className="game-media-item video" autoPlay loop muted controls style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '4px', boxShadow: '0 10px 35px rgba(0, 0, 0, 0.5)' }} />
                 )}
                 {activeTabItem.type === 'pdf' && (
-                  <iframe src={activeTabItem.url} className="game-media-item pdf" title={activeTabItem.label} />
+                  <iframe src={activeTabItem.url} className="game-media-item pdf" title={activeTabItem.label} style={{ width: '100%', height: '100%', background: 'white', border: 'none', borderRadius: '4px', boxShadow: '0 10px 35px rgba(0, 0, 0, 0.5)' }} />
                 )}
-              </div>
+              </Flex>
             )
           )}
-        </div>
-      </div>
-    </div>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
   )
 }

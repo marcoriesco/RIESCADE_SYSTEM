@@ -1,10 +1,7 @@
 @use "./fonts";
 @use "./header";
 @use "./footer";
-@use "./components";
 @use "./menu";
-@use "./overlays";
-@use "./themes";
 
 
 $theme-color: #9f0043;
@@ -61,4 +58,25 @@ body {
 
 .hide {
   display: none !important;
+}
+
+// CUSTOM SCROLLBAR
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--theme-color);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Dialog, Box, Flex, Heading, Text, Button, Badge } from '@radix-ui/themes'
+import { Dialog, Box, Flex, Heading, Text, Button, Badge, Spinner } from '@radix-ui/themes'
 
 interface NetplayRoom {
   isLan: boolean
@@ -214,7 +214,7 @@ export const NetplayLobbyOverlay: React.FC<NetplayLobbyOverlayProps> = ({
 
         {loading ? (
           <Flex direction="column" align="center" justify="center" p="6" gap="3" style={{ flexGrow: 1 }}>
-            <Box className="netplay-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+            <Spinner size="3" />
             <Text size="2" color="gray">{t('SEARCHING NETPLAY GAMES...')}</Text>
           </Flex>
         ) : groupedRooms.length === 0 ? (

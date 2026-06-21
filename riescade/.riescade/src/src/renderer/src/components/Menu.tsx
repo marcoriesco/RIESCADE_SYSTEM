@@ -11,7 +11,9 @@ import {
   Flex,
   Box,
   Heading,
-  Text
+  Text,
+  Spinner,
+  Progress
 } from '@radix-ui/themes'
 import { WebThemeRenderer } from './theme/WebThemeRenderer'
 import { InputConfigOverlay } from './InputConfigOverlay'
@@ -178,6 +180,7 @@ interface MenuProps {
   onOpenNetplayLobby?: () => void
   onCreateImageCache?: () => void
   onCreateThemeAssetsCache?: () => void
+  onSettingChange?: (name: string, value: any) => void
 }
 
 const getGamepadGuid = (pad: Gamepad): string => {
@@ -204,7 +207,20 @@ const isGameSystem = (s: any) => {
   return allowedHardware.includes(hw)
 }
 
-export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, allSystems = [], selectedSystem, onUpdateGamelists, settings: initialSettings, onOpenNetplayLobby, onCreateImageCache, onCreateThemeAssetsCache }) => {
+export const Menu: React.FC<MenuProps> = ({
+  isOpen,
+  onClose,
+  theme,
+  themeData,
+  allSystems = [],
+  selectedSystem,
+  onUpdateGamelists,
+  settings: initialSettings,
+  onOpenNetplayLobby,
+  onCreateImageCache,
+  onCreateThemeAssetsCache,
+  onSettingChange
+}) => {
   const [settings, setSettings] = useState<Record<string, any>>(initialSettings || {})
 
   useEffect(() => {
@@ -451,6 +467,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
   }
 
   const updateSetting = (name: string, value: any) => {
+    onSettingChange?.(name, value)
     if (name === 'bios_view_mode_temp') {
       setBiosViewMode(value as 'installed' | 'all')
       return
@@ -2864,7 +2881,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               handleSelect(item, -1)
             }}
           >
-            ◁
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 4L9 11L4.5 7.5L9 4Z" fill="currentColor"></path></svg>
           </Button>
           <Text size="2">{label}</Text>
           <Button 
@@ -2875,7 +2892,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               handleSelect(item, 1)
             }}
           >
-            ▷
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 11L6 4L10.5 7.5L6 11Z" fill="currentColor"></path></svg>
           </Button>
         </Flex>
       )
@@ -2956,7 +2973,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
         }
       }
 
-      return <Text size="3" className="riescade-menu-arrow">›</Text>
+      return <Text size="3" className="riescade-menu-arrow"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg></Text>
     }
     return null
   }
@@ -3182,7 +3199,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           <Flex direction="column" align="center" gap="3">
             <Heading size="3">{t('SCANNING BLUETOOTH')}</Heading>
             <Text size="2" color="gray">{t('Searching for devices...')}</Text>
-            <Box className="riescade-modal-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+            <Spinner size="3" />
             <Button
               onClick={() => {
                 if (bluetoothScanTimeoutRef.current) {
@@ -3268,7 +3285,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
           <Box mb="4" style={{ maxHeight: '300px', overflowY: 'auto' }}>
             {updateState.status === 'checking' && (
               <Flex direction="column" align="center" gap="3" p="4">
-                <Box className="riescade-modal-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+                <Spinner size="3" />
                 <Text>{t('Checking for updates...')}</Text>
               </Flex>
             )}
@@ -3310,10 +3327,8 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
               <Flex direction="column" align="center" gap="3" p="4">
                 {updateState.percent !== undefined ? (
                   <Box style={{ width: '100%', maxWidth: '400px' }}>
-                    <Box style={{ height: '14px', borderRadius: '7px', background: 'rgba(255, 255, 255, 0.1)', overflow: 'hidden', marginBottom: '10px' }}>
-                      <Box style={{ width: `${updateState.percent}%`, height: '100%', background: 'var(--theme-color)', borderRadius: '6px', transition: 'width 0.2s ease-out' }} />
-                    </Box>
-                    <Flex justify="between" align="center">
+                    <Progress value={updateState.percent} style={{ height: '8px' }} />
+                    <Flex justify="between" align="center" mt="1">
                       <Text weight="bold" style={{ color: 'var(--theme-color)' }}>{updateState.percent}%</Text>
                       {updateState.downloadedBytes !== undefined && updateState.totalBytes !== undefined && (
                         <Text size="1" style={{ opacity: 0.6 }}>
@@ -3323,7 +3338,7 @@ export const Menu: React.FC<MenuProps> = ({ isOpen, onClose, theme, themeData, a
                     </Flex>
                   </Box>
                 ) : (
-                  <Box className="riescade-modal-spinner" style={{ borderColor: 'var(--theme-color)', borderTopColor: 'transparent' }} />
+                  <Spinner size="3" />
                 )}
                 <Text weight="bold">{t('Downloading and extracting update files...')}</Text>
                 <Text size="1" style={{ opacity: 0.7, marginTop: '10px' }}>
