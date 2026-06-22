@@ -249,23 +249,28 @@ You can access nested properties using dots.
 
 ## Custom HTML Elements
 
-Our engine provides special tags that you can use in your `system.html` and `gamelist.html` files. These elements are highly optimized and handle all input and logic automatically.
+Our engine provides special tags that you can use in your `system.html` and `gamelist.html` files. These elements are highly optimized and handle all input, scrolling, and logic automatically.
 
-### `<riescade-system-carousel />`
-Used in `system.html` to display the list of systems.
-- `type`: Either `horizontal` (default) or `vertical`.
-- `itemWidth` / `itemHeight`: Dimensions of each system logo/item.
-- `gap`: Spacing between items.
-- `logoScale`: Scale of the logo when not selected (e.g., `0.8`).
-- `logoSelectedScale`: Scale of the logo when selected (e.g., `1.2`).
-- `itemsCount`: Number of items to keep in DOM (for performance).
+### `<riescade-systems />`
+Used in `system.html` to display the list of game systems.
+- `mode`: Layout mode. Use `"carousel"` (default) for a sliding carousel, or omit/set to `"grid"` to render a static grid of systems.
+- `item-class`: Custom CSS class applied to each system card/tile (e.g., `item-class="riescade-carousel-item"`).
+- `media-source`: Relative directory to fetch system logo assets (e.g., `./assets/logos` or `"theme"`).
+- `type`: Orientation in carousel mode, either `horizontal` (default) or `vertical`.
+- `logo-scale` / `logo-selected-scale`: Scales of the unselected/selected system logo respectively.
+- `gap`: Space between items in pixels.
+- `items-count`: Maximum number of carousel items to render simultaneously for rendering performance.
 
-### `<riescade-game-carousel />`
-Used in `gamelist.html` to display a carousel of games.
-- Supports the same attributes as the system carousel.
-- `media-source`: Which media type to display (`marquee`, `wheel`, `image`, `thumbnail`).
-- `itemMarquee`: If `true`, uses the marquee/wheel image as the primary asset.
-- `itemBackground`: If `true`, shows a background box behind the asset.
+### `<riescade-gamelists />`
+Used in `gamelist.html` to display the list of games.
+- `mode`: Layout mode. Use `"carousel"` for vertical/horizontal list carousel, or omit/set to `"grid"` to render a multi-column responsive grid.
+- `item-class`: Custom CSS class applied to each game card/tile (e.g., `item-class="gamelist-grid-item"`).
+- `media-source`: Which game metadata media to render on the card (`marquee` / `wheel` for logos, `thumbnail` for boxart, `image` for screenshots).
+- `direction` / `type`: Orientation of carousel mode (`horizontal` or `vertical`).
+- `items-count`: Maximum number of items visible.
+- `item-marquee`: If `true`, enforces using the marquee/wheel image as the primary asset.
+- `item-background`: If `true`, exposes a `--item-art` CSS custom property containing the path to the game's image/fanart for background card styling.
+- `gap` / `item-width` / `item-height`: Layout dimensions in pixels.
 
 ### `<riescade-gamelist />`
 Used in `gamelist.html` to display a classic vertical text list of games.
