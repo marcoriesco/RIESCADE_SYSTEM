@@ -191,9 +191,10 @@ $menu-transition: background-color 0.15s ease;
 
 // ─── Submenu Count Badge ───────────────────────────────────────
 .riescade-menu-badge {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   padding: 2px 8px;
-  border-radius: 10px;
+  color: #fff;
+  border-radius: 4px;
 }
 
 // ─── Submenu Arrow ─────────────────────────────────────────────

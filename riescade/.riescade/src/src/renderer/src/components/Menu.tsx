@@ -1060,8 +1060,10 @@ export const Menu: React.FC<MenuProps> = ({
         let currentValues = values.filter(v => v !== 'none')
         
         // Special logic for VisibleSystems/ScraperSystems: if empty, it means ALL are selected
-        if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && values.length === 0) {
+        if (item.settingName === 'VisibleSystems' && values.length === 0) {
           currentValues = allSystems.map((s: any) => s.name)
+        } else if (item.settingName === 'ScraperSystems' && values.length === 0) {
+          currentValues = selectedSystem ? [selectedSystem.name] : []
         }
 
         const isSelected = currentValues.includes(item.value)
@@ -2484,14 +2486,6 @@ export const Menu: React.FC<MenuProps> = ({
               ]
             },
             { 
-              id: 'find_netplay_achievements_action', 
-              label: t('FIND ALL GAMES WITH NETPLAY/ACHIEVEMENTS'), 
-              type: 'action', 
-              onClick: () => {
-                alert(t('Scanning games database for achievements and netplay compatibility.'))
-              } 
-            },
-            { 
               id: 'clear_caches_action', 
               label: t('CLEAR CACHE AND DATABASE'), 
               type: 'action',
@@ -2865,8 +2859,10 @@ export const Menu: React.FC<MenuProps> = ({
         } else {
           const values = String(currentSettingVal || '').split(',').filter(v => v.trim() !== '')
           
-          if ((item.settingName === 'VisibleSystems' || item.settingName === 'ScraperSystems') && values.length === 0) {
+          if (item.settingName === 'VisibleSystems' && values.length === 0) {
             isOn = true // Default to all selected
+          } else if (item.settingName === 'ScraperSystems' && values.length === 0) {
+            isOn = false
           } else {
             isOn = values.includes(item.value)
           }
@@ -2992,10 +2988,10 @@ export const Menu: React.FC<MenuProps> = ({
         if (selectedCount > 0) {
           return (
             <Flex align="center" gap="2">
-              <Text size="1" color="indigo" weight="bold" className="riescade-menu-badge">
+              <Text size="2" color="pink" weight="bold" className="riescade-menu-badge">
                 {selectedCount} {t('SELECTED')}
               </Text>
-              <Text size="3" color="gray">›</Text>
+              <Text size="3" color="gray"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg></Text>
             </Flex>
           )
         }

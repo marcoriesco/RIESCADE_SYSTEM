@@ -761,16 +761,14 @@ export const InputConfigOverlay: React.FC<Props> = ({ isOpen, onClose }) => {
                 color={doneSelection === 'ok' && phase === 'done' ? undefined : 'gray'}
                 disabled={phase !== 'done'}
                 onClick={saveAndExit}
-                style={{ flex: 1 }}
               >
-                OK
+                CONFIRM
               </Button>
               <Button
                 variant={doneSelection === 'cancel' && phase === 'done' ? 'solid' : 'soft'}
                 color={doneSelection === 'cancel' && phase === 'done' ? undefined : 'gray'}
                 disabled={phase !== 'done'}
                 onClick={onClose}
-                style={{ flex: 1 }}
               >
                 CANCEL
               </Button>

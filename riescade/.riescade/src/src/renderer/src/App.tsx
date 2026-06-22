@@ -2845,19 +2845,21 @@ function App() {
 								size="1"
 								style={{
 									padding: '10px 18px',
-									minWidth: '280px',
-									maxWidth: '500px',
+									width: 'auto',
+									maxWidth: '90vw',
 									pointerEvents: 'auto',
 								}}
 							>
 								<Flex align="center" gap="3" style={{ width: '100%' }}>
-									<Spinner size="2" />
+									<Box style={{ color: 'var(--theme-color)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+										<Spinner size="2" />
+									</Box>
 									<Flex direction="column" gap="0">
 										<Text size="2" weight="bold" style={{ color: 'var(--theme-color)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
 											PROCURANDO MÍDIAS {bulkScrapeStatus.current}/{bulkScrapeStatus.total}
 										</Text>
-										<Text size="1" style={{ opacity: 0.7, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
-											<Text size="1" weight="bold" style={{ color: 'var(--theme-color)' }}>{bulkScrapeStatus.systemCode}</Text>: {bulkScrapeStatus.gameName}
+										<Text size="1" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
+											<Text size="1" weight="bold" style={{ opacity: 0.7, color: 'white' }}>{bulkScrapeStatus.systemCode}</Text>: {bulkScrapeStatus.gameName}
 										</Text>
 									</Flex>
 								</Flex>
