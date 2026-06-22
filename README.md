@@ -12,22 +12,30 @@ O repositório é organizado para manter uma estrutura portátil e fácil de imp
 RIESCADE_SYSTEM/               # Raiz do sistema (portátil)
 ├── RIESCADE.exe               # Inicializador compilado principal (executável portátil)
 ├── README.md                  # Este arquivo de documentação
-├── bios/                      # Diretório para BIOS de emuladores
-├── roms/                      # Diretório para jogos (ROMs)
-├── saves/                     # Diretório para salvamentos de jogos
+├── bios/                      # BIOS de emuladores
+├── cheats/                    # Trapaças/Cheats
+├── decorations/               # Molduras/Bezels para emuladores
+├── emulators/                 # Emuladores e RetroArch
+├── roms/                      # Jogos (ROMs) organizados por console
+├── saves/                     # Salvamentos de jogos
 ├── screenshots/               # Capturas de tela dos jogos
-├── emulators/                 # Emuladores autónomos e retroarch
-├── riescade/                  # Pasta do frontend e utilitários
-│   ├── .riescade/             # Binários e configurações do Frontend Electron
-│   │   ├── configs/           # Arquivos de configurações do sistema (ex: systems.json)
-│   │   ├── logs/              # Logs de execução (gerados em runtime, vazios no release)
-│   │   └── src/               # Código-fonte do Frontend (Electron + React + TS)
-│   ├── launcher/              # Binários do lançador de emuladores
-│   │   ├── emulatorLauncher.exe   # Lançador compilado
-│   │   ├── src/               # Código-fonte do Emulator Launcher (C# .NET)
-│   │   └── *.dll              # Dependências do lançador (SDL, SharpDX, etc.)
-│   └── updater/               # Atualizador do sistema
-│       └── RIESCADEUpdater.exe    # Executável do atualizador
+├── system/                    # Arquivos e scripts do sistema
+└── riescade/                  # Pasta do frontend e utilitários
+    ├── emulationstation.exe   # Executável do EmulationStation original
+    ├── emulatorLauncher.exe   # Lançador de emuladores precompilado
+    ├── themes/                # Pastas dos temas (ex: switch2)
+    ├── collections/           # Coleções customizadas
+    ├── music/                 # Músicas de fundo
+    ├── videos/                # Vídeos do sistema
+    ├── .emulationstation/     # Configurações do EmulationStation (es_systems.cfg)
+    └── .riescade/             # Core do Frontend Electron
+        ├── RIESCADE.exe       # Binário executável do Frontend Electron
+        ├── riescade.db        # Banco de dados SQLite persistente
+        ├── locales/           # Arquivos de idioma do Frontend
+        └── src/               # Código-fonte do Frontend (Electron + React + TS)
+            ├── package.json   # Dependências e scripts npm
+            ├── src/           # Códigos TypeScript (main, preload, renderer)
+            └── out/           # Diretório compilado final (gerado no build)
 ```
 
 ---
@@ -62,27 +70,6 @@ O código-fonte do frontend está localizado em [riescade/.riescade/src](file://
    ```bash
    npm run release
    ```
-
----
-
-### 2. Emulator Launcher (C# .NET)
-
-O código-fonte do lançador de emuladores está localizado em [riescade/launcher/src](file:///c:/tmp/RIESCADE_SYSTEM/riescade/launcher/src). Ele gerencia a inicialização dos emuladores e mapeamento de controles.
-
-#### Pré-requisitos
-- **MSBuild.exe** instalado (Geralmente incluído no .NET Framework v4.0+, disponível em `C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe`).
-
-#### Passos para compilação:
-1. Abra o prompt de comando (CMD) na pasta do código-fonte do launcher:
-   ```cmd
-   cd riescade\launcher\src
-   ```
-2. Execute o arquivo de lote para iniciar a compilação via MSBuild:
-   ```cmd
-   build.bat
-   ```
-3. O script irá restaurar os compiladores necessários e compilar a solução C#. Após o término da compilação com sucesso, ele copiará automaticamente o `emulatorLauncher.exe` e as DLLs de dependência atualizadas para a pasta pai `riescade/launcher/`.
-
 ---
 
 ## ⚙️ Funcionamento das Rotas e Portabilidade
