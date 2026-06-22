@@ -2326,7 +2326,6 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
                         <Text size="2" color={isSelected ? undefined : "gray"}>
                           {field.key === 'releasedate' ? formatDateForDisplay(val) : (field.type === 'rating' ? getStarsString(val) : val)}
                         </Text>
-                        <span className="riescade-menu-arrow">›</span>
                       </Flex>
                     )}
                   </Box>
@@ -2381,7 +2380,7 @@ export const GameOptionsOverlay: React.FC<GameOptionsProps> = ({
       <Dialog.Root open={isOpen && scraperStage === 0} onOpenChange={(open) => { if (!open) onClose(); }}>
         <Dialog.Content 
           size={showMetadataEditor ? "4" : "3"}
-          className="riescade-menu"
+          className={`riescade-menu ${showMetadataEditor && 'riescade-menu-metadata'}`}
           style={{ maxWidth: showMetadataEditor ? '850px' : '600px' }}
         >
           {showMetadataEditor ? (

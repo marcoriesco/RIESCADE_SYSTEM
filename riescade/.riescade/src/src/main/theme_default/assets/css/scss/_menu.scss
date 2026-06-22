@@ -335,3 +335,13 @@ $menu-transition: background-color 0.15s ease;
   text-overflow: ellipsis;
   max-width: 100%;
 }
+
+// METADATA HACK
+.riescade-menu-metadata {
+  .riescade-menu-item-value {
+    max-width: 70%;
+  }
+  .riescade-menu-item-content {
+    max-width: 30%;
+  }
+}

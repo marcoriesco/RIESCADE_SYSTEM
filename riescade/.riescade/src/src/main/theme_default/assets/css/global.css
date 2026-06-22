@@ -552,6 +552,13 @@
   max-width: 100%;
 }
 
+.riescade-menu-metadata .riescade-menu-item-value {
+  max-width: 70%;
+}
+.riescade-menu-metadata .riescade-menu-item-content {
+  max-width: 30%;
+}
+
 :root {
   --theme-color: #9f0043;
   --text-primary: #ffffff;

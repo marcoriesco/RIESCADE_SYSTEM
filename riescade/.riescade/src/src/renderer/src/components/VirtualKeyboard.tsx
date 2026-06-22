@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Dialog } from '@radix-ui/themes'
+import { Dialog, Heading, TextField, Grid, Button, Flex } from '@radix-ui/themes'
 
 interface VirtualKeyboardProps {
   isOpen: boolean
@@ -152,156 +152,233 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
     <>
       <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
         <Dialog.Content 
-          className="riescade-menu riescade-osk-container"
+          className="riescade-menu riescade-menu-osk"
           style={{
             maxWidth: '1000px',
             width: '95%',
           }}
         >
-          <h3 className="riescade-osk-title">{title}</h3>
-        
-        <div className="riescade-osk-input-wrapper">
-          <input 
-            type={isPassword ? 'password' : 'text'}
-            className="riescade-osk-input"
-            value={val}
-            readOnly
-          />
-          <span className="riescade-osk-cursor">|</span>
-        </div>
-
-        <div className="riescade-osk-grid">
-          {/* Row 0 */}
-          {gridMapping[0].map((k, idx) => (
-            <div
-              key={`row0-${idx}`}
-              className={`riescade-osk-key ${activeKeyId === k && gridPos.row === 0 && gridPos.col === idx ? 'selected' : ''}`}
-              onClick={() => handleKeyPress(k)}
+          <Flex className='riescade-menu-header' direction="column" align="stretch" gap="4" p="2">
+            <Heading className='riescade-menu-title' align="center" size="4">
+              {title}
+            </Heading>
+          
+            <TextField.Root 
+              type={isPassword ? 'password' : 'text'}
+              value={val}
+              readOnly
+              size="3"
+              style={{
+                fontSize: '1.7rem',
+                fontWeight: 500,
+              }}
             >
-              {getKeyDisplay(k, layout)}
-            </div>
-          ))}
+              <TextField.Slot side="right">
+                <span className="riescade-osk-cursor">|</span>
+              </TextField.Slot>
+            </TextField.Root>
 
-          {/* Row 1 */}
-          {gridMapping[1].slice(0, 12).map((k, idx) => (
-            <div
-              key={`row1-${idx}`}
-              className={`riescade-osk-key ${activeKeyId === k && gridPos.row === 1 && gridPos.col === idx ? 'selected' : ''}`}
-              onClick={() => handleKeyPress(k)}
-            >
-              {getKeyDisplay(k, layout)}
-            </div>
-          ))}
-          {/* Spanned OK key */}
-          <div
-            className={`riescade-osk-key ok-key ${activeKeyId === 'OK' ? 'selected' : ''}`}
-            onClick={() => handleKeyPress('OK')}
-          >
-            {getKeyDisplay('OK', layout)}
-          </div>
+            <Grid columns="13" gap="2">
+              {/* Row 0 */}
+              {gridMapping[0].map((k, idx) => {
+                const isSelected = activeKeyId === k && gridPos.row === 0 && gridPos.col === idx
+                return (
+                  <Button
+                    key={`row0-${idx}`}
+                    size="3"
+                    className={`riescade-osk-button ${isSelected ? 'selected' : ''}`}
+                    variant={isSelected ? "solid" : "soft"}
+                    color={isSelected ? undefined : "gray"}
+                    onClick={() => handleKeyPress(k)}
+                    style={{
+                      height: '48px',
+                      fontSize: '1.25rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {getKeyDisplay(k, layout)}
+                  </Button>
+                )
+              })}
 
-          {/* Row 2 */}
-          {gridMapping[2].slice(0, 12).map((k, idx) => (
-            <div
-              key={`row2-${idx}`}
-              className={`riescade-osk-key ${activeKeyId === k && gridPos.row === 2 && gridPos.col === idx ? 'selected' : ''}`}
-              onClick={() => handleKeyPress(k)}
-            >
-              {getKeyDisplay(k, layout)}
-            </div>
-          ))}
+              {/* Row 1 */}
+              {gridMapping[1].slice(0, 12).map((k, idx) => {
+                const isSelected = activeKeyId === k && gridPos.row === 1 && gridPos.col === idx
+                return (
+                  <Button
+                    key={`row1-${idx}`}
+                    size="3"
+                    className={`riescade-osk-button ${isSelected ? 'selected' : ''}`}
+                    variant={isSelected ? "solid" : "soft"}
+                    color={isSelected ? undefined : "gray"}
+                    onClick={() => handleKeyPress(k)}
+                    style={{
+                      height: '48px',
+                      fontSize: '1.25rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {getKeyDisplay(k, layout)}
+                  </Button>
+                )
+              })}
+              {/* Spanned OK key */}
+              <Button
+                className={`riescade-osk-button ${activeKeyId === 'OK' ? 'selected' : ''}`}
+                size="3"
+                variant={activeKeyId === 'OK' ? "solid" : "soft"}
+                color={activeKeyId === 'OK' ? undefined : "gray"}
+                onClick={() => handleKeyPress('OK')}
+                style={{
+                  gridColumn: '13',
+                  gridRow: 'span 2',
+                  height: '104px',
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {getKeyDisplay('OK', layout)}
+              </Button>
 
-          {/* Row 3 */}
-          {gridMapping[3].slice(0, 11).map((k, idx) => (
-            <div
-              key={`row3-${idx}`}
-              className={`riescade-osk-key ${activeKeyId === k && gridPos.row === 3 && gridPos.col === idx ? 'selected' : ''}`}
-              onClick={() => handleKeyPress(k)}
-            >
-              {getKeyDisplay(k, layout)}
-            </div>
-          ))}
-          {/* Spanned ... key */}
-          <div
-            className={`riescade-osk-key span-2 ${activeKeyId === '...' ? 'selected' : ''}`}
-            onClick={() => handleKeyPress('...')}
-          >
-            {getKeyDisplay('...', layout)}
-          </div>
+              {/* Row 2 */}
+              {gridMapping[2].slice(0, 12).map((k, idx) => {
+                const isSelected = activeKeyId === k && gridPos.row === 2 && gridPos.col === idx
+                return (
+                  <Button
+                    key={`row2-${idx}`}
+                    size="3"
+                    className={`riescade-osk-button ${isSelected ? 'selected' : ''}`}
+                    variant={isSelected ? "solid" : "soft"}
+                    color={isSelected ? undefined : "gray"}
+                    onClick={() => handleKeyPress(k)}
+                    style={{
+                      height: '48px',
+                      fontSize: '1.25rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {getKeyDisplay(k, layout)}
+                  </Button>
+                )
+              })}
 
-          {/* Row 4 */}
-          <div
-            className={`riescade-osk-key span-2 ${activeKeyId === 'SHIFT' ? 'selected' : ''}`}
-            onClick={() => handleKeyPress('SHIFT')}
-          >
-            {getKeyDisplay('SHIFT', layout)}
-          </div>
-          <div
-            className={`riescade-osk-key span-6 ${activeKeyId === 'SPACE' ? 'selected' : ''}`}
-            onClick={() => handleKeyPress('SPACE')}
-          >
-            {getKeyDisplay('SPACE', layout)}
-          </div>
-          <div
-            className={`riescade-osk-key span-2 ${activeKeyId === 'RESET' ? 'selected' : ''}`}
-            onClick={() => handleKeyPress('RESET')}
-          >
-            {getKeyDisplay('RESET', layout)}
-          </div>
-          <div
-            className={`riescade-osk-key span-3 ${activeKeyId === 'CANCEL' ? 'selected' : ''}`}
-            onClick={() => handleKeyPress('CANCEL')}
-          >
-            {getKeyDisplay('CANCEL', layout)}
-          </div>
-        </div>
-      </Dialog.Content>
-    </Dialog.Root>
+              {/* Row 3 */}
+              {gridMapping[3].slice(0, 11).map((k, idx) => {
+                const isSelected = activeKeyId === k && gridPos.row === 3 && gridPos.col === idx
+                return (
+                  <Button
+                    key={`row3-${idx}`}
+                    size="3"
+                    className={`riescade-osk-button ${isSelected ? 'selected' : ''}`}
+                    variant={isSelected ? "solid" : "soft"}
+                    color={isSelected ? undefined : "gray"}
+                    onClick={() => handleKeyPress(k)}
+                    style={{
+                      height: '48px',
+                      fontSize: '1.25rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {getKeyDisplay(k, layout)}
+                  </Button>
+                )
+              })}
+              {/* Spanned ... key */}
+              <Button
+                className={`riescade-osk-button ${activeKeyId === '...' ? 'selected' : ''}`}
+                size="3"
+                variant={activeKeyId === '...' ? "solid" : "soft"}
+                color={activeKeyId === '...' ? undefined : "gray"}
+                onClick={() => handleKeyPress('...')}
+                style={{
+                  gridColumn: 'span 2',
+                  height: '48px',
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {getKeyDisplay('...', layout)}
+              </Button>
 
-    <style>{`
-      .riescade-osk-container {
-          background: #11141a;
-          border: 2px solid #333;
-          border-radius: 8px;
-          width: 960px;
-          padding: 25px 35px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95);
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        .riescade-osk-title {
-          color: var(--theme-color, #ff0055);
-          font-size: 1.5rem;
-          font-weight: bold;
-          text-align: center;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          margin: 0;
-        }
-        .riescade-osk-input-wrapper {
-          background: #fff;
-          border-radius: 4px;
-          padding: 10px 18px;
-          display: flex;
-          align-items: center;
-          border: 2px solid #555;
-          position: relative;
-        }
-        .riescade-osk-input {
-          width: 100%;
-          border: none;
-          background: transparent;
-          color: #000;
-          font-size: 1.7rem;
-          font-family: inherit;
-          outline: none;
-          padding: 0;
-          margin: 0;
-          font-weight: 500;
-        }
+              {/* Row 4 */}
+              <Button
+                className={`riescade-osk-button ${activeKeyId === 'SHIFT' ? 'selected' : ''}`}
+                size="3"
+                variant={activeKeyId === 'SHIFT' ? "solid" : "soft"}
+                color={activeKeyId === 'SHIFT' ? undefined : "gray"}
+                onClick={() => handleKeyPress('SHIFT')}
+                style={{
+                  gridColumn: 'span 2',
+                  height: '48px',
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {getKeyDisplay('SHIFT', layout)}
+              </Button>
+              <Button
+                className={`riescade-osk-button ${activeKeyId === 'SPACE' ? 'selected' : ''}`}
+                size="3"
+                variant={activeKeyId === 'SPACE' ? "solid" : "soft"}
+                color={activeKeyId === 'SPACE' ? undefined : "gray"}
+                onClick={() => handleKeyPress('SPACE')}
+                style={{
+                  gridColumn: 'span 6',
+                  height: '48px',
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {getKeyDisplay('SPACE', layout)}
+              </Button>
+              <Button
+                className={`riescade-osk-button ${activeKeyId === 'RESET' ? 'selected' : ''}`}
+                size="3"
+                variant={activeKeyId === 'RESET' ? "solid" : "soft"}
+                color={activeKeyId === 'RESET' ? undefined : "gray"}
+                onClick={() => handleKeyPress('RESET')}
+                style={{
+                  gridColumn: 'span 2',
+                  height: '48px',
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {getKeyDisplay('RESET', layout)}
+              </Button>
+              <Button
+                className={`riescade-osk-button ${activeKeyId === 'CANCEL' ? 'selected' : ''}`}
+                size="3"
+                variant={activeKeyId === 'CANCEL' ? "solid" : "soft"}
+                color={activeKeyId === 'CANCEL' ? undefined : "gray"}
+                onClick={() => handleKeyPress('CANCEL')}
+                style={{
+                  gridColumn: 'span 3',
+                  height: '48px',
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {getKeyDisplay('CANCEL', layout)}
+              </Button>
+            </Grid>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+
+      <style>{`
         .riescade-osk-cursor {
-          color: #ff0055;
+          color: var(--theme-color, #ff0055);
           font-size: 1.7rem;
           font-weight: bold;
           animation: osk-blink 0.8s infinite;
@@ -311,51 +388,15 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
           0%, 100% { opacity: 0; }
           50% { opacity: 1; }
         }
-        .riescade-osk-grid {
-          display: grid;
-          grid-template-columns: repeat(13, 1fr);
-          gap: 7px;
+        .riescade-osk-button {
+          transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
-        .riescade-osk-key {
-          background: #191c24;
-          border: 1px solid #2e3440;
-          border-radius: 4px;
-          color: #d8dee9;
-          font-size: 1.25rem;
-          height: 48px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          font-weight: bold;
-          user-select: none;
-          transition: all 0.1s ease;
-        }
-        .riescade-osk-key:hover, .riescade-osk-key.selected {
-          background: #fff;
-          color: #000;
-          border-color: #fff;
-          transform: scale(1.04);
-          box-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
-        }
-        .riescade-osk-key.ok-key {
-          grid-column: 13;
-          grid-row: span 2;
-          height: 103px;
-          background: #2b303c;
-        }
-        .riescade-osk-key.span-2 {
-          grid-column: span 2;
-        }
-        .riescade-osk-key.span-6 {
-          grid-column: span 6;
-        }
-        .riescade-osk-key.span-3 {
-          grid-column: span 3;
-        }
-        @keyframes osk-fade-in {
-          from { opacity: 0; transform: scale(0.97); }
-          to { opacity: 1; transform: scale(1); }
+        .riescade-osk-button:hover,
+        .riescade-osk-button.selected {
+          transform: scale(1.04) !important;
+          box-shadow: 0 0 12px var(--theme-color, #ff0055) !important;
+          background-color: var(--theme-color, #ff0055) !important;
+          color: #fff !important;
         }
       `}</style>
     </>
