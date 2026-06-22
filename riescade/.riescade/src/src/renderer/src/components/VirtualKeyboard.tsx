@@ -394,8 +394,8 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
         .riescade-osk-button:hover,
         .riescade-osk-button.selected {
           transform: scale(1.04) !important;
-          box-shadow: 0 0 12px var(--theme-color, #ff0055) !important;
-          background-color: var(--theme-color, #ff0055) !important;
+          box-shadow: 0 0 12px var(--theme-color) !important;
+          background-color: var(--theme-color) !important;
           color: #fff !important;
         }
       `}</style>
