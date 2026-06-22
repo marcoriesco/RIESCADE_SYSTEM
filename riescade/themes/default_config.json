@@ -3,8 +3,8 @@
   "controller": "ps4",
   "system_type": "carousel",
   "gamelist_type": "carousel",
-  "gamelist_video": "false",
-  "gamelist_video_delay": "5",
-  "system_video": "false",
+  "gamelist_video": "true",
+  "gamelist_video_delay": "3",
+  "system_video": "true",
   "system_video_delay": "3"
 }

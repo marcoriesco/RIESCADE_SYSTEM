@@ -1,10 +1,18 @@
 <div data-riescade-view="system">
 	<link rel="stylesheet" href="./assets/css/system.css" />
+	<link rel="stylesheet" href="./assets/css/animate.css" />
 
 	<!-- FANART & OVERLAY -->
 	<img class="system-image-fanart" decoding="async" src="./assets/arts/{system:theme}.webp" onerror="this.src = './assets/default.webp'"/>
 	<img class="system-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
 
+	<!-- ANIMATE BACKGROUND -->
+	<div class="system-animate-fanart" data-riescade-key="system">
+		<riescade-system-video class="system-video" autoplay loop delay="{options:system_video_delay}">
+			<source src="./assets/animate/{system:theme}.mp4" />
+		</riescade-system-video>
+	</div>
+	
 	<!-- HEADER GLOBAL -->
 	<div class="riescade-header">
 		<div class="header-left">

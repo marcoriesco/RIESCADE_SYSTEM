@@ -6,11 +6,16 @@
   "templates": {
     "system": {
       "optionId": "system_type",
-      "carousel": "system_carousel.html",
+      "carousel": "system.html",
       "grid": "system_grid.html",
-      "default": "system_carousel.html"
+      "default": "system.html"
     },
-    "gamelist": "gamelist.html",
+    "gamelist": {
+      "optionId": "gamelist_type",
+      "carousel": "gamelist.html",
+      "grid": "gamelist_grid.html",
+      "default": "gamelist.html"
+    },
     "start": "start.html",
     "loading": "loading.html"
   },

@@ -2282,7 +2282,7 @@ function App() {
 					const direction = key.replace('arrow', '') as 'up' | 'down' | 'left' | 'right';
 					const nextIndex = getNextGridIndex(
 						'[data-riescade-grid="system"]',
-						'.riescade-carousel-item',
+						'.riescade-carousel-item, .gamelist-grid-item, .ns2-game',
 						systemIndex,
 						direction
 					);
@@ -2307,7 +2307,7 @@ function App() {
 					const direction = key.replace('arrow', '') as 'up' | 'down' | 'left' | 'right';
 					const nextIndex = getNextGridIndex(
 						'[data-riescade-grid="gamelist"]',
-						'.riescade-carousel-item',
+						'.riescade-carousel-item, .gamelist-grid-item, .ns2-game',
 						selectedGameIndex,
 						direction
 					);

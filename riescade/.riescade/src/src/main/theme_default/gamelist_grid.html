@@ -1,0 +1,154 @@
+<div data-riescade-view="gamelist">
+  <link rel="stylesheet" href="./assets/css/gamelist.css" />
+  <link rel="stylesheet" href="./assets/css/animate.css" />
+
+ 	<!-- FANART & OVERLAY -->
+  <img class="{game:fanart ? 'gamelist-image-fanart' : 'gamelist-image-default' } animate__animated animate__fadeIn" decoding="async" src="{game:fanart}" onerror="this.onerror=null; this.src = './assets/arts/{system:theme}.webp'; this.className = 'gamelist-image-default'" data-riescade-key="game" />
+	<img class="gamelist-image-overlay" decoding="async" src="./assets/overlays/overlay-system.webp" />
+	
+  <!-- GAMEPLAY VIDEO -->
+  <div class="gameplay-video-container" data-riescade-key="game">
+    <riescade-video class="gamelist-video" autoplay loop delay="{options:gamelist_video_delay}">
+      <source src="{game:video}" />
+    </riescade-video>
+  </div>
+
+  <!-- HEADER GLOBAL -->
+  <div class="riescade-header">
+
+    <div class="header-left">
+        <div class="system-name">{system:fullName}</div>
+    </div>
+
+    <div class="header-center centered">
+        <riescade-clock format="HH:mm" />
+    </div>
+
+    <div class="header-right">
+      <div class="user-profile">
+        <span class="user-name">{global.cheevos.username ? {global.cheevos.username} : 'User'}</span>
+				<div class="user-avatar-container">
+					<img class="user-avatar" src="{global.cheevos.username ? 'https://media.retroachievements.org/UserPic/{global.cheevos.username}.png' : './assets/riescade.webp'}"/>
+					<span class="{global.netplay ? 'user-online animate__animated animate__pulse' : 'hide'}"></span>
+				</div>      
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Conteúdo da Gamelist em Grid -->
+  <div class="gamelist-main-content gamelist-grid-layout">
+    <div class="gamelist-left-col">
+      <!-- LOGO DO SISTEMA -->
+      <div class="gamelist-grid-system-logo-container">
+        <img class="gamelist-grid-system-logo" src="./assets/logos/{system:theme}.webp" onerror="this.style.display='none';" />
+        <span class="system-gamecount-badge">({system:gamecount} {t:GAMES_COUNT})</span>
+      </div>
+
+      <!-- CAPA DO JOGO -->
+      <div class="gamelist-thumbnail-container animate__animated animate__fadeInLeft" data-riescade-key="game">
+        <img
+          src="{system:isCollections ? '' : '{game:thumbnail}'}"
+          class="gamelist-thumbnail"
+          onerror="this.className = 'hide'"
+        />
+      </div>
+
+      <!-- METADADOS DO JOGO SELECIONADO -->
+      <div class="gamelist-meta animate__animated animate__fadeIn {system:isCollections ? 'hide' : ''}" data-riescade-key="game">
+        <h2 class="gamelist-meta-title">{game:name}</h2>
+        <div class="gamelist-meta-info">
+          {game:releasedate ? '{game:releasedate:Y}' : ''} {game:developer ? '• {game:developer}' : ''} {game:genre ? '• {game:genre}' : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="gamelist-right-col">
+      <riescade-gamelists
+        class="main-gamelists"
+        item-class="gamelist-grid-item"
+        media-source="marquee"
+      ></riescade-gamelists>
+    </div>
+  </div>
+
+  <!-- FOOTER GLOBAL -->
+  <div class="riescade-footer">
+    <div class="system-meta">
+        <span class="system-meta-name">
+            {system:theme}
+            <span class="system-meta-hardware">[{system:hardwareType}]</span>
+        </span>
+    </div>
+
+    <!-- Helpsystem Customizado -->
+    <div class="helpsystem centered">
+      <div class="helpsystem-html">
+        <div class="help-item">
+          <img src="./assets/helpsystem/{options:controller}/accept.svg" class="help-icon" />
+          <span class="help-label">{t:HELP_PLAY}</span>
+        </div>
+        <div class="help-item">
+          <img src="./assets/helpsystem/{options:controller}/accept.svg" class="help-icon" />
+          <span class="help-label">{t:HELP_OPTIONS}</span>
+        </div>
+        <div class="help-item">
+          <img src="./assets/helpsystem/{options:controller}/back.svg" class="help-icon" />
+          <span class="help-label">{t:HELP_BACK}</span>
+        </div>
+        <div class="help-item">
+          <img src="./assets/helpsystem/{options:controller}/search.svg" class="help-icon" />
+          <span class="help-label">{t:HELP_SEARCH}</span>
+        </div>
+        <div class="help-item">
+          <img src="./assets/helpsystem/{options:controller}/extra.svg" class="help-icon" />
+          <span class="help-label">{t:HELP_SAVE}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="controller-activity">
+        <img src="./assets/indicators/{options:controller}.svg" class="controller-activity-icon" />
+    </div>
+  </div>
+
+  <!-- GAMELIST EMPTY MESSAGE -->
+  <div class="{system:gamecount == '0' ? 'gamelist-empty' : 'hide'}" style="{gamelist:loading ? 'display: none !important;' : ''}">
+    <p>{t:EMPTY_GAMELIST}</p>
+  </div>
+
+  <!-- GAMELIST LOADING OVERLAY -->
+  <div class="gamelist-loading-screen-root" style="{gamelist:loading ? 'display: flex;' : 'display: none;'}">
+
+    <img class="gamelist-loading-bg" src="./assets/arts/{system:theme}.webp" onerror="this.style.display='none';" />
+
+    <div class="gamelist-loading-overlay"></div>
+
+    <div class="gamelist-loading-content">
+      <div class="gamelist-loading-logo-container">
+        <img src="./assets/logos/{system:theme}.webp" onerror="this.style.display='none';" />
+      </div>
+      <h1 class="gamelist-loading-title">{system:fullName}</h1>
+    </div>
+
+    <div class="gamelist-loading-text-row">
+      <span class="gamelist-loading-text">{t:LOADING_GAMELIST}</span>
+      <span class="gamelist-loading-dots">...</span>
+    </div>
+
+    <div class="gamelist-loading-spinner-container">
+      <svg class="gamelist-loading-icon" width="128" height="128" viewBox="0 0 256 256" fill="none">
+        <defs>
+          <linearGradient id="grad_gamelist" x1="40" y1="40" x2="216" y2="216" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="var(--theme-color)"/>
+            <stop offset="100%" stop-color="color-mix(in srgb, var(--theme-color) 30%, black)"/>
+          </linearGradient>
+        </defs>
+        <!-- Shadow / depth -->
+        <circle cx="128" cy="128" r="84" stroke="color-mix(in srgb, var(--theme-color) 15%, black)" stroke-width="24" stroke-linecap="round" stroke-dasharray="440 120" transform="rotate(38 128 128)" opacity="0.45"/>
+        <!-- Main circular loader -->
+        <circle cx="128" cy="128" r="84" stroke="url(#grad_gamelist)" stroke-width="24" stroke-linecap="round" stroke-dasharray="440 120" transform="rotate(38 128 128)"/>
+      </svg>
+    </div>
+  </div>
+</div>
